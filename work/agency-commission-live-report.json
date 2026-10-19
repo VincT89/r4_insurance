@@ -1,0 +1,19 @@
+{
+    "database": "r4_insurance",
+    "migration": "\n   INFO  Running migrations.  \n\r\n  2026_10_16_180000_create_agency_commission_schedules ................................................... 1 sec. DONE\r\n\r\n",
+    "existing_records_unchanged": true,
+    "clients": 50,
+    "policies": 50,
+    "schedules_before": 0,
+    "rates_before": 0,
+    "pages": {
+        "\/suppliers\/1": 200,
+        "\/suppliers\/1\/commissions": 200,
+        "\/suppliers\/1\/commissions\/create": 200,
+        "\/suppliers\/1\/commissions\/1": 200,
+        "\/suppliers\/1\/commissions\/1\/edit": 200
+    },
+    "temporary_records_removed": true,
+    "automatic_commission_calculation_enabled": false,
+    "ok": true
+}

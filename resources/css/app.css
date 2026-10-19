@@ -1,0 +1,32 @@
+@import './sodano/_variables.css';
+@import './sodano/_reset.css';
+@import './sodano/_shell.css';
+@import './sodano/_typography.css';
+@import './sodano/_buttons.css';
+@import './sodano/_components.css';
+@import './sodano/_dropdown.css';
+@import './sodano/_tables.css';
+@import './sodano/_forms.css';
+@import './sodano/_layouts.css';
+@import './sodano/_pages.css';
+@import './sodano/_animations.css';
+@import './sodano/_canvas-bg.css';
+@import './sodano/_auth.css';
+@import './sodano/_utilities.css';
+@import './sodano/_commercial.css';
+@import './sodano/_planning-fields.css';
+@import './sodano/_client-materials.css';
+@import './sodano/_insurance-clients.css';
+
+@import './sodano/_notes.css';
+@import './sodano/_responsive.css';
+@import './sodano/_appearance.css';
+@import './sodano/_imports.css';
+@import './sodano/_table-tools.css';
+@import './sodano/_appearance-hover.css';
+@import './sodano/_workspace.css';
+@import './sodano/_commissions.css';
+@import './sodano/_signing.css';
+@import './sodano/_claims.css';
+
+@font-face { font-family: 'Ubuntu'; src: url('../fonts/Ubuntu-R.ttf') format('truetype'); font-style: normal; font-weight: 400; font-display: swap; }

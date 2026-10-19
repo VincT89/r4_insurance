@@ -1,0 +1,13 @@
+{
+    "admin_unchanged": true,
+    "existing_record_counts_unchanged": true,
+    "agencies_count": 0,
+    "pages": {
+        "\/suppliers": 200,
+        "\/suppliers\/create": 200,
+        "\/clients": 200,
+        "\/dashboard": 200,
+        "\/audit-logs": 200
+    },
+    "pending_migrations": []
+}

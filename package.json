@@ -1,0 +1,44 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "prebuild": "node scripts/prepare-ocr.mjs && node scripts/prepare-excel.mjs",
+        "predev": "node scripts/prepare-excel.mjs",
+        "build": "vite build",
+        "dev": "vite",
+        "pretest:tables": "node scripts/prepare-excel.mjs",
+        "test:tables": "node --test tests/Frontend/table-pagination.test.mjs tests/Frontend/table-workbook.test.mjs tests/Frontend/communication-selection.test.mjs"
+    },
+    "devDependencies": {
+        "alpinejs": "^3.4.2",
+        "autoprefixer": "^10.4.2",
+        "esbuild": "0.28.2",
+        "assert": "2.1.0",
+        "buffer": "6.0.3",
+        "create-hash": "1.2.0",
+        "events": "3.3.0",
+        "process": "0.11.10",
+        "randombytes": "2.1.0",
+        "stream-browserify": "3.0.0",
+        "util": "0.12.5",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^3.0.0",
+        "postcss": "^8.4.31",
+        "vite": "^8.0.0"
+    },
+    "overrides": {
+        "exceljs": {
+            "uuid": "11.1.1"
+        }
+    },
+    "dependencies": {
+        "@tesseract.js-data/ita": "1.0.0",
+        "exceljs": "4.4.0",
+        "jspdf": "4.2.1",
+        "jspdf-autotable": "5.0.9",
+        "lucide": "^1.14.0",
+        "pdfjs-dist": "6.4.299",
+        "tesseract.js": "7.0.0"
+    }
+}

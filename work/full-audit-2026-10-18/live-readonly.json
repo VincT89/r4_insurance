@@ -1,0 +1,95 @@
+{
+    "date": "2026-10-18T18:06:12+02:00",
+    "connection": "mysql",
+    "read_only": true,
+    "counts": {
+        "users": 1,
+        "clients": 50,
+        "insurance_policies": 50,
+        "supplier_agencies": 16,
+        "supplier_companies": 20,
+        "insurance_branches": 34,
+        "insurance_subbranches": 44,
+        "attachments": 0,
+        "insurance_quote_cases": 0,
+        "insurance_quotes": 0,
+        "insurance_titles": 0,
+        "insurance_collections": 0,
+        "insurance_claims": 0,
+        "insurance_claim_activities": 0,
+        "insurance_form_templates": 7,
+        "insurance_form_packages": 0,
+        "agency_commission_schedules": 0,
+        "audit_logs": 8131
+    },
+    "integrity": {
+        "policies_without_client": 0,
+        "policy_vehicle_wrong_client": 0,
+        "policy_asset_wrong_client": 0,
+        "policy_subbranch_wrong_branch": 0,
+        "policy_expiry_before_start": 0,
+        "title_amount_mismatch": 0,
+        "overpaid_titles": 0,
+        "claim_policy_wrong_client": 0,
+        "policy_document_wrong_client": 0
+    },
+    "active_users_by_role": [
+        {
+            "role": "admin",
+            "total": 1
+        }
+    ],
+    "policies_by_status": [
+        {
+            "status": "active",
+            "total": 20
+        },
+        {
+            "status": "cancelled",
+            "total": 5
+        },
+        {
+            "status": "ceased",
+            "total": 5
+        },
+        {
+            "status": "expired",
+            "total": 5
+        },
+        {
+            "status": "renewed",
+            "total": 5
+        },
+        {
+            "status": "replaced",
+            "total": 5
+        },
+        {
+            "status": "suspended",
+            "total": 5
+        }
+    ],
+    "templates_by_status": [
+        {
+            "status": "draft",
+            "total": 2
+        },
+        {
+            "status": "legacy",
+            "total": 5
+        }
+    ],
+    "document_files_missing": 0,
+    "runtime": {
+        "environment": "local",
+        "debug": true,
+        "https_url": false,
+        "session_secure": null,
+        "session_http_only": true,
+        "session_same_site": "lax",
+        "attachments_disk_visibility": null,
+        "public_storage_link": false
+    },
+    "database_version": "10.4.32-MariaDB",
+    "migrations": 171
+}

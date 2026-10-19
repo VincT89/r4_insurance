@@ -1,0 +1,19 @@
+{
+    "read_only": true,
+    "database": "r4_insurance",
+    "pending_migrations": [],
+    "client_count": 0,
+    "policy_count": 0,
+    "vehicle_count": 0,
+    "attachment_count": 0,
+    "pages": {
+        "\/login": 200,
+        "\/dashboard": 200,
+        "\/clients": 200,
+        "\/clients\/create": 200,
+        "\/users": 200,
+        "\/profile": 200,
+        "\/audit-logs": 200
+    },
+    "errors": []
+}

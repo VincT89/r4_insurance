@@ -1,0 +1,7 @@
+.agency-company-options { display: grid; gap: 0.65rem; max-height: 20rem; overflow-y: auto; padding: 0.5rem 0; }
+.form-row > fieldset.form-group { min-width: 0; border: 0; margin: 0; padding: 0; }
+.form-row > fieldset.form-group > legend { font-size: 11px; font-weight: 600; margin-bottom: 6px; }
+.agency-company-options label { display: flex; gap: 0.65rem; align-items: flex-start; cursor: pointer; }
+.agency-company-options input { flex: 0 0 auto; margin-top: 0.2rem; }
+.import-source-name { overflow-wrap: anywhere; margin-top: 0.75rem; }
+.import-review-table td { white-space: normal; min-width: 8rem; max-width: 30rem; overflow-wrap: anywhere; }

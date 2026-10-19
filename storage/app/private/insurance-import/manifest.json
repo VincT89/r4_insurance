@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "batch_key": "6f46a48e3c55a55e7200a6f5d20e6605d8608640f6dae4ddf0ca59f3898571c2",
+  "files": {
+    "summary.json": "d0d565bec59ad9d4dc4ba1c0fb54ce290cd4b166ed343a595c0c977d3e59357f",
+    "clients.json": "56758d11025b06da5796a52b50cd335b60fc07667f5c60362396300a247c56e6",
+    "policies.json": "b783b756c23fcf0158a936b6401a3a92c0725fbf779b0309392e230d5f323150",
+    "issues.json": "20197a6c8425ac454a9026673088504c1ac560595741bfd692cbb595d7812d94",
+    "excluded.json": "e072669122374919c8b2a1be069dbb8821cdaa7285d25eca0e266019ccf7d12e",
+    "repeated-policies.json": "905da650af0bf585dcc918b1afdbcf0a1371f314aff04aac8877007150d404af",
+    "source-rows.jsonl": "88a609c44a28164cc322fa9a76cdc14052790de4dcaa226316866b67a52c3738",
+    "review.xlsx": "5a977ab9c72cce449fb35723ff6a29caf8fa3e013733eb4205585b7981e519e4"
+  }
+}

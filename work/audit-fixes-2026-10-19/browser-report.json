@@ -1,0 +1,82 @@
+{
+  "started": "2026-10-19T06:43:08.618Z",
+  "checks": [
+    {
+      "name": "history-all-from-page-2",
+      "format": "Excel",
+      "rows": 512
+    },
+    {
+      "name": "history-all-from-page-2",
+      "format": "PDF",
+      "rows": 512
+    },
+    {
+      "name": "activities-from-page-2",
+      "format": "Excel",
+      "rows": 12
+    },
+    {
+      "name": "files-from-page-2",
+      "format": "Excel",
+      "rows": 12
+    },
+    {
+      "name": "filtered-history",
+      "format": "Excel",
+      "rows": 511
+    },
+    {
+      "name": "clients-from-page-2",
+      "format": "Excel",
+      "rows": 33
+    },
+    {
+      "name": "simultaneous-policy-edit",
+      "staleSaveBlocked": true,
+      "inputPreserved": true,
+      "reviewAndResave": true
+    },
+    {
+      "name": "employee-permissions-and-retained-history",
+      "deleteHttpStatus": 403,
+      "deleteControlsHidden": true,
+      "profileExplainsRetention": true
+    }
+  ],
+  "layouts": [
+    {
+      "name": "filters-desktop",
+      "viewport": 1440,
+      "body": 1440
+    },
+    {
+      "name": "filters-mobile",
+      "viewport": 390,
+      "body": 390
+    },
+    {
+      "name": "policy-conflict-desktop",
+      "viewport": 1440,
+      "body": 1440
+    },
+    {
+      "name": "policy-conflict-mobile",
+      "viewport": 390,
+      "body": 390
+    },
+    {
+      "name": "profile-history-desktop",
+      "viewport": 1440,
+      "body": 1440
+    },
+    {
+      "name": "profile-history-mobile",
+      "viewport": 390,
+      "body": 390
+    }
+  ],
+  "errors": [],
+  "external": [],
+  "finished": "2026-10-19T06:43:58.111Z"
+}

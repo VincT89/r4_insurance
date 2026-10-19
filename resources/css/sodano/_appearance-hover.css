@@ -1,0 +1,39 @@
+.app-body .sidebar .nav-item:hover {
+  --bg: var(--ap-sidebar-hover);
+  --bg1: var(--ap-sidebar-hover);
+  --bg2: var(--ap-sidebar-hover-soft);
+  --bg3: var(--ap-sidebar-hover-line);
+  --text: var(--ap-sidebar-hover-text);
+  --text1: var(--ap-sidebar-hover-text);
+  --text2: var(--ap-sidebar-hover-muted);
+  --text3: var(--ap-sidebar-hover-muted);
+  --line: var(--ap-sidebar-hover-line);
+  --line2: var(--ap-sidebar-hover-line);
+  --line3: var(--ap-sidebar-hover-border);
+  --accent-text: var(--ap-sidebar-hover-accent);
+  --blue-title: var(--ap-sidebar-hover-heading);
+  --link-hover: var(--ap-sidebar-hover-link-hover);
+  color: var(--text);
+  background: var(--ap-sidebar-hover);
+}
+.app-body :is(.btn-g, .btn-s, .btn-sec, .btn-icon, .tb-btn, .sidebar-toggle):hover {
+  --bg: var(--ap-secondary-hover);
+  --bg1: var(--ap-secondary-hover);
+  --bg2: var(--ap-secondary-hover-soft);
+  --bg3: var(--ap-secondary-hover-line);
+  --text: var(--ap-secondary-hover-text);
+  --text1: var(--ap-secondary-hover-text);
+  --text2: var(--ap-secondary-hover-muted);
+  --text3: var(--ap-secondary-hover-muted);
+  --line: var(--ap-secondary-hover-line);
+  --line2: var(--ap-secondary-hover-line);
+  --line3: var(--ap-secondary-hover-border);
+  --accent-text: var(--ap-secondary-hover-accent);
+  --blue-title: var(--ap-secondary-hover-heading);
+  --link-hover: var(--ap-secondary-hover-link-hover);
+  color: var(--text);
+  background: var(--ap-secondary-hover);
+}
+.app-body a:not(.btn):not(.nav-item):not(.app-brand):not(.btn-icon):hover { color: var(--link-hover); }
+.app-body .btn-p:hover { background: var(--ap-primary-hover); border-color: var(--ap-primary-hover); }
+

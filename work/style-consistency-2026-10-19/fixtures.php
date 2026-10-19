@@ -1,0 +1,25 @@
+<?php
+$root = dirname(__DIR__, 2);
+require $root.'/vendor/autoload.php';
+$app = require $root.'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$db = config('database.connections.sqlite.database');
+if (!app()->environment('testing') || config('database.default') !== 'sqlite' || realpath(dirname($db)) !== realpath($root.'/work/insurance-ui') || !preg_match('/^ui-[0-9]+\.sqlite$/', basename($db))) throw new RuntimeException('Database isolato richiesto.');
+config(['filesystems.disks.attachments.root'=>$root.'/work/insurance-ui/attachments','mail.default'=>'array']);
+$admin = App\Models\User::where('email','ui-test@example.test')->firstOrFail();
+auth()->login($admin);
+$client = App\Models\Client::findOrFail(1);
+$policy = $client->policies()->findOrFail(1);
+$company = $policy->supplierCompany;
+$company->update(['email'=>'preventivi@example.test']);
+$agency = $policy->supplierAgency;
+$agency->companies()->syncWithoutDetaching([$company->id]);
+$claims = app(App\Services\InsuranceClaims::class);
+$claim = $claims->create($admin,$policy,['number'=>'SN-2026-15','event_on'=>today()->toDateString(),'reported_on'=>today()->toDateString(),'description'=>'Danno al veicolo in sosta. Dati di collaudo isolati.','assigned_to'=>$admin->id,'context_hash'=>$claims->context($policy),'request_key'=>(string)Illuminate\Support\Str::uuid(),'activity_label'=>'Richiedere il verbale','activity_due_on'=>today()->addDays(3)->toDateString()],[]);
+$schedule = app(App\Services\AgencyCommissionRegistry::class)->save($agency,$admin,['supplier_company_id'=>$company->id,'valid_from'=>today()->startOfMonth()->toDateString(),'accrual_event'=>null,'entries'=>[['branch_id'=>$policy->insurance_branch_id,'subbranch_id'=>null,'selected'=>1,'basis'=>'net_premium','issue_rate'=>'12.5','renewal_rate'=>'10']]]);
+$forms = app(App\Services\InsuranceForms::class);
+$package = $forms->createPackage($client,$policy,['templates'=>[8],'reason'=>'initial','context_hash'=>$forms->contextHash($client,$policy),'request_key'=>(string)Illuminate\Support\Str::uuid(),'signer_name'=>'Alessandro Varesi','signer_role'=>'Legale rappresentante','place'=>'Napoli','document_date'=>today()->toDateString()]);
+$message = app(App\Services\AgencyEmailWorkflow::class)->prepare($admin,$agency,collect([$policy]),['period'=>'day','date'=>today()->toDateString()],today()->format('d/m/Y'));
+$case = App\Models\InsuranceQuoteCase::findOrFail(1);
+$quoteMessage = app(App\Services\QuoteRequestEmailWorkflow::class)->prepare($case,$admin,['supplier_company_id'=>$company->id,'subject'=>'Richiesta preventivo autovettura','body'=>'Si richiede una proposta per la copertura indicata nella pratica di collaudo.'],[]);
+echo json_encode(['claim'=>$claim->id,'activity'=>$claim->activities()->first()->id,'schedule'=>$schedule->id,'package'=>$package->id,'document'=>$package->documents()->first()->generated->id,'message'=>$message->id,'quote_message'=>$quoteMessage->id],JSON_THROW_ON_ERROR);

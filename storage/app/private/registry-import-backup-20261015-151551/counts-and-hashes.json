@@ -1,0 +1,30 @@
+{
+    "users": {
+        "count": 1,
+        "sha256": "d07078f37610452ba101c1fd03f3323e0dafb3572e0cb0076e23c5bbaf86b68e"
+    },
+    "clients": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "supplier_companies": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "supplier_agencies": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "supplier_agency_company": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "audit_logs": {
+        "count": 9,
+        "sha256": "e3f54cc0d02f843bb38b8e31d468cb6319514d12e5c2b392331e4a6c08afeef8"
+    },
+    "insurance_policies": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+}

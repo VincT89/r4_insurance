@@ -1,0 +1,141 @@
+{
+  "flows": [
+    "Favicon PNG e ICO non vuote e collegate al login",
+    "Filtri combinati ed export completo di 520/260 righe su più pagine; zeri iniziali conservati",
+    "Salvataggio e modifica di un’unica agenzia con due compagnie",
+    "Anteprima importazione e download del prospetto; esportazione PDF del catalogo",
+    "Controlli presenti nelle tabelle clienti, polizze, targhe, documenti, scadenze, fornitori e utenti",
+    "I testi esportati non diventano formule Excel"
+  ],
+  "layouts": [
+    {
+      "name": "Filtri clienti desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      }
+    },
+    {
+      "name": "Filtri clienti smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "Agenzia plurimandataria desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      }
+    },
+    {
+      "name": "Agenzia plurimandataria smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "Importazione overview smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "Importazione registry smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "Importazione branches smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "Importazione providers smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "Importazione issues smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "Importazione mapping smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "Catalogo rami desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      }
+    },
+    {
+      "name": "/clients/1?tab=policies smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/clients/1?tab=vehicles smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/clients/1?tab=documents smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/clients/1?tab=deadlines smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/suppliers smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/supplier-companies smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/users smartphone",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  ],
+  "javascriptErrors": [],
+  "failedResponses": [],
+  "ok": true
+}

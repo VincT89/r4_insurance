@@ -1,0 +1,14 @@
+/* Eleva la shell sopra il canvas fisso */
+.shell {
+  position: relative;
+  z-index: 1;
+}
+
+/* Topbar e sidebar rimangono opache */
+.topbar  { background: var(--bg);  }
+.sidebar { background: var(--bg1); }
+
+/* Main area è trasparente — mostra il canvas */
+.main { background: transparent; }
+.content { background: transparent; }
+.page-header { background: transparent; }

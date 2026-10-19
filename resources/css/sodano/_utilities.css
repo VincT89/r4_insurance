@@ -1,0 +1,149 @@
+/* _utilities.css — classi monouso per sostituire stili inline ripetuti */
+
+/* Layout */
+.u-flex            { display: flex; }
+.u-flex-col        { display: flex; flex-direction: column; }
+.u-flex-center     { display: flex; align-items: center; }
+.u-flex-between    { display: flex; align-items: center; justify-content: space-between; }
+.u-flex-end        { display: flex; justify-content: flex-end; }
+.u-flex-1          { flex: 1; }
+.u-flex-wrap       { flex-wrap: wrap; }
+.u-gap-xs          { gap: 6px; }
+.u-gap-sm          { gap: 8px; }
+.u-gap-md          { gap: 12px; }
+.u-gap-lg          { gap: 16px; }
+.u-gap-xl          { gap: 24px; }
+
+/* Spacing */
+.u-mt-xs           { margin-top: 4px; }
+.u-mt-sm           { margin-top: 8px; }
+.u-mt-md           { margin-top: 16px; }
+.u-mt-lg           { margin-top: 24px; }
+.u-mb-sm           { margin-bottom: 8px; }
+.u-mb-md           { margin-bottom: 16px; }
+.u-mb-lg           { margin-bottom: 20px; }
+.u-m-0             { margin: 0; }
+.u-ml-auto         { margin-left: auto; }
+.u-p-md            { padding: 16px; }
+.u-p-lg            { padding: 24px; }
+
+/* Typography */
+.u-text-mono       { font-family: var(--mono); font-size: 11px; color: var(--text2); }
+.u-text-meta       { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+.u-text-label      { font-size: 12px; color: var(--text3); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px; }
+.u-text-accent-link { color: var(--accent); text-decoration: none; }
+.u-text-red        { color: var(--red-text); }
+.u-text-muted      { font-size: 13px; color: var(--text3); }
+.u-text-strong     { font-weight: 500; color: var(--text1); }
+.u-text-italic     { font-style: italic; }
+.u-text-strike     { text-decoration: line-through; color: var(--text3); }
+.u-text-normal-case { text-transform: none; }
+
+/* Misc */
+.u-cursor-pointer  { cursor: pointer; }
+.u-truncate        { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.u-nowrap          { white-space: nowrap; }
+.u-w-full          { width: 100%; box-sizing: border-box; }
+.u-text-right      { text-align: right; }
+.u-text-center     { text-align: center; }
+.u-overflow-hidden { overflow: hidden; }
+
+/* Icone Lucide */
+.u-icon-xs         { width: 12px; height: 12px; display: inline-block; vertical-align: text-bottom; }
+.u-icon-sm         { width: 14px; height: 14px; display: inline-block; vertical-align: text-bottom; margin-right: 4px; }
+.u-icon-md         { width: 16px; height: 16px; display: inline-block; vertical-align: middle; }
+.u-icon-lg         { width: 20px; height: 20px; display: inline-block; vertical-align: middle; }
+
+/* Separatori con padding */
+.u-section-sep     { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 16px; }
+.u-empty-state     { text-align: center; color: var(--text3); padding: 32px; }
+.u-empty-state-sm  { text-align: center; color: var(--text3); padding: 16px; }
+
+/* Hover Utilities */
+.hover-bg:hover        { background: var(--bg2); }
+.hover-bg-alt:hover    { background: var(--bg3); }
+.hover-text:hover      { color: var(--text); }
+.hover-danger:hover    { background: rgba(245, 75, 75, 0.08); color: var(--red); }
+
+
+.u-text-orange { color: var(--orange-text); }
+.u-accent-blue { accent-color: var(--blue); }
+
+/* Form sizes. Le dimensioni dei pulsanti vivono in _buttons.css. */
+.form-in-sm,
+.form-sel-sm {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+}
+
+.filter-search {
+    width: 200px;
+}
+
+.u-w-150 { width: 150px; }
+.u-bg-accent { background-color: var(--accent) !important; }
+.u-inline-middle { display: inline-block; vertical-align: middle; }
+.u-whitespace-pre-wrap { white-space: pre-wrap; }
+
+/* Min heights */
+.u-min-h-100 { min-height: 100px; }
+.u-min-h-250 { min-height: 250px; }
+.u-min-h-300 { min-height: 300px; }
+
+.u-justify-center { justify-content: center; }
+
+.skeleton-box { background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite linear; border-radius: var(--r); }
+@keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.absolute-cover { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+.u-text-green { color: var(--green-text); }
+.u-text-blue { color: var(--blue-text); }
+.u-text-purple { color: var(--purple-text); }
+.u-text-teal { color: var(--teal-text); }
+.u-bg-2 { background: var(--bg2); }
+.u-bg-3 { background: var(--bg3); }
+.u-text-sm { font-size: 12px; }
+.u-text-xs { font-size: 11px; }
+.u-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.u-text-hero { font-size: 32px; font-weight: 600; color: var(--text); }
+.u-font-mono { font-family: var(--mono); }
+.u-w-250 { width: 250px; }
+.u-border-b { border-bottom: 1px solid var(--line); }
+.u-py-sm { padding-top: 8px; padding-bottom: 8px; }
+.u-text-h4 { font-size: 16px; }
+.u-text-tiny { font-size: 9px; }
+.u-bg-teal { background-color: var(--teal) !important; }
+.u-bg-muted { background-color: var(--text3) !important; }
+.u-leading-relaxed { line-height: 1.5; }
+.u-text-10 { font-size: 10px; }
+.g-col-full { grid-column: 1 / -1; }
+.u-text-warning { color: var(--orange-text); }
+.u-uppercase { text-transform: uppercase; }
+.u-text-accent { color: var(--accent); }
+.g-3col { grid-template-columns: repeat(3, 1fr); }
+.u-opacity-50 { opacity: 0.5; }
+.u-text-secondary { color: var(--text2) !important; }
+.u-text-md { font-size: 14px; }
+.u-text-blue { color: var(--blue-text) !important; }
+.u-text-danger { color: var(--red-text) !important; }
+.u-dot-small { width: 4px; height: 4px; border-radius: 50%; background: var(--text3); }
+.u-no-underline { text-decoration: none; }
+.u-table-seamless { border-top: 1px solid var(--line); margin-top: -1px; }
+.u-align-middle { vertical-align: middle; }
+.u-text-inherit { color: inherit; }
+.u-items-center { align-items: center; }
+.u-tracking-wide { letter-spacing: 0.5px; }
+.u-pb-0 { padding-bottom: 0 !important; }
+.u-bg-bg3 { background: var(--bg3); }
+.u-m-md { margin: 16px; }
+.u-text-primary { color: var(--text1) !important; }
+.u-flex-col { display: flex; flex-direction: column; }
+.u-text-body { color: var(--text); }
+.u-font-sans { font-family: var(--sans); }
+.u-mx-xs { margin-left: 4px; margin-right: 4px; }
+.u-mb-0 { margin-bottom: 0 !important; }
+.u-max-w-300 { max-width: 300px; }
+.u-max-w-200 { max-width: 200px; }
+.u-w-full { width: 100%; }
+.u-text-purple { color: var(--purple-text) !important; }
+.u-mt-0 { margin-top: 0 !important; }
+.u-inline-flex { display: inline-flex; }

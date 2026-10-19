@@ -1,0 +1,23 @@
+{
+    "database": "r4_insurance",
+    "read_only_transaction": true,
+    "migration_files": 26,
+    "pending_migrations": [],
+    "retired_tables_remaining": [],
+    "table_count": 25,
+    "foreign_keys_checked": 10,
+    "pages": {
+        "\/login": 200,
+        "\/dashboard": 200,
+        "\/clients": 200,
+        "\/clients\/create": 200,
+        "\/teams": 200,
+        "\/teams\/create": 200,
+        "\/users": 200,
+        "\/users\/create": 200,
+        "\/profile": 200,
+        "\/audit-logs": 200,
+        "\/daily-notes": 200
+    },
+    "errors": []
+}

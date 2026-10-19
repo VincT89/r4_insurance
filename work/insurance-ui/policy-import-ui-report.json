@@ -1,0 +1,19 @@
+{
+  "flows": [
+    "Polizza importata con stato incerto, origini Excel, collegamenti compagnia/agenzia; modifica con agenzie dipendenti dalla compagnia",
+    "Tab polizze ramo/sottoramo, filtro per numero, Excel con zeri iniziali conservati e PDF filtrato",
+    "Gruppi sospesi consultabili senza scegliere una riga; scadenze originali distinte dallo stato della copertura"
+  ],
+  "layouts": [
+    "Polizza importata desktop",
+    "Polizza importata mobile",
+    "Esito polizze desktop",
+    "Esito polizze mobile",
+    "Righe sospese desktop",
+    "Righe sospese mobile",
+    "Scadenze con stato incerto desktop",
+    "Scadenze con stato incerto mobile"
+  ],
+  "errors": [],
+  "ok": true
+}

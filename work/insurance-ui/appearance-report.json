@@ -1,0 +1,119 @@
+{
+  "flows": [
+    "Logo originale e favicon su accesso desktop e mobile",
+    "Colori e hover: anteprima fedele, salvataggio, navigazione e annullamento",
+    "Preferenze personali disponibili in una nuova sessione",
+    "Logout e login conservano il tema nel browser, compresi campi e pulsanti",
+    "Tema scuro, testo con contrasto automatico e ripristino su smartphone"
+  ],
+  "layouts": [
+    {
+      "name": "Login mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "Impostazioni desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      }
+    },
+    {
+      "name": "Login con tema personale",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/settings/appearance",
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      }
+    },
+    {
+      "name": "/clients",
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      }
+    },
+    {
+      "name": "/clients/1",
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      }
+    },
+    {
+      "name": "/clients/1/edit",
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      }
+    },
+    {
+      "name": "/suppliers",
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      }
+    },
+    {
+      "name": "/profile",
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      }
+    },
+    {
+      "name": "/settings/appearance",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/clients",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/clients/1",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/clients/1/edit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/suppliers",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    },
+    {
+      "name": "/profile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  ],
+  "javascriptErrors": [],
+  "failedResponses": [],
+  "ok": true
+}

@@ -1,0 +1,979 @@
+/*
+ * Responsive layer
+ *
+ * Imported last so the application shell and every module share the same
+ * breakpoints without duplicating fixes in individual views.
+ */
+
+.mobile-menu-toggle,
+.sidebar-backdrop {
+  display: none;
+}
+
+.shell,
+.main,
+.content,
+.topbar-center,
+.breadcrumb,
+.ph-left,
+.ph-right,
+.panel,
+.panel-header,
+.panel-title,
+.panel-body,
+.form-g,
+.filter-bar,
+.filter-bar-right {
+  min-width: 0;
+}
+
+.breadcrumb {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+img,
+video {
+  max-width: 100%;
+}
+
+pre,
+code {
+  overflow-wrap: anywhere;
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.t-table-wrap,
+.table-responsive,
+.social-table-container,
+.attachments-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dashboard-chart-card,
+.dashboard-chart-body,
+.apexcharts-canvas,
+.apexcharts-svg {
+  max-width: 100%;
+}
+
+@media (max-width: 1199px) {
+  .audit-log-filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .kpi-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .g-4col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dash-grid {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+
+  .inv-fiscal-line {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .inv-line-desc {
+    grid-column: 1 / -1;
+  }
+
+  .inv-line-qty,
+  .inv-line-unit {
+    grid-column: span 1;
+  }
+
+  .inv-line-price,
+  .inv-line-vat {
+    grid-column: span 2;
+  }
+
+  .inv-line-nature {
+    grid-column: span 2;
+  }
+
+  .inv-line-reference {
+    grid-column: span 4;
+  }
+
+  .inv-line-remove {
+    grid-column: 1 / -1;
+    justify-self: end;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .shell,
+  .shell.expanded {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .topbar {
+    grid-column: 1;
+    padding-right: 14px;
+  }
+
+  .topbar-left,
+  .shell.expanded .topbar-left {
+    width: auto;
+    min-width: 0;
+    padding-left: 12px;
+  }
+
+  .mobile-menu-toggle {
+    width: 38px;
+    height: 38px;
+    margin-right: 8px;
+    flex: 0 0 38px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line2);
+    border-radius: var(--r);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
+  .mobile-menu-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .logo-text,
+  .shell.expanded .logo-text {
+    width: auto;
+    opacity: 1;
+  }
+
+  .topbar-center {
+    padding: 0 14px;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: var(--top);
+    bottom: 0;
+    left: 0;
+    width: min(var(--sidebar-open), 88vw);
+    height: calc(100dvh - var(--top));
+    min-height: 0;
+    z-index: 130;
+    transform: translateX(-105%);
+    transition: transform .25s cubic-bezier(.4, 0, .2, 1);
+    box-shadow: 12px 0 30px rgba(10, 20, 40, .2);
+    overscroll-behavior: contain;
+  }
+
+  .shell.expanded .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: var(--top) 0 0;
+    z-index: 120;
+    width: 100%;
+    height: calc(100dvh - var(--top));
+    border: 0;
+    background: rgba(10, 20, 40, .48);
+    backdrop-filter: blur(2px);
+    cursor: pointer;
+  }
+
+  .sidebar-backdrop[style*="display: none"] {
+    display: none !important;
+  }
+
+  .sidebar-backdrop:not([style*="display: none"]) {
+    display: block;
+  }
+
+  .sidebar-toggle {
+    margin-left: auto;
+    margin-right: 14px;
+  }
+
+  .main {
+    grid-column: 1;
+    min-width: 0;
+  }
+
+  .dash-grid,
+  .g-invoice,
+  .g-shoot-detail,
+  .shooting-request-layout,
+  .cmp-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cmp-aside {
+    width: auto;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+    .payment-info-column {
+        padding-top: 0 !important;
+    }
+
+  .aruba-status-grid,
+  .fiscal-history-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fiscal-action-row,
+  .fiscal-action-row form,
+  .fiscal-action-row .btn {
+    width: 100%;
+  }
+
+  .fiscal-action-row .btn {
+    min-height: 44px;
+  }
+
+  .audit-log-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .audit-log-filter-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .audit-log-filter-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .shooting-contact-summary,
+  .shooting-revision-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shooting-contact-register,
+  .shooting-contact-recorded {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .shooting-contact-register .form-g {
+    max-width: none;
+  }
+
+  .shooting-client-response-actions > *,
+  .shooting-contact-actions > * {
+    flex: 1 1 180px;
+    justify-content: center;
+  }
+
+  .shooting-revision-slot {
+    grid-template-columns: minmax(0, 1fr) minmax(130px, .7fr) auto;
+  }
+
+  .inv-fiscal-line {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .inv-line-desc,
+  .inv-line-nature,
+  .inv-line-reference {
+    grid-column: 1 / -1;
+  }
+
+  .inv-line-qty,
+  .inv-line-unit,
+  .inv-line-price,
+  .inv-line-vat {
+    grid-column: span 1;
+  }
+
+  .inv-line-remove {
+    grid-column: 1 / -1;
+  }
+
+  .inv-search-field { max-width: none; }
+  .topbar {
+    padding-right: 10px;
+  }
+
+  .topbar-left,
+  .shell.expanded .topbar-left {
+    padding-left: 8px;
+  }
+
+  .mobile-menu-toggle {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    margin-right: 6px;
+  }
+
+  .logo-mark {
+    width: 28px;
+  }
+
+  .logo-mark img {
+    height: 24px;
+  }
+
+  .logo-text,
+  .shell.expanded .logo-text,
+  .tb-date {
+    display: none;
+  }
+
+  .topbar-center {
+    padding: 0 8px;
+  }
+
+  .breadcrumb {
+    font-size: 10px;
+    letter-spacing: .02em;
+  }
+
+  .topbar-right {
+    gap: 6px;
+  }
+
+  .content {
+    padding: 14px 12px 22px;
+  }
+
+  .page-header {
+    padding: 14px 12px 0;
+  }
+
+  .page-heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+  }
+
+  .page-title {
+    font-size: clamp(24px, 8vw, 30px);
+    line-height: 1.08;
+    overflow-wrap: anywhere;
+  }
+
+  .page-meta {
+    line-height: 1.45;
+  }
+
+  .ph-right {
+    width: 100%;
+    padding-left: 0;
+    padding-bottom: 0;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .ph-right > .btn,
+  .ph-right > a.btn,
+  .ph-right > button.btn {
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .panel {
+    max-width: 100%;
+  }
+
+  .panel-header {
+    padding: 12px 14px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .panel-header > .tab-switcher,
+  .panel-header > [class*="actions"] {
+    width: 100%;
+  }
+
+  .panel-body.pad {
+    padding: 14px;
+  }
+
+  .kpi-strip,
+  .kpi-strip.u-grid-3,
+  .g-4col,
+  .social-kpi-grid,
+  .mkt-plan-stats-grid,
+  .shoot-kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .kpi-cell {
+    min-width: 0;
+    padding: 14px;
+  }
+
+  .kpi-val-t {
+    font-size: clamp(25px, 8vw, 30px);
+  }
+
+  .kpi-label-t,
+  .kpi-delta-t {
+    overflow-wrap: anywhere;
+  }
+
+  .dash-grid,
+  .g-2col,
+  .g-2col-main,
+  .g-3col,
+  .g-invoice,
+  .g-shoot-detail,
+  .g-shoot-2col,
+  .task-detail-grid,
+  .mkt-type-grid,
+  .cmp-layout,
+  .cmp-post-detail-layout,
+  .int-grid,
+  .settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .g-cards,
+  .notes-grid,
+  .social-grid,
+  .social-asset-grid,
+  .nc-preview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-in,
+  .form-sel,
+  .form-ta,
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+    font-size: 16px;
+  }
+
+  .filter-bar,
+  .filters-row,
+  .filter-bar-right,
+  .mkt-calendar-filters,
+  .shooting-filter-bar {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .filter-bar-right {
+    margin-left: 0;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+  }
+
+  .finance-filter-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .finance-date-input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .finance-btn-sm {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .filter-bar-right > *,
+  .filter-bar > form,
+  .filters-row > *,
+  .shooting-filter-bar > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .inv-filter-group,
+  .inv-filter-group:first-child { flex-basis: 100%; }
+
+  .inv-filter-group .pill { min-height: var(--control-h-touch); }
+
+  .inv-search-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inv-search-field { flex-basis: auto; }
+
+  .inv-search-field .form-in,
+  .inv-search-actions .btn { min-height: var(--control-h-touch); }
+
+  .inv-search-actions .btn { flex: 1 1 auto; }
+
+  .filter-search,
+  .mkt-search-in,
+  .mkt-filter-sel,
+  .shooting-input-md,
+  .shooting-select-sm,
+  .hosting-w-150,
+  .hosting-w-250,
+  .u-w-150,
+  .u-w-250 {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .pills,
+  .tab-switcher {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab-switcher {
+    width: 100%;
+  }
+
+  .tab-btn,
+  .pill {
+    flex: 0 0 auto;
+    min-height: 44px;
+  }
+
+  .btn-cal-nav,
+  .cal-mini-day,
+  .social-header-link,
+  .form-in,
+  .form-sel,
+  .form-ta,
+  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  .cal-mini-day {
+    height: 44px;
+  }
+
+  .t-table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .t-table thead,
+  .t-table tbody {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  /* Quando esiste gia un wrapper, deve esserci un solo livello di scroll. */
+  .table-responsive > .t-table,
+  .t-table-wrap > .t-table,
+  .social-table-container > .t-table,
+  .client-table-scroll > .t-table,
+  .attachments-table-wrap > .t-table {
+    display: table;
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+    overflow: visible;
+  }
+
+  .table-responsive > .t-table thead,
+  .table-responsive > .t-table tbody,
+  .t-table-wrap > .t-table thead,
+  .t-table-wrap > .t-table tbody,
+  .social-table-container > .t-table thead,
+  .social-table-container > .t-table tbody,
+  .client-table-scroll > .t-table thead,
+  .client-table-scroll > .t-table tbody,
+  .attachments-table-wrap > .t-table thead,
+  .attachments-table-wrap > .t-table tbody {
+    width: auto;
+    min-width: 0;
+  }
+
+  .t-table thead th,
+  .t-table tbody td {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .t-table tbody tr .table-actions,
+  .t-table tbody tr .act-btn {
+    opacity: 1;
+  }
+
+  .table-actions,
+  .att-actions {
+    flex-wrap: wrap;
+  }
+
+  .flow {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .flow-step {
+    min-width: 140px;
+  }
+
+  .kanban {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .calendar-kanban-columns > .k-col {
+    width: min(78vw, 280px) !important;
+  }
+
+  .cal-week {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .cal-day {
+    min-width: min(78vw, 260px);
+  }
+
+  .cal-grid-7,
+  .cal-day-header-grid {
+    min-width: 700px;
+  }
+
+  .cal-gmain > .u-flex-between {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cal-gmain > .u-flex-between > .u-flex {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .cal-gmain > .u-flex-between > .tab-switcher {
+    width: 100%;
+  }
+
+  .cmp-calendar,
+  .cmp-calendar-wrap,
+  .mkt-calendar-grid,
+  .mkt-calendar-body {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .welcome,
+  .welcome-quick,
+  .form-actions,
+  .modal-ft,
+  .lw-modal-ft,
+  .confirm-modal-footer,
+  .att-form,
+  .task-attachment-form,
+  .inv-custom-lines-hd,
+  .inv-custom-line-row,
+  .inv-add-item-form,
+  .inv-items-builder-hd,
+  .mkt-flex-gap16,
+  .nc-picker-footer {
+    flex-wrap: wrap;
+  }
+
+  .welcome {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .welcome-greeting {
+    font-size: 30px;
+  }
+
+  .form-actions,
+  .att-form,
+  .task-attachment-form,
+  .inv-custom-line-row,
+  .inv-add-item-form,
+  .mkt-flex-gap16,
+  .shooting-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-actions {
+    gap: 10px;
+  }
+
+  .form-actions > *,
+  .modal-ft > *,
+  .lw-modal-ft > *,
+  .confirm-modal-footer > *,
+  .att-form > *,
+  .task-attachment-form > *,
+  .inv-custom-line-row > *,
+  .inv-add-item-form > *,
+  .mkt-flex-gap16 > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .inv-line-desc,
+  .inv-line-qty,
+  .inv-line-price,
+  .task-checklist-create-assignee {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .overlay,
+  .lw-overlay {
+    padding: 12px;
+  }
+
+  .modal,
+  .lw-modal,
+  .lw-modal-sm,
+  .lw-modal-lg,
+  .confirm-modal-box {
+    width: 100%;
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+
+  .lw-modal-hd,
+  .lw-modal-body,
+  .lw-modal-ft {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .confirm-modal-box {
+    padding: 20px;
+  }
+
+  .dropdown-menu {
+    max-width: calc(100vw - 16px);
+  }
+
+  #toast {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    width: auto;
+  }
+
+  .pagination {
+    padding-left: 12px;
+    padding-right: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cmp-version-img {
+    width: min(140px, 40vw);
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
+
+@media (max-width: 479px) {
+  .audit-timeline-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .audit-timeline-date {
+    white-space: normal;
+  }
+
+  .shooting-revision-slot {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shooting-revision-slot .btn {
+    width: 100%;
+  }
+
+  .shooting-revision-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .shooting-revision-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .inv-fiscal-line {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .inv-line-desc,
+  .inv-line-qty,
+  .inv-line-unit,
+  .inv-line-price,
+  .inv-line-vat,
+  .inv-line-nature,
+  .inv-line-reference,
+  .inv-line-remove {
+    grid-column: 1 / -1;
+  }
+
+  .inv-line-remove {
+    width: 100%;
+    min-width: 0;
+    justify-self: stretch;
+  }
+  .content {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .page-header {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .kpi-strip,
+  .kpi-strip.u-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kpi-strip > .kpi-cell:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .g-4col,
+  .social-kpi-grid,
+  .mkt-plan-stats-grid,
+  .shoot-kpi-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel-header,
+  .panel-body.pad {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .btn {
+    white-space: normal;
+  }
+
+  .task-item,
+  .feed-item,
+  .audit-item {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .audit-item {
+    flex-wrap: wrap;
+  }
+
+  .audit-time {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 899px) {
+  .client-summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (pointer: coarse) {
+  .btn,
+  .btn-s,
+  .btn-sec,
+  .btn-d,
+  .btn-danger,
+  .btn-blue,
+  .btn-orange,
+  .btn-outline-primary,
+  .btn-ghost-primary,
+  .btn-icon,
+  .pill,
+  .tab-btn,
+  .tb-btn,
+  .avatar-btn,
+  .sidebar-toggle,
+  .nav-item,
+  .social-header-link,
+  .btn-cal-nav,
+  .cal-mini-day,
+  .fc .fc-button,
+  .form-in,
+  .form-sel,
+  input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+  select {
+    min-height: var(--control-h-touch);
+  }
+
+  .btn-icon {
+    width: var(--control-h-touch);
+    height: var(--control-h-touch);
+    min-width: var(--control-h-touch);
+  }
+
+  .cal-mini-day {
+    height: 44px;
+  }
+
+  .btn-cal-nav,
+  .notes-nav-btn,
+  .hosting-password-toggle,
+  .hosting-password-copy,
+  .shooting-slot-del {
+    width: var(--control-h-touch);
+    height: var(--control-h-touch);
+    min-width: var(--control-h-touch);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar-backdrop {
+    transition: none;
+  }
+}

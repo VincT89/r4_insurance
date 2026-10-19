@@ -1,0 +1,26 @@
+{
+  "flows": [
+    "Chiusura esplicita su polizza attiva, modifica consentita nello stesso giorno e blocco alla mezzanotte successiva; segnalazione disponibile",
+    "Notifica admin, correzione motivata, esito conservato e notificato all’operatore senza riaprire la lavorazione"
+  ],
+  "layouts": [
+    "open-desktop",
+    "open-mobile",
+    "closed-today-desktop",
+    "closed-today-mobile",
+    "locked-next-day-desktop",
+    "locked-next-day-mobile",
+    "report-form-desktop",
+    "report-form-mobile",
+    "admin-report-desktop",
+    "admin-report-mobile",
+    "admin-reason-desktop",
+    "admin-reason-mobile",
+    "resolved-desktop",
+    "resolved-mobile"
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "labelIssues": [],
+  "ok": true
+}

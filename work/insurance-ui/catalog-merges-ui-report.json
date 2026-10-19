@@ -1,0 +1,18 @@
+{
+  "flows": [
+    "Catalogo accorpato con fonti originali; selezioni dipendenti; prodotto separato; tab ramo/sottoramo; filtro prodotto; Excel con colonne separate e PDF",
+    "Anteprima aggiornata con destinazioni approvate, campo prodotto e classificazioni ancora da verificare"
+  ],
+  "layouts": [
+    "Origini catalogo desktop",
+    "Origini catalogo mobile",
+    "Ramo sottoramo prodotto desktop",
+    "Ramo sottoramo prodotto mobile",
+    "Tab polizze desktop",
+    "Tab polizze mobile",
+    "Classificazioni Excel desktop",
+    "Classificazioni Excel mobile"
+  ],
+  "errors": [],
+  "ok": true
+}

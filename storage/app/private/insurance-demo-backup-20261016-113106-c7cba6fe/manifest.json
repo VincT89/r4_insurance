@@ -1,0 +1,106 @@
+{
+    "client_consents": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "attachments": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "client_document_requests": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "insurance_policy_imports": {
+        "rows": 4859,
+        "sha256": "7d487d9c056fc4496b00a2c61e9df7993f6d3a032b7544f37856a5c97755605f"
+    },
+    "insurance_policies": {
+        "rows": 2605,
+        "sha256": "18adf789d957e5619f806d290de5cc194c7bea6be1f4dd0c408e567ea1c09974"
+    },
+    "client_relationships": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "client_household_members": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "client_households": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "client_merges": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "client_contacts": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "client_interactions": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "client_assets": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "client_vehicles": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "client_user": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "clients": {
+        "rows": 4884,
+        "sha256": "4274dcac998d18a347511be25eb382536029baabd3b661dedf9b1baee78637f6"
+    },
+    "insurance_deadline_reminders": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "users": {
+        "rows": 1,
+        "sha256": "d07078f37610452ba101c1fd03f3323e0dafb3572e0cb0076e23c5bbaf86b68e"
+    },
+    "supplier_companies": {
+        "rows": 20,
+        "sha256": "d7879d58d7b9293795e413d266dc354b44eaa6e34d3f6906feec366127fbe4fe"
+    },
+    "supplier_agencies": {
+        "rows": 16,
+        "sha256": "4c69e86c6dcc5a3a942f490f2a8ab928299cf954d7d64ef635d315ae59776a48"
+    },
+    "supplier_agency_company": {
+        "rows": 26,
+        "sha256": "915326fc7386fcf53fd28d2ce256028ad5f387b0398deedd7cee9db7d80158d0"
+    },
+    "insurance_branches": {
+        "rows": 34,
+        "sha256": "e9a14d7b3283fb8b1ef2c0f8977a96b869aa304e8e594b5ced5f98f9665142ea"
+    },
+    "insurance_subbranches": {
+        "rows": 44,
+        "sha256": "c2f8eb75fe2527ddd7eaafa35f66c3ee30fee788e12862b9d7b702a91e457aca"
+    },
+    "insurance_catalog_aliases": {
+        "rows": 21,
+        "sha256": "27e041bdb9ad4c4352f940ca7654461345d6da4d99eb58177f97a4708b26caf2"
+    },
+    "registry_import_entries": {
+        "rows": 4992,
+        "sha256": "cbcc1bd089c41a1367fef10b90d7d1a368898ee723a36b3695f0256978327265"
+    },
+    "notifications": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "audit_logs": {
+        "rows": 7924,
+        "sha256": "9993be3d5b740075171320cddb148d770a90438b70c5536d8a48fc760e8fb931"
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "previous_clients": 4884,
+    "previous_policies": 2605,
+    "clients": 50,
+    "policies": 50,
+    "preserved": [
+        "users",
+        "supplier_companies",
+        "supplier_agencies",
+        "supplier_agency_company",
+        "insurance_branches",
+        "insurance_subbranches",
+        "insurance_catalog_aliases"
+    ],
+    "backup": "insurance-demo-backup-20261016-114544-b0e986b8",
+    "files_removed": 0,
+    "file_cleanup_pending": [],
+    "mode": "demo-applied"
+}

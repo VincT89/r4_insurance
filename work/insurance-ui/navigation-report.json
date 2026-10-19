@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "Navigazione desktop: Clienti, Fornitori, Agenzie e subagenzie",
+    "Menu smartphone: apertura, Escape, collegamenti e chiusura dopo la navigazione",
+    "Tab polizze e scadenze su smartphone, colonne della tabella raggiungibili",
+    "Moduli lunghi su smartphone: campi finali e pulsanti di salvataggio raggiungibili",
+    "Conferma eliminazione: tastiera, focus, Escape e annullamento senza perdita dati"
+  ],
+  "javascriptErrors": [],
+  "ok": true
+}

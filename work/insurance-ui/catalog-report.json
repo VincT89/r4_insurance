@@ -1,0 +1,21 @@
+{
+  "flows": [
+    "Ramo e sottoramo salvati; cambio ramo azzera il sottoramo; collegamento alla polizza di prova",
+    "Filtri avanzati, Excel/PDF dei risultati e layout desktop/mobile",
+    "Rinominare un ramo usato da polizze è bloccato senza perdere i collegamenti",
+    "Richiesta modificabile, file ricevuto e validato, nuova versione da validare, originale scaricabile nello storico",
+    "Checklist configurata per ramo e sottoramo applicata senza duplicare richieste",
+    "Scadenzario: versioni correnti, richieste non ricevute, filtri ed esportazioni Excel/PDF desktop/mobile"
+  ],
+  "layouts": [
+    "Nuova polizza mobile",
+    "Catalogo desktop",
+    "Catalogo mobile",
+    "Documenti desktop",
+    "Documenti mobile",
+    "Scadenze desktop",
+    "Scadenze mobile"
+  ],
+  "errors": [],
+  "ok": true
+}

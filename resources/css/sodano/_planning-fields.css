@@ -1,0 +1,40 @@
+.project-search { position: relative; min-width: 0; }
+.project-search-options {
+    position: absolute; inset: 100% 0 auto; z-index: 30;
+    max-height: 260px; overflow-y: auto; overscroll-behavior: contain;
+    border: 1px solid var(--line); border-radius: var(--r); background: var(--bg1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .14);
+}
+.project-search-options[hidden] { display: none; }
+.project-search-option { padding: 10px 12px; color: var(--text); cursor: pointer; overflow-wrap: anywhere; }
+.project-search-option:hover, .project-search-option.is-active { background: var(--bg2); }
+.project-search-option[aria-selected="true"] { font-weight: 700; }
+.project-search-help { margin-top: 5px; font-size: 12px; line-height: 1.4; color: var(--text2); }
+.publication-date-picker { min-width: 0; }
+.publication-date-trigger { width: 100%; cursor: pointer; text-align: left; }
+.publication-calendar {
+    margin-top: 8px; padding: 10px; border: 1px solid var(--line); border-radius: var(--r);
+    background: var(--bg1); width: 100%; min-width: 0;
+}
+.publication-calendar-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; }
+.publication-calendar-heading strong { flex-basis: 100%; order: -1; text-align: center; font-size: 14px; }
+.publication-calendar-help { margin: 10px 0; color: var(--text2); font-size: 12px; line-height: 1.5; }
+.publication-calendar-weekdays, .publication-calendar-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; }
+.publication-calendar-weekdays { text-align: center; color: var(--text2); font-size: 11px; margin-bottom: 4px; }
+.publication-calendar-day {
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    min-width: 0; min-height: 42px; padding: 3px 0; border: 1px solid transparent; border-radius: 6px;
+    background: transparent; color: var(--text); cursor: pointer; font: inherit; font-size: 13px;
+}
+.publication-calendar-day:hover, .publication-calendar-day.is-selected { background: var(--bg2); border-color: var(--accent); }
+.publication-calendar-day.is-other-month { color: var(--text3); }
+.publication-calendar-day[aria-current="date"] { font-weight: 700; }
+.publication-calendar-indicator { display: flex; align-items: center; gap: 2px; min-height: 12px; font-size: 10px; }
+.publication-calendar-dot { width: 5px; height: 5px; flex: 0 0 5px; border-radius: 50%; background: #dc2626; }
+.publication-calendar-week-total { margin: 1px 0 6px; text-align: right; color: var(--text2); font-size: 10px; }
+.publication-calendar-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; margin-top: 10px; }
+.publication-calendar button:focus-visible, .project-search input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 680px) {
+    .form-g:has(> .publication-date-picker) { flex-basis: 100%; }
+    .u-flex:has(> .form-g > .publication-date-picker) { flex-wrap: wrap; }
+}

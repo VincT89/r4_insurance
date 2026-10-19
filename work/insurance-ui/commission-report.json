@@ -1,0 +1,33 @@
+{
+  "flows": [
+    "Admin configura mandato, rami e sottorami con basi e aliquote distinte; maturazione e percentuali mancanti restano da definire.",
+    "Revisione motivata con storico conservato, filtri per mandato, ramo, data e base; esportazioni Excel e PDF.",
+    "Annullamento confermato con motivazione e storico; utente amministrazione in sola lettura, modifica riservata all’admin."
+  ],
+  "layouts": [
+    "form-desktop",
+    "form-desktop-bottom",
+    "form-mobile",
+    "form-mobile-bottom",
+    "saved-desktop",
+    "saved-desktop-bottom",
+    "saved-mobile",
+    "saved-mobile-bottom",
+    "revision-desktop",
+    "revision-desktop-bottom",
+    "revision-mobile",
+    "revision-mobile-bottom",
+    "filtered-desktop",
+    "filtered-desktop-bottom",
+    "filtered-mobile",
+    "filtered-mobile-bottom",
+    "readonly-history-desktop",
+    "readonly-history-desktop-bottom",
+    "readonly-history-mobile",
+    "readonly-history-mobile-bottom"
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "labelIssues": [],
+  "ok": true
+}

@@ -1,0 +1,549 @@
+[
+  {
+    "error": false,
+    "headings": [
+      "Sinistro · SN-2026-15",
+      "Cliente e polizza",
+      "Dati del sinistro",
+      "",
+      "Attività e promemoria",
+      "",
+      "Documenti del sinistro",
+      "",
+      "Storico della pratica"
+    ],
+    "links": [
+      {
+        "text": "Sinistri",
+        "url": "http://127.0.0.1:8037/claims"
+      },
+      {
+        "text": "Modifica dati",
+        "url": "http://127.0.0.1:8037/claims/1/edit"
+      },
+      {
+        "text": "Dati del sinistro",
+        "url": "#claim-data"
+      },
+      {
+        "text": "Attività e promemoria",
+        "url": "#activities"
+      },
+      {
+        "text": "Documenti",
+        "url": "#claim-files"
+      },
+      {
+        "text": "Storico",
+        "url": "#claim-history"
+      },
+      {
+        "text": "Officine Valdoro S.r.l.",
+        "url": "http://127.0.0.1:8037/clients/1"
+      },
+      {
+        "text": "SA-2026-001",
+        "url": "http://127.0.0.1:8037/clients/1/policies/1"
+      },
+      {
+        "text": "Gestisci attività",
+        "url": "http://127.0.0.1:8037/claims/1/activities/1"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/claims/1",
+    "viewport": 1280,
+    "name": "claim-show",
+    "image": "qa-claim-show-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Modifica sinistro · SN-2026-15",
+      "Cliente e polizza",
+      "Dati del sinistro",
+      "Motivo della modifica"
+    ],
+    "links": [
+      {
+        "text": "Scheda sinistro",
+        "url": "http://127.0.0.1:8037/claims/1"
+      },
+      {
+        "text": "Officine Valdoro S.r.l.",
+        "url": "http://127.0.0.1:8037/clients/1"
+      },
+      {
+        "text": "SA-2026-001",
+        "url": "http://127.0.0.1:8037/clients/1/policies/1"
+      },
+      {
+        "text": "Annulla",
+        "url": "http://127.0.0.1:8037/claims/1"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/claims/1/edit",
+    "viewport": 1280,
+    "name": "claim-edit",
+    "image": "qa-claim-edit-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Gestisci attività",
+      "Attività del sinistro",
+      "Esito o nuova data"
+    ],
+    "links": [
+      {
+        "text": "Scheda sinistro",
+        "url": "http://127.0.0.1:8037/claims/1#activities"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/claims/1/activities/1",
+    "viewport": 1280,
+    "name": "claim-activity",
+    "image": "qa-claim-activity-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Nuovo sinistro",
+      "Cliente e polizza",
+      "Dati del sinistro",
+      "Prossima attività",
+      "Documenti iniziali"
+    ],
+    "links": [
+      {
+        "text": "Sinistri",
+        "url": "http://127.0.0.1:8037/claims"
+      },
+      {
+        "text": "Officine Valdoro S.r.l.",
+        "url": "http://127.0.0.1:8037/clients/1"
+      },
+      {
+        "text": "SA-2026-001",
+        "url": "http://127.0.0.1:8037/clients/1/policies/1"
+      },
+      {
+        "text": "Cambia polizza",
+        "url": "http://127.0.0.1:8037/claims/create?client=1"
+      },
+      {
+        "text": "Annulla",
+        "url": "http://127.0.0.1:8037/claims"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/claims/create?policy=1",
+    "viewport": 1280,
+    "name": "claim-create",
+    "image": "qa-claim-create-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Assicurazione autovettura",
+      "Richiesta del cliente",
+      "Documenti della richiesta",
+      "Richieste alle compagnie",
+      "Proposte",
+      "Nobis",
+      "Preventivo ricevuto",
+      "Storico richieste email",
+      "Filtra invii"
+    ],
+    "links": [
+      {
+        "text": "Officine Valdoro S.r.l.",
+        "url": "http://127.0.0.1:8037/clients/1"
+      },
+      {
+        "text": "Preventivi",
+        "url": "http://127.0.0.1:8037/quotes"
+      },
+      {
+        "text": "Invia richiesta di preventivo",
+        "url": "http://127.0.0.1:8037/quotes/1/emails/create"
+      },
+      {
+        "text": "Apri proposta",
+        "url": "#proposal-1"
+      },
+      {
+        "text": "Azzera filtri",
+        "url": "http://127.0.0.1:8037/quotes/1"
+      },
+      {
+        "text": "Apri richiesta",
+        "url": "http://127.0.0.1:8037/quote-emails/01a153d3-8028-70de-b7e4-9220d2047adb"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/quotes/1",
+    "viewport": 1280,
+    "name": "quote-show",
+    "image": "qa-quote-show-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Richiedi preventivo",
+      "Cliente e destinatario",
+      "Richiesta alla compagnia",
+      "Aggiungi nuovi allegati da inviare"
+    ],
+    "links": [
+      {
+        "text": "Torna alla pratica",
+        "url": "http://127.0.0.1:8037/quotes/1"
+      },
+      {
+        "text": "Annulla",
+        "url": "http://127.0.0.1:8037/quotes/1"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/quotes/1/emails/create",
+    "viewport": 1280,
+    "name": "quote-email-compose",
+    "image": "qa-quote-email-compose-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Controlla la richiesta prima di inviarla",
+      "Destinatario e invio",
+      "Testo da inviare",
+      "Allegati inclusi"
+    ],
+    "links": [
+      {
+        "text": "Torna alla pratica",
+        "url": "http://127.0.0.1:8037/quotes/1"
+      },
+      {
+        "text": "Prepara un’altra richiesta",
+        "url": "http://127.0.0.1:8037/quotes/1/emails/create"
+      },
+      {
+        "text": "Apri Impostazioni email",
+        "url": "http://127.0.0.1:8037/settings/email"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/quote-emails/01a153d3-8028-70de-b7e4-9220d2047adb",
+    "viewport": 1280,
+    "name": "quote-email-review",
+    "image": "qa-quote-email-review-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Emissione #1",
+      "Dati del titolo",
+      "Registra incasso",
+      "Pagamento ricevuto",
+      "Movimenti del titolo",
+      "Quietanze e documenti"
+    ],
+    "links": [
+      {
+        "text": "Rate e quietanze",
+        "url": "http://127.0.0.1:8037/titles?policy=1"
+      },
+      {
+        "text": "SA-2026-001",
+        "url": "http://127.0.0.1:8037/clients/1/policies/1"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/titles/1",
+    "viewport": 1280,
+    "name": "title-show",
+    "image": "qa-title-show-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Condizioni provvigionali · Agenzia Valserena",
+      "Mandato e validità",
+      "Rami, sottorami e percentuali"
+    ],
+    "links": [
+      {
+        "text": "Tutte le aliquote",
+        "url": "http://127.0.0.1:8037/suppliers/1/commissions"
+      },
+      {
+        "text": "Modifica condizioni",
+        "url": "http://127.0.0.1:8037/suppliers/1/commissions/1/edit"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/suppliers/1/commissions/1",
+    "viewport": 1280,
+    "name": "commission-show",
+    "image": "qa-commission-show-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Modifica condizioni · Agenzia Valserena",
+      "Mandato e periodo",
+      "Rami, sottorami e aliquote",
+      "RC auto",
+      "Riferimenti e storico"
+    ],
+    "links": [
+      {
+        "text": "Provvigioni agenzia",
+        "url": "http://127.0.0.1:8037/suppliers/1/commissions"
+      },
+      {
+        "text": "Annulla",
+        "url": "http://127.0.0.1:8037/suppliers/1/commissions"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/suppliers/1/commissions/1/edit",
+    "viewport": 1280,
+    "name": "commission-edit",
+    "image": "qa-commission-edit-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Fascicolo #1 · Officine Valdoro S.r.l.",
+      "Riferimenti",
+      "Dichiarazione di collaudo · modello v1",
+      ""
+    ],
+    "links": [
+      {
+        "text": "Storico fascicoli",
+        "url": "http://127.0.0.1:8037/clients/1/forms?policy=1"
+      },
+      {
+        "text": "Scheda polizza",
+        "url": "http://127.0.0.1:8037/clients/1/policies/1"
+      },
+      {
+        "text": "Scarica modulo PDF",
+        "url": "http://127.0.0.1:8037/attachments/1/download"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/clients/1/forms/1",
+    "viewport": 1280,
+    "name": "forms-package",
+    "image": "qa-forms-package-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Prepara moduli · Officine Valdoro S.r.l.",
+      "Cliente e polizza",
+      "Firmatario",
+      "Moduli da preparare",
+      "Motivazione e controllo"
+    ],
+    "links": [
+      {
+        "text": "Moduli e firme",
+        "url": "http://127.0.0.1:8037/clients/1/forms?policy=1"
+      },
+      {
+        "text": "Annulla",
+        "url": "http://127.0.0.1:8037/clients/1/forms"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/clients/1/forms/create?policy=1",
+    "viewport": 1280,
+    "name": "forms-create",
+    "image": "qa-forms-create-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Modifica dati documento",
+      "File e validità",
+      "Collegamenti e descrizione",
+      "Verifica del documento"
+    ],
+    "links": [
+      {
+        "text": "Officine Valdoro S.r.l.",
+        "url": "http://127.0.0.1:8037/clients/1?tab=documents"
+      },
+      {
+        "text": "Annulla",
+        "url": "http://127.0.0.1:8037/clients/1?tab=documents"
+      },
+      {
+        "text": "Scarica il file",
+        "url": "http://127.0.0.1:8037/attachments/1/download"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/clients/1/documents/1/edit",
+    "viewport": 1280,
+    "name": "document-edit",
+    "image": "qa-document-edit-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Modifica veicolo",
+      "Dati del veicolo",
+      "Note"
+    ],
+    "links": [
+      {
+        "text": "Officine Valdoro S.r.l.",
+        "url": "http://127.0.0.1:8037/clients/1?tab=vehicles"
+      },
+      {
+        "text": "Annulla",
+        "url": "http://127.0.0.1:8037/clients/1?tab=vehicles"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/clients/1/vehicles/1/edit",
+    "viewport": 1280,
+    "name": "vehicle-edit",
+    "image": "qa-vehicle-edit-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Modifica: Referente",
+      "Referente"
+    ],
+    "links": [
+      {
+        "text": "Officine Valdoro S.r.l.",
+        "url": "http://127.0.0.1:8037/clients/1?tab=network"
+      },
+      {
+        "text": "Annulla",
+        "url": "http://127.0.0.1:8037/clients/1?tab=network"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/clients/1/records/contacts/1/edit",
+    "viewport": 1280,
+    "name": "contact-edit",
+    "image": "qa-contact-edit-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Modifica: Bene assicurabile",
+      "Bene assicurabile"
+    ],
+    "links": [
+      {
+        "text": "Officine Valdoro S.r.l.",
+        "url": "http://127.0.0.1:8037/clients/1?tab=assets"
+      },
+      {
+        "text": "Annulla",
+        "url": "http://127.0.0.1:8037/clients/1?tab=assets"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/clients/1/records/assets/1/edit",
+    "viewport": 1280,
+    "name": "asset-edit",
+    "image": "qa-asset-edit-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Verifica RCA · SA-2026-001",
+      "Controllo sul Portale dell’Automobilista",
+      "Registra esito",
+      "Storico verifiche RCA"
+    ],
+    "links": [
+      {
+        "text": "Scheda polizza",
+        "url": "http://127.0.0.1:8037/clients/1/policies/1"
+      },
+      {
+        "text": "Apri verifica RCA ufficiale",
+        "url": "https://www.ilportaledellautomobilista.it/web/portale-automobilista/ext/verifica-copertura-rc"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/clients/1/policies/1/coverage-checks",
+    "viewport": 1280,
+    "name": "coverage",
+    "image": "qa-coverage-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Controlla l’email prima di inviarla",
+      "Polizze selezionate",
+      "Testo dell’email"
+    ],
+    "links": [
+      {
+        "text": "Torna alla selezione",
+        "url": "http://127.0.0.1:8037/agency-communications?period=day&date=2026-10-19"
+      },
+      {
+        "text": "Storico invii",
+        "url": "http://127.0.0.1:8037/agency-communications/history"
+      },
+      {
+        "text": "Impostazioni email",
+        "url": "http://127.0.0.1:8037/settings/email"
+      }
+    ],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/agency-communications/messages/01a153d3-8012-70fe-8ad9-f34ce91eac03",
+    "viewport": 1280,
+    "name": "communication-review",
+    "image": "qa-communication-review-1280.png"
+  },
+  {
+    "error": false,
+    "headings": [
+      "Blocco note",
+      "Nota 1"
+    ],
+    "links": [],
+    "overflow": false,
+    "plainFieldsets": [],
+    "url": "/daily-notes",
+    "viewport": 1145,
+    "name": "note-populated",
+    "image": "qa-note-populated-1145.png"
+  }
+]

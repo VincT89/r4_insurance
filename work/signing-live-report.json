@@ -1,0 +1,69 @@
+{
+    "database": "r4_insurance",
+    "migration": "\n   INFO  Running migrations.  \n\r\n  2026_10_18_120000_expand_signing_document_storage .................................................... 414.31ms DONE\r\n\r\n",
+    "existing_records_unchanged": true,
+    "clients": 50,
+    "policies": 50,
+    "source_templates": 7,
+    "template_states": {
+        "draft": 2,
+        "legacy": 5
+    },
+    "pages": {
+        "\/settings\/forms": 200,
+        "\/settings\/forms\/create": 200,
+        "\/settings\/forms\/6": 200,
+        "\/clients\/4900": 200,
+        "\/clients\/4900\/forms": 200,
+        "\/clients\/4900\/forms\/create": 200,
+        "\/clients\/4900\/policies\/2620": 200,
+        "\/clients\/4900\/forms\/create?policy=2620": 200,
+        "\/clients\/4900\/policies\/2620\/coverage-checks": 200
+    },
+    "packages": 0,
+    "coverage_checks": 0,
+    "external_plate_queries": 0,
+    "ok": true,
+    "text_columns": {
+        "insurance_form_templates": "longtext",
+        "insurance_form_documents": "longtext",
+        "insurance_form_packages": "longtext"
+    },
+    "source_templates_match": {
+        "Allegato 3": {
+            "same_body": true,
+            "status": "legacy",
+            "edited_by_user": false
+        },
+        "Allegato 4 Ter": {
+            "same_body": true,
+            "status": "legacy",
+            "edited_by_user": false
+        },
+        "Allegato 4bis": {
+            "same_body": true,
+            "status": "legacy",
+            "edited_by_user": false
+        },
+        "Allegato 4": {
+            "same_body": true,
+            "status": "legacy",
+            "edited_by_user": false
+        },
+        "Consegna Documenti": {
+            "same_body": true,
+            "status": "legacy",
+            "edited_by_user": false
+        },
+        "Dichiarazione Coerenza": {
+            "same_body": true,
+            "status": "draft",
+            "edited_by_user": false
+        },
+        "Consenso Invio Elettronico": {
+            "same_body": true,
+            "status": "draft",
+            "edited_by_user": false
+        }
+    }
+}

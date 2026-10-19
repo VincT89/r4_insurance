@@ -1,0 +1,18 @@
+
+.permission-fieldset { border: 0; min-width: 0; padding: 0; margin: 0; }
+.permission-fieldset:disabled :is(input, select, textarea) { opacity: 1; }
+.commercial-history-row { padding: 16px 0; border-bottom: 1px solid var(--line); }
+.commercial-history-row h2 { font-size: 16px; margin-bottom: 8px; }
+.client-commercial-notes { white-space: pre-wrap; overflow-wrap: anywhere; }
+.commercial-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.commercial-actions form { margin: 0; }
+.client-search-form { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin-bottom: 20px; }
+.client-search-form .form-g { flex: 1 1 240px; margin: 0; }
+.client-registry-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; margin: 0; }
+.client-registry-details > div { min-width: 0; }
+.client-registry-details dt { color: var(--text3); font-size: 12px; margin-bottom: 4px; }
+.client-registry-details dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+    .client-registry-details { grid-template-columns: minmax(0, 1fr); }
+    .client-search-form > *, .commercial-actions > *, .commercial-actions form .btn { width: 100%; }
+}

@@ -1,0 +1,1487 @@
+{
+    "sources_verified": true,
+    "note": "Conteggi di righe Excel, non di polizze uniche. Nessuna modifica al database.",
+    "branches": [
+        {
+            "id": 1,
+            "name": "3VIRUS",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 1,
+                    "name": "3VIRUS",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "3VIRUS",
+                    "subbranch": "3VIRUS",
+                    "rows": 3,
+                    "companies": {
+                        "AM TRUST": 3
+                    },
+                    "sample_rows": [
+                        3519,
+                        5229,
+                        5798
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "ABITAZIONE",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 2,
+                    "name": "INCENDIO",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "ABITAZIONE",
+                    "subbranch": "INCENDIO",
+                    "rows": 10,
+                    "companies": {
+                        "REALE MUTUA": 10
+                    },
+                    "sample_rows": [
+                        1688,
+                        2720,
+                        3178
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "AUTO",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 3,
+                    "name": "AUTO",
+                    "review": true
+                },
+                {
+                    "id": 4,
+                    "name": "CVT",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "AUTO",
+                    "subbranch": "AUTO",
+                    "rows": 1,
+                    "companies": {
+                        "SARA ASSICURAZIONI": 1
+                    },
+                    "sample_rows": [
+                        4561
+                    ],
+                    "reason": "AUTO non identifica da solo la copertura RC: verificare RC auto o altre garanzie"
+                },
+                {
+                    "branch": "AUTO",
+                    "subbranch": "CVT",
+                    "rows": 1,
+                    "companies": {
+                        "LLOYD'S INSURANCE": 1
+                    },
+                    "sample_rows": [
+                        6829
+                    ],
+                    "reason": "AUTO non identifica da solo la copertura RC: verificare RC auto o altre garanzie"
+                },
+                {
+                    "branch": "AUTO",
+                    "subbranch": "",
+                    "rows": 83,
+                    "companies": {
+                        "ZURICH": 83
+                    },
+                    "sample_rows": [
+                        31,
+                        85,
+                        168
+                    ],
+                    "reason": "AUTO non identifica da solo la copertura RC: verificare RC auto o altre garanzie"
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "name": "CANE& GATTO",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 5,
+                    "name": "CANE&GATTO",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "CANE& GATTO",
+                    "subbranch": "CANE&GATTO",
+                    "rows": 3,
+                    "companies": {
+                        "REALE MUTUA": 3
+                    },
+                    "sample_rows": [
+                        1232,
+                        3897,
+                        4984
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "name": "CANE&GATTO",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 6,
+                    "name": "CANE&GATTO",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "CANE&GATTO",
+                    "subbranch": "CANE&GATTO",
+                    "rows": 1,
+                    "companies": {
+                        "UNIPOL": 1
+                    },
+                    "sample_rows": [
+                        2669
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "name": "CASA",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 7,
+                    "name": "CASA",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "CASA",
+                    "subbranch": "",
+                    "rows": 64,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 64
+                    },
+                    "sample_rows": [
+                        98,
+                        151,
+                        160
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                },
+                {
+                    "branch": "CASA",
+                    "subbranch": "CASA",
+                    "rows": 14,
+                    "companies": {
+                        "ZURICH": 6,
+                        "UNIPOL": 7,
+                        "ALLIANZ": 1
+                    },
+                    "sample_rows": [
+                        745,
+                        746,
+                        1319
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "name": "CAT-NAT",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 8,
+                    "name": "CAT-NAT",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "CAT-NAT",
+                    "subbranch": "CAT-NAT",
+                    "rows": 27,
+                    "companies": {
+                        "UNIPOL": 11,
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 5,
+                        "REALE MUTUA": 11
+                    },
+                    "sample_rows": [
+                        438,
+                        536,
+                        2101
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "name": "COMMERCIO",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 9,
+                    "name": "COMMERCIO",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "COMMERCIO",
+                    "subbranch": "",
+                    "rows": 43,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 29,
+                        "ZURICH": 14
+                    },
+                    "sample_rows": [
+                        235,
+                        276,
+                        277
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                },
+                {
+                    "branch": "COMMERCIO",
+                    "subbranch": "COMMERCIO",
+                    "rows": 37,
+                    "companies": {
+                        "REALE MUTUA": 24,
+                        "UNIPOL": 13
+                    },
+                    "sample_rows": [
+                        181,
+                        185,
+                        1379
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "name": "CONDOMINIO",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 10,
+                    "name": "CONDOMINIO",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "CONDOMINIO",
+                    "subbranch": "CONDOMINIO",
+                    "rows": 13,
+                    "companies": {
+                        "AXA": 12,
+                        "ZURICH": 1
+                    },
+                    "sample_rows": [
+                        378,
+                        518,
+                        962
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "name": "CVT",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 11,
+                    "name": "CVT",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "CVT",
+                    "subbranch": "CVT",
+                    "rows": 3,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 3
+                    },
+                    "sample_rows": [
+                        497,
+                        3452,
+                        4041
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 11,
+            "name": "DANNI",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 12,
+                    "name": "RESIDENT",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "DANNI",
+                    "subbranch": "RESIDENT",
+                    "rows": 4,
+                    "companies": {
+                        "EUROPE ASSISTANCE": 4
+                    },
+                    "sample_rows": [
+                        2860,
+                        2861,
+                        2947
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 12,
+            "name": "FIDEIUSSIONE",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 13,
+                    "name": "PROVVIS",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "FIDEIUSSIONE",
+                    "subbranch": "",
+                    "rows": 3,
+                    "companies": {
+                        "COFACE": 1,
+                        "AXA": 2
+                    },
+                    "sample_rows": [
+                        1142,
+                        2851,
+                        5426
+                    ],
+                    "reason": "Uniformazione della denominazione proposta"
+                },
+                {
+                    "branch": "FIDEIUSSIONE",
+                    "subbranch": "PROVVIS",
+                    "rows": 2,
+                    "companies": {
+                        "ZURICH": 2
+                    },
+                    "sample_rows": [
+                        2046,
+                        5281
+                    ],
+                    "reason": "Uniformazione della denominazione proposta"
+                }
+            ]
+        },
+        {
+            "id": 13,
+            "name": "FIDEJUSSIONI",
+            "review": true,
+            "status": "active",
+            "subbranches": [],
+            "sources": [
+                {
+                    "branch": "FIDEJUSSIONI",
+                    "subbranch": "",
+                    "rows": 1,
+                    "companies": {
+                        "ZURICH": 1
+                    },
+                    "sample_rows": [
+                        5791
+                    ],
+                    "reason": "Uniformazione della denominazione proposta"
+                }
+            ]
+        },
+        {
+            "id": 14,
+            "name": "FURTO",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 14,
+                    "name": "FURTO",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "FURTO",
+                    "subbranch": "FURTO",
+                    "rows": 1,
+                    "companies": {
+                        "UNIPOL": 1
+                    },
+                    "sample_rows": [
+                        5667
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 15,
+            "name": "GLOBALE FABBRICATI",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 15,
+                    "name": "CONDOMINIO",
+                    "review": true
+                },
+                {
+                    "id": 16,
+                    "name": "FABBRICATO",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "GLOBALE FABBRICATI",
+                    "subbranch": "",
+                    "rows": 13,
+                    "companies": {
+                        "ZURICH": 12,
+                        "UNIPOL": 1
+                    },
+                    "sample_rows": [
+                        172,
+                        319,
+                        320
+                    ],
+                    "reason": "Accorpamento delle denominazioni da confermare"
+                },
+                {
+                    "branch": "GLOBALE FABBRICATI",
+                    "subbranch": "CONDOMINIO",
+                    "rows": 9,
+                    "companies": {
+                        "SARA ASSICURAZIONI": 9
+                    },
+                    "sample_rows": [
+                        2030,
+                        2449,
+                        2450
+                    ],
+                    "reason": "Accorpamento delle denominazioni da confermare"
+                },
+                {
+                    "branch": "GLOBALE FABBRICATI",
+                    "subbranch": "FABBRICATO",
+                    "rows": 8,
+                    "companies": {
+                        "UNIPOL": 8
+                    },
+                    "sample_rows": [
+                        1380,
+                        1720,
+                        1988
+                    ],
+                    "reason": "Accorpamento delle denominazioni da confermare"
+                }
+            ]
+        },
+        {
+            "id": 16,
+            "name": "GLOBALI FABBRICATI",
+            "review": true,
+            "status": "active",
+            "subbranches": [],
+            "sources": [
+                {
+                    "branch": "GLOBALI FABBRICATI",
+                    "subbranch": "",
+                    "rows": 62,
+                    "companies": {
+                        "REALE MUTUA": 57,
+                        "GROUPAMA": 5
+                    },
+                    "sample_rows": [
+                        62,
+                        87,
+                        353
+                    ],
+                    "reason": "Accorpamento delle denominazioni da confermare"
+                }
+            ]
+        },
+        {
+            "id": 17,
+            "name": "INCENDIO",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 17,
+                    "name": "COMMERCIO",
+                    "review": false
+                },
+                {
+                    "id": 18,
+                    "name": "INCENDIO",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "INCENDIO",
+                    "subbranch": "COMMERCIO",
+                    "rows": 17,
+                    "companies": {
+                        "REALE MUTUA": 17
+                    },
+                    "sample_rows": [
+                        152,
+                        521,
+                        1027
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                },
+                {
+                    "branch": "INCENDIO",
+                    "subbranch": "INCENDIO",
+                    "rows": 1,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 1
+                    },
+                    "sample_rows": [
+                        1227
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 18,
+            "name": "INCENDIO\/FURTO",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 19,
+                    "name": "INC\/FURTO",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "INCENDIO\/FURTO",
+                    "subbranch": "INC\/FURTO",
+                    "rows": 6,
+                    "companies": {
+                        "REALE MUTUA": 6
+                    },
+                    "sample_rows": [
+                        1193,
+                        2079,
+                        2526
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 19,
+            "name": "INF COND",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 20,
+                    "name": "INF COND",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "INF COND",
+                    "subbranch": "INF COND",
+                    "rows": 62,
+                    "companies": {
+                        "REALE MUTUA": 30,
+                        "UNIPOL": 32
+                    },
+                    "sample_rows": [
+                        44,
+                        128,
+                        206
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 20,
+            "name": "INFORT-MALATTIE",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 21,
+                    "name": "INF-MALAT",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "INFORT-MALATTIE",
+                    "subbranch": "INF-MALAT",
+                    "rows": 6,
+                    "companies": {
+                        "REALE MUTUA": 6
+                    },
+                    "sample_rows": [
+                        2349,
+                        2350,
+                        5465
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 21,
+            "name": "INFORTUNI",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 22,
+                    "name": "INFORTUNI",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "INFORTUNI",
+                    "subbranch": "",
+                    "rows": 876,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 876
+                    },
+                    "sample_rows": [
+                        10,
+                        20,
+                        28
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                },
+                {
+                    "branch": "INFORTUNI",
+                    "subbranch": "INFORTUNI",
+                    "rows": 42,
+                    "companies": {
+                        "UNIPOL": 42
+                    },
+                    "sample_rows": [
+                        220,
+                        323,
+                        491
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 22,
+            "name": "INTEGRAZIONE MOBILITÃ",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 23,
+                    "name": "MULTIRISCH",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "INTEGRAZIONE MOBILITÃ",
+                    "subbranch": "",
+                    "rows": 1,
+                    "companies": {
+                        "EUROPE ASSISTANCE": 1
+                    },
+                    "sample_rows": [
+                        6436
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                },
+                {
+                    "branch": "INTEGRAZIONE MOBILITÃ",
+                    "subbranch": "MULTIRISCH",
+                    "rows": 612,
+                    "companies": {
+                        "EUROPE ASSISTANCE": 612
+                    },
+                    "sample_rows": [
+                        12,
+                        21,
+                        58
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 23,
+            "name": "PLURIATTIVA INF",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 24,
+                    "name": "PLUINF",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "PLURIATTIVA INF",
+                    "subbranch": "PLUINF",
+                    "rows": 1,
+                    "companies": {
+                        "GROUPAMA": 1
+                    },
+                    "sample_rows": [
+                        6301
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 24,
+            "name": "RC",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 25,
+                    "name": "RC",
+                    "review": true
+                },
+                {
+                    "id": 26,
+                    "name": "STUDIO",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "RC",
+                    "subbranch": "RC",
+                    "rows": 2,
+                    "companies": {
+                        "AXA": 1,
+                        "REVO": 1
+                    },
+                    "sample_rows": [
+                        864,
+                        2383
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                },
+                {
+                    "branch": "RC",
+                    "subbranch": "STUDIO",
+                    "rows": 1,
+                    "companies": {
+                        "GROUPAMA": 1
+                    },
+                    "sample_rows": [
+                        4480
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 25,
+            "name": "RC GENERALE",
+            "review": false,
+            "status": "active",
+            "subbranches": [],
+            "sources": [
+                {
+                    "branch": "RC GENERALE",
+                    "subbranch": "",
+                    "rows": 13,
+                    "companies": {
+                        "REALE MUTUA": 13
+                    },
+                    "sample_rows": [
+                        358,
+                        1369,
+                        1370
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 26,
+            "name": "RCA",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 27,
+                    "name": "AUTO",
+                    "review": true
+                },
+                {
+                    "id": 28,
+                    "name": "MOTO",
+                    "review": true
+                },
+                {
+                    "id": 29,
+                    "name": "RCA",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "RCA",
+                    "subbranch": "AUTO",
+                    "rows": 1794,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 1794
+                    },
+                    "sample_rows": [
+                        8,
+                        9,
+                        11
+                    ],
+                    "reason": "Accorpamento RCA\/RCAUTO proposto; il dettaglio del veicolo si conserva se indicato"
+                },
+                {
+                    "branch": "RCA",
+                    "subbranch": "MOTO",
+                    "rows": 27,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 27
+                    },
+                    "sample_rows": [
+                        239,
+                        578,
+                        993
+                    ],
+                    "reason": "Accorpamento RCA\/RCAUTO proposto; il dettaglio del veicolo si conserva se indicato"
+                },
+                {
+                    "branch": "RCA",
+                    "subbranch": "RCA",
+                    "rows": 2071,
+                    "companies": {
+                        "UNIPOL": 1620,
+                        "PRIMA": 406,
+                        "ALLIANZ": 2,
+                        "ZURICH": 33,
+                        "AXA": 7,
+                        "ALLIANZ VIVA": 1,
+                        "HDI": 2
+                    },
+                    "sample_rows": [
+                        16,
+                        24,
+                        26
+                    ],
+                    "reason": "Accorpamento RCA\/RCAUTO proposto; il dettaglio del veicolo si conserva se indicato"
+                }
+            ]
+        },
+        {
+            "id": 27,
+            "name": "RCAUTO",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 30,
+                    "name": "RCAUTO",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "RCAUTO",
+                    "subbranch": "",
+                    "rows": 242,
+                    "companies": {
+                        "REALE MUTUA": 242
+                    },
+                    "sample_rows": [
+                        40,
+                        43,
+                        127
+                    ],
+                    "reason": "Accorpamento RCA\/RCAUTO proposto; il dettaglio del veicolo si conserva se indicato"
+                },
+                {
+                    "branch": "RCAUTO",
+                    "subbranch": "RCAUTO",
+                    "rows": 20,
+                    "companies": {
+                        "UNIPOL": 20
+                    },
+                    "sample_rows": [
+                        2187,
+                        2756,
+                        2763
+                    ],
+                    "reason": "Accorpamento RCA\/RCAUTO proposto; il dettaglio del veicolo si conserva se indicato"
+                }
+            ]
+        },
+        {
+            "id": 28,
+            "name": "RCP",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 31,
+                    "name": "LIB.PROF",
+                    "review": false
+                },
+                {
+                    "id": 32,
+                    "name": "RCP",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "RCP",
+                    "subbranch": "",
+                    "rows": 39,
+                    "companies": {
+                        "TOKIO MARINE HCC": 39
+                    },
+                    "sample_rows": [
+                        19,
+                        143,
+                        328
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                },
+                {
+                    "branch": "RCP",
+                    "subbranch": "LIB.PROF",
+                    "rows": 19,
+                    "companies": {
+                        "AM TRUST": 19
+                    },
+                    "sample_rows": [
+                        6195,
+                        6196,
+                        6197
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                },
+                {
+                    "branch": "RCP",
+                    "subbranch": "RCP",
+                    "rows": 27,
+                    "companies": {
+                        "AM TRUST": 10,
+                        "DUAL": 5,
+                        "UNIPOL": 3,
+                        "SARA ASSICURAZIONI": 3,
+                        "AXA": 1,
+                        "REVO": 4,
+                        "BHITALIA": 1
+                    },
+                    "sample_rows": [
+                        744,
+                        1413,
+                        1946
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 29,
+            "name": "RCT",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 33,
+                    "name": "RCT",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "RCT",
+                    "subbranch": "RCT",
+                    "rows": 4,
+                    "companies": {
+                        "UNIPOL": 3,
+                        "SARA ASSICURAZIONI": 1
+                    },
+                    "sample_rows": [
+                        2072,
+                        4293,
+                        5742
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 30,
+            "name": "RE",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 34,
+                    "name": "AFFITTACAM",
+                    "review": true
+                },
+                {
+                    "id": 35,
+                    "name": "INFORTUNI",
+                    "review": true
+                },
+                {
+                    "id": 36,
+                    "name": "RC CAPOFAM",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "RE",
+                    "subbranch": "AFFITTACAM",
+                    "rows": 6,
+                    "companies": {
+                        "ZURICH": 6
+                    },
+                    "sample_rows": [
+                        422,
+                        2027,
+                        2028
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                },
+                {
+                    "branch": "RE",
+                    "subbranch": "INFORTUNI",
+                    "rows": 5,
+                    "companies": {
+                        "PRIMA": 5
+                    },
+                    "sample_rows": [
+                        2092,
+                        3386,
+                        4233
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                },
+                {
+                    "branch": "RE",
+                    "subbranch": "RC CAPOFAM",
+                    "rows": 11,
+                    "companies": {
+                        "PRIMA": 11
+                    },
+                    "sample_rows": [
+                        976,
+                        3216,
+                        3677
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 31,
+            "name": "TCM",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 37,
+                    "name": "TCM",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "TCM",
+                    "subbranch": "TCM",
+                    "rows": 4,
+                    "companies": {
+                        "UNIPOL": 2,
+                        "ZURICH": 2
+                    },
+                    "sample_rows": [
+                        2638,
+                        3440,
+                        6106
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 32,
+            "name": "TIROCINIO",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 38,
+                    "name": "TIROCINIO",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "TIROCINIO",
+                    "subbranch": "TIROCINIO",
+                    "rows": 5,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 5
+                    },
+                    "sample_rows": [
+                        2776,
+                        3432,
+                        3433
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 33,
+            "name": "TUTELA LEGALE",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 39,
+                    "name": "TUTELA LEG",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "TUTELA LEGALE",
+                    "subbranch": "TUTELA LEG",
+                    "rows": 8,
+                    "companies": {
+                        "AM TRUST": 7,
+                        "REVO": 1
+                    },
+                    "sample_rows": [
+                        2613,
+                        3606,
+                        4118
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 34,
+            "name": "UFFICIO",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 40,
+                    "name": "S. UFFICIO",
+                    "review": false
+                },
+                {
+                    "id": 41,
+                    "name": "UFFICIO",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "UFFICIO",
+                    "subbranch": "S. UFFICIO",
+                    "rows": 2,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 2
+                    },
+                    "sample_rows": [
+                        5180,
+                        5666
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                },
+                {
+                    "branch": "UFFICIO",
+                    "subbranch": "UFFICIO",
+                    "rows": 1,
+                    "companies": {
+                        "GROUPAMA": 1
+                    },
+                    "sample_rows": [
+                        1183
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        },
+        {
+            "id": 35,
+            "name": "UNICA INFORTUNI",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 42,
+                    "name": "UNICA INF",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "UNICA INFORTUNI",
+                    "subbranch": "",
+                    "rows": 1,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 1
+                    },
+                    "sample_rows": [
+                        3001
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                },
+                {
+                    "branch": "UNICA INFORTUNI",
+                    "subbranch": "UNICA INF",
+                    "rows": 12,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 12
+                    },
+                    "sample_rows": [
+                        349,
+                        795,
+                        1557
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 36,
+            "name": "VIAGGI",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 43,
+                    "name": "VIAGGI",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "VIAGGI",
+                    "subbranch": "VIAGGI",
+                    "rows": 1,
+                    "companies": {
+                        "UNIPOL": 1
+                    },
+                    "sample_rows": [
+                        3604
+                    ],
+                    "reason": "Uniformazione singolare\/plurale proposta"
+                }
+            ]
+        },
+        {
+            "id": 37,
+            "name": "VIAGGI NOSTOP",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 44,
+                    "name": "VIAGGI",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "VIAGGI NOSTOP",
+                    "subbranch": "VIAGGI",
+                    "rows": 12,
+                    "companies": {
+                        "EUROPE": 12
+                    },
+                    "sample_rows": [
+                        339,
+                        420,
+                        444
+                    ],
+                    "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+                }
+            ]
+        },
+        {
+            "id": 38,
+            "name": "VIAGGIO",
+            "review": true,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 45,
+                    "name": "VIAGGIO",
+                    "review": true
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "VIAGGIO",
+                    "subbranch": "VIAGGIO",
+                    "rows": 1,
+                    "companies": {
+                        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA": 1
+                    },
+                    "sample_rows": [
+                        2199
+                    ],
+                    "reason": "Uniformazione singolare\/plurale proposta"
+                }
+            ]
+        },
+        {
+            "id": 39,
+            "name": "VITA",
+            "review": false,
+            "status": "active",
+            "subbranches": [
+                {
+                    "id": 46,
+                    "name": "P.U.R.",
+                    "review": false
+                },
+                {
+                    "id": 47,
+                    "name": "PIP",
+                    "review": false
+                },
+                {
+                    "id": 48,
+                    "name": "VITA",
+                    "review": false
+                }
+            ],
+            "sources": [
+                {
+                    "branch": "VITA",
+                    "subbranch": "P.U.R.",
+                    "rows": 27,
+                    "companies": {
+                        "REALE MUTUA": 27
+                    },
+                    "sample_rows": [
+                        249,
+                        1006,
+                        1496
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                },
+                {
+                    "branch": "VITA",
+                    "subbranch": "PIP",
+                    "rows": 74,
+                    "companies": {
+                        "REALE MUTUA": 74
+                    },
+                    "sample_rows": [
+                        247,
+                        275,
+                        316
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                },
+                {
+                    "branch": "VITA",
+                    "subbranch": "VITA",
+                    "rows": 6,
+                    "companies": {
+                        "ZURICH": 6
+                    },
+                    "sample_rows": [
+                        161,
+                        162,
+                        3905
+                    ],
+                    "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+                }
+            ]
+        }
+    ],
+    "policies_in_database": 0,
+    "requests_in_database": 0
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\FullAuditProbeTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" tests="1" assertions="2" errors="0" failures="1" skipped="0" time="1.219904">
+    <testcase name="test_audit_author_should_survive_user_deletion" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="85" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="2" time="1.219904">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FullAuditProbeTest::test_audit_author_should_survive_user_deletion&#13;
+Lo storico dell’incasso non conserva più l’autore dopo la cancellazione dell’utente.
+Failed asserting that null is identical to 'Jaylon Heathcote'.
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php:91</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

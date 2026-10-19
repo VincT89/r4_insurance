@@ -1,0 +1,8 @@
+{
+    "id": 1,
+    "email": "admin@admin.it",
+    "password": "$2y$12$42aeeQfYJhp38UIjByHI\/ev1SW2Faia\/0KL1Z2H0hrMfD7cp.Okve",
+    "role": "admin",
+    "status": "active",
+    "password_changed_at": "2026-10-14 14:53:21"
+}

@@ -1,0 +1,45 @@
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pulse {
+  0%,100% { transform: scale(1); opacity: .8; }
+  50%      { transform: scale(1.5); opacity: 0; }
+}
+
+/* KPI strip: stagger per cella */
+.kpi-strip .kpi-cell:nth-child(1) { animation: slideUp .3s ease both .05s; }
+.kpi-strip .kpi-cell:nth-child(2) { animation: slideUp .3s ease both .10s; }
+.kpi-strip .kpi-cell:nth-child(3) { animation: slideUp .3s ease both .15s; }
+.kpi-strip .kpi-cell:nth-child(4) { animation: slideUp .3s ease both .20s; }
+.kpi-strip .kpi-cell:nth-child(5) { animation: slideUp .3s ease both .25s; }
+
+/* Panel: entra dopo le KPI */
+.panel { animation: slideUp .4s ease both .25s; }
+
+/* Page content */
+.content .page.active { animation: pgIn .25s cubic-bezier(.4,0,.2,1); }
+
+/* Accessibilità */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* SPA Transitions */
+.page-transition-root {
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-root.is-navigating {
+  opacity: 0.5;
+  transform: translateY(4px);
+}

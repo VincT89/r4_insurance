@@ -1,0 +1,16 @@
+{
+    "database": "r4_insurance",
+    "migrations": "\n   INFO  Running migrations.  \n\r\n  2026_10_16_160000_add_policy_work_completion ......................................................... 681.61ms DONE\r\n\r\n",
+    "existing_records_unchanged": true,
+    "clients": 50,
+    "policies": 50,
+    "closed_workflows": 0,
+    "correction_requests": 0,
+    "pages": {
+        "\/dashboard": 200,
+        "\/policies": 200,
+        "\/clients\/4886\/policies\/2606": 200,
+        "\/clients\/4886\/policies\/2606\/edit": 200
+    },
+    "ok": true
+}

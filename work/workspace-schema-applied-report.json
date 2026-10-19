@@ -1,0 +1,13 @@
+{
+    "mode": "schema-applied",
+    "pending": [
+        "2026_10_16_105000_complete_policy_renewal_fields"
+    ],
+    "clients": 4884,
+    "policies": 2605,
+    "teams": 0,
+    "team_members": 0,
+    "php_upload_max": "512M",
+    "php_post_max": "512M",
+    "backup": "workspace-schema-backup-20261016-113251-59884a5a"
+}

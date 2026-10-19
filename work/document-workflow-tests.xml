@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="4" assertions="81" errors="0" failures="0" skipped="0" time="1.449428">
+    <testsuite name="Core" tests="4" assertions="81" errors="0" failures="0" skipped="0" time="1.449428">
+      <testsuite name="Tests\Feature\DocumentWorkflowTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" tests="4" assertions="81" errors="0" failures="0" skipped="0" time="1.449428">
+        <testcase name="test_requests_versions_and_validation_keep_original_files_and_require_new_review" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="29" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="33" time="1.048085"/>
+        <testcase name="test_foreign_clients_context_changes_duplicate_versions_and_expired_validation_are_rejected" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="60" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="17" time="0.143901"/>
+        <testcase name="test_checklists_are_configured_explicitly_and_do_not_duplicate_requests" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="81" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="12" time="0.087851"/>
+        <testcase name="test_global_deadlines_enforce_visibility_filters_and_ignore_replaced_files_and_received_requests" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="100" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="19" time="0.169591"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

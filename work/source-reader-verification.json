@@ -1,0 +1,19 @@
+{
+  "sources": [
+    {
+      "source": "clients",
+      "rows": 4900,
+      "cellsCompared": 112700,
+      "source_sha256": "f0155309ce8ac55f614974820087b31e7b23a701dba752b39d9d4a2384a9c114",
+      "mismatches": 0
+    },
+    {
+      "source": "policies",
+      "rows": 7412,
+      "cellsCompared": 400248,
+      "source_sha256": "9561bc84d4053b48f3be0bf5617afbc36015cddb410574f68cbde27ebcbe2a3e",
+      "mismatches": 0
+    }
+  ],
+  "ok": true
+}

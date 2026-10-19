@@ -1,0 +1,21 @@
+<?php
+$root=dirname(__DIR__,2);
+require $root.'/vendor/autoload.php';
+$app=require $root.'/bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$db=config('database.connections.sqlite.database');
+if(config('database.default')!=='sqlite'||dirname($db)!==__DIR__||!preg_match('/^ui-[0-9]+\.sqlite$/',basename($db)))throw new RuntimeException('Database di collaudo richiesto.');
+$admin=App\Models\User::where('email','ui-test@example.test')->firstOrFail();
+auth()->login($admin);
+$client=App\Models\Client::orderBy('id')->firstOrFail();$policy=$client->policies()->orderBy('id')->firstOrFail();
+for($i=1;$i<=32;$i++)App\Models\Client::factory()->create(['name'=>'Cliente collaudo '.str_pad((string)$i,2,'0',STR_PAD_LEFT),'email'=>null,'phone'=>null,'commercial_user_id'=>$client->commercial_user_id]);
+$ledger=app(App\Services\InsuranceLedger::class);
+$ledger->generate($policy,hash('sha256',json_encode($ledger->plan($policy))));
+$title=$policy->titles()->firstOrFail();
+$ledger->collect($title,['received_on'=>today()->toDateString(),'amount_cents'=>10000,'payment_method'=>'Bonifico a Intermediario','recipient'=>'our_agency','document_type'=>'transfer','consultant_id'=>$admin->id,'idempotency_key'=>(string)Illuminate\Support\Str::uuid()]);
+$case=$client->quoteCases()->create(['insurance_branch_id'=>$policy->insurance_branch_id,'subject'=>'Assicurazione autovettura','status'=>'open','created_by'=>$admin->id]);
+app(App\Services\InsuranceQuoteWorkflow::class)->request($case,$policy->supplier_company_id,today()->toDateString());
+$vehicle=$client->vehicles()->firstOrFail();
+$contact=$client->contacts()->create(['name'=>'Marco Riva','role'=>'Referente','email'=>'referente@example.test']);
+$asset=$client->assets()->create(['name'=>'Sede amministrativa','category'=>'Ufficio','asset_type'=>'property','address'=>'Via del Collaudo 10']);
+echo json_encode(['title_id'=>$title->id,'case_id'=>$case->id,'vehicle_id'=>$vehicle->id,'contact_id'=>$contact->id,'asset_id'=>$asset->id],JSON_THROW_ON_ERROR);

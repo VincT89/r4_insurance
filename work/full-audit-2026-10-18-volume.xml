@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\FullAuditVolumeTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditVolumeTest.php" tests="1" assertions="5" errors="0" failures="0" skipped="0" time="5.901164">
+    <testcase name="test_lists_with_ten_years_of_policy_volume" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditVolumeTest.php" line="13" class="Tests\Feature\FullAuditVolumeTest" classname="Tests.Feature.FullAuditVolumeTest" assertions="5" time="5.901164"/>
+  </testsuite>
+</testsuites>

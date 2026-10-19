@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="12" assertions="100" errors="1" failures="0" skipped="0" time="6.776299">
+    <testsuite name="Core" tests="12" assertions="100" errors="1" failures="0" skipped="0" time="6.776299">
+      <testsuite name="Tests\Feature\InsuranceWorkspaceTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" tests="7" assertions="68" errors="0" failures="0" skipped="0" time="3.014461">
+        <testcase name="test_direct_form_client_lookup_quick_creation_and_policy_attachments" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="22" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="16" time="1.034015"/>
+        <testcase name="test_portfolio_context_and_global_save_enforce_client_scope_and_links" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="38" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="10" time="0.126309"/>
+        <testcase name="test_month_report_includes_last_day_and_excludes_next_month_with_distinct_agencies" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="55" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="5" time="0.086421"/>
+        <testcase name="test_reminders_cover_fifteen_days_once_respect_scope_and_ignore_replaced_documents" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="68" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="6" time="0.059762"/>
+        <testcase name="test_daily_agency_email_is_a_reviewed_draft_scoped_by_agency_and_date" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="85" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="12" time="1.551586"/>
+        <testcase name="test_expired_identity_warns_unknown_cannot_be_validated_and_non_pdf_policy_upload_is_rejected" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="101" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="9" time="0.088111"/>
+        <testcase name="test_source_status_frequency_and_method_do_not_invent_paid_or_resolve_mixed_groups" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="116" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="10" time="0.068257"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\InsuranceDemoAndUploadsTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" tests="5" assertions="32" errors="1" failures="0" skipped="0" time="3.761838">
+        <testcase name="test_multi_documents_keep_independent_identity_types_dates_and_reject_cross_client_links" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="28" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="11" time="0.096638"/>
+        <testcase name="test_generic_and_livewire_batches_validate_every_file_and_store_both_valid_files" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="42" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="8" time="1.141631"/>
+        <testcase name="test_reset_backs_up_dependents_preserves_catalog_and_admin_and_creates_fifty_linked_examples" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="55" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="1" time="0.557518">
+          <error type="Illuminate\Database\QueryException">Tests\Feature\InsuranceDemoAndUploadsTest::test_reset_backs_up_dependents_preserves_catalog_and_admin_and_creates_fifty_linked_examples&#13;
+Illuminate\Database\QueryException: SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: clients.slug (Connection: sqlite, Database: :memory:, SQL: insert into "clients" ("name", "company_name", "client_type", "email", "status", "commercial_user_id", "notes", "registry_name_key", "updated_at", "created_at") values (Cliente dimostrativo 001, ?, person, cliente001@example.test, active, 1, Dati dimostrativi per il collaudo. Nessun cliente reale., cliente dimostrativo 001, 2026-10-16 12:00:00, 2026-10-16 12:00:00))
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Connection.php:857
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Connection.php:813
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Connection.php:590
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Connection.php:554
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Query\Processors\Processor.php:32
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php:4258
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:2271
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1685
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1601
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:1405
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:1225
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Support\helpers.php:393
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php:1224
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php:23
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2842
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:2858
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\database\seeders\InsuranceDemoSeeder.php:24
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Concerns\ManagesTransactions.php:35
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:502
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:364
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\database\seeders\InsuranceDemoSeeder.php:18
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\app\Services\InsuranceDemoReset.php:62
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\Concerns\ManagesTransactions.php:35
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php:502
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php:364
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\app\Services\InsuranceDemoReset.php:18
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php:63</error>
+        </testcase>
+        <testcase name="test_reset_failure_rolls_back_clients_and_leaves_files_untouched" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="77" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="4" time="0.449739"/>
+        <testcase name="test_merit_classes_are_validated_saved_and_displayed" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="87" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="8" time="1.516312"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

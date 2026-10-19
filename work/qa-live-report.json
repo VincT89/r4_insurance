@@ -1,0 +1,52 @@
+{
+    "ok": true,
+    "counts": {
+        "clients": 0,
+        "client_vehicles": 0,
+        "insurance_policies": 0,
+        "attachments": 0,
+        "supplier_companies": 0,
+        "supplier_agencies": 0
+    },
+    "fkChecks": {
+        "attachments.insurance_policy_id": 0,
+        "attachments.uploaded_by": 0,
+        "attachments.vehicle_id": 0,
+        "audit_logs.user_id": 0,
+        "clients.commercial_user_id": 0,
+        "client_user.client_id": 0,
+        "client_user.user_id": 0,
+        "client_vehicles.client_id": 0,
+        "insurance_policies.client_id": 0,
+        "insurance_policies.vehicle_id": 0,
+        "supplier_agencies.parent_agency_id": 0,
+        "supplier_agencies.supplier_company_id": 0,
+        "team_user.team_id": 0,
+        "team_user.user_id": 0,
+        "user_daily_notes.user_id": 0,
+        "user_daily_note_checklist_items.user_daily_note_entry_id": 0,
+        "user_daily_note_entries.user_daily_note_id": 0
+    },
+    "links": {
+        "policy_vehicle_client": 0,
+        "document_client": 0,
+        "document_insurance_policy_id": 0,
+        "document_vehicle_id": 0,
+        "document_policy_vehicle": 0,
+        "supplier_hierarchy": 0
+    },
+    "missingFiles": 0,
+    "adminUnchanged": true,
+    "pages": {
+        "\/clients": 200,
+        "\/clients\/create": 200,
+        "\/supplier-companies": 200,
+        "\/supplier-companies\/create": 200,
+        "\/suppliers": 200,
+        "\/suppliers\/create": 200,
+        "\/dashboard": 200,
+        "\/audit-logs": 200
+    },
+    "pending": [],
+    "remainingRetired": []
+}

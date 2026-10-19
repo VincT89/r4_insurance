@@ -1,0 +1,68 @@
+const { chromium } = require('C:/Users/vince/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const { spawn, execFileSync } = require('node:child_process');
+const fs = require('node:fs');
+const path = require('node:path');
+const net = require('node:net');
+const assert = require('node:assert/strict');
+const ExcelJS = require('../../node_modules/exceljs');
+const root = path.resolve(__dirname, '../..');
+const php = 'C:/PHP 8.3.1/php.exe';
+const env = { ...process.env, APP_ENV:'testing', APP_DEBUG:'false', DB_CONNECTION:'sqlite', DB_DATABASE:path.join(__dirname,`ui-${Date.now()}.sqlite`), DB_URL:'', CACHE_STORE:'array', SESSION_DRIVER:'file', SESSION_COOKIE:`merge_qa_${Date.now()}`, QUEUE_CONNECTION:'sync', MAIL_MAILER:'array', CATALOG_MERGE_QA:'1' };
+const report = { flows:[], layouts:[], errors:[] };
+const delay = ms => new Promise(resolve=>setTimeout(resolve,ms));
+(async()=>{
+    const reservation=net.createServer(); await new Promise(r=>reservation.listen(0,'127.0.0.1',r)); const port=reservation.address().port; await new Promise(r=>reservation.close(r));
+    const base=`http://127.0.0.1:${port}`; env.APP_URL=base;
+    execFileSync(php,[path.join(__dirname,'prepare.php')],{cwd:root,env,windowsHide:true,stdio:'pipe'});
+    const server=spawn(php,['-S',`127.0.0.1:${port}`,'-t',path.join(root,'public'),path.join(__dirname,'router.php')],{cwd:root,env,windowsHide:true,stdio:'ignore'});
+    let browser, page;
+    try {
+        for(let i=0;i<60;i++){try{if((await fetch(base+'/login')).ok)break;}catch{}await delay(250);}
+        browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
+        const context=await browser.newContext({viewport:{width:1440,height:1050},acceptDownloads:true});
+        await context.route('**/*',route=>new URL(route.request().url()).origin===base?route.continue():route.abort());
+        page=await context.newPage(); page.setDefaultTimeout(15000);
+        page.on('pageerror',e=>report.errors.push(e.message));
+        page.on('response',r=>{if(r.status()>=500)report.errors.push(`${r.status()} ${r.url()}`);});
+        const settled=async()=>{await page.evaluate(async()=>{await window.Alpine?.nextTick();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));await Promise.all(document.getAnimations().filter(a=>a.effect?.getComputedTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})));});};
+        const ready=async()=>{await page.waitForLoadState('load');await page.waitForFunction(()=>[...document.querySelectorAll('[x-data]')].every(e=>e._x_dataStack?.length));await settled();};
+        const goto=async url=>{assert.equal((await page.goto(base+url)).status(),200,url);await ready();};
+        const submit=async name=>{await Promise.all([page.waitForNavigation(),page.getByRole('button',{name,exact:true}).click()]);await ready();};
+        const layout=async(label,mobile=false)=>{await page.setViewportSize(mobile?{width:390,height:844}:{width:1440,height:1050});if(mobile)await page.keyboard.press('Escape');await settled();assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),label);report.layouts.push(label);};
+        await goto('/login');await page.locator('[name=email]').fill('ui-test@example.test');await page.locator('[name=password]').fill('password-testing-only');await submit('Entra');
+        await goto('/settings/insurance-catalog?search=RC%20auto');assert.equal(await page.locator('table.t-table tbody tr').count(),1);assert.ok((await page.locator('table.t-table').innerText()).includes('RC auto'));
+        await page.getByRole('link',{name:'Modifica',exact:true}).click();await ready();assert.ok((await page.locator('main').innerText()).includes('RCAUTO'));
+        await layout('Origini catalogo desktop');await layout('Origini catalogo mobile',true);
+        await goto('/clients/1/policies/create');
+        await page.locator('[name=category]').selectOption('RC auto');
+        assert.deepEqual(await page.locator('[name=subcategory] option').allTextContents(),['Non specificato','AUTO','MOTO']);
+        await page.locator('[name=subcategory]').selectOption('AUTO');await page.getByLabel('Nome del prodotto',{exact:true}).fill('Prodotto dimostrativo QA');
+        await page.locator('[name=category]').selectOption('Viaggi');assert.equal(await page.locator('[name=subcategory]').inputValue(),'');assert.equal(await page.locator('[name=product]').inputValue(),'Prodotto dimostrativo QA');
+        await page.locator('[name=category]').selectOption('RC auto');await page.locator('[name=subcategory]').selectOption('AUTO');
+        await page.locator('[name=company]').fill('Compagnia dimostrativa QA');await page.locator('[name=number]').fill('MERGE-QA');await page.locator('[name=starts_on]').fill('2026-10-15');await page.locator('[name=expires_on]').fill('2027-10-15');
+        await layout('Ramo sottoramo prodotto desktop');await page.screenshot({path:path.join(__dirname,'merge-product-desktop.png')});
+        await layout('Ramo sottoramo prodotto mobile',true);await page.screenshot({path:path.join(__dirname,'merge-product-mobile.png')});
+        await submit('Salva polizza');assert.ok((await page.locator('main').innerText()).includes('Prodotto dimostrativo QA'));
+        await goto('/clients/1?tab=policies&category=RC%20auto');
+        await page.getByRole('navigation',{name:'Sottorami del ramo selezionato'}).getByRole('link',{name:'AUTO',exact:true}).click();await ready();
+        const table=page.locator('table.t-table').first();assert.ok((await table.innerText()).includes('Prodotto dimostrativo QA'));
+        await page.getByRole('button',{name:'Filtra tabella',exact:true}).click();await page.locator('.table-filter-picker').getByRole('button',{name:'Nome del prodotto',exact:true}).click();
+        await page.getByRole('textbox',{name:'Valore per Nome del prodotto',exact:true}).fill('Prodotto dimostrativo QA');await page.getByRole('button',{name:'Applica filtri',exact:true}).click();
+        await page.waitForFunction(()=>document.querySelector('.table-export-status')?.textContent.startsWith('1 risultato'));
+        const [download]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'Esporta Excel',exact:true}).click()]);await download.saveAs(path.join(__dirname,'merge-product.xlsx'));
+        const workbook=new ExcelJS.Workbook();await workbook.xlsx.readFile(path.join(__dirname,'merge-product.xlsx'));
+        assert.deepEqual(workbook.getWorksheet('Dati').getRow(6).values.slice(1,6),['MERGE-QA','RC auto','AUTO','Prodotto dimostrativo QA','Compagnia dimostrativa QA']);
+        const [pdf]=await Promise.all([page.waitForEvent('download'),page.getByRole('button',{name:'Esporta PDF',exact:true}).click()]);await pdf.saveAs(path.join(__dirname,'merge-product.pdf'));assert.equal(fs.readFileSync(path.join(__dirname,'merge-product.pdf')).subarray(0,5).toString(),'%PDF-');
+        await layout('Tab polizze desktop');await page.screenshot({path:path.join(__dirname,'merge-policy-table-desktop.png')});
+        await layout('Tab polizze mobile',true);await page.screenshot({path:path.join(__dirname,'merge-policy-table-mobile.png')});
+        report.flows.push('Catalogo accorpato con fonti originali; selezioni dipendenti; prodotto separato; tab ramo/sottoramo; filtro prodotto; Excel con colonne separate e PDF');
+        await goto('/settings/insurance-import?section=branches');assert.ok((await page.locator('main').innerText()).includes('Accorpamento approvato'));
+        const pending=page.locator('tr').filter({hasText:'PROVVIS'});assert.ok((await pending.innerText()).includes('Da verificare'));
+        await layout('Classificazioni Excel desktop');await page.screenshot({path:path.join(__dirname,'merge-preview-desktop.png')});
+        await layout('Classificazioni Excel mobile',true);
+        report.flows.push('Anteprima aggiornata con destinazioni approvate, campo prodotto e classificazioni ancora da verificare');
+        assert.deepEqual(report.errors,[]);report.ok=true;
+    } catch(error) { report.ok=false;report.failure=error.stack;if(page){report.page=page.url();report.text=(await page.locator('main').innerText().catch(()=>'' )).slice(0,3000);await page.screenshot({path:path.join(__dirname,'merge-failure.png')}).catch(()=>{});}throw error; }
+    finally { if(browser)await browser.close();server.kill();fs.writeFileSync(path.join(__dirname,'catalog-merges-ui-report.json'),JSON.stringify(report,null,2)); }
+    console.log(JSON.stringify(report,null,2));
+})().catch(e=>{console.error(e.stack);process.exitCode=1;});

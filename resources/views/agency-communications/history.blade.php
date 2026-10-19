@@ -1,0 +1,12 @@
+<x-app-layout title="Storico comunicazioni">
+    <x-page-header><x-slot:title>Storico comunicazioni</x-slot:title><x-slot:actions><a class="btn btn-p" href="{{ route('agency-communications.index') }}">Prepara comunicazione</a></x-slot:actions></x-page-header>
+    @include('agency-communications.navigation')
+    <form method="GET" class="client-search-form filter-grid"><div class="form-row">
+        <x-form-group name="month" label="Mese"><input id="field-month" class="form-in" name="month" type="month" value="{{ $filters['month'] }}" required></x-form-group>
+        <x-form-group name="agency" label="Agenzia"><select id="field-agency" class="form-sel" name="agency"><option value="">Tutte</option>@foreach($agencies as $agency)<option value="{{ $agency->id }}" @selected((string)($filters['agency'] ?? '')===(string)$agency->id)>{{ $agency->name }}</option>@endforeach</select></x-form-group>
+        <x-form-group name="state" label="Esito"><select id="field-state" class="form-sel" name="state"><option value="">Tutti</option>@foreach(\App\Models\AgencyCommunication::STATUSES as $value=>$label)<option value="{{ $value }}" @selected(($filters['state'] ?? '')===$value)>{{ $label }}</option>@endforeach</select></x-form-group>
+    </div><div class="search-form-actions"><button class="btn btn-p">Applica filtri</button><a class="btn btn-g" href="{{ route('agency-communications.history') }}">Azzera filtri</a></div></form>
+    <x-panel><div class="client-table-scroll" role="region" aria-label="Storico comunicazioni alle agenzie" tabindex="0"><table class="t-table"><thead><tr><th>Preparata il</th><th>Agenzia</th><th>Destinatario</th><th>Polizze</th><th>Esito</th><th>Operatore</th><th>Dettaglio</th></tr></thead><tbody>
+        @forelse($messages as $message)@php($payload=$message->payload)<tr><td>{{ $message->created_at->format('d/m/Y H:i') }}</td><td>{{ $payload['recipient']['name'] }}</td><td>{{ $payload['recipient']['address'] }}</td><td>{{ count($payload['policies']) }}</td><td>{{ $message->status_label }}</td><td>{{ $message->user?->name ?: 'Utente non più presente' }}</td><td><a href="{{ route('agency-communications.show',$message) }}">Apri riepilogo</a></td></tr>@empty<tr><td colspan="7">Nessuna comunicazione nel periodo selezionato.</td></tr>@endforelse
+    </tbody></table></div>{{ $messages->links() }}</x-panel>
+</x-app-layout>

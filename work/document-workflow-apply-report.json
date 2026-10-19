@@ -1,0 +1,26 @@
+{
+    "migration": "2026_10_15_210000_add_document_workflow",
+    "unchanged": {
+        "users": true,
+        "clients": true,
+        "insurance_policies": true,
+        "registry_import_entries": true,
+        "supplier_companies": true,
+        "supplier_agencies": true,
+        "supplier_agency_company": true,
+        "insurance_branches": true,
+        "insurance_subbranches": true,
+        "attachments": true
+    },
+    "counts": {
+        "branches": 39,
+        "subbranches": 48,
+        "agencies": 16,
+        "clients": 4884,
+        "clients_held": 71,
+        "policies": 0,
+        "documents": 0,
+        "requests": 0
+    },
+    "pending": []
+}

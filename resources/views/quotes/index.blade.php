@@ -1,0 +1,15 @@
+<x-app-layout title="Preventivi">
+<x-page-header><x-slot:title>Preventivi</x-slot:title><x-slot:actions>@can('create',\App\Models\Client::class)<a class="btn btn-p" href="{{ route('quotes.create') }}">Nuovo preventivo</a>@endcan</x-slot:actions></x-page-header>
+<form method="GET" class="client-search-form" aria-label="Filtra preventivi">
+@if($filters['client']??null)<input type="hidden" name="client" value="{{ $filters['client'] }}">@endif
+<x-form-group label="Cliente o oggetto" name="search"><input class="form-in" name="search" value="{{ $filters['search']??'' }}"></x-form-group>
+<x-form-group label="Stato pratica" name="status"><select class="form-sel" name="status"><option value="">Tutti</option>@foreach(['open'=>'Aperta','approved'=>'Approvata','closed'=>'Polizza stipulata'] as $key=>$label)<option value="{{ $key }}" @selected(($filters['status']??'')===$key)>{{ $label }}</option>@endforeach</select></x-form-group>
+<x-form-group label="Compagnia" name="company"><select class="form-sel" name="company"><option value="">Tutte</option>@foreach($companies as $company)<option value="{{ $company->id }}" @selected(($filters['company']??'')==$company->id)>{{ $company->name }}</option>@endforeach</select></x-form-group>
+<div class="search-form-actions"><button class="btn btn-p">Applica filtri</button><a class="btn btn-g" href="{{ route('quotes.index') }}">Azzera</a></div>
+<details class="search-more" @if(filled($filters['from']??null) || filled($filters['to']??null)) open @endif>
+<summary class="btn btn-g">Altri filtri</summary><div class="search-more-fields">
+@foreach(['from'=>'Apertura dal','to'=>'Al'] as $key=>$label)<x-form-group :label="$label" :name="$key"><input class="form-in" type="date" name="{{ $key }}" value="{{ $filters[$key]??'' }}"></x-form-group>@endforeach
+</div></details>
+</form>
+<x-panel><div class="client-table-scroll" role="region" aria-label="Preventivi" tabindex="0"><table class="t-table"><thead><tr><th>Pratica</th><th>Cliente</th><th>Ramo</th><th>Sottoramo</th><th>Compagnie interpellate</th><th>Data</th><th>Stato</th></tr></thead><tbody>@forelse($cases as $case)<tr><td><a href="{{ route('quotes.show',$case) }}">{{ $case->subject }}</a></td><td>{{ $case->client->name }}</td><td>{{ $case->branch->name }}</td><td>{{ $case->subbranch?->name ?: 'Non specificato' }}</td><td>{{ $case->quotes->map(fn($q)=>$q->company->name)->join(', ') ?: 'Nessuna richiesta registrata' }}</td><td>{{ $case->created_at->format('d/m/Y') }}</td><td>{{ ['open'=>'Aperta','approved'=>'Approvata','closed'=>'Polizza stipulata'][$case->status] }}</td></tr>@empty<tr><td colspan="7">Nessun preventivo corrisponde ai filtri.</td></tr>@endforelse</tbody></table></div>{{ $cases->links() }}</x-panel>
+</x-app-layout>

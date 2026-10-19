@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="1" assertions="11" errors="0" failures="1" skipped="0" time="1.096445">
+    <testsuite name="Core" tests="1" assertions="11" errors="0" failures="1" skipped="0" time="1.096445">
+      <testsuite name="Tests\Feature\AuditSafetyRegressionTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AuditSafetyRegressionTest.php" tests="1" assertions="11" errors="0" failures="1" skipped="0" time="1.096445">
+        <testcase name="test_two_edits_in_the_same_second_cannot_overwrite_each_other_and_input_is_retained" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AuditSafetyRegressionTest.php" line="99" class="Tests\Feature\AuditSafetyRegressionTest" classname="Tests.Feature.AuditSafetyRegressionTest" assertions="11" time="1.096445">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\AuditSafetyRegressionTest::test_two_edits_in_the_same_second_cannot_overwrite_each_other_and_input_is_retained&#13;
+Failed asserting that '&lt;!DOCTYPE html&gt;\r\n
+&lt;html lang="it"&gt;\r\n
+\r\n
+&lt;head&gt;\r\n
+  &lt;meta charset="UTF-8"&gt;\r\n
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;\r\n
+  &lt;meta name="csrf-token" content="atmgV3SDxB9Gg1zsX8cEi4huuGLciTSfJAEXrQkW"&gt;\r\n
+  &lt;title&gt;Modifica polizza&lt;/title&gt;\r\n
+  &lt;link rel="shortcut icon" href="http://127.0.0.1:8001/favicon.ico?v=gs-white-20261015"&gt;\n
+&lt;link rel="icon" type="image/png" sizes="16x16" href="http://127.0.0.1:8001/favicon-16x16.png?v=gs-white-20261015"&gt;\n
+&lt;link rel="icon" type="image/png" sizes="32x32" href="http://127.0.0.1:8001/favicon-32x32.png?v=gs-white-20261015"&gt;\n
+&lt;link rel="apple-touch-icon" sizes="180x180" href="http://127.0.0.1:8001/apple-touch-icon.png?v=gs-white-20261015"&gt;\n
+  &lt;link rel="preload" as="style" href="http://127.0.0.1:8001/build/assets/app-SyqzAgbI.css" /&gt;&lt;link rel="modulepreload" as="script" href="http://127.0.0.1:8001/build/assets/app-DxuvAEXZ.js" /&gt;&lt;link rel="modulepreload" as="script" href="http://127.0.0.1:8001/build/assets/icons-C44F7d7u.js" /&gt;&lt;link rel="modulepreload" as="script" href="http://127.0.0.1:8001/build/assets/rolldown-runtime-DAXXjFlN.js" /&gt;&lt;link rel="stylesheet" href="http://127.0.0.1:8001/build/assets/app-SyqzAgbI.css" data-navigate-track="reload" /&gt;&lt;script type="module" src="http://127.0.0.1:8001/build/assets/app-DxuvAEXZ.js" data-navigate-track="reload"&gt;&lt;/script&gt;  &lt;!-- Livewire Styles --&gt;&lt;style &gt;[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.list-item][wire\:loading\.list-item], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak="x-cloak"],[x-cloak=""] {display: none !important;}[wire\:cloak="wire:cloak"],[wire\:cloak=""] {display: none !important;}dialog#livewire-error::backdrop {background-color: rgba(0, 0, 0, .6);}&lt;/style&gt;\r\n
+&lt;/head&gt;\r\n
+\r\n
+&lt;body class="app-body" style="--ap-sidebar:#18181d;--ap-sidebar-text:#ffffff;--ap-sidebar-muted:#bebec0;--ap-sidebar-line:#46464a;--ap-sidebar-border:#979799;--ap-sidebar-soft:#26262b;--ap-sidebar-heading:#ffffff;--ap-sidebar-link-hover:#ffffff;--ap-sidebar-accent:#ffffff;--ap-sidebar-red:#ffffff;--ap-sidebar-green:#ffffff;--ap-sidebar-blue:#ffffff;--ap-sidebar-orange:#ffffff;--ap-sidebar-purple:#ffffff;--ap-sidebar-teal:#ffffff;--ap-sidebar-yellow:#ffffff;--ap-sidebar-active:#26262e;--ap-sidebar-active-text:#ffffff;--ap-sidebar-active-muted:#c2c2c4;--ap-sidebar-active-line:#515158;--ap-sidebar-active-border:#9d9da1;--ap-sidebar-active-soft:#33333b;--ap-sidebar-active-heading:#ffffff;--ap-sidebar-active-link-hover:#ffffff;--ap-sidebar-active-accent:#ffffff;--ap-sidebar-active-red:#ffffff;--ap-sidebar-active-green:#ffffff;--ap-sidebar-active-blue:#ffffff;--ap-sidebar-active-orange:#ffffff;--ap-sidebar-active-purple:#ffffff;--ap-sidebar-active-teal:#ffffff;--ap-sidebar-active-yellow:#ffffff;--ap-topbar:#111115;--ap-topbar-text:#ffffff;--ap-topbar-muted:#bcbcbd;--ap-topbar-line:#414144;--ap-topbar-border:#949496;--ap-topbar-soft:#1f1f23;--ap-topbar-heading:#ffffff;--ap-topbar-link-hover:#ffffff;--ap-topbar-accent:#ffffff;--ap-topbar-red:#ffffff;--ap-topbar-green:#ffffff;--ap-topbar-blue:#ffffff;--ap-topbar-orange:#ffffff;--ap-topbar-purple:#ffffff;--ap-topbar-teal:#ffffff;--ap-topbar-yellow:#ffffff;--ap-page:#f1f5f9;--ap-page-text:#1a1a2e;--ap-page-muted:#565767;--ap-page-line:#c6c9d0;--ap-page-border:#7b7d89;--ap-page-soft:#e4e8ed;--ap-page-heading:#1d4ed8;--ap-page-link-hover:#163da8;--ap-page-accent:#c8102e;--ap-page-red:#b42323;--ap-page-green:#147a52;--ap-page-blue:#2459b8;--ap-page-orange:#a33b00;--ap-page-purple:#6d4db7;--ap-page-teal:#0f766e;--ap-page-yellow:#854d0e;--ap-panel:#f4f6f9;--ap-panel-text:#1a1a2e;--ap-panel-muted:#575867;--ap-panel-line:#c8cad0;--ap-panel-border:#7c7d89;--ap-panel-soft:#e7e9ed;--ap-panel-heading:#1d4ed8;--ap-panel-link-hover:#163da8;--ap-panel-accent:#c8102e;--ap-panel-red:#b42323;--ap-panel-green:#147a52;--ap-panel-blue:#2459b8;--ap-panel-orange:#a33b00;--ap-panel-purple:#6d4db7;--ap-panel-teal:#0f766e;--ap-panel-yellow:#854d0e;--ap-field:#f1f5f9;--ap-field-text:#1a1a2e;--ap-field-muted:#565767;--ap-field-line:#c6c9d0;--ap-field-border:#7b7d89;--ap-field-soft:#e4e8ed;--ap-field-heading:#1d4ed8;--ap-field-link-hover:#163da8;--ap-field-accent:#c8102e;--ap-field-red:#b42323;--ap-field-green:#147a52;--ap-field-blue:#2459b8;--ap-field-orange:#a33b00;--ap-field-purple:#6d4db7;--ap-field-teal:#0f766e;--ap-field-yellow:#854d0e;--ap-table-header:#18181d;--ap-table-header-text:#ffffff;--ap-table-header-muted:#bebec0;--ap-table-header-line:#46464a;--ap-table-header-border:#979799;--ap-table-header-soft:#26262b;--ap-table-header-heading:#ffffff;--ap-table-header-link-hover:#ffffff;--ap-table-header-accent:#ffffff;--ap-table-header-red:#ffffff;--ap-table-header-green:#ffffff;--ap-table-header-blue:#ffffff;--ap-table-header-orange:#ffffff;--ap-table-header-purple:#ffffff;--ap-table-header-teal:#ffffff;--ap-table-header-yellow:#ffffff;--ap-table-body:#f4f6f9;--ap-table-body-text:#1a1a2e;--ap-table-body-muted:#575867;--ap-table-body-line:#c8cad0;--ap-table-body-border:#7c7d89;--ap-table-body-soft:#e7e9ed;--ap-table-body-heading:#1d4ed8;--ap-table-body-link-hover:#163da8;--ap-table-body-accent:#c8102e;--ap-table-body-red:#b42323;--ap-table-body-green:#147a52;--ap-table-body-blue:#2459b8;--ap-table-body-orange:#a33b00;--ap-table-body-purple:#6d4db7;--ap-table-body-teal:#0f766e;--ap-table-body-yellow:#854d0e;--ap-table-hover:#e2e8f0;--ap-table-hover-text:#1a1a2e;--ap-table-hover-muted:#525464;--ap-table-hover-line:#babfc9;--ap-table-hover-border:#747785;--ap-table-hover-soft:#d6dce4;--ap-table-hover-heading:#1d4ed8;--ap-table-hover-link-hover:#163da8;--ap-table-hover-accent:#c8102e;--ap-table-hover-red:#b42323;--ap-table-hover-green:#000000;--ap-table-hover-blue:#2459b8;--ap-table-hover-orange:#a33b00;--ap-table-hover-purple:#6d4db7;--ap-table-hover-teal:#000000;--ap-table-hover-yellow:#854d0e;--ap-form-border:#c8102e;--ap-form-border-text:#ffffff;--ap-form-border-muted:#ffffff;--ap-form-border-line:#d34058;--ap-form-border-border:#ffffff;--ap-form-border-soft:#cb1e3b;--ap-form-border-heading:#ffffff;--ap-form-border-link-hover:#ffffff;--ap-form-border-accent:#ffffff;--ap-form-border-red:#ffffff;--ap-form-border-green:#ffffff;--ap-form-border-blue:#ffffff;--ap-form-border-orange:#ffffff;--ap-form-border-purple:#ffffff;--ap-form-border-teal:#ffffff;--ap-form-border-yellow:#ffffff;--ap-sidebar-hover:#26262e;--ap-sidebar-hover-text:#ffffff;--ap-sidebar-hover-muted:#c2c2c4;--ap-sidebar-hover-line:#515158;--ap-sidebar-hover-border:#9d9da1;--ap-sidebar-hover-soft:#33333b;--ap-sidebar-hover-heading:#ffffff;--ap-sidebar-hover-link-hover:#ffffff;--ap-sidebar-hover-accent:#ffffff;--ap-sidebar-hover-red:#ffffff;--ap-sidebar-hover-green:#ffffff;--ap-sidebar-hover-blue:#ffffff;--ap-sidebar-hover-orange:#ffffff;--ap-sidebar-hover-purple:#ffffff;--ap-sidebar-hover-teal:#ffffff;--ap-sidebar-hover-yellow:#ffffff;--ap-secondary-hover:#e2e8f0;--ap-secondary-hover-text:#1a1a2e;--ap-secondary-hover-muted:#525464;--ap-secondary-hover-line:#babfc9;--ap-secondary-hover-border:#747785;--ap-secondary-hover-soft:#d6dce4;--ap-secondary-hover-heading:#1d4ed8;--ap-secondary-hover-link-hover:#163da8;--ap-secondary-hover-accent:#c8102e;--ap-secondary-hover-red:#b42323;--ap-secondary-hover-green:#000000;--ap-secondary-hover-blue:#2459b8;--ap-secondary-hover-orange:#a33b00;--ap-secondary-hover-purple:#6d4db7;--ap-secondary-hover-teal:#000000;--ap-secondary-hover-yellow:#854d0e;--ap-login-panel:#000000;--ap-login-panel-text:#ffffff;--ap-login-panel-muted:#b8b8b8;--ap-login-panel-line:#333333;--ap-login-panel-border:#8c8c8c;--ap-login-panel-soft:#0f0f0f;--ap-login-panel-heading:#ffffff;--ap-login-panel-link-hover:#ffffff;--ap-login-panel-accent:#ffffff;--ap-login-panel-red:#ffffff;--ap-login-panel-green:#ffffff;--ap-login-panel-blue:#ffffff;--ap-login-panel-orange:#ffffff;--ap-login-panel-purple:#ffffff;--ap-login-panel-teal:#ffffff;--ap-login-panel-yellow:#ffffff;--ap-primary:#c8102e;--ap-primary-text:#ffffff;--ap-primary-hover:#e8304e;--ap-primary-hover-text:#000000;--ap-primary-rgb:200, 16, 46;"&gt;\r\n
+\r\n
+  &lt;a class="skip-link" href="#content-area"&gt;Vai al contenuto principale&lt;/a&gt;\r\n
+\r\n
+  \r\n
+\r\n
+  \r\n
+  &lt;div id="toast" role="status" aria-live="polite"&gt;&lt;/div&gt;\r\n
+\r\n
+  &lt;div class="shell" id="shell" \r\n
+       x-data="{ sidebarOpen: window.innerWidth &gt;= 1024 }" \r\n
+       @resize.window="sidebarOpen = window.innerWidth &gt;= 1024"\r\n
+       @keydown.escape.window="if (window.innerWidth &lt; 1024) sidebarOpen = false"\r\n
+       :class="sidebarOpen ? 'expanded' : ''"&gt;\r\n
+\r\n
+    \r\n
+    &lt;header class="topbar"&gt;\r\n
+      &lt;div class="topbar-left"&gt;\r\n
+        &lt;button\r\n
+          type="button"\r\n
+          class="mobile-menu-toggle"\r\n
+          @click="sidebarOpen = !sidebarOpen; setTimeout(() =&gt; window.refreshAppLayout(), 350)"\r\n
+          :aria-expanded="sidebarOpen.toString()"\r\n
+          aria-controls="app-sidebar"\r\n
+          :aria-label="sidebarOpen ? 'Chiudi menu di navigazione' : 'Apri menu di navigazione'"\r\n
+        &gt;\r\n
+          &lt;svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"\r\n
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"&gt;\r\n
+            &lt;line x1="3" y1="6" x2="21" y2="6"&gt;&lt;/line&gt;\r\n
+            &lt;line x1="3" y1="12" x2="21" y2="12"&gt;&lt;/line&gt;\r\n
+            &lt;line x1="3" y1="18" x2="21" y2="18"&gt;&lt;/line&gt;\r\n
+          &lt;/svg&gt;\r\n
+        &lt;/button&gt;\r\n
+        &lt;a class="app-brand" href="http://127.0.0.1:8001/dashboard" aria-label="R4 Insurance: dashboard"&gt;\r\n
+          &lt;img class="brand-symbol" src="http://127.0.0.1:8001/images/agency-signature.svg" alt="" width="115" height="50"&gt;\r\n
+          &lt;span class="brand-name"&gt;Soluzioni Assicurative SAS&lt;/span&gt;\r\n
+        &lt;/a&gt;\r\n
+      &lt;/div&gt;\r\n
+      &lt;div class="topbar-center"&gt;\r\n
+        &lt;nav class="breadcrumb" aria-label="Percorso della pagina"&gt;\r\n
+                      &lt;span class="cur"&gt;Modifica polizza&lt;/span&gt;\r\n
+                  &lt;/nav&gt;\r\n
+      &lt;/div&gt;\r\n
+      &lt;div class="topbar-right"&gt;\r\n
+        &lt;span class="tb-date"&gt;LUN 19 OTT 2026&lt;/span&gt;\r\n
+        &lt;div wire:key="lw-1014725530-0" wire:snapshot="{&amp;quot;data&amp;quot;:[],&amp;quot;memo&amp;quot;:{&amp;quot;id&amp;quot;:&amp;quot;iOiRieAzdgXN6EgVviuQ&amp;quot;,&amp;quot;name&amp;quot;:&amp;quot;notifications.notification-dropdown&amp;quot;,&amp;quot;path&amp;quot;:&amp;quot;clients\/1\/policies\/1\/edit&amp;quot;,&amp;quot;method&amp;quot;:&amp;quot;GET&amp;quot;,&amp;quot;release&amp;quot;:&amp;quot;a-a-a&amp;quot;,&amp;quot;children&amp;quot;:[],&amp;quot;scripts&amp;quot;:[],&amp;quot;assets&amp;quot;:[],&amp;quot;errors&amp;quot;:[],&amp;quot;locale&amp;quot;:&amp;quot;en&amp;quot;,&amp;quot;islands&amp;quot;:[]},&amp;quot;checksum&amp;quot;:&amp;quot;b62ddd97eed07bde5f069261027f45229bff83e1c3138511971dc6c96d70264c&amp;quot;}" wire:effects="[]" wire:id="iOiRieAzdgXN6EgVviuQ" wire:name="notifications.notification-dropdown" class="dropdown" wire:poll.30s.visible x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="if(open){ open = false; $nextTick(() =&gt; $refs.notificationsTrigger.focus()) }"&gt;\n
+  &lt;button\n
+    id="notifications-trigger"\n
+    type="button"\n
+    class="tb-btn"\n
+    x-ref="notificationsTrigger"\n
+    aria-controls="notifications-panel"\n
+    :aria-expanded="open.toString()"\n
+    aria-label="Notifiche"\n
+    @click="open = !open; if (open) $wire.$refresh()"\n
+  &gt;\n
+    &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"&gt;\n
+      &lt;path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" /&gt;\n
+    &lt;/svg&gt;\n
+  &lt;/button&gt;\n
+\n
+  &lt;div id="notifications-panel" class="dropdown-menu dropdown-menu-wide" role="region" aria-labelledby="notifications-trigger" x-show="open" x-transition x-cloak :aria-hidden="(!open).toString()"&gt;\n
+    &lt;div class="dropdown-header"&gt;\n
+      &lt;div class="dropdown-header-title"&gt;Notifiche&lt;/div&gt;\n
+      &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;&lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\n
+    &lt;div class="dropdown-body"&gt;\n
+      &lt;!--[if BLOCK]&gt;&lt;![endif]--&gt;        &lt;div class="notif-empty"&gt;\n
+          &lt;i data-lucide="inbox" class="u-icon-lg notif-empty-icon"&gt;&lt;/i&gt;\n
+          &lt;div class="u-text-strong"&gt;Nessuna notifica&lt;/div&gt;\n
+          &lt;div&gt;Gli avvisi sulle scadenze e le segnalazioni compariranno qui.&lt;/div&gt;\n
+        &lt;/div&gt;\n
+      &lt;!--[if ENDBLOCK]&gt;&lt;![endif]--&gt;    &lt;/div&gt;\n
+  &lt;/div&gt;\n
+&lt;/div&gt;\n\r
+\n
+        &lt;div class="dropdown" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="if(open){ open = false; $nextTick(() =&gt; $refs.profileTrigger.focus()) }"&gt;\r\n
+          &lt;button\r\n
+            type="button"\r\n
+            class="avatar-btn"\r\n
+            x-ref="profileTrigger"\r\n
+            title="Mr. Rolando Lubowitz PhD"\r\n
+            aria-label="Apri menu profilo di Mr. Rolando Lubowitz PhD"\r\n
+            aria-controls="profile-menu"\r\n
+            :aria-expanded="open.toString()"\r\n
+            @click="open = !open"\r\n
+          &gt;\r\n
+            MR\r\n
+          &lt;/button&gt;\r\n
+          &lt;div id="profile-menu" class="dropdown-menu" role="menu" x-show="open" x-transition x-cloak :aria-hidden="(!open).toString()"&gt;\r\n
+            &lt;div class="dropdown-header stacked"&gt;\r\n
+              &lt;div class="dropdown-header-title"&gt;Mr. Rolando Lubowitz PhD&lt;/div&gt;\r\n
+              &lt;div class="u-text-meta"&gt;Amministratore&lt;/div&gt;\r\n
+            &lt;/div&gt;\r\n
+            &lt;a href="http://127.0.0.1:8001/profile" class="dropdown-item" role="menuitem"&gt;Profilo&lt;/a&gt;\r\n
+            &lt;div class="dropdown-divider"&gt;&lt;/div&gt;\r\n
+            &lt;form method="POST" action="http://127.0.0.1:8001/logout"&gt;\r\n
+              &lt;input type="hidden" name="_token" value="atmgV3SDxB9Gg1zsX8cEi4huuGLciTSfJAEXrQkW" autocomplete="off"&gt;              &lt;button type="submit" class="dropdown-item danger" role="menuitem"&gt;Esci&lt;/button&gt;\r\n
+            &lt;/form&gt;\r\n
+          &lt;/div&gt;\r\n
+        &lt;/div&gt;\r\n
+      &lt;/div&gt;\r\n
+    &lt;/header&gt;\r\n
+\r\n
+    &lt;button\r\n
+      type="button"\r\n
+      class="sidebar-backdrop"\r\n
+      x-show="sidebarOpen"\r\n
+      x-transition.opacity\r\n
+      x-cloak\r\n
+      @click="sidebarOpen = false"\r\n
+      aria-label="Chiudi menu di navigazione"\r\n
+    &gt;&lt;/button&gt;\r\n
+\r\n
+    \r\n
+    &lt;nav\r\n
+      class="sidebar"\r\n
+      id="app-sidebar"\r\n
+      aria-label="Navigazione principale"\r\n
+      :aria-hidden="(!sidebarOpen &amp;&amp; window.innerWidth &lt; 1024).toString()"\r\n
+      :inert="!sidebarOpen &amp;&amp; window.innerWidth &lt; 1024"\r\n
+      @click="if ($event.target.closest('a') &amp;&amp; window.innerWidth &lt; 1024) sidebarOpen = false"\r\n
+    &gt;\r\n
+      &lt;button\r\n
+        type="button"\r\n
+        class="sidebar-toggle"\r\n
+        @click="sidebarOpen = !sidebarOpen; setTimeout(() =&gt; window.refreshAppLayout(), 350)"\r\n
+        :aria-expanded="sidebarOpen.toString()"\r\n
+        aria-controls="app-sidebar"\r\n
+        :aria-label="sidebarOpen ? 'Chiudi menu di navigazione' : 'Apri menu di navigazione'"\r\n
+      &gt;\r\n
+        &lt;svg x-show="sidebarOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"\r\n
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" x-cloak&gt;\r\n
+          &lt;path d="m15 18-6-6 6-6" /&gt;\r\n
+        &lt;/svg&gt;\r\n
+        &lt;svg x-show="!sidebarOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"\r\n
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" x-cloak&gt;\r\n
+          &lt;line x1="3" y1="6" x2="21" y2="6"&gt;&lt;/line&gt;\r\n
+          &lt;line x1="3" y1="12" x2="21" y2="12"&gt;&lt;/line&gt;\r\n
+          &lt;line x1="3" y1="18" x2="21" y2="18"&gt;&lt;/line&gt;\r\n
+        &lt;/svg&gt;\r\n
+      &lt;/button&gt;\r\n
+\r\n
+      &lt;div class="nav-group"&gt;\r\n
+        &lt;div class="nav-group-label"&gt;Operatività&lt;/div&gt;\r\n
+        &lt;a href="http://127.0.0.1:8001/dashboard" class="nav-item" x-bind:title="!sidebarOpen ? 'Dashboard' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="layout-dashboard" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Dashboard&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Dashboard&lt;/div&gt;\n
+&lt;/a&gt;        &lt;a href="http://127.0.0.1:8001/daily-notes" class="nav-item" wire:navigate="" x-bind:title="!sidebarOpen ? 'Blocco Note' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="book-open" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Blocco Note&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Blocco Note&lt;/div&gt;\n
+&lt;/a&gt;                  &lt;a href="http://127.0.0.1:8001/policies/create" class="btn btn-p sidebar-policy-button" title="Nuova polizza" &gt;&lt;i data-lucide="plus" width="16" height="16" aria-hidden="true"&gt;&lt;/i&gt;&lt;span&gt;Nuova polizza&lt;/span&gt;&lt;/a&gt;\r\n
+              &lt;/div&gt;\r\n
+              &lt;div class="nav-divider"&gt;&lt;/div&gt;\r\n
+        &lt;div class="nav-group"&gt;\r\n
+          &lt;div class="nav-group-label"&gt;Anagrafica&lt;/div&gt;\r\n
+          &lt;a href="http://127.0.0.1:8001/clients" class="nav-item" x-bind:title="!sidebarOpen ? 'Clienti' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="users" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Clienti&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Clienti&lt;/div&gt;\n
+&lt;/a&gt;                      &lt;a href="http://127.0.0.1:8001/suppliers" class="nav-item" x-bind:title="!sidebarOpen ? 'Agenzie' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="building-2" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Agenzie&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Agenzie&lt;/div&gt;\n
+&lt;/a&gt;                  &lt;/div&gt;\r\n
+                    &lt;div class="nav-divider"&gt;&lt;/div&gt;\r\n
+        &lt;div class="nav-group"&gt;\r\n
+          &lt;div class="nav-group-label"&gt;Gestione&lt;/div&gt;\r\n
+          &lt;a href="http://127.0.0.1:8001/claims" class="nav-item" x-bind:title="!sidebarOpen ? 'Sinistri' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="folder-open" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Sinistri&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Sinistri&lt;/div&gt;\n
+&lt;/a&gt;          &lt;a href="http://127.0.0.1:8001/quotes" class="nav-item" x-bind:title="!sidebarOpen ? 'Preventivi' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="file-text" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Preventivi&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Preventivi&lt;/div&gt;\n
+&lt;/a&gt;          &lt;a href="http://127.0.0.1:8001/titles" class="nav-item" x-bind:title="!sidebarOpen ? 'Titoli e quietanze' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="files" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Titoli e quietanze&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Titoli e quietanze&lt;/div&gt;\n
+&lt;/a&gt;          &lt;a href="http://127.0.0.1:8001/collections" class="nav-item" x-bind:title="!sidebarOpen ? 'Incassi' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="wallet" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Incassi&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Incassi&lt;/div&gt;\n
+&lt;/a&gt;          &lt;a href="http://127.0.0.1:8001/policies" class="nav-item active" x-bind:title="!sidebarOpen ? 'Polizze' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="files" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Polizze&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Polizze&lt;/div&gt;\n
+&lt;/a&gt;          &lt;a href="http://127.0.0.1:8001/deadlines" class="nav-item" x-bind:title="!sidebarOpen ? 'Scadenze' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="clock" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Scadenze&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Scadenze&lt;/div&gt;\n
+&lt;/a&gt;          &lt;a href="http://127.0.0.1:8001/agency-communications" class="nav-item" x-bind:title="!sidebarOpen ? 'Comunicazioni' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="mail" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Comunicazioni&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Comunicazioni&lt;/div&gt;\n
+&lt;/a&gt;&lt;a href="http://127.0.0.1:8001/reports" class="nav-item" x-bind:title="!sidebarOpen ? 'Report' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="chart-no-axes-combined" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Report&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Report&lt;/div&gt;\n
+&lt;/a&gt;        &lt;/div&gt;\r\n
+                    &lt;div class="nav-divider"&gt;&lt;/div&gt;\r\n
+        &lt;div class="nav-group"&gt;\r\n
+          &lt;div class="nav-group-label"&gt;Amministrazione&lt;/div&gt;\r\n
+          &lt;a href="http://127.0.0.1:8001/users" class="nav-item" x-bind:title="!sidebarOpen ? 'Utenti' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="user-cog" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Utenti&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Utenti&lt;/div&gt;\n
+&lt;/a&gt;          &lt;a href="http://127.0.0.1:8001/audit-logs" class="nav-item" x-bind:title="!sidebarOpen ? 'Registro attività' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="history" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Registro attività&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Registro attività&lt;/div&gt;\n
+&lt;/a&gt;        &lt;/div&gt;\r\n
+            &lt;div class="nav-spacer"&gt;&lt;/div&gt;\r\n
+      &lt;div class="nav-divider"&gt;&lt;/div&gt;\r\n
+      &lt;div class="nav-group"&gt;\r\n
+        &lt;a href="http://127.0.0.1:8001/profile" class="nav-item" x-bind:title="!sidebarOpen ? 'Impostazioni' : ''"&gt;\n
+    &lt;div class="nav-icon"&gt;&lt;i data-lucide="settings" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\n
+    &lt;span class="nav-label"&gt;Impostazioni&lt;/span&gt;\n
+        &lt;div class="nav-tooltip"&gt;Impostazioni&lt;/div&gt;\n
+&lt;/a&gt;      &lt;/div&gt;\r\n
+\r\n
+      &lt;form method="POST" action="http://127.0.0.1:8001/logout" class="sidebar-logout-form"&gt;\r\n
+        &lt;input type="hidden" name="_token" value="atmgV3SDxB9Gg1zsX8cEi4huuGLciTSfJAEXrQkW" autocomplete="off"&gt;        &lt;button type="submit" class="nav-item logout sidebar-logout-btn" x-bind:title="!sidebarOpen ? 'Logout' : ''"&gt;\r\n
+          &lt;div class="nav-icon"&gt;&lt;i data-lucide="log-out" width="16" height="16" stroke-width="1.8"&gt;&lt;/i&gt;&lt;/div&gt;\r\n
+          &lt;span class="nav-label"&gt;Logout&lt;/span&gt;\r\n
+          &lt;div class="nav-tooltip"&gt;Logout&lt;/div&gt;\r\n
+        &lt;/button&gt;\r\n
+      &lt;/form&gt;\r\n
+    &lt;/nav&gt;\r\n
+\r\n
+    \r\n
+    &lt;main class="main"&gt;\r\n
+      &lt;div class="content page-transition-root" id="content-area" tabindex="-1"&gt;\r\n
+        \r\n
+                                \r\n
+        &lt;div class="page-heading"&gt;\n
+    &lt;div class="ph-left"&gt;\n
+                &lt;div class="page-title" role="heading" aria-level="1"&gt;Modifica polizza&lt;/div&gt;\n
+            &lt;/div&gt;\n
+            &lt;div class="ph-right"&gt;&lt;a href="http://127.0.0.1:8001/clients/1" class="btn btn-g"&gt;White Ltd&lt;/a&gt;&lt;/div&gt;\n
+    &lt;/div&gt;\n
+        &lt;div class="panel"&gt;\n
+        &lt;div class="panel-body pad"&gt;\n
+        &lt;form method="POST" enctype="multipart/form-data" action="http://127.0.0.1:8001/clients/1/policies/1" x-data="{ branch: 'RC auto', subbranch: '', subbranches: JSON.parse('{\u0022RC auto\u0022:[]}'), company: 'Nobis', agency: '', agencies: JSON.parse('{\u0022NOBIS\u0022:[]}') }"&gt;\n
+            &lt;input type="hidden" name="_token" value="atmgV3SDxB9Gg1zsX8cEi4huuGLciTSfJAEXrQkW" autocomplete="off"&gt;                            &lt;input type="hidden" name="_method" value="PATCH"&gt;                &lt;input type="hidden" name="policy_revision" value="d40d604f4b462bf70fb6693e9fafdc1c955799beb06161bab4d7beeb736bf5c8"&gt;\n
+                                        &lt;p class="u-text-meta u-mb-md"&gt;I campi con * sono obbligatori.&lt;/p&gt;\n
+                                    &lt;fieldset class="form-section"&gt;&lt;legend&gt;Polizza e intermediari&lt;/legend&gt;&lt;div class="form-row"&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-category" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-category-label" for="field-category" &gt;\n
+        Ramo\n
+                    &lt;span aria-hidden="true"&gt; *&lt;/span&gt;&lt;span class="sr-only"&gt; (obbligatorio)&lt;/span&gt;\n
+            &lt;/label&gt;\n
+    &lt;select id="field-category" name="category" class="form-sel" x-model="branch" @change="subbranch = ''" required&gt;&lt;option value=""&gt;Seleziona il ramo&lt;/option&gt;&lt;option value="RC auto" selected&gt;RC auto&lt;/option&gt;&lt;/select&gt;\n
+                    &lt;p class="u-text-meta"&gt;&lt;a href="http://127.0.0.1:8001/settings/insurance-catalog"&gt;Gestisci rami e sottorami&lt;/a&gt;&lt;/p&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-subcategory" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-subcategory-label" for="field-subcategory" &gt;\n
+        Sottoramo\n
+            &lt;/label&gt;\n
+    &lt;select id="field-subcategory" name="subcategory" class="form-sel" x-model="subbranch"&gt;&lt;option value=""&gt;Non specificato&lt;/option&gt;&lt;template x-for="item in (subbranches[branch] || [])" :key="item"&gt;&lt;option :value="item" x-text="item" :selected="item === subbranch"&gt;&lt;/option&gt;&lt;/template&gt;&lt;/select&gt;\n
+                    &lt;p class="u-text-meta"&gt;Sono disponibili soltanto i sottorami del ramo selezionato.&lt;/p&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-product" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-product-label" for="field-product" &gt;\n
+        Nome del prodotto\n
+            &lt;/label&gt;\n
+    &lt;input id="field-product" name="product" class="form-in" value="" maxlength="255"&gt;&lt;p class="u-text-meta"&gt;Nome commerciale indicato dalla compagnia. Lascialo vuoto se non è noto.&lt;/p&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-company" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-company-label" for="field-company" &gt;\n
+        Compagnia\n
+                    &lt;span aria-hidden="true"&gt; *&lt;/span&gt;&lt;span class="sr-only"&gt; (obbligatorio)&lt;/span&gt;\n
+            &lt;/label&gt;\n
+    &lt;select id="field-company" name="company" class="form-sel" x-model="company" @change="agency = ''" required&gt;&lt;option value=""&gt;Seleziona la compagnia&lt;/option&gt;&lt;option value="Nobis" selected&gt;Nobis&lt;/option&gt; &lt;/select&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-supplier-agency-id" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-supplier-agency-id-label" for="field-supplier-agency-id" &gt;\n
+        Agenzia\n
+            &lt;/label&gt;\n
+    &lt;select id="field-supplier-agency-id" name="supplier_agency_id" class="form-sel" x-model="agency"&gt;&lt;option value=""&gt;Nessuna agenzia collegata&lt;/option&gt;&lt;template x-for="item in (agencies[company.trim().toUpperCase().replace(/\s+/g, ' ')] || [])" :key="item.id"&gt;&lt;option :value="String(item.id)" x-text="item.name" :selected="String(item.id) === agency"&gt;&lt;/option&gt;&lt;/template&gt;&lt;/select&gt;&lt;p class="u-text-meta"&gt;Le agenzie disponibili sono quelle collegate alla compagnia indicata.&lt;/p&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-number" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-number-label" for="field-number" &gt;\n
+        Numero polizza\n
+                    &lt;span aria-hidden="true"&gt; *&lt;/span&gt;&lt;span class="sr-only"&gt; (obbligatorio)&lt;/span&gt;\n
+            &lt;/label&gt;\n
+    &lt;input id="field-number" name="number" class="form-in" value="SA-2026-870" maxlength="100" required&gt;\n
+    &lt;/div&gt;\n
+            &lt;/div&gt;&lt;/fieldset&gt;\n
+            &lt;fieldset class="form-section"&gt;&lt;legend&gt;Veicolo, bene o soggetto assicurato&lt;/legend&gt;&lt;div class="form-row"&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-vehicle-id" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-vehicle-id-label" for="field-vehicle-id" &gt;\n
+        Veicolo / targa\n
+            &lt;/label&gt;\n
+    &lt;select id="field-vehicle-id" name="vehicle_id" class="form-sel"&gt;&lt;option value=""&gt;Nessun veicolo collegato&lt;/option&gt;&lt;/select&gt;\n
+                    &lt;p class="u-text-meta"&gt;Le targhe si registrano nella sezione Veicoli e targhe del cliente.&lt;/p&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-insured-subject" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-insured-subject-label" for="field-insured-subject" &gt;\n
+        Bene o soggetto assicurato\n
+            &lt;/label&gt;\n
+    &lt;input id="field-insured-subject" name="insured_subject" class="form-in" value="" maxlength="255"&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-client-asset-id" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-client-asset-id-label" for="field-client-asset-id" &gt;\n
+        Immobile o altro bene collegato\n
+            &lt;/label&gt;\n
+    &lt;select id="field-client-asset-id" name="client_asset_id" class="form-sel"&gt;&lt;option value=""&gt;Nessun bene collegato&lt;/option&gt;&lt;/select&gt;&lt;p class="u-text-meta"&gt;Scegli un bene oppure un veicolo. Registra i beni nella sezione Immobili e beni del cliente.&lt;/p&gt;\n
+    &lt;/div&gt;\n
+            &lt;/div&gt;&lt;/fieldset&gt;\n
+            &lt;fieldset class="form-section"&gt;&lt;legend&gt;Classi di merito RC Auto&lt;/legend&gt;&lt;div class="form-row"&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-merit-class-cu" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-merit-class-cu-label" for="field-merit-class-cu" &gt;\n
+        Classe universale CU\n
+            &lt;/label&gt;\n
+    &lt;select id="field-merit-class-cu" name="merit_class_cu" class="form-sel"&gt;&lt;option value=""&gt;Non indicata / non applicabile&lt;/option&gt;&lt;option value="1" &gt;1&lt;/option&gt;&lt;option value="2" &gt;2&lt;/option&gt;&lt;option value="3" &gt;3&lt;/option&gt;&lt;option value="4" &gt;4&lt;/option&gt;&lt;option value="5" &gt;5&lt;/option&gt;&lt;option value="6" &gt;6&lt;/option&gt;&lt;option value="7" &gt;7&lt;/option&gt;&lt;option value="8" &gt;8&lt;/option&gt;&lt;option value="9" &gt;9&lt;/option&gt;&lt;option value="10" &gt;10&lt;/option&gt;&lt;option value="11" &gt;11&lt;/option&gt;&lt;option value="12" &gt;12&lt;/option&gt;&lt;option value="13" &gt;13&lt;/option&gt;&lt;option value="14" &gt;14&lt;/option&gt;&lt;option value="15" &gt;15&lt;/option&gt;&lt;option value="16" &gt;16&lt;/option&gt;&lt;option value="17" &gt;17&lt;/option&gt;&lt;option value="18" &gt;18&lt;/option&gt;&lt;/select&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-merit-class-internal" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-merit-class-internal-label" for="field-merit-class-internal" &gt;\n
+        Classe interna della compagnia\n
+            &lt;/label&gt;\n
+    &lt;input id="field-merit-class-internal" name="merit_class_internal" class="form-in" value="" maxlength="30"&gt;\n
+    &lt;/div&gt;\n
+            &lt;/div&gt;&lt;/fieldset&gt;\n
+            &lt;fieldset class="form-section"&gt;&lt;legend&gt;Date, premio e stato&lt;/legend&gt;&lt;div class="form-row"&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-starts-on" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-starts-on-label" for="field-starts-on" &gt;\n
+        Decorrenza\n
+                    &lt;span aria-hidden="true"&gt; *&lt;/span&gt;&lt;span class="sr-only"&gt; (obbligatorio)&lt;/span&gt;\n
+            &lt;/label&gt;\n
+    &lt;input id="field-starts-on" type="date" name="starts_on" class="form-in" value="2026-10-01" required&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-expires-on" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-expires-on-label" for="field-expires-on" &gt;\n
+        Scadenza\n
+                    &lt;span aria-hidden="true"&gt; *&lt;/span&gt;&lt;span class="sr-only"&gt; (obbligatorio)&lt;/span&gt;\n
+            &lt;/label&gt;\n
+    &lt;input id="field-expires-on" type="date" name="expires_on" class="form-in" value="2027-10-01" required&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-premium" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-premium-label" for="field-premium" &gt;\n
+        Premio di polizza (€)\n
+            &lt;/label&gt;\n
+    &lt;input id="field-premium" type="number" name="premium" class="form-in" value="1000.00" min="0" step="0.01" max="9999999999.99"&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-status" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-status-label" for="field-status" &gt;\n
+        Stato polizza\n
+                    &lt;span aria-hidden="true"&gt; *&lt;/span&gt;&lt;span class="sr-only"&gt; (obbligatorio)&lt;/span&gt;\n
+            &lt;/label&gt;\n
+    &lt;select id="field-status" name="status" class="form-sel" required&gt;&lt;option value="active" selected&gt;Attiva&lt;/option&gt;&lt;option value="renewed" &gt;Rinnovata&lt;/option&gt;&lt;option value="expired" &gt;Scaduta&lt;/option&gt;&lt;option value="suspended" &gt;Sospesa&lt;/option&gt;&lt;option value="replaced" &gt;Sostituita&lt;/option&gt;&lt;option value="cancelled" &gt;Annullata&lt;/option&gt;&lt;option value="ceased" &gt;Cessata&lt;/option&gt;&lt;option value="review" &gt;Da verificare&lt;/option&gt;&lt;/select&gt;\n
+    &lt;/div&gt;\n
+            &lt;/div&gt;&lt;/fieldset&gt;\n
+            &lt;fieldset class="form-section"&gt;&lt;legend&gt;Rinnovo e frazionamento&lt;/legend&gt;&lt;div class="form-row"&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-tacit-renewal" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-tacit-renewal-label" for="field-tacit-renewal" &gt;\n
+        Tacito rinnovo\n
+            &lt;/label&gt;\n
+    &lt;select id="field-tacit-renewal" class="form-sel" name="tacit_renewal"&gt;&lt;option value=""&gt;Non indicato&lt;/option&gt;&lt;option value="1" &gt;Sì&lt;/option&gt;&lt;option value="0" &gt;No&lt;/option&gt;&lt;/select&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-payment-method" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-payment-method-label" for="field-payment-method" &gt;\n
+        Metodo di pagamento abituale\n
+            &lt;/label&gt;\n
+    &lt;select id="field-payment-method" class="form-sel" name="payment_method"&gt;&lt;option value=""&gt;Non indicato&lt;/option&gt;&lt;option value="Bonifico a Compagnia" &gt;Bonifico a Compagnia&lt;/option&gt;&lt;option value="Bonifico a Intermediario" &gt;Bonifico a Intermediario&lt;/option&gt;&lt;option value="Assegno a Compagnia" &gt;Assegno a Compagnia&lt;/option&gt;&lt;option value="Assegno a Intermediario" &gt;Assegno a Intermediario&lt;/option&gt;&lt;option value="Contanti a Intermediario" &gt;Contanti a Intermediario&lt;/option&gt;&lt;option value="Contanti a Compagnia" &gt;Contanti a Compagnia&lt;/option&gt;&lt;option value="Carta di credito a Intermediario" &gt;Carta di credito a Intermediario&lt;/option&gt;&lt;option value="Carta di credito a Compagnia" &gt;Carta di credito a Compagnia&lt;/option&gt;&lt;option value="Finanziamento" &gt;Finanziamento&lt;/option&gt;&lt;/select&gt;&lt;p class="u-text-meta"&gt;Preferenza per i titoli. Non registra un incasso.&lt;/p&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-payment-frequency" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-payment-frequency-label" for="field-payment-frequency" &gt;\n
+        Frazionamento\n
+            &lt;/label&gt;\n
+    &lt;select id="field-payment-frequency" class="form-sel" name="payment_frequency"&gt;&lt;option value=""&gt;Non indicato&lt;/option&gt;&lt;option value="Unico" &gt;Unico&lt;/option&gt;&lt;option value="Annuale" &gt;Annuale&lt;/option&gt;&lt;option value="Semestrale" &gt;Semestrale&lt;/option&gt;&lt;option value="Quadrimestrale" &gt;Quadrimestrale&lt;/option&gt;&lt;option value="Trimestrale" &gt;Trimestrale&lt;/option&gt;&lt;option value="Mensile" &gt;Mensile&lt;/option&gt;&lt;/select&gt;\n
+    &lt;/div&gt;\n
+                &lt;div class="form-g" data-form-group  data-field-id="field-installment-premium" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-installment-premium-label" for="field-installment-premium" &gt;\n
+        Premio rata (€)\n
+            &lt;/label&gt;\n
+    &lt;input id="field-installment-premium" class="form-in" type="number" name="installment_premium" value="" min="0" step="0.01" max="9999999999.99"&gt;\n
+    &lt;/div&gt;\n
+            &lt;/div&gt;\n
+            &lt;input type="hidden" name="ad_horas" value="0"&gt;&lt;label class="u-flex-center u-gap-sm u-mb-md"&gt;&lt;input type="checkbox" name="ad_horas" value="1" &gt; Ad horas: comunicazione urgente all’agenzia&lt;/label&gt;&lt;/fieldset&gt;\n
+            &lt;fieldset class="form-section"&gt;&lt;legend&gt;Note&lt;/legend&gt;&lt;div class="form-g" data-form-group  data-field-id="field-notes" &gt;\n
+    &lt;label class="form-lbl" data-form-label  id="field-notes-label" for="field-notes" &gt;\n
+        Note sulla polizza\n
+            &lt;/label&gt;\n
+    &lt;textarea id="field-notes" name="notes" class="form-ta" rows="4" maxlength="10000"&gt;Testo ancora da confrontare&lt;/textarea&gt;\n
+    &lt;/div&gt;&lt;/fieldset&gt;\n
+                                    &lt;div class="insurance-form-actions"&gt;&lt;a href="http://127.0.0.1:8001/clients/1/policies/1" class="btn btn-g"&gt;Annulla&lt;/a&gt;&lt;button type="submit" class="btn btn-p"&gt;Salva polizza&lt;/button&gt;&lt;/div&gt;\n
+        &lt;/form&gt;\n
+    &lt;/div&gt;\n
+&lt;/div&gt;\r\n
+      &lt;/div&gt;\r\n
+    &lt;/main&gt;\r\n
+\r\n
+  &lt;/div&gt;\r\n
+\r\n
+  &lt;script&gt;\r\n
+    window.refreshAppLayout = function () {\r\n
+      window.dispatchEvent(new CustomEvent('app:layout-resized'));\r\n
+    };\r\n
+  &lt;/script&gt;\r\n
+\r\n
+    &lt;!-- Livewire Scripts --&gt;\n
+&lt;script src="http://127.0.0.1:8001/livewire-f5e792fb/livewire.js?id=8ea5922c"   data-csrf="atmgV3SDxB9Gg1zsX8cEi4huuGLciTSfJAEXrQkW" data-module-url="http://127.0.0.1:8001/livewire-f5e792fb" data-update-uri="http://127.0.0.1:8001/livewire-f5e792fb/update" data-navigate-once="true"&gt;&lt;/script&gt;\r\n
+&lt;/body&gt;\r\n
+\r\n
+&lt;/html&gt;\r\n
+' [UTF-8](length: 36815) contains "Controlla gli aggiornamenti prima di salvare" [ASCII](length: 44).
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:46
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:720
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AuditSafetyRegressionTest.php:111</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="8" assertions="106" errors="0" failures="0" skipped="0" time="5.531543">
+    <testsuite name="Core" tests="8" assertions="106" errors="0" failures="0" skipped="0" time="5.531543">
+      <testsuite name="Tests\Feature\AgencyEmailWorkflowTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyEmailWorkflowTest.php" tests="8" assertions="106" errors="0" failures="0" skipped="0" time="5.531543">
+        <testcase name="test_exact_reviewed_cumulative_message_is_sent_once_and_audited" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyEmailWorkflowTest.php" line="41" class="Tests\Feature\AgencyEmailWorkflowTest" classname="Tests.Feature.AgencyEmailWorkflowTest" assertions="24" time="3.536446"/>
+        <testcase name="test_changed_policy_client_recipient_or_sender_requires_a_new_review" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyEmailWorkflowTest.php" line="66" class="Tests\Feature\AgencyEmailWorkflowTest" classname="Tests.Feature.AgencyEmailWorkflowTest" assertions="18" time="0.118700"/>
+        <testcase name="test_overlap_of_two_different_reviews_does_not_repeat_a_policy" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyEmailWorkflowTest.php" line="81" class="Tests\Feature\AgencyEmailWorkflowTest" classname="Tests.Feature.AgencyEmailWorkflowTest" assertions="10" time="0.100778"/>
+        <testcase name="test_uncertain_delivery_never_retries_until_an_operator_confirms_non_delivery" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyEmailWorkflowTest.php" line="91" class="Tests\Feature\AgencyEmailWorkflowTest" classname="Tests.Feature.AgencyEmailWorkflowTest" assertions="17" time="0.132818"/>
+        <testcase name="test_expired_review_inactive_agency_foreign_policy_and_different_operator_are_blocked" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyEmailWorkflowTest.php" line="106" class="Tests\Feature\AgencyEmailWorkflowTest" classname="Tests.Feature.AgencyEmailWorkflowTest" assertions="12" time="0.249994"/>
+        <testcase name="test_employee_cannot_read_or_change_mail_settings_or_send" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyEmailWorkflowTest.php" line="121" class="Tests\Feature\AgencyEmailWorkflowTest" classname="Tests.Feature.AgencyEmailWorkflowTest" assertions="8" time="0.086219"/>
+        <testcase name="test_smtp_password_stays_encrypted_and_is_never_rendered_or_flashed" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyEmailWorkflowTest.php" line="131" class="Tests\Feature\AgencyEmailWorkflowTest" classname="Tests.Feature.AgencyEmailWorkflowTest" assertions="11" time="1.248992"/>
+        <testcase name="test_disabled_configuration_cannot_pretend_to_send_using_log_mailer" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyEmailWorkflowTest.php" line="144" class="Tests\Feature\AgencyEmailWorkflowTest" classname="Tests.Feature.AgencyEmailWorkflowTest" assertions="6" time="0.057596"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

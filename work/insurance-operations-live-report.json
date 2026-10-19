@@ -1,0 +1,28 @@
+{
+    "database": "r4_insurance",
+    "migrations": "\n   INFO  Running migrations.  \n\r\n  2026_10_16_150000_link_collections_to_agency_communications .......................................... 482.99ms DONE\r\n\r\n",
+    "priorities": [
+        "EUROPE ASSISTANCE",
+        "NOBIS COMPAGNIA DI ASSICURAZIONI SPA"
+    ],
+    "clients": 50,
+    "policies": 50,
+    "quote_cases": 0,
+    "titles": 0,
+    "collections": 0,
+    "records_unchanged": true,
+    "smtp_configured": false,
+    "pages": {
+        "\/dashboard": 200,
+        "\/quotes": 200,
+        "\/quotes\/create": 200,
+        "\/policies\/create": 200,
+        "\/titles": 200,
+        "\/collections": 200,
+        "\/deadlines?kind=title": 200,
+        "\/reports": 200,
+        "\/agency-communications\/collections": 200,
+        "\/agency-communications\/history": 200
+    },
+    "ok": true
+}

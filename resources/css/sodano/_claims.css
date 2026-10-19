@@ -1,0 +1,22 @@
+.claim-intro, .claim-shortcuts { margin-bottom:18px; }
+.claim-description { white-space:pre-wrap; overflow-wrap:anywhere; margin-top:18px; line-height:1.55; }
+.claim-notice { margin-top:16px; padding:12px 14px; border-left:3px solid var(--ap-primary); background:var(--bg2); line-height:1.5; }
+.claim-details { margin-top:18px; }
+.claim-details > summary { cursor:pointer; width:fit-content; }
+.claim-details > form, .claim-details > dl, .claim-details > .panel { margin-top:16px; }
+.claim-action { margin:0 0 24px; }
+.claim-event-details { min-width:220px; max-width:680px; white-space:pre-wrap; overflow-wrap:anywhere; }
+.claim-event-details > div + div { margin-top:8px; }
+.claim-history-details > .claim-event-details { margin-top:12px; }
+.claim-history-details > summary { cursor:pointer; }
+#claim-history .t-table td { vertical-align:top; }
+.app-body [id^="claim-"], .app-body #activities { scroll-margin-top:85px; }
+@media(max-width:640px) {
+    .app-body #claim-history .t-table, .app-body #claim-history .t-table tbody { display:block; width:100%; min-width:0; }
+    .app-body #claim-history .t-table thead { position:absolute; width:1px; height:1px; clip-path:inset(50%); overflow:hidden; }
+    .app-body #claim-history .t-table tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); padding:14px; gap:12px; border-bottom:1px solid var(--line); }
+    .app-body #claim-history .t-table td { display:block; padding:0; border:0; min-width:0; overflow-wrap:anywhere; }
+    .app-body #claim-history .t-table td:nth-child(n+3) { grid-column:1 / -1; }
+    .app-body #claim-history .t-table td[data-label]::before { content:attr(data-label); display:block; font-weight:600; color:var(--text); margin-bottom:4px; }
+    .app-body #claim-history .claim-event-details { min-width:0; }
+}

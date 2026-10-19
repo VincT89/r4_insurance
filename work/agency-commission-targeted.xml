@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="12" assertions="146" errors="0" failures="1" skipped="0" time="47.918373">
+    <testsuite name="Core" tests="12" assertions="146" errors="0" failures="1" skipped="0" time="47.918373">
+      <testsuite name="Tests\Feature\AgencyCommissionTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" tests="12" assertions="146" errors="0" failures="1" skipped="0" time="47.918373">
+        <testcase name="test_admin_configures_exact_rates_and_bases_without_creating_financial_movements" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="37" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="15" time="11.856265"/>
+        <testcase name="test_only_admin_can_write_conditions_while_existing_agency_read_roles_are_preserved" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="50" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="23" time="5.401152"/>
+        <testcase name="test_unlinked_companies_crossed_subbranches_and_duplicate_rows_are_rejected" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="66" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="7" time="0.409476"/>
+        <testcase name="test_invalid_percentages_unknown_bases_and_truncated_forms_are_rejected" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="76" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="19" time="0.376135"/>
+        <testcase name="test_overlaps_include_boundaries_but_different_scopes_and_companies_are_allowed" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="86" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="13" time="0.284495"/>
+        <testcase name="test_revision_is_atomic_keeps_previous_rates_and_rejects_stale_writes" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="98" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="15" time="23.809996"/>
+        <testcase name="test_conflicting_revision_does_not_replace_the_original" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="113" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="8" time="0.133502"/>
+        <testcase name="test_void_preserves_history_and_allows_replacement_after_confirmation" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="120" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="12" time="0.151956"/>
+        <testcase name="test_historic_conditions_protect_agency_mandate_and_catalog_links" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="130" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="13" time="0.234618"/>
+        <testcase name="test_agency_cannot_access_or_mutate_another_agencys_configuration" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="142" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="6" time="0.453497"/>
+        <testcase name="test_inactive_catalog_rows_already_in_schedule_are_preserved_in_revisions" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="152" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="7" time="4.132230"/>
+        <testcase name="test_pages_and_filters_render_and_untrusted_old_input_is_safe" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php" line="161" class="Tests\Feature\AgencyCommissionTest" classname="Tests.Feature.AgencyCommissionTest" assertions="8" time="0.675050">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\AgencyCommissionTest::test_pages_and_filters_render_and_untrusted_old_input_is_safe&#13;
+Failed asserting that the value at [rates] fulfills the expectations defined by the closure.
+Failed asserting that false is true.
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:46
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:1356
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AgencyCommissionTest.php:167</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

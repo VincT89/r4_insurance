@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Correzioni dell’audit — 19 ottobre 2026</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f5f8;color:#172333;font:16px/1.6 system-ui,sans-serif}main{max-width:1000px;margin:auto;padding:28px}h1{font-size:30px;line-height:1.25;border-bottom:3px solid #124d85;padding-bottom:18px}h2{font-size:22px;margin-top:32px}a{color:#124d85;text-underline-offset:3px}p,li{margin:10px 0}table{width:100%;border-collapse:collapse;background:white}th,td{padding:14px;border:1px solid #ccd5df;text-align:left;vertical-align:top}th{background:#e5edf5}.table-wrap{overflow:auto}figure{margin:24px 0}img{display:block;width:100%;border:1px solid #ccd5df}figure.mobile{max-width:390px}figcaption{margin-top:8px;color:#526174;font-size:14px}@media(max-width:650px){main{padding:18px}h1{font-size:25px}th,td{min-width:180px;padding:10px}}
+</style>
+</head>
+<body><main>
+<p>Soluzioni Assicurative SAS · R4 Insurance</p>
+<h1>Correzioni dell’audit</h1>
+<p>19 ottobre 2026. <strong>Completate e verificate le quattro priorità F01–F04.</strong> Questo aggiornamento integra l’<a href="../full-audit-2026-10-18/report.html">audit del 18 ottobre</a>, che conserva le prove dei problemi originari.</p>
+<div class="table-wrap"><table><thead><tr><th>Rilievo</th><th>Comportamento corretto</th><th>Verifica</th></tr></thead><tbody>
+<tr><td>F01 · Cancellazioni</td><td>Contatti, beni, annotazioni, veicoli, relazioni e nuclei possono essere eliminati solo dall’admin. Gli operatori mantengono le modifiche consentite. Restano i vincoli sui dati collegati e sul cliente di appartenenza.</td><td>Richieste dirette di commerciale e responsabile operativo respinte; pulsanti nascosti; admin autorizzato sui record eliminabili. Collegamenti non coerenti respinti.</td></tr>
+<tr><td>F02 · Modifiche simultanee</td><td>Ogni modulo di modifica contiene il riferimento ai dati aperti. Se la polizza cambia, il salvataggio viene bloccato e il testo inserito resta nel modulo. È possibile consultare la polizza aggiornata in un’altra scheda e riaprire il modulo.</td><td>Due modifiche nello stesso secondo; tentativi senza riferimento o con valore errato; due schede reali del browser, confronto e nuovo salvataggio. Il blocco dal giorno successivo alla fine lavorazione e le correzioni admin motivate continuano a funzionare.</td></tr>
+<tr><td>F03 · Autori nello storico</td><td>Un account con log, documenti o altri dati operativi collegati non viene cancellato. L’admin può disattivarlo, conservando l’attribuzione. Gli account inutilizzati restano eliminabili.</td><td>Cancellazione da amministrazione, profilo e modello; autore presente soltanto nel registro; autore di un’annotazione senza log; disattivazione; protezione dell’ultimo admin.</td></tr>
+<tr><td>F04 · Filtri ed esportazioni</td><td>Il caricamento completo riparte dalla prima pagina della tabella interessata anche quando la pagina contiene più tabelle con paginazioni separate. I filtri correnti rimangono applicati.</td><td>512 eventi esportati da pagina 2, con attraversamento del blocco da 500 righe; 511 eventi dopo filtro; 12 attività; 12 allegati; 33 clienti. Excel scaricati e conteggio delle righe controllato. PDF generato con 512 righe dichiarate dall’esportatore.</td></tr>
+</tbody></table></div>
+<h2>Prove eseguite</h2>
+<ul>
+<li>Suite PHP completa: <strong>260 test, 4.367 asserzioni, nessun errore o fallimento</strong>. <a href="phpunit.xml">Risultato completo</a>.</li>
+<li>Verifica ulteriore dell’autore presente soltanto nel registro: superata. <a href="audit-author.xml">Risultato mirato</a>.</li>
+<li>JavaScript: sei controlli superati su paginazione, filtri testuali, importi e date. Build completata; rimane l’avviso sulle dimensioni di alcuni pacchetti già presente nell’audit.</li>
+<li>Browser Chrome isolato: otto verifiche di flusso/esportazione e sei controlli di layout a 1.440 e 390 pixel; nessun errore JavaScript o richiesta esterna. <a href="browser-report.json">Risultati del browser</a>.</li>
+<li>Database SQLite temporanei, file di collaudo e posta simulata. Il database operativo non è stato modificato; queste correzioni non richiedono migrazioni.</li>
+</ul>
+<p>Le prove coprono le correzioni indicate. Non costituiscono una nuova verifica completa di sicurezza, concorrenza sul server definitivo, tutti i dispositivi o consegna delle email reali.</p>
+<h2>Schermate controllate</h2>
+<figure><a href="policy-conflict-desktop.png"><img src="policy-conflict-desktop.png" alt="Avviso di conflitto durante la modifica di una polizza su desktop"></a><figcaption>Avviso, confronto dei dati e riapertura del modulo.</figcaption></figure>
+<figure class="mobile"><a href="policy-conflict-mobile.png"><img src="policy-conflict-mobile.png" alt="Gli stessi controlli di recupero delle modifiche su schermo di 390 pixel"></a><figcaption>Controlli leggibili e disposti verticalmente su smartphone.</figcaption></figure>
+<p><a href="filters-mobile.png">Filtri e comandi di esportazione su smartphone</a> · <a href="history-all-from-page-2.xlsx">Excel con 512 eventi</a> · <a href="history-all-from-page-2.pdf">PDF dello storico</a> · <a href="filtered-history.xlsx">Excel filtrato con 511 eventi</a></p>
+<h2>Prossimo lavoro</h2>
+<p><strong>F05: aggiornare gli avvisi quando un titolo viene saldato.</strong> Seguono la pulizia dei ruoli e il percorso preventivo/polizza, i tipi numerici e data negli Excel, la paginazione delle comunicazioni, gli aggiornamenti mirati delle dipendenze e le rifiniture responsive descritte nell’audit.</p>
+<p>Restano da definire con il cliente la matrice dei ruoli, i testi pubblici e i moduli approvati, gli obblighi documentali per ramo, le regole di maturazione delle provvigioni e i parametri reali della posta. F06–F10 e U01–U05 rimangono aperti.</p>
+</main></body></html>
+

@@ -1,0 +1,74 @@
+{
+    "adminPasswordUnchanged": true,
+    "pendingMigrations": [],
+    "databaseCounts": {
+        "clients": 4884,
+        "insurance_policies": 0,
+        "supplier_companies": 20,
+        "supplier_agencies": 16,
+        "supplier_agency_company": 26
+    },
+    "batchFilesVerified": true,
+    "candidateClientsMatchingExisting": 4292,
+    "importedClientLinksValid": true,
+    "importedRegistries": {
+        "company": {
+            "imported": 20
+        },
+        "agency": {
+            "imported": 16
+        },
+        "client": {
+            "imported": 4884,
+            "held": 71
+        }
+    },
+    "agencyCompanyLinksValid": true,
+    "pages": {
+        "\/settings\/insurance-import": {
+            "status": 200,
+            "favicon": true
+        },
+        "\/settings\/insurance-import?section=branches": {
+            "status": 200,
+            "favicon": true
+        },
+        "\/settings\/insurance-import?section=registry": {
+            "status": 200,
+            "favicon": true
+        },
+        "\/settings\/insurance-import?section=registry&result=held": {
+            "status": 200,
+            "favicon": true
+        },
+        "\/clients": {
+            "status": 200,
+            "favicon": true
+        },
+        "\/clients?import_review=1": {
+            "status": 200,
+            "favicon": true
+        },
+        "\/clients\/1?tab=registry": {
+            "status": 200,
+            "favicon": true
+        },
+        "\/clients\/1\/edit": {
+            "status": 200,
+            "favicon": true
+        },
+        "\/suppliers": {
+            "status": 200,
+            "favicon": true
+        },
+        "\/suppliers\/create": {
+            "status": 200,
+            "favicon": true
+        },
+        "\/supplier-companies": {
+            "status": 200,
+            "favicon": true
+        }
+    },
+    "ok": true
+}

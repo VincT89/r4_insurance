@@ -1,0 +1,28 @@
+{
+    "ok": true,
+    "adminUnchanged": true,
+    "columnExists": true,
+    "pending": [],
+    "pages": {
+        "\/profile": {
+            "status": 200,
+            "signature": true,
+            "theme": true
+        },
+        "\/settings\/appearance": {
+            "status": 200,
+            "signature": true,
+            "theme": true
+        },
+        "\/clients": {
+            "status": 200,
+            "signature": true,
+            "theme": true
+        },
+        "\/suppliers": {
+            "status": 200,
+            "signature": true,
+            "theme": true
+        }
+    }
+}

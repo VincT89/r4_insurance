@@ -1,0 +1,10 @@
+<x-panel title="Storico richieste email" padded>
+<form method="GET" action="{{ route('quotes.show',$case) }}" class="client-search-form filter-grid"><div class="form-row">
+<x-form-group label="Compagnia" name="email_company"><select id="field-email-company" name="email_company" class="form-sel"><option value="">Tutte</option>@foreach($companies as $company)<option value="{{ $company->id }}" @selected(($emailFilters['email_company']??'')==$company->id)>{{ $company->name }}</option>@endforeach</select></x-form-group>
+<x-form-group label="Esito" name="email_state"><select id="field-email-state" name="email_state" class="form-sel"><option value="">Tutti</option>@foreach(\App\Models\InsuranceQuoteEmail::STATUSES as $key=>$label)<option value="{{ $key }}" @selected(($emailFilters['email_state']??'')===$key)>{{ $label }}</option>@endforeach</select></x-form-group>
+<x-form-group label="Mese di preparazione" name="email_month"><input id="field-email-month" name="email_month" type="month" class="form-in" value="{{ $emailFilters['email_month']??'' }}"></x-form-group>
+</div><div class="search-form-actions"><a class="btn btn-g" href="{{ route('quotes.show',$case) }}">Azzera filtri</a><button class="btn btn-p">Applica filtri</button></div></form>
+<div class="client-table-scroll" role="region" aria-label="Richieste di preventivo inviate" tabindex="0"><table class="t-table"><thead><tr><th>Preparata il</th><th>Compagnia</th><th>Operatore</th><th>Esito</th><th>Inviata il</th><th>Azioni</th></tr></thead><tbody>
+@forelse($emails as $email)<tr><td>{{ $email->created_at->format('d/m/Y H:i') }}</td><td>{{ $email->company->name }}</td><td>{{ $email->user?->name ?: 'Utente non disponibile' }}</td><td>{{ $email->status_label }}</td><td>{{ $email->sent_at?->format('d/m/Y H:i') ?: 'Non inviata' }}</td><td><a href="{{ route('quote-emails.show',$email) }}">Apri richiesta</a></td></tr>@empty<tr><td colspan="6">Nessuna richiesta email per i filtri selezionati.</td></tr>@endforelse
+</tbody></table></div>{{ $emails->links() }}
+</x-panel>

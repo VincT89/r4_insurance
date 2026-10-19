@@ -1,0 +1,208 @@
+{
+  "flows": [
+    "Preferenze, referenti aggiuntivi, relazione reciproca e nucleo familiare",
+    "Ramo e sottoramo: salvataggio, tab dipendenti, filtro e bene collegato",
+    "Consenso elettronico per polizza: nessuna preselezione, prova scaricabile e revoca nello storico",
+    "Contatto manuale, esito e modifica nello storico",
+    "Duplicati: confronto esplicito, trasferimento, storico e reindirizzamento della vecchia scheda",
+    "Desktop e smartphone: moduli, etichette, tab e collegamenti",
+    "Smartphone: cambio sottoramo, campi condizionali e salvataggio di un consenso negato"
+  ],
+  "layouts": [
+    {
+      "path": "/clients/2?tab=registry",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=network",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=assets",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=consents",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=history",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=policies&category=Ramo%20dimostrativo",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/records/contacts/create",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/records/assets/create",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/records/interactions/create",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/records/consents/create",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/relationships/1/edit",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/households/1/edit",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/policies/4/edit",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/policies/4",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/duplicates",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=registry",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2?tab=network",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2?tab=assets",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2?tab=consents",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2?tab=history",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2?tab=policies&category=Ramo%20dimostrativo",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/records/contacts/create",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/records/assets/create",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/records/interactions/create",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/records/consents/create",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/relationships/1/edit",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/households/1/edit",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/policies/4/edit",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/policies/4",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/duplicates",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "links": [
+    "/clients",
+    "/clients/2/policies/create",
+    "/clients/2/edit",
+    "/clients/2?tab=policies",
+    "/clients/2?tab=registry",
+    "/clients/2?tab=network",
+    "/clients/2?tab=vehicles",
+    "/clients/2?tab=assets",
+    "/clients/2?tab=documents",
+    "/clients/2?tab=deadlines",
+    "/clients/2?tab=history",
+    "/clients/2?tab=consents",
+    "/clients/2/duplicates",
+    "/clients/2/records/contacts/create",
+    "/clients/2/records/contacts/1/edit",
+    "/clients/2/relationships/create",
+    "/clients/3?tab=network",
+    "/clients/2/relationships/1/edit",
+    "/clients/2/households/create",
+    "/clients/2/households/1/edit",
+    "/clients/2/records/assets/create",
+    "/clients/2/policies/4",
+    "/clients/2/records/assets/1/edit",
+    "/clients/2/records/consents/create",
+    "/attachments/1/download",
+    "/clients/2/records/interactions/create",
+    "/clients/2/records/interactions/1/edit",
+    "/clients/2/policies/create?category=Ramo%20dimostrativo",
+    "/clients/2?tab=policies&category=RC%20auto",
+    "/clients/2?tab=policies&category=Infortuni",
+    "/clients/2?tab=policies&category=RC%20persone",
+    "/clients/2?tab=policies&category=Ramo%20dimostrativo",
+    "/clients/2?tab=policies&category=Ramo%20dimostrativo&subcategory=Sottoramo%20A%20dimostrativo",
+    "/clients/2?tab=policies&category=Ramo%20dimostrativo&subcategory=Sottoramo%20B%20dimostrativo",
+    "/clients/2/policies/5",
+    "/clients/2",
+    "/clients/2/policies/4/edit",
+    "/clients/2/documents/create?policy=4",
+    "/clients/2?tab=assets"
+  ],
+  "javascriptErrors": [],
+  "failedResponses": [],
+  "ok": true,
+  "database": "SQLite isolato con soli dati dimostrativi"
+}

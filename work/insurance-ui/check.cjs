@@ -1,0 +1,86 @@
+const { chromium } = require('C:/Users/vince/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const { spawn, execFileSync } = require('node:child_process');
+const fs = require('node:fs');
+const path = require('node:path');
+const net = require('node:net');
+const assert = require('node:assert/strict');
+const root = path.resolve(__dirname, '../..');
+const php = 'C:/PHP 8.3.1/php.exe';
+const env = { ...process.env, APP_ENV: 'testing', APP_DEBUG: 'false', DB_CONNECTION: 'sqlite', DB_DATABASE: path.join(__dirname, `ui-${Date.now()}.sqlite`), DB_URL: '', CACHE_STORE: 'array', SESSION_DRIVER: 'file', SESSION_COOKIE: 'insurance_ui_test', QUEUE_CONNECTION: 'sync', MAIL_MAILER: 'array' };
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+(async () => {
+    const reservation = net.createServer();
+    await new Promise(resolve => reservation.listen(0, '127.0.0.1', resolve));
+    const port = reservation.address().port;
+    await new Promise(resolve => reservation.close(resolve));
+    const base = `http://127.0.0.1:${port}`;
+    env.APP_URL = base;
+    if (!fs.existsSync(env.DB_DATABASE)) execFileSync(php, [path.join(__dirname, 'prepare.php')], { cwd: root, env, windowsHide: true, stdio: 'pipe' });
+    const server = spawn(php, ['-S', `127.0.0.1:${port}`, '-t', path.join(root, 'public'), path.join(__dirname, 'router.php')], { cwd: root, env, windowsHide: true, stdio: 'ignore' });
+    let browser;
+    const errors = [];
+    try {
+        let ready = false;
+        for (let attempt = 0; attempt < 30; attempt++) {
+            try { const response = await fetch(base+'/login'); if (response.ok) { ready = true; break; } } catch {}
+            await delay(300);
+        }
+        assert.ok(ready, 'Server di prova disponibile');
+        browser = await chromium.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
+        const context = await browser.newContext({ viewport: { width: 1440, height: 1050 } });
+        await context.route('**/*', route => new URL(route.request().url()).origin === base ? route.continue() : route.abort());
+        const page = await context.newPage();
+        page.on('pageerror', error => errors.push(error.message));
+        await page.goto(base+'/login');
+        await page.locator('input[name=email]').fill('ui-test@example.test');
+        await page.locator('input[name=password]').fill('password-testing-only');
+        await Promise.all([page.waitForURL('**/dashboard'), page.locator('button[type=submit]').click()]);
+        await page.goto(base+'/clients/1');
+        const tabs = page.getByRole('navigation', { name: 'Tipologie di polizza' });
+        await tabs.getByRole('link', { name: 'RC auto', exact: true }).click();
+        await page.waitForURL('**category=RC*');
+        assert.equal(await page.locator('table').getByText('DEMO-1', { exact: true }).count(), 1);
+        assert.equal(await page.locator('table').getByText('DEMO-2', { exact: true }).count(), 0);
+        await page.screenshot({ path: path.join(__dirname, 'desktop-policies.png'), fullPage: true });
+        await page.getByRole('link', { name: 'Nuova polizza', exact: true }).click();
+        assert.equal(await page.locator('[name=category]').inputValue(), 'RC auto');
+        await page.locator('[name=company]').fill('Compagnia dimostrativa');
+        await page.locator('[name=number]').fill('UI-DEMO-4');
+        await page.locator('[name=vehicle_id]').selectOption('1');
+        await page.locator('[name=starts_on]').fill('2026-01-01');
+        await page.locator('[name=expires_on]').fill('2026-12-31');
+        await Promise.all([page.waitForURL(/\/policies\/\d+$/), page.getByRole('button', { name: 'Salva polizza' }).click()]);
+        await page.getByRole('link', { name: 'Carica documento', exact: true }).click();
+        await page.locator('[name=file]').setInputFiles({ name: 'documento-ui-test.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nDocumento dimostrativo') });
+        await page.locator('[name=document_category]').selectOption('policy');
+        await page.locator('[name=expires_on]').fill('2026-12-31');
+        await Promise.all([page.waitForURL('**tab=documents'), page.getByRole('button', { name: 'Carica documento', exact: true }).click()]);
+        assert.equal(await page.getByRole('link', { name: 'documento-ui-test.pdf', exact: true }).count(), 1);
+        await page.getByRole('navigation', { name: 'Sezioni della scheda cliente' }).getByRole('link', { name: 'Scadenze', exact: true }).click();
+        await page.locator('[name=period]').selectOption('60');
+        await Promise.all([page.waitForURL('**period=60**'), page.getByRole('button', { name: 'Filtra', exact: true }).click()]);
+        assert.equal(await page.locator('table').getByText('UI-DEMO-4', { exact: false }).count(), 0);
+        await page.goto(base+'/clients/create');
+        await page.locator('[name=client_type]').selectOption('company');
+        await page.locator('[name=birth_date]').waitFor({ state: 'hidden' });
+        assert.equal(await page.locator('[name=birth_date]').isVisible(), false);
+        assert.equal(await page.locator('[name=birth_date]').isDisabled(), true);
+        await page.locator('[name=client_type]').selectOption('person');
+        await page.locator('[name=birth_date]').waitFor({ state: 'visible' });
+        assert.equal(await page.locator('[name=birth_date]').isVisible(), true);
+        await page.setViewportSize({ width: 390, height: 844 });
+        await page.goto(base+'/clients/1?tab=policies&category=Infortuni');
+        await page.getByRole('navigation', { name: 'Tipologie di polizza' }).getByRole('link', { name: 'RC auto', exact: true }).click();
+        await page.waitForURL('**category=RC*');
+        await page.screenshot({ path: path.join(__dirname, 'mobile-policies.png'), fullPage: true });
+        assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Nessuna fuoriuscita orizzontale della pagina mobile');
+        await page.goto(base+'/clients/1/edit');
+        await page.screenshot({ path: path.join(__dirname, 'mobile-registry.png'), fullPage: true });
+        assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Modulo anagrafica contenuto nella pagina mobile');
+        assert.deepEqual(errors, [], 'Nessun errore JavaScript');
+        console.log(JSON.stringify({ ok: true, viewportChecks: ['1440x1050', '390x844'], flows: ['login', 'policy-tabs', 'create-policy', 'upload-document', 'deadline-filter', 'person-company-fields'], javascriptErrors: errors, database: 'SQLite di prova separato' }, null, 2));
+    } finally {
+        if (browser) await browser.close();
+        server.kill();
+    }
+})().catch(error => { console.error(error.stack); process.exitCode = 1; });

@@ -1,0 +1,68 @@
+[
+  {
+    "file": "signing-source-1.pdf",
+    "pages": 4,
+    "characters": 5861,
+    "outside_page": 0
+  },
+  {
+    "file": "signing-source-2.pdf",
+    "pages": 3,
+    "characters": 5824,
+    "outside_page": 0
+  },
+  {
+    "file": "signing-source-3.pdf",
+    "pages": 5,
+    "characters": 7253,
+    "outside_page": 0
+  },
+  {
+    "file": "signing-source-4.pdf",
+    "pages": 3,
+    "characters": 4261,
+    "outside_page": 0
+  },
+  {
+    "file": "signing-source-5.pdf",
+    "pages": 2,
+    "characters": 2228,
+    "outside_page": 0
+  },
+  {
+    "file": "signing-source-6.pdf",
+    "pages": 1,
+    "characters": 1073,
+    "outside_page": 0
+  },
+  {
+    "file": "signing-source-7.pdf",
+    "pages": 1,
+    "characters": 1742,
+    "outside_page": 0
+  },
+  {
+    "file": "signing-preview.pdf",
+    "pages": 1,
+    "characters": 325,
+    "outside_page": 0
+  },
+  {
+    "file": "signing-client.pdf",
+    "pages": 1,
+    "characters": 279,
+    "outside_page": 0
+  },
+  {
+    "file": "signing-policy.pdf",
+    "pages": 1,
+    "characters": 340,
+    "outside_page": 0
+  },
+  {
+    "file": "signing-coverage.pdf",
+    "pages": 1,
+    "characters": 356,
+    "outside_page": 0
+  }
+]

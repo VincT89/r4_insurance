@@ -1,0 +1,13 @@
+.form-template-text { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.55; }
+.form-template-choice { padding:12px 0; border-bottom:1px solid var(--ap-form-border,var(--ap-primary)); }
+.form-template-choice:last-of-type { border-bottom:0; }
+.form-signing-upload { margin:12px 0 20px; }
+.form-signing-upload > form { margin-top:14px; }
+.form-document-actions { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+.form-template-editor { min-height:250px; line-height:1.5; }
+.form-template-tokens { display:flex; flex-wrap:wrap; gap:6px 14px; overflow-wrap:anywhere; }
+.form-reference-prose .panel-body > * + * { margin-top:12px; }
+.form-reference-prose .panel-body p { line-height:1.5; }
+.form-section .client-registry-details + .form-row { margin-top:16px; }
+.form-section .form-g + .insurance-checkbox { display:flex; gap:8px; align-items:flex-start; margin-top:12px; line-height:1.5; }
+@media(max-width:600px) { .form-document-actions { align-items:stretch; flex-direction:column; } }

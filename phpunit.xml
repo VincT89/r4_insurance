@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Core">
+            <file>tests/Unit/PhoneNormalizerTest.php</file>
+            <file>tests/Feature/Auth/AuthenticationTest.php</file>
+            <file>tests/Feature/Auth/PasswordUpdateTest.php</file>
+            <file>tests/Feature/ProfileTest.php</file>
+            <file>tests/Feature/AppearanceTest.php</file>
+            <file>tests/Feature/FirstLoginPasswordChangeTest.php</file>
+            <file>tests/Feature/Core/UserAdministrationSafetyTest.php</file>
+            <file>tests/Feature/RolePermissionsTest.php</file>
+            <file>tests/Feature/RoleMigrationTest.php</file>
+            <file>tests/Feature/QuoteRequestContextTest.php</file>
+            <file>tests/Feature/AuditSafetyRegressionTest.php</file>
+            <file>tests/Feature/Security/SecurityHeadersTest.php</file>
+            <file>tests/Feature/ClientMaterialsTest.php</file>
+            <file>tests/Feature/RetiredModulesCleanupTest.php</file>
+            <file>tests/Feature/InsuranceClientRegistryTest.php</file>
+            <file>tests/Feature/ClientRegistryCompletionTest.php</file>
+            <file>tests/Feature/SupplierAgencyTest.php</file>
+            <file>tests/Feature/InsuranceImportPreparationTest.php</file>
+            <file>tests/Feature/RegistryExcelImporterTest.php</file>
+            <file>tests/Feature/HeldRegistryResolutionTest.php</file>
+            <file>tests/Feature/InsuranceCatalogTest.php</file>
+            <file>tests/Feature/ApprovedInsuranceCatalogMergesTest.php</file>
+            <file>tests/Feature/PolicyExcelImporterTest.php</file>
+            <file>tests/Feature/EquivalentPolicyImportTest.php</file>
+            <file>tests/Feature/DocumentWorkflowTest.php</file>
+            <file>tests/Feature/InsuranceWorkspaceTest.php</file>
+            <file>tests/Feature/InsuranceDemoAndUploadsTest.php</file>
+            <file>tests/Feature/AgencyEmailWorkflowTest.php</file>
+            <file>tests/Feature/CommunicationPaginationTest.php</file>
+            <file>tests/Feature/InsuranceOperationsTest.php</file>
+            <file>tests/Feature/InsurancePolicyWorkflowTest.php</file>
+            <file>tests/Feature/QuoteRequestEmailTest.php</file>
+            <file>tests/Feature/AgencyCommissionTest.php</file>
+            <file>tests/Feature/InsuranceSigningTest.php</file>
+            <file>tests/Feature/InsuranceClaimsTest.php</file>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BROADCAST_CONNECTION" value="null"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="DB_URL" value=""/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
+    </php>
+</phpunit>

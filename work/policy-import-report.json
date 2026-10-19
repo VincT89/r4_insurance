@@ -1,0 +1,61 @@
+{
+    "batch_hash": "33aa59516565e1b798a1b35185be8ea3c8e1136930f20f544d821f6c512f5220",
+    "ready": 2324,
+    "held": 2535,
+    "already_imported": 0,
+    "issues": {
+        "numero_polizza_ripetuto": 1495,
+        "denominazione_compagnia_da_confermare": 841,
+        "classificazione_da_confermare": 648,
+        "identita_cliente_da_verificare": 233,
+        "identificativo_fiscale_da_verificare": 167,
+        "premio_non_valido": 157,
+        "cliente_non_collegabile": 152,
+        "stessa_polizza_intestatari_diversi": 109,
+        "scadenza_precedente_decorrenza": 2,
+        "dati_polizza_non_validi": 2
+    },
+    "created": 2324,
+    "unchanged": {
+        "users": true,
+        "clients": true,
+        "registry_import_entries": true,
+        "supplier_companies": true,
+        "supplier_agencies": true,
+        "supplier_agency_company": true,
+        "insurance_branches": true,
+        "insurance_subbranches": true,
+        "insurance_catalog_aliases": true,
+        "attachments": true,
+        "client_document_requests": true,
+        "client_vehicles": true,
+        "client_assets": true
+    },
+    "existing_policies_unchanged": true,
+    "repeat_import": {
+        "batch_hash": "33aa59516565e1b798a1b35185be8ea3c8e1136930f20f544d821f6c512f5220",
+        "ready": 0,
+        "held": 2535,
+        "already_imported": 2324,
+        "issues": {
+            "numero_polizza_ripetuto": 1495,
+            "denominazione_compagnia_da_confermare": 841,
+            "classificazione_da_confermare": 648,
+            "identita_cliente_da_verificare": 233,
+            "identificativo_fiscale_da_verificare": 167,
+            "premio_non_valido": 157,
+            "cliente_non_collegabile": 152,
+            "stessa_polizza_intestatari_diversi": 109,
+            "scadenza_precedente_decorrenza": 2,
+            "dati_polizza_non_validi": 2
+        }
+    },
+    "counts": {
+        "policies": 2324,
+        "status_review": 2324,
+        "imported": 2324,
+        "held": 2535
+    },
+    "pending_migrations": [],
+    "ok": true
+}

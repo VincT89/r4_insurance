@@ -1,0 +1,354 @@
+/* Colori personali: ogni superficie mantiene testi e controlli leggibili. */
+body.app-body {
+  --bg: var(--ap-page);
+  --bg1: var(--ap-page);
+  --bg2: var(--ap-page-soft);
+  --bg3: var(--ap-page-line);
+  --text: var(--ap-page-text);
+  --text1: var(--ap-page-text);
+  --text2: var(--ap-page-muted);
+  --text3: var(--ap-page-muted);
+  --line: var(--ap-page-line);
+  --line2: var(--ap-page-line);
+  --line3: var(--ap-page-border);
+  --border: var(--ap-page-border);
+  --blue-title: var(--ap-page-heading);
+  --link-hover: var(--ap-page-link-hover);
+  --accent-text: var(--ap-page-accent);
+  --red-text: var(--ap-page-red);
+  --green-text: var(--ap-page-green);
+  --blue-text: var(--ap-page-blue);
+  --orange-text: var(--ap-page-orange);
+  --purple-text: var(--ap-page-purple);
+  --teal-text: var(--ap-page-teal);
+  --yellow-text: var(--ap-page-yellow);
+  color: var(--text);
+  background-color: var(--ap-page);
+}
+
+.app-body :is(.panel, .settings-panel, .kpi-cell, .modal, .dropdown-menu, .dropdown-panel, .lw-modal, .notes-container, .notes-sidebar) {
+  --bg: var(--ap-panel);
+  --bg1: var(--ap-panel);
+  --bg2: var(--ap-panel-soft);
+  --bg3: var(--ap-panel-line);
+  --text: var(--ap-panel-text);
+  --text1: var(--ap-panel-text);
+  --text2: var(--ap-panel-muted);
+  --text3: var(--ap-panel-muted);
+  --line: var(--ap-panel-line);
+  --line2: var(--ap-panel-line);
+  --line3: var(--ap-panel-border);
+  --border: var(--ap-panel-border);
+  --blue-title: var(--ap-panel-heading);
+  --link-hover: var(--ap-panel-link-hover);
+  --accent-text: var(--ap-panel-accent);
+  --red-text: var(--ap-panel-red);
+  --green-text: var(--ap-panel-green);
+  --blue-text: var(--ap-panel-blue);
+  --orange-text: var(--ap-panel-orange);
+  --purple-text: var(--ap-panel-purple);
+  --teal-text: var(--ap-panel-teal);
+  --yellow-text: var(--ap-panel-yellow);
+  color: var(--text);
+  background-color: var(--ap-panel);
+}
+
+.app-body .sidebar {
+  --bg: var(--ap-sidebar);
+  --bg1: var(--ap-sidebar);
+  --bg2: var(--ap-sidebar-soft);
+  --bg3: var(--ap-sidebar-line);
+  --text: var(--ap-sidebar-text);
+  --text1: var(--ap-sidebar-text);
+  --text2: var(--ap-sidebar-muted);
+  --text3: var(--ap-sidebar-muted);
+  --line: var(--ap-sidebar-line);
+  --line2: var(--ap-sidebar-line);
+  --line3: var(--ap-sidebar-border);
+  --border: var(--ap-sidebar-border);
+  --blue-title: var(--ap-sidebar-heading);
+  --link-hover: var(--ap-sidebar-link-hover);
+  --accent-text: var(--ap-sidebar-accent);
+  --red-text: var(--ap-sidebar-red);
+  --green-text: var(--ap-sidebar-green);
+  --blue-text: var(--ap-sidebar-blue);
+  --orange-text: var(--ap-sidebar-orange);
+  --purple-text: var(--ap-sidebar-purple);
+  --teal-text: var(--ap-sidebar-teal);
+  --yellow-text: var(--ap-sidebar-yellow);
+  color: var(--text);
+  background-color: var(--ap-sidebar);
+}
+
+.app-body .sidebar .nav-item.active {
+  --bg: var(--ap-sidebar-active);
+  --bg1: var(--ap-sidebar-active);
+  --bg2: var(--ap-sidebar-active-soft);
+  --bg3: var(--ap-sidebar-active-line);
+  --text: var(--ap-sidebar-active-text);
+  --text1: var(--ap-sidebar-active-text);
+  --text2: var(--ap-sidebar-active-muted);
+  --text3: var(--ap-sidebar-active-muted);
+  --line: var(--ap-sidebar-active-line);
+  --line2: var(--ap-sidebar-active-line);
+  --line3: var(--ap-sidebar-active-border);
+  --border: var(--ap-sidebar-active-border);
+  --blue-title: var(--ap-sidebar-active-heading);
+  --link-hover: var(--ap-sidebar-active-link-hover);
+  --accent-text: var(--ap-sidebar-active-accent);
+  --red-text: var(--ap-sidebar-active-red);
+  --green-text: var(--ap-sidebar-active-green);
+  --blue-text: var(--ap-sidebar-active-blue);
+  --orange-text: var(--ap-sidebar-active-orange);
+  --purple-text: var(--ap-sidebar-active-purple);
+  --teal-text: var(--ap-sidebar-active-teal);
+  --yellow-text: var(--ap-sidebar-active-yellow);
+  color: var(--text);
+  background-color: var(--ap-sidebar-active);
+}
+
+.app-body .topbar {
+  --bg: var(--ap-topbar);
+  --bg1: var(--ap-topbar);
+  --bg2: var(--ap-topbar-soft);
+  --bg3: var(--ap-topbar-line);
+  --text: var(--ap-topbar-text);
+  --text1: var(--ap-topbar-text);
+  --text2: var(--ap-topbar-muted);
+  --text3: var(--ap-topbar-muted);
+  --line: var(--ap-topbar-line);
+  --line2: var(--ap-topbar-line);
+  --line3: var(--ap-topbar-border);
+  --border: var(--ap-topbar-border);
+  --blue-title: var(--ap-topbar-heading);
+  --link-hover: var(--ap-topbar-link-hover);
+  --accent-text: var(--ap-topbar-accent);
+  --red-text: var(--ap-topbar-red);
+  --green-text: var(--ap-topbar-green);
+  --blue-text: var(--ap-topbar-blue);
+  --orange-text: var(--ap-topbar-orange);
+  --purple-text: var(--ap-topbar-purple);
+  --teal-text: var(--ap-topbar-teal);
+  --yellow-text: var(--ap-topbar-yellow);
+  color: var(--text);
+  background-color: var(--ap-topbar);
+}
+
+.app-body .t-table tbody {
+  --bg: var(--ap-table-body);
+  --bg1: var(--ap-table-body);
+  --bg2: var(--ap-table-body-soft);
+  --bg3: var(--ap-table-body-line);
+  --text: var(--ap-table-body-text);
+  --text1: var(--ap-table-body-text);
+  --text2: var(--ap-table-body-muted);
+  --text3: var(--ap-table-body-muted);
+  --line: var(--ap-table-body-line);
+  --line2: var(--ap-table-body-line);
+  --line3: var(--ap-table-body-border);
+  --border: var(--ap-table-body-border);
+  --blue-title: var(--ap-table-body-heading);
+  --link-hover: var(--ap-table-body-link-hover);
+  --accent-text: var(--ap-table-body-accent);
+  --red-text: var(--ap-table-body-red);
+  --green-text: var(--ap-table-body-green);
+  --blue-text: var(--ap-table-body-blue);
+  --orange-text: var(--ap-table-body-orange);
+  --purple-text: var(--ap-table-body-purple);
+  --teal-text: var(--ap-table-body-teal);
+  --yellow-text: var(--ap-table-body-yellow);
+  color: var(--text);
+  background-color: var(--ap-table-body);
+}
+
+.app-body .t-table tbody tr:hover {
+  --bg: var(--ap-table-hover);
+  --bg1: var(--ap-table-hover);
+  --bg2: var(--ap-table-hover-soft);
+  --bg3: var(--ap-table-hover-line);
+  --text: var(--ap-table-hover-text);
+  --text1: var(--ap-table-hover-text);
+  --text2: var(--ap-table-hover-muted);
+  --text3: var(--ap-table-hover-muted);
+  --line: var(--ap-table-hover-line);
+  --line2: var(--ap-table-hover-line);
+  --line3: var(--ap-table-hover-border);
+  --border: var(--ap-table-hover-border);
+  --blue-title: var(--ap-table-hover-heading);
+  --link-hover: var(--ap-table-hover-link-hover);
+  --accent-text: var(--ap-table-hover-accent);
+  --red-text: var(--ap-table-hover-red);
+  --green-text: var(--ap-table-hover-green);
+  --blue-text: var(--ap-table-hover-blue);
+  --orange-text: var(--ap-table-hover-orange);
+  --purple-text: var(--ap-table-hover-purple);
+  --teal-text: var(--ap-table-hover-teal);
+  --yellow-text: var(--ap-table-hover-yellow);
+  color: var(--text);
+  background-color: var(--ap-table-hover);
+}
+
+.app-body .t-table :is(thead, thead th) {
+  --bg: var(--ap-table-header);
+  --bg1: var(--ap-table-header);
+  --bg2: var(--ap-table-header-soft);
+  --bg3: var(--ap-table-header-line);
+  --text: var(--ap-table-header-text);
+  --text1: var(--ap-table-header-text);
+  --text2: var(--ap-table-header-muted);
+  --text3: var(--ap-table-header-muted);
+  --line: var(--ap-table-header-line);
+  --line2: var(--ap-table-header-line);
+  --line3: var(--ap-table-header-border);
+  --border: var(--ap-table-header-border);
+  --blue-title: var(--ap-table-header-heading);
+  --link-hover: var(--ap-table-header-link-hover);
+  --accent-text: var(--ap-table-header-accent);
+  --red-text: var(--ap-table-header-red);
+  --green-text: var(--ap-table-header-green);
+  --blue-text: var(--ap-table-header-blue);
+  --orange-text: var(--ap-table-header-orange);
+  --purple-text: var(--ap-table-header-purple);
+  --teal-text: var(--ap-table-header-teal);
+  --yellow-text: var(--ap-table-header-yellow);
+  color: var(--text);
+  background-color: var(--ap-table-header);
+}
+
+.app-body :is(.form-in, .form-sel, .form-ta, .form-select, .form-textarea) {
+  --bg: var(--ap-field);
+  --bg1: var(--ap-field);
+  --bg2: var(--ap-field-soft);
+  --bg3: var(--ap-field-line);
+  --text: var(--ap-field-text);
+  --text1: var(--ap-field-text);
+  --text2: var(--ap-field-muted);
+  --text3: var(--ap-field-muted);
+  --line: var(--ap-field-line);
+  --line2: var(--ap-field-line);
+  --line3: var(--ap-field-border);
+  --border: var(--ap-field-border);
+  --blue-title: var(--ap-field-heading);
+  --link-hover: var(--ap-field-link-hover);
+  --accent-text: var(--ap-field-accent);
+  --red-text: var(--ap-field-red);
+  --green-text: var(--ap-field-green);
+  --blue-text: var(--ap-field-blue);
+  --orange-text: var(--ap-field-orange);
+  --purple-text: var(--ap-field-purple);
+  --teal-text: var(--ap-field-teal);
+  --yellow-text: var(--ap-field-yellow);
+  color: var(--text);
+  background-color: var(--ap-field);
+}
+
+
+.app-body .login-right {
+  --bg: var(--ap-login-panel);
+  --bg1: var(--ap-login-panel);
+  --bg2: var(--ap-login-panel-soft);
+  --bg3: var(--ap-login-panel-line);
+  --text: var(--ap-login-panel-text);
+  --text1: var(--ap-login-panel-text);
+  --text2: var(--ap-login-panel-muted);
+  --text3: var(--ap-login-panel-muted);
+  --line: var(--ap-login-panel-line);
+  --line2: var(--ap-login-panel-line);
+  --line3: var(--ap-login-panel-border);
+  --border: var(--ap-login-panel-border);
+  --blue-title: var(--ap-login-panel-heading);
+  --accent-text: var(--ap-login-panel-accent);
+  --link-hover: var(--ap-login-panel-link-hover);
+  color: var(--text);
+  background: var(--ap-login-panel);
+}
+
+.app-body {
+  --accent: var(--ap-primary);
+  --accent2: var(--ap-primary-hover);
+  --accent-rgb: var(--ap-primary-rgb);
+  --bg-main: var(--ap-page);
+  background: var(--ap-page);
+}
+.app-body :is(.panel, .kpi-cell, .modal, .settings-panel) { background: var(--ap-panel); }
+.app-body .main, .app-body .content { background: transparent; }
+.app-body .page-title, .app-body .page-title strong { color: var(--ap-page-heading); }
+.app-body :is(.panel-title, .appearance-group legend, .appearance-preview h2) { color: var(--ap-panel-heading); }
+.app-body .t-table tbody td { background: transparent; }
+.app-body :is(.form-in, .form-sel, .form-ta):focus { background: var(--ap-field); outline: 2px solid var(--ap-field-border); outline-offset: 1px; }
+.app-body :is(.form-in, .form-ta)::placeholder { color: var(--ap-field-muted); }
+.app-body :is(.password-toggle, .password-toggle:hover) { color: var(--ap-field-text); }
+.app-body .sidebar .nav-item.active { border-left-color: var(--accent-text); }
+.app-body .sidebar .nav-item.active .nav-icon { color: var(--accent-text); }
+.app-body :is(.btn-p, .avatar-btn, .nav-badge, .pagination .page-item.active .page-link) { color: var(--ap-primary-text); }
+.app-body .btn-p:hover { color: var(--ap-primary-hover-text); }
+.app-body :is(.welcome-greeting em, .kpi-cell.accent-line .kpi-val-t, .t-display em) { color: var(--accent-text); }
+.app-body :is(.btn, .btn-icon, .btn-s, .btn-g, a, input, select, textarea):focus-visible { outline-color: var(--text); }
+.app-body .t-table a:not(.btn):not(.act-btn) { color: var(--blue-title); }
+.app-body .topbar::after { background: var(--ap-topbar-line); }
+.app-body .skip-link { background: var(--ap-page-text); color: var(--ap-page); }
+
+.app-brand { display: flex; align-items: center; flex: 0 0 auto; gap: 9px; max-width: 100%; text-decoration: none; }
+.topbar-left { padding-left: 12px; }
+.app-brand .brand-symbol { display: block; width: 44px; height: 38px; object-fit: contain; flex-shrink: 0; }
+.brand-name { display: none; font-size: 14px; font-weight: 600; line-height: 1.2; color: var(--text); max-width: 140px; }
+.shell.expanded .brand-name { display: block; }
+.shell.expanded .app-brand .brand-symbol { width: 70px; }
+.login-logo img { display: block; width: 115px; height: auto; flex-shrink: 0; }
+.login-logo { max-width: 100%; }
+.login-logo-name { font-size: 23px; line-height: 1.3; max-width: 280px; }
+.login-title { max-width: 560px; font-size: clamp(28px, 3vw, 42px); line-height: 1.22; }
+.login-description { margin-top: 24px; max-width: 420px; font-size: 15px; line-height: 1.7; color: var(--text2); }
+.login-mobile-brand { display: none; }
+.login-right { min-width: 0; padding-inline: clamp(28px, 5vw, 100px); }
+.guest-body { overflow-y: auto; }
+.app-body .login-shell { background: var(--ap-page); }
+.app-body .login-eyebrow { color: var(--ap-page-accent); }
+.app-body .login-title strong { color: var(--ap-page-heading); }
+.login-shell { min-height: 100dvh; }
+.legal-brand .legal-signature { width: 72px; height: auto; }
+.appearance-intro { max-width: 850px; line-height: 1.65; margin: 0 0 10px; color: var(--text2); font-size: 13px; }
+.appearance-intro + .appearance-intro { margin-bottom: 26px; }
+.appearance-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; max-width: 1120px; }
+.appearance-group { min-width: 0; padding: 10px 24px 20px; border: 1px solid var(--line); margin: 0; }
+.appearance-group legend { padding: 0 8px; font-weight: 700; font-size: 15px; line-height: 1.5; }
+.appearance-field { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-block: 14px; }
+.appearance-field + .appearance-field { border-top: 1px solid var(--line); }
+.appearance-field > label { font-size: 13px; line-height: 1.45; color: var(--text); }
+.appearance-inputs { display: flex; align-items: center; flex-shrink: 0; gap: 8px; }
+.appearance-inputs input[type=color] { appearance: none; width: 42px; height: 42px; padding: 3px; border: 1px solid var(--line3); border-radius: var(--r); background: var(--bg); cursor: pointer; }
+.appearance-inputs input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
+.appearance-inputs input[type=color]::-webkit-color-swatch { border: 0; border-radius: 3px; }
+.appearance-inputs .form-in { width: 100px; min-height: 42px; font-family: ui-monospace, monospace; font-size: 13px; }
+.appearance-help { margin: 16px 0 24px; font-size: 12px; line-height: 1.6; color: var(--text2); }
+.appearance-preview { max-width: 1120px; overflow: hidden; }
+.appearance-preview h2 { font-size: 15px; margin: 20px 24px 8px; }
+.appearance-preview p { font-size: 12px; margin: 0 24px 20px; color: var(--text2); }
+.appearance-preview-scroll { overflow: auto; }
+.appearance-preview .t-table { min-width: 420px; }
+.appearance-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 24px; max-width: 1120px; }
+.appearance-actions .btn, .appearance-reset .btn { min-height: 42px; font-size: 12px; padding-inline: 18px; }
+.appearance-actions p { flex-basis: 100%; color: var(--text2); font-size: 12px; line-height: 1.6; margin: 0; }
+.appearance-reset { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); max-width: 1120px; }
+@media (max-width: 1100px) {
+  .appearance-field { align-items: flex-start; flex-direction: column; gap: 10px; }
+}
+@media (max-width: 992px) {
+  .login-mobile-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 38px; }
+  .login-mobile-brand img { width: 68px; height: auto; flex-shrink: 0; }
+  .login-mobile-brand span { font-size: 16px; font-weight: 600; line-height: 1.4; }
+}
+@media (max-width: 767px) {
+  .brand-name, .shell.expanded .brand-name { display: none; }
+  .app-brand .brand-symbol, .shell.expanded .app-brand .brand-symbol { width: 48px; }
+  .appearance-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .appearance-group { padding-inline: 18px; }
+  .appearance-field { flex-direction: row; align-items: center; }
+}
+@media (max-width: 420px) {
+  .appearance-field { align-items: flex-start; flex-direction: column; }
+  .appearance-inputs { width: 100%; }
+  .appearance-inputs .form-in { flex: 1; min-width: 0; }
+  .appearance-actions .btn, .appearance-reset .btn { width: 100%; min-height: 44px; }
+}
+

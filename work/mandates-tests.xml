@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="8" assertions="183" errors="0" failures="0" skipped="0" time="3.711561">
+    <testsuite name="Core" tests="8" assertions="183" errors="0" failures="0" skipped="0" time="3.711561">
+      <testsuite name="Tests\Feature\SupplierAgencyTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\SupplierAgencyTest.php" tests="8" assertions="183" errors="0" failures="0" skipped="0" time="3.711561">
+        <testcase name="test_admin_can_create_update_filter_and_delete_an_agency_with_audit" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\SupplierAgencyTest.php" line="15" class="Tests\Feature\SupplierAgencyTest" classname="Tests.Feature.SupplierAgencyTest" assertions="25" time="2.958128"/>
+        <testcase name="test_agency_access_is_limited_to_existing_management_roles" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\SupplierAgencyTest.php" line="45" class="Tests\Feature\SupplierAgencyTest" classname="Tests.Feature.SupplierAgencyTest" assertions="19" time="0.100627"/>
+        <testcase name="test_agency_validation_and_separation_from_insurance_policies" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\SupplierAgencyTest.php" line="64" class="Tests\Feature\SupplierAgencyTest" classname="Tests.Feature.SupplierAgencyTest" assertions="11" time="0.060457"/>
+        <testcase name="test_company_hierarchy_can_be_created_browsed_and_filtered" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\SupplierAgencyTest.php" line="77" class="Tests\Feature\SupplierAgencyTest" classname="Tests.Feature.SupplierAgencyTest" assertions="38" time="0.222502"/>
+        <testcase name="test_relationships_cannot_cross_companies_form_cycles_or_orphan_subagencies" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\SupplierAgencyTest.php" line="107" class="Tests\Feature\SupplierAgencyTest" classname="Tests.Feature.SupplierAgencyTest" assertions="27" time="0.070332"/>
+        <testcase name="test_subagency_can_be_reassigned_explicitly_and_empty_companies_deleted" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\SupplierAgencyTest.php" line="131" class="Tests\Feature\SupplierAgencyTest" classname="Tests.Feature.SupplierAgencyTest" assertions="13" time="0.086167"/>
+        <testcase name="test_companies_use_the_same_access_rules_as_agencies" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\SupplierAgencyTest.php" line="151" class="Tests\Feature\SupplierAgencyTest" classname="Tests.Feature.SupplierAgencyTest" assertions="28" time="0.104635"/>
+        <testcase name="test_existing_unassigned_agencies_are_preserved_and_new_relationships_validated" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\SupplierAgencyTest.php" line="173" class="Tests\Feature\SupplierAgencyTest" classname="Tests.Feature.SupplierAgencyTest" assertions="22" time="0.108714"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

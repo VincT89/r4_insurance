@@ -1,0 +1,21 @@
+{
+  "screens": [
+    "notifications-desktop",
+    "notifications-mobile",
+    "history-mobile-compact",
+    "history-mobile-details",
+    "reopened-mobile-bottom",
+    "history-desktop-final",
+    "list-desktop-final",
+    "table-filter-final"
+  ],
+  "exports": [
+    "history Excel",
+    "history PDF",
+    "list Excel",
+    "list PDF"
+  ],
+  "errors": [],
+  "external": [],
+  "ok": true
+}

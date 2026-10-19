@@ -1,0 +1,28 @@
+.table-tools { padding: 10px 16px; min-width: 0; border-bottom: 1px solid var(--line); }
+.table-tools-actions, .table-filter-pagination, .table-filter-picker, .table-filter-operators, .table-filter-combine { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.table-tools-actions > .btn:first-child { margin-right: auto; }
+.table-filter-panel { margin-top: 14px; display: grid; gap: 12px; padding: 18px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); }
+.table-filter-help { margin: 0 0 4px; color: var(--text2); font-size: 13px; line-height: 1.6; }
+.table-filter-label { display: block; margin: 0; color: var(--text); font-family: var(--sans); font-size: 13px; font-weight: 600; }
+.table-filter-rules { display: grid; gap: 16px; }
+.table-filter-rule { min-width: 0; margin: 4px 0 0; padding: 14px; border: 1px solid var(--border); border-radius: var(--r); }
+.table-filter-rule legend { padding: 0 8px; color: var(--text); font-family: var(--sans); font-size: 14px; font-weight: 600; }
+.table-filter-values { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-top: 12px; }
+.table-filter-value { display: grid; gap: 6px; flex: 1 1 200px; max-width: 420px; min-width: 0; }
+.table-filter-value .form-in { font-family: var(--sans); font-size: 14px; }
+.table-filter-combine { border-top: 1px solid var(--border); padding-top: 12px; }
+.table-filter-combine > .table-filter-label { flex-basis: 100%; }
+.table-tools .btn[aria-pressed="true"] { background: var(--ap-primary); color: var(--ap-primary-text); border-color: var(--ap-primary); box-shadow: inset 0 0 0 1px currentColor; }
+.table-tools .btn[aria-pressed="true"]:hover { background: var(--ap-primary-hover); color: var(--ap-primary-hover-text); }
+.table-tools .btn { min-height: 38px; font-family: var(--sans); font-size: 12px; line-height: 1.35; }
+.table-export-status:not(:empty) { margin: 10px 0; }
+.table-tools [hidden], .t-table tr[hidden], .panel nav[hidden] { display: none !important; }
+@media (max-width: 600px) {
+    .table-tools { padding: 12px; }
+    .table-filter-panel { padding: 12px; }
+    .table-filter-rule { padding: 10px; }
+    .table-tools .btn { min-height: 44px; }
+    .table-tools-actions .btn, .table-filter-picker .btn, .table-filter-combine .btn { flex: 1 1 auto; }
+    .table-filter-value { max-width: none; flex-basis: 100%; }
+    .table-filter-operators .btn { flex: 1 1 calc(50% - 8px); }
+}

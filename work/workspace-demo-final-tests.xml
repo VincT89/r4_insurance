@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="6" assertions="53" errors="0" failures="0" skipped="0" time="25.373695">
+    <testsuite name="Core" tests="6" assertions="53" errors="0" failures="0" skipped="0" time="25.373695">
+      <testsuite name="Tests\Feature\InsuranceDemoAndUploadsTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" tests="6" assertions="53" errors="0" failures="0" skipped="0" time="25.373695">
+        <testcase name="test_multi_documents_keep_independent_identity_types_dates_and_reject_cross_client_links" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="28" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="11" time="15.519826"/>
+        <testcase name="test_generic_and_livewire_batches_validate_every_file_and_store_both_valid_files" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="42" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="8" time="3.419219"/>
+        <testcase name="test_reset_backs_up_dependents_preserves_catalog_and_admin_and_creates_fifty_linked_examples" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="55" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="18" time="4.317511"/>
+        <testcase name="test_reset_failure_rolls_back_clients_and_leaves_files_untouched" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="77" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="4" time="0.555752"/>
+        <testcase name="test_merit_classes_are_validated_saved_and_displayed" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="87" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="8" time="1.501354"/>
+        <testcase name="test_legacy_payment_schema_receives_renewal_fields_without_changing_existing_policies" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceDemoAndUploadsTest.php" line="97" class="Tests\Feature\InsuranceDemoAndUploadsTest" classname="Tests.Feature.InsuranceDemoAndUploadsTest" assertions="4" time="0.060035"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

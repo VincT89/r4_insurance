@@ -1,0 +1,33 @@
+{
+    "database": "r4_insurance",
+    "migrations": "\n   INFO  Running migrations.  \n\r\n  2026_10_16_170000_create_quote_request_emails ........................................................ 755.44ms DONE\r\n\r\n",
+    "existing_records_unchanged": true,
+    "clients": 50,
+    "policies": 50,
+    "smtp_configured": false,
+    "priority_companies": [
+        {
+            "id": 9,
+            "name": "EUROPE ASSISTANCE",
+            "active": true,
+            "email_present": false
+        },
+        {
+            "id": 13,
+            "name": "NOBIS COMPAGNIA DI ASSICURAZIONI SPA",
+            "active": true,
+            "email_present": false
+        }
+    ],
+    "emails_before": 0,
+    "pages": {
+        "\/quotes": 200,
+        "\/quotes\/create": 200,
+        "\/quotes\/1": 200,
+        "\/quotes\/1\/emails\/create": 200,
+        "\/quote-emails\/01a14552-8050-708f-bddd-55ecd589f7cc": 200
+    },
+    "temporary_records_removed": true,
+    "real_emails_sent": 0,
+    "ok": true
+}

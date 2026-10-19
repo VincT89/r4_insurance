@@ -1,0 +1,2868 @@
+{
+  "summary": {
+    "held": 71,
+    "registry_conflicts": 7,
+    "policy_only": 64,
+    "policy_only_fiscal_valid": 38,
+    "policy_only_multiple_names": 1,
+    "policy_only_exact_name": 25,
+    "policy_only_near_fiscal": 20
+  },
+  "items": [
+    {
+      "entry_id": 148,
+      "key": "fa33c161b6bbf7798398337e0b2b5a524251ec012651b46c232010da1cffc193",
+      "source": "clients",
+      "names": [
+        "Cond. Via Imbriani,111",
+        "Imbriani 111Condominio"
+      ],
+      "titles": [
+        "Cond.",
+        "Spett.le"
+      ],
+      "fiscal_identifier": "05643050726",
+      "fiscal_valid": true,
+      "source_rows": [
+        1101,
+        2479
+      ],
+      "differences": {
+        "Titolo": [
+          {
+            "value": "Cond.",
+            "rows": [
+              1101
+            ]
+          },
+          {
+            "value": "Spett.le",
+            "rows": [
+              2479
+            ]
+          }
+        ],
+        "Contraente": [
+          {
+            "value": "Cond. Via Imbriani,111",
+            "rows": [
+              1101
+            ]
+          },
+          {
+            "value": "Imbriani 111Condominio",
+            "rows": [
+              2479
+            ]
+          }
+        ],
+        "Indirizzo": [
+          {
+            "value": "Via Imbriani,111",
+            "rows": [
+              1101
+            ]
+          },
+          {
+            "value": "Via M.R.Imbriani, 111",
+            "rows": [
+              2479
+            ]
+          }
+        ]
+      },
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 1350,
+      "key": "6dab51420d267a05808f6e59ae200e5914f9ceb863c63d1515c0a86e2ed378af",
+      "source": "clients",
+      "names": [
+        "CATALANO DONATO",
+        "Catalano Donato"
+      ],
+      "titles": [
+        "SIGN",
+        "Sig."
+      ],
+      "fiscal_identifier": "CTLDNT48T18A662R",
+      "fiscal_valid": true,
+      "source_rows": [
+        844,
+        845
+      ],
+      "differences": {
+        "Titolo": [
+          {
+            "value": "SIGN",
+            "rows": [
+              844
+            ]
+          },
+          {
+            "value": "Sig.",
+            "rows": [
+              845
+            ]
+          }
+        ],
+        "Cellulare": [
+          {
+            "value": "333 333333",
+            "rows": [
+              844
+            ]
+          },
+          {
+            "value": "349 6154490",
+            "rows": [
+              845
+            ]
+          }
+        ],
+        "Provincia": [
+          {
+            "value": "BARI",
+            "rows": [
+              844
+            ]
+          },
+          {
+            "value": "BA",
+            "rows": [
+              845
+            ]
+          }
+        ],
+        "Indirizzo": [
+          {
+            "value": "VIA P.GIOV.PAOLO I",
+            "rows": [
+              844
+            ]
+          },
+          {
+            "value": "Via Papa Giovanni Paolo I, 6/F",
+            "rows": [
+              845
+            ]
+          }
+        ],
+        "CAP": [
+          {
+            "value": "70125",
+            "rows": [
+              844
+            ]
+          },
+          {
+            "value": "70124",
+            "rows": [
+              845
+            ]
+          }
+        ],
+        "Ufficio": [
+          {
+            "value": "Agenzia Generale",
+            "rows": [
+              844
+            ]
+          },
+          {
+            "value": "0",
+            "rows": [
+              845
+            ]
+          }
+        ],
+        "Consulente": [
+          {
+            "value": "Gianfranco Palombella",
+            "rows": [
+              844
+            ]
+          },
+          {
+            "value": "NO",
+            "rows": [
+              845
+            ]
+          }
+        ]
+      },
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 2008,
+      "key": "453bed3978ff20399dc1146e7a1333efe76a4d8554eabf26f7ec014499a337a0",
+      "source": "clients",
+      "names": [
+        "FICCO NUNZIA"
+      ],
+      "titles": [
+        "SIGN",
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "FCCNNZ47T60C514K",
+      "fiscal_valid": true,
+      "source_rows": [
+        2020,
+        2021
+      ],
+      "differences": {
+        "Titolo": [
+          {
+            "value": "SIGN",
+            "rows": [
+              2020
+            ]
+          },
+          {
+            "value": "Sig.ra",
+            "rows": [
+              2021
+            ]
+          }
+        ],
+        "E-Mail": [
+          {
+            "value": "G.SPADONE@INFO.IT",
+            "rows": [
+              2020
+            ]
+          },
+          {
+            "value": "4GBROKER@GMAIL.COM",
+            "rows": [
+              2021
+            ]
+          }
+        ],
+        "Indirizzo": [
+          {
+            "value": "VIA C.EUGENIO 30",
+            "rows": [
+              2020
+            ]
+          },
+          {
+            "value": "VIA CURIEL EUGENIO 30",
+            "rows": [
+              2021
+            ]
+          }
+        ],
+        "Ufficio": [
+          {
+            "value": "Agenzia Generale",
+            "rows": [
+              2020
+            ]
+          },
+          {
+            "value": "0",
+            "rows": [
+              2021
+            ]
+          }
+        ],
+        "Consulente": [
+          {
+            "value": "Emiliana Ruggiero",
+            "rows": [
+              2020
+            ]
+          },
+          {
+            "value": "NO",
+            "rows": [
+              2021
+            ]
+          }
+        ]
+      },
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 2656,
+      "key": "0758b794b05c3698753842c879590efb41de602c22625c10832a3a81fa6df7f0",
+      "source": "clients",
+      "names": [
+        "LEONE GIANFRANCO"
+      ],
+      "titles": [
+        "SIG.",
+        "SIGN"
+      ],
+      "fiscal_identifier": "LNEGFR47A02C514F",
+      "fiscal_valid": true,
+      "source_rows": [
+        2683,
+        2684
+      ],
+      "differences": {
+        "Titolo": [
+          {
+            "value": "SIGN",
+            "rows": [
+              2683
+            ]
+          },
+          {
+            "value": "SIG.",
+            "rows": [
+              2684
+            ]
+          }
+        ],
+        "Cellulare": [
+          {
+            "value": "333 333333",
+            "rows": [
+              2683
+            ]
+          },
+          {
+            "value": "333 3333333",
+            "rows": [
+              2684
+            ]
+          }
+        ],
+        "E-Mail": [
+          {
+            "value": "G.SPADONE@INFO.IT",
+            "rows": [
+              2683
+            ]
+          },
+          {
+            "value": "4g@4gbroker.it",
+            "rows": [
+              2684
+            ]
+          }
+        ],
+        "Provincia": [
+          {
+            "value": "CERIGNOLA",
+            "rows": [
+              2683
+            ]
+          },
+          {
+            "value": "FOGGIA",
+            "rows": [
+              2684
+            ]
+          }
+        ],
+        "Città": [
+          {
+            "value": "FG",
+            "rows": [
+              2683
+            ]
+          },
+          {
+            "value": "CERIGNOLA",
+            "rows": [
+              2684
+            ]
+          }
+        ],
+        "Indirizzo": [
+          {
+            "value": "VIA MONTE ROSA 2",
+            "rows": [
+              2683
+            ]
+          },
+          {
+            "value": "VIA MONTEROSA 2",
+            "rows": [
+              2684
+            ]
+          }
+        ],
+        "Ufficio": [
+          {
+            "value": "Agenzia Generale",
+            "rows": [
+              2683
+            ]
+          },
+          {
+            "value": "0",
+            "rows": [
+              2684
+            ]
+          }
+        ],
+        "Consulente": [
+          {
+            "value": "Emiliana Ruggiero",
+            "rows": [
+              2683
+            ]
+          },
+          {
+            "value": "NO",
+            "rows": [
+              2684
+            ]
+          }
+        ]
+      },
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 2702,
+      "key": "0c5a5783501a778e3dd120dc779292a67852590833752974b0e99766f169fbb8",
+      "source": "clients",
+      "names": [
+        "LOPALCO GIUSEPPE"
+      ],
+      "titles": [
+        "SIGN",
+        "dott."
+      ],
+      "fiscal_identifier": "LPLGPP78D14D761L",
+      "fiscal_valid": true,
+      "source_rows": [
+        2799,
+        2800
+      ],
+      "differences": {
+        "Titolo": [
+          {
+            "value": "SIGN",
+            "rows": [
+              2799
+            ]
+          },
+          {
+            "value": "dott.",
+            "rows": [
+              2800
+            ]
+          }
+        ],
+        "Cellulare": [
+          {
+            "value": "333 333333",
+            "rows": [
+              2799
+            ]
+          },
+          {
+            "value": "333 3333333",
+            "rows": [
+              2800
+            ]
+          }
+        ],
+        "E-Mail": [
+          {
+            "value": "G.SPADONE@GMAIL.COM",
+            "rows": [
+              2799
+            ]
+          },
+          {
+            "value": "4g@4gbroker.it",
+            "rows": [
+              2800
+            ]
+          }
+        ],
+        "Provincia": [
+          {
+            "value": "BARI - BA",
+            "rows": [
+              2799
+            ]
+          },
+          {
+            "value": "BARI",
+            "rows": [
+              2800
+            ]
+          }
+        ],
+        "Ufficio": [
+          {
+            "value": "Agenzia Generale",
+            "rows": [
+              2799
+            ]
+          },
+          {
+            "value": "0",
+            "rows": [
+              2800
+            ]
+          }
+        ],
+        "Consulente": [
+          {
+            "value": "GIUSEPPE",
+            "rows": [
+              2799
+            ]
+          },
+          {
+            "value": "NO",
+            "rows": [
+              2800
+            ]
+          }
+        ]
+      },
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 3544,
+      "key": "18907246c1183e65be28c27d24fe2b3624eaae82e0ee555a41858d38090b5fba",
+      "source": "clients",
+      "names": [
+        "PUGLIESE GIROLAMO"
+      ],
+      "titles": [
+        "SIG.",
+        "SIGN"
+      ],
+      "fiscal_identifier": "PGLGLM72B04C514K",
+      "fiscal_valid": true,
+      "source_rows": [
+        3889,
+        3890
+      ],
+      "differences": {
+        "Titolo": [
+          {
+            "value": "SIGN",
+            "rows": [
+              3889
+            ]
+          },
+          {
+            "value": "SIG.",
+            "rows": [
+              3890
+            ]
+          }
+        ],
+        "Cellulare": [
+          {
+            "value": "333 333333",
+            "rows": [
+              3889
+            ]
+          },
+          {
+            "value": "333 3333333",
+            "rows": [
+              3890
+            ]
+          }
+        ],
+        "E-Mail": [
+          {
+            "value": "G.SPADONE@GMAIL.COM",
+            "rows": [
+              3889
+            ]
+          },
+          {
+            "value": "4g@4gbroker.it",
+            "rows": [
+              3890
+            ]
+          }
+        ],
+        "Ufficio": [
+          {
+            "value": "Agenzia Generale",
+            "rows": [
+              3889
+            ]
+          },
+          {
+            "value": "0",
+            "rows": [
+              3890
+            ]
+          }
+        ],
+        "Consulente": [
+          {
+            "value": "Emiliana Ruggiero",
+            "rows": [
+              3889
+            ]
+          },
+          {
+            "value": "NO",
+            "rows": [
+              3890
+            ]
+          }
+        ]
+      },
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 3866,
+      "key": "92f3c5784cbff5889456e52144a399c6a4cb2d1da4fbb738dcd9756dcefeeebc",
+      "source": "clients",
+      "names": [
+        "PETAROSCIA LEONARDO"
+      ],
+      "titles": [
+        "SPETT.LE",
+        "Spett.le"
+      ],
+      "fiscal_identifier": "PTRLRD70P19A662Q",
+      "fiscal_valid": true,
+      "source_rows": [
+        3726,
+        3727
+      ],
+      "differences": {
+        "Provincia": [
+          {
+            "value": "BARI - BA",
+            "rows": [
+              3726
+            ]
+          },
+          {
+            "value": "BA",
+            "rows": [
+              3727
+            ]
+          }
+        ],
+        "Ufficio": [
+          {
+            "value": "Agenzia Generale",
+            "rows": [
+              3726
+            ]
+          },
+          {
+            "value": "0",
+            "rows": [
+              3727
+            ]
+          }
+        ],
+        "Consulente": [
+          {
+            "value": "Gianfranco Palombella",
+            "rows": [
+              3726
+            ]
+          },
+          {
+            "value": "NO",
+            "rows": [
+              3727
+            ]
+          }
+        ]
+      },
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4929,
+      "key": "93f8b5cda19f4b942195a965a30ccdbc588c5e036dd5c720f621cb329cecc177",
+      "source": "policies",
+      "names": [
+        "COMPULAB SRL"
+      ],
+      "titles": [
+        "SocietÃ¯Â¿Â½"
+      ],
+      "fiscal_identifier": "2157890720",
+      "fiscal_valid": false,
+      "source_rows": [
+        1183,
+        5936
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4930,
+      "key": "1098f74298b88082fc2d1b60303cf5d424159a75aa0cc26664c3e3cd2ee62ced",
+      "source": "policies",
+      "names": [
+        "De Maio Oreste"
+      ],
+      "titles": [
+        "Avv."
+      ],
+      "fiscal_identifier": "2580610729",
+      "fiscal_valid": false,
+      "source_rows": [
+        340
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 1651,
+          "name": "De Maio Oreste",
+          "fiscal_identifier": "DMERST56A10A662U",
+          "fiscal_valid": true,
+          "source_rows": [
+            1473
+          ]
+        }
+      ],
+      "near_fiscal_matches": [],
+      "similar_name_matches": [
+        {
+          "id": 1651,
+          "name": "De Maio Oreste",
+          "fiscal_identifier": "DMERST56A10A662U",
+          "fiscal_valid": true,
+          "source_rows": [
+            1473
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4931,
+      "key": "d4646258a67c02507efc3c3c0a2a224a842d375c52712def2eecdaea05d2f0a8",
+      "source": "policies",
+      "names": [
+        "MAGNISI RDA SNC"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "2869450722",
+      "fiscal_valid": false,
+      "source_rows": [
+        2060,
+        5535,
+        5640,
+        7395,
+        7404
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4932,
+      "key": "57dfa8169bee8737ebcbf633b90f670a92b3d233dec4d26587121bc195970571",
+      "source": "policies",
+      "names": [
+        "Lampolops Srl"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "3864140722",
+      "fiscal_valid": false,
+      "source_rows": [
+        1027,
+        1032,
+        4679
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 62,
+          "name": "Lampolops Srl",
+          "fiscal_identifier": "03864140722",
+          "fiscal_valid": true,
+          "source_rows": [
+            2607
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 62,
+          "name": "Lampolops Srl",
+          "fiscal_identifier": "03864140722",
+          "fiscal_valid": true,
+          "source_rows": [
+            2607
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 62,
+          "name": "Lampolops Srl",
+          "fiscal_identifier": "03864140722",
+          "fiscal_valid": true,
+          "source_rows": [
+            2607
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4933,
+      "key": "55cb2f1d017932588ad7f85e441263587d19110d77cdd02fcbc0fd986358631c",
+      "source": "policies",
+      "names": [
+        "Depalma Viaggi Srl"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "4528500723",
+      "fiscal_valid": false,
+      "source_rows": [
+        6943
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 91,
+          "name": "Depalma Viaggi Srl",
+          "fiscal_identifier": "04528500723",
+          "fiscal_valid": true,
+          "source_rows": [
+            1626
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 91,
+          "name": "Depalma Viaggi Srl",
+          "fiscal_identifier": "04528500723",
+          "fiscal_valid": true,
+          "source_rows": [
+            1626
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 91,
+          "name": "Depalma Viaggi Srl",
+          "fiscal_identifier": "04528500723",
+          "fiscal_valid": true,
+          "source_rows": [
+            1626
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4934,
+      "key": "6a238e1a5a6270cc974efc0bc968d2990d3a732d074eabb5db3ee8f86697f8fe",
+      "source": "policies",
+      "names": [
+        "Tecnoffice Srl"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "4792630727",
+      "fiscal_valid": false,
+      "source_rows": [
+        282,
+        1370,
+        4204,
+        5157
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 95,
+          "name": "TECNOFFICE SRL",
+          "fiscal_identifier": "04792630727",
+          "fiscal_valid": true,
+          "source_rows": [
+            4612
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 95,
+          "name": "TECNOFFICE SRL",
+          "fiscal_identifier": "04792630727",
+          "fiscal_valid": true,
+          "source_rows": [
+            4612
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 95,
+          "name": "TECNOFFICE SRL",
+          "fiscal_identifier": "04792630727",
+          "fiscal_valid": true,
+          "source_rows": [
+            4612
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4935,
+      "key": "e807a750e589c3dbe8c822935bca00bc8fc0641c5450b2a8dcef8755b343ce61",
+      "source": "policies",
+      "names": [
+        "Di Marco Piergennaro"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "5167590727",
+      "fiscal_valid": false,
+      "source_rows": [
+        4480
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 1692,
+          "name": "Di Marco Piergennaro",
+          "fiscal_identifier": "DMRPGN65D25A662I",
+          "fiscal_valid": true,
+          "source_rows": [
+            1690
+          ]
+        }
+      ],
+      "near_fiscal_matches": [],
+      "similar_name_matches": [
+        {
+          "id": 1692,
+          "name": "Di Marco Piergennaro",
+          "fiscal_identifier": "DMRPGN65D25A662I",
+          "fiscal_valid": true,
+          "source_rows": [
+            1690
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4936,
+      "key": "04bc13e1780a9b37628b5e66b73e1e9e3bb8747d677341008b6a76bfb73d6ea8",
+      "source": "policies",
+      "names": [
+        "Caseificio Andriese Snc"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "5582100722",
+      "fiscal_valid": false,
+      "source_rows": [
+        521,
+        4273
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 110,
+          "name": "Caseificio Andriese Snc",
+          "fiscal_identifier": "05582100722",
+          "fiscal_valid": true,
+          "source_rows": [
+            799
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 110,
+          "name": "Caseificio Andriese Snc",
+          "fiscal_identifier": "05582100722",
+          "fiscal_valid": true,
+          "source_rows": [
+            799
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 110,
+          "name": "Caseificio Andriese Snc",
+          "fiscal_identifier": "05582100722",
+          "fiscal_valid": true,
+          "source_rows": [
+            799
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4937,
+      "key": "2aa0f274adad0d9397fd5061b9d94597cc12f7bbd3b945d0a2c199e616b5dfe4",
+      "source": "policies",
+      "names": [
+        "Cond. Via Imbriani,111"
+      ],
+      "titles": [
+        "Cond."
+      ],
+      "fiscal_identifier": "5643050726",
+      "fiscal_valid": false,
+      "source_rows": [
+        3481
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4938,
+      "key": "5453bfcc29b56bb90c46907e2ba183fdced334a1cd22bc381c213cda535cb29f",
+      "source": "policies",
+      "names": [
+        "IRON GYM & FITNESS"
+      ],
+      "titles": [
+        "SPETT.LE"
+      ],
+      "fiscal_identifier": "6286120727",
+      "fiscal_valid": false,
+      "source_rows": [
+        3374,
+        3375,
+        5853,
+        5874,
+        7044,
+        7045
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 124,
+          "name": "IRON GYM & FITNESS",
+          "fiscal_identifier": "06286120727",
+          "fiscal_valid": true,
+          "source_rows": [
+            2499
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 124,
+          "name": "IRON GYM & FITNESS",
+          "fiscal_identifier": "06286120727",
+          "fiscal_valid": true,
+          "source_rows": [
+            2499
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 124,
+          "name": "IRON GYM & FITNESS",
+          "fiscal_identifier": "06286120727",
+          "fiscal_valid": true,
+          "source_rows": [
+            2499
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4939,
+      "key": "e8443065fe356aac80862079ce2a5f3c6fab87401cf2ee98907ad5713f26d3b6",
+      "source": "policies",
+      "names": [
+        "Pasticceria 2000 di Chieco Raffaele"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "6390400726",
+      "fiscal_valid": false,
+      "source_rows": [
+        2660,
+        5875,
+        6414
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [
+        {
+          "id": 128,
+          "name": "Pasticceria 2000 di Chieco Raffele",
+          "fiscal_identifier": "06390400726",
+          "fiscal_valid": true,
+          "source_rows": [
+            3636
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 128,
+          "name": "Pasticceria 2000 di Chieco Raffele",
+          "fiscal_identifier": "06390400726",
+          "fiscal_valid": true,
+          "source_rows": [
+            3636
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4940,
+      "key": "c2bf89dfa77f114a403d6cd35d16c25735acee17d864025c7e1883bd7aea5e49",
+      "source": "policies",
+      "names": [
+        "IDROSERVICE di Luigi Tandoi Srl"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "6421780724",
+      "fiscal_valid": false,
+      "source_rows": [
+        1193,
+        2079
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 130,
+          "name": "IDROSERVICE di Luigi Tandoi Srl",
+          "fiscal_identifier": "06421780724",
+          "fiscal_valid": true,
+          "source_rows": [
+            2467
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 130,
+          "name": "IDROSERVICE di Luigi Tandoi Srl",
+          "fiscal_identifier": "06421780724",
+          "fiscal_valid": true,
+          "source_rows": [
+            2467
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 130,
+          "name": "IDROSERVICE di Luigi Tandoi Srl",
+          "fiscal_identifier": "06421780724",
+          "fiscal_valid": true,
+          "source_rows": [
+            2467
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4941,
+      "key": "962c196253e0bc8aa9c6de6ea35af314ec508318c4a12f49a84eeafdf146fd76",
+      "source": "policies",
+      "names": [
+        "Panetteria Veneto di Consiglio Antonio"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "6935760725",
+      "fiscal_valid": false,
+      "source_rows": [
+        2770,
+        5817,
+        6396
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 145,
+          "name": "Panetteria Veneto di Consiglio Antonio",
+          "fiscal_identifier": "06935760725",
+          "fiscal_valid": true,
+          "source_rows": [
+            3558
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 145,
+          "name": "Panetteria Veneto di Consiglio Antonio",
+          "fiscal_identifier": "06935760725",
+          "fiscal_valid": true,
+          "source_rows": [
+            3558
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 145,
+          "name": "Panetteria Veneto di Consiglio Antonio",
+          "fiscal_identifier": "06935760725",
+          "fiscal_valid": true,
+          "source_rows": [
+            3558
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4942,
+      "key": "783a2d01349fa36d4c6261198b0cb58813a4dab1301b440ca50e463cf5ec880d",
+      "source": "policies",
+      "names": [
+        "Rolando Bros Di Luca e Marco Rolando"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "7352600725",
+      "fiscal_valid": false,
+      "source_rows": [
+        2761,
+        3376,
+        3377,
+        6062
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": [
+        {
+          "id": 157,
+          "name": "Rolando Bros di Luca e Marco Rolando Snc",
+          "fiscal_identifier": "0735360075",
+          "fiscal_valid": false,
+          "source_rows": [
+            4058
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4943,
+      "key": "dc15378a11cdc5d673e11215e8e02692b5507c5478822e7fc867dcfa4d4f24a4",
+      "source": "policies",
+      "names": [
+        "UN MONDO DI CAFFE' DI AURICANO ADDOLORATA"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "7653870720",
+      "fiscal_valid": false,
+      "source_rows": [
+        2668,
+        6451
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 171,
+          "name": "UN MONDO DI CAFFE DI AURICANO ADDOLORATA",
+          "fiscal_identifier": "07653870720",
+          "fiscal_valid": true,
+          "source_rows": [
+            4733
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 171,
+          "name": "UN MONDO DI CAFFE DI AURICANO ADDOLORATA",
+          "fiscal_identifier": "07653870720",
+          "fiscal_valid": true,
+          "source_rows": [
+            4733
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 171,
+          "name": "UN MONDO DI CAFFE DI AURICANO ADDOLORATA",
+          "fiscal_identifier": "07653870720",
+          "fiscal_valid": true,
+          "source_rows": [
+            4733
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4944,
+      "key": "a05f2bd9fddd941d3688c038f88969d48543a9be0a965490bbfe2e7ca501e1b6",
+      "source": "policies",
+      "names": [
+        "Il Tarallo Del Corso S.r.l."
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "7738410724",
+      "fiscal_valid": false,
+      "source_rows": [
+        5770,
+        6793
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 176,
+          "name": "Il Tarallo Del Corso S.r.l.",
+          "fiscal_identifier": "07738410724",
+          "fiscal_valid": true,
+          "source_rows": [
+            2475
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 176,
+          "name": "Il Tarallo Del Corso S.r.l.",
+          "fiscal_identifier": "07738410724",
+          "fiscal_valid": true,
+          "source_rows": [
+            2475
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 176,
+          "name": "Il Tarallo Del Corso S.r.l.",
+          "fiscal_identifier": "07738410724",
+          "fiscal_valid": true,
+          "source_rows": [
+            2475
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4945,
+      "key": "66eaf62634ea37b63cf573710785a35ce35d59c3a0d6914c4f1597a687c5b101",
+      "source": "policies",
+      "names": [
+        "Dal Mio Piccolo di Stolfi Anna"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "7767220721",
+      "fiscal_valid": false,
+      "source_rows": [
+        3609,
+        6465
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4946,
+      "key": "b84db6cc9171f6735cf1357d9ff29b11f804a8003714f7548dfddafaf892eee2",
+      "source": "policies",
+      "names": [
+        "Borgonovo srls"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "7788930720",
+      "fiscal_valid": false,
+      "source_rows": [
+        2609
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 177,
+          "name": "Borgonovo srls",
+          "fiscal_identifier": "07788930720",
+          "fiscal_valid": true,
+          "source_rows": [
+            429
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 177,
+          "name": "Borgonovo srls",
+          "fiscal_identifier": "07788930720",
+          "fiscal_valid": true,
+          "source_rows": [
+            429
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 177,
+          "name": "Borgonovo srls",
+          "fiscal_identifier": "07788930720",
+          "fiscal_valid": true,
+          "source_rows": [
+            429
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4947,
+      "key": "1442aacce9f44a22372e26db58a864771b2689ed4b5506665447be5d2f122e27",
+      "source": "policies",
+      "names": [
+        "BELDRAGO SRL"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "8021740728",
+      "fiscal_valid": false,
+      "source_rows": [
+        2027,
+        2028,
+        2029
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4948,
+      "key": "4d279a7be4b6fbc5d99000979319da7e38aac2b296bd0851c81d1638442db4dc",
+      "source": "policies",
+      "names": [
+        "PARE' GIOIELLI DI PAPARELLA M."
+      ],
+      "titles": [
+        "SPETT.LE"
+      ],
+      "fiscal_identifier": "8155580726",
+      "fiscal_valid": false,
+      "source_rows": [
+        1014,
+        5158
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 195,
+          "name": "PARE GIOIELLI DI PAPARELLA M.",
+          "fiscal_identifier": "08155580726",
+          "fiscal_valid": true,
+          "source_rows": [
+            3609
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 195,
+          "name": "PARE GIOIELLI DI PAPARELLA M.",
+          "fiscal_identifier": "08155580726",
+          "fiscal_valid": true,
+          "source_rows": [
+            3609
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 195,
+          "name": "PARE GIOIELLI DI PAPARELLA M.",
+          "fiscal_identifier": "08155580726",
+          "fiscal_valid": true,
+          "source_rows": [
+            3609
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4949,
+      "key": "518df18f78786e428618560c2b2ae1115429f2c2e8b8c5989487036716ed9568",
+      "source": "policies",
+      "names": [
+        "Associazione di Volontariato EDEN"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "91052290722",
+      "fiscal_valid": true,
+      "source_rows": [
+        2519,
+        3478,
+        4386
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4950,
+      "key": "a8735837aaba363aaac02aaef80a42ada632695acf095b5b151777acc712a575",
+      "source": "policies",
+      "names": [
+        "Cond. Via Monte San Michele"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "93118300727",
+      "fiscal_valid": true,
+      "source_rows": [
+        952
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4951,
+      "key": "410294e904492e640b61bc624f831a1475416ae6c0b488da1ce0f883ec0130cc",
+      "source": "policies",
+      "names": [
+        "COND. MONTE GRAPPA 107"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "93203770727",
+      "fiscal_valid": true,
+      "source_rows": [
+        2040
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4952,
+      "key": "8cf20951f891b4a06deeb0fb3ad3bad982e3061546752ebcd3444f0ed10153d9",
+      "source": "policies",
+      "names": [
+        "ALLEGREZZA VINCENZO"
+      ],
+      "titles": [
+        "SIGN"
+      ],
+      "fiscal_identifier": "ALLVCN55M456C",
+      "fiscal_valid": false,
+      "source_rows": [
+        6814
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 2570,
+          "name": "ALLEGREZZA VINCENZO",
+          "fiscal_identifier": "LLGVCN68B28A662J",
+          "fiscal_valid": true,
+          "source_rows": [
+            102
+          ]
+        }
+      ],
+      "near_fiscal_matches": [],
+      "similar_name_matches": [
+        {
+          "id": 2570,
+          "name": "ALLEGREZZA VINCENZO",
+          "fiscal_identifier": "LLGVCN68B28A662J",
+          "fiscal_valid": true,
+          "source_rows": [
+            102
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4953,
+      "key": "03e7a58c13126f5df6307b85053c5b971d1bc65879634245d90bdc9de23d8517",
+      "source": "policies",
+      "names": [
+        "BILARDI GERMANO",
+        "Bilardi Germano"
+      ],
+      "titles": [
+        "Dott.",
+        "Sig."
+      ],
+      "fiscal_identifier": "BLRGMN63E01A662F",
+      "fiscal_valid": true,
+      "source_rows": [
+        1272,
+        1273,
+        2583,
+        2584,
+        5184,
+        5192,
+        6185,
+        6186
+      ],
+      "differences": {
+        "Titolo": [
+          {
+            "value": "Dott.",
+            "rows": [
+              1272,
+              1273,
+              5184,
+              5192
+            ]
+          },
+          {
+            "value": "Sig.",
+            "rows": [
+              2583,
+              2584,
+              6185,
+              6186
+            ]
+          }
+        ]
+      },
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4954,
+      "key": "93359f8b2fa32debcd264ac7fe081f4eec710b92198a0c5c59672a554f745de8",
+      "source": "policies",
+      "names": [
+        "BELVISO TERESA"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "BLVTRS46S57H687G",
+      "fiscal_valid": true,
+      "source_rows": [
+        379
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 492,
+          "name": "BELVISO TERESA",
+          "fiscal_identifier": "BLVTRS40S57H687A",
+          "fiscal_valid": true,
+          "source_rows": [
+            368
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 492,
+          "name": "BELVISO TERESA",
+          "fiscal_identifier": "BLVTRS40S57H687A",
+          "fiscal_valid": true,
+          "source_rows": [
+            368
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 492,
+          "name": "BELVISO TERESA",
+          "fiscal_identifier": "BLVTRS40S57H687A",
+          "fiscal_valid": true,
+          "source_rows": [
+            368
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4955,
+      "key": "1aacf94c9a2587e6b407ba836be9da56faa980087544d950a960a77c2ed46b64",
+      "source": "policies",
+      "names": [
+        "BITETTO MARIANNA"
+      ],
+      "titles": [
+        "SIGN.RA"
+      ],
+      "fiscal_identifier": "BTTMNN77H46A662L",
+      "fiscal_valid": false,
+      "source_rows": [
+        1002,
+        4807,
+        6590
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 653,
+          "name": "BITETTO MARIANNA",
+          "fiscal_identifier": "BTTMNN77H46A662I",
+          "fiscal_valid": true,
+          "source_rows": [
+            398
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 653,
+          "name": "BITETTO MARIANNA",
+          "fiscal_identifier": "BTTMNN77H46A662I",
+          "fiscal_valid": true,
+          "source_rows": [
+            398
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 653,
+          "name": "BITETTO MARIANNA",
+          "fiscal_identifier": "BTTMNN77H46A662I",
+          "fiscal_valid": true,
+          "source_rows": [
+            398
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4956,
+      "key": "b6b25d63c6e9c013eba8df3ccda27ec0d640f0360a77f432daf1ce6ea6f799b1",
+      "source": "policies",
+      "names": [
+        "CHIARELLI ANTONIA"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "CHRNTN63R47A662D",
+      "fiscal_valid": true,
+      "source_rows": [
+        3541,
+        3542,
+        3543,
+        3544,
+        3545
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4957,
+      "key": "90d462e789f6015ab10c9843406f8a75018c12f677aa3d4bad3e3928e45ac12a",
+      "source": "policies",
+      "names": [
+        "CANTACESSI ANNA"
+      ],
+      "titles": [
+        "SIG.RA"
+      ],
+      "fiscal_identifier": "CNTNNA49M70A055Y",
+      "fiscal_valid": true,
+      "source_rows": [
+        3408,
+        7015
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4958,
+      "key": "e0c07052afd4b61a0e2ab0909f7b1ae8983a1c9070e1b9848c9e73c3fd3039fc",
+      "source": "policies",
+      "names": [
+        "caricola domenico"
+      ],
+      "titles": [
+        "sig"
+      ],
+      "fiscal_identifier": "CRCDNC44D27A662N",
+      "fiscal_valid": true,
+      "source_rows": [
+        3237
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4959,
+      "key": "067f8deb72570a2d6a5259e2198837259f30ea3fa17a397abf9d19ede11290b6",
+      "source": "policies",
+      "names": [
+        "CORTOPASSO ANTONIO"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "CRTNTN63B06C514E",
+      "fiscal_valid": true,
+      "source_rows": [
+        3211,
+        3232,
+        6973
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4960,
+      "key": "c0cd09394ac0a48e4cd9c59ea7f389c7a9bd6b1c7556d3020897e9298cabe95d",
+      "source": "policies",
+      "names": [
+        "covelli rocco"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "CVLRCC79P30E223B",
+      "fiscal_valid": true,
+      "source_rows": [
+        2830,
+        2831,
+        2847,
+        4956,
+        6343,
+        6344
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4961,
+      "key": "172e6c093a8ee5fe71350c074ff2e9dec4110ba0222064064a26a2a20b56c5f6",
+      "source": "policies",
+      "names": [
+        "DI COSIMO DOMENICO"
+      ],
+      "titles": [
+        "SIG"
+      ],
+      "fiscal_identifier": "DCSDNC82E01A662Y",
+      "fiscal_valid": true,
+      "source_rows": [
+        428,
+        1244,
+        4912,
+        5053
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4962,
+      "key": "1a596c3ee4130c4da6558635dad26bfe41c3882e0a827c63da1c5a14ebb01faa",
+      "source": "policies",
+      "names": [
+        "DI PERNA MATTEO"
+      ],
+      "titles": [
+        "SIG."
+      ],
+      "fiscal_identifier": "DPRMTT55E12H839C",
+      "fiscal_valid": true,
+      "source_rows": [
+        1741
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4963,
+      "key": "6a31e96b2cb25336953edd7c257afb1f74fedde405eb397a6d5203295c05c684",
+      "source": "policies",
+      "names": [
+        "dipasquale annamaria"
+      ],
+      "titles": [
+        "signora"
+      ],
+      "fiscal_identifier": "DPSNMR66R48C214D",
+      "fiscal_valid": false,
+      "source_rows": [
+        1169,
+        1171,
+        4971,
+        4972
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 1802,
+          "name": "dipasquale annamaria",
+          "fiscal_identifier": "DPSNMR66R48C514D",
+          "fiscal_valid": true,
+          "source_rows": [
+            1827
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 1802,
+          "name": "dipasquale annamaria",
+          "fiscal_identifier": "DPSNMR66R48C514D",
+          "fiscal_valid": true,
+          "source_rows": [
+            1827
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 1802,
+          "name": "dipasquale annamaria",
+          "fiscal_identifier": "DPSNMR66R48C514D",
+          "fiscal_valid": true,
+          "source_rows": [
+            1827
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4964,
+      "key": "072499f63bbdb4bd7eb9abceb4194240c1714ee4943305eebf3fdb2a07cb4ba3",
+      "source": "policies",
+      "names": [
+        "DAVITTI MARIASTELLA"
+      ],
+      "titles": [
+        "SIGNRA"
+      ],
+      "fiscal_identifier": "DVTDVTMST77S46A6",
+      "fiscal_valid": false,
+      "source_rows": [
+        2152,
+        5868
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 1951,
+          "name": "DAVITTI MARIASTELLA",
+          "fiscal_identifier": "DVTMST77S46A662K",
+          "fiscal_valid": true,
+          "source_rows": [
+            1392
+          ]
+        }
+      ],
+      "near_fiscal_matches": [],
+      "similar_name_matches": [
+        {
+          "id": 1951,
+          "name": "DAVITTI MARIASTELLA",
+          "fiscal_identifier": "DVTMST77S46A662K",
+          "fiscal_valid": true,
+          "source_rows": [
+            1392
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4965,
+      "key": "d77e73af0aa20ca71fc9e008f369b29657718470753443de5474b0034dc8bd51",
+      "source": "policies",
+      "names": [
+        "Fucilli Giuseppe"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "FCLGPP58B03A662T",
+      "fiscal_valid": true,
+      "source_rows": [
+        3302,
+        3303,
+        3304,
+        6818,
+        6819,
+        6820
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4966,
+      "key": "0d4201eefd71531eef2b0523947106fcb4edd5e44c3d0d26090e9384ec04c050",
+      "source": "policies",
+      "names": [
+        "Ghionda Felice"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "GHNFLC67L25A662Q",
+      "fiscal_valid": true,
+      "source_rows": [
+        2554,
+        6412
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4967,
+      "key": "5f4017c0902f0b7463a44beaa8afe58249de58e24914bdbe23bd2b5f0b336719",
+      "source": "policies",
+      "names": [
+        "Galetta Rosa"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "GLTRSO50C59A662X",
+      "fiscal_valid": true,
+      "source_rows": [
+        2338,
+        6047
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4968,
+      "key": "a5a2ae11b2662bfc559fd0e1a1398d725f427690452f1d6750e3f49ed5122144",
+      "source": "policies",
+      "names": [
+        "Loconsole Emanuele"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "LCNMNL61T03A662C",
+      "fiscal_valid": true,
+      "source_rows": [
+        3413,
+        7322
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4969,
+      "key": "b2f1ce1c9c1314743d86ec9218721b9651e0c49844dcaa4a0348e0bd843efbd6",
+      "source": "policies",
+      "names": [
+        "Altieri Francesco"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "LTRFNC66A29A662Z",
+      "fiscal_valid": true,
+      "source_rows": [
+        249,
+        712,
+        3103,
+        3438,
+        3443,
+        4277,
+        6931,
+        7029
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4970,
+      "key": "e7f12dec36fb0a27072aee6179045c9bab9e4251e4381a2f111ad9549b6ff1a8",
+      "source": "policies",
+      "names": [
+        "MAGNISI MATTIA"
+      ],
+      "titles": [
+        "SIG",
+        "SIGN"
+      ],
+      "fiscal_identifier": "MGNMTT54D03A662Q",
+      "fiscal_valid": true,
+      "source_rows": [
+        1312,
+        3705,
+        5096,
+        7365
+      ],
+      "differences": {
+        "Titolo": [
+          {
+            "value": "SIGN",
+            "rows": [
+              1312,
+              5096
+            ]
+          },
+          {
+            "value": "SIG",
+            "rows": [
+              3705,
+              7365
+            ]
+          }
+        ]
+      },
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4971,
+      "key": "6e0dd71b2428f3cef8851d336c2d0c3dfef4c623561f9b0657aaf224f4377868",
+      "source": "policies",
+      "names": [
+        "MAGRO MARIA ROSARIA"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "MGRMRS62S70E326F",
+      "fiscal_valid": true,
+      "source_rows": [
+        1893,
+        1894,
+        1895,
+        5732,
+        5733,
+        5734,
+        5903
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4972,
+      "key": "c039fd48f6e83b447c4df3b7f6b5ecbf5a521570f50741568a50b93571613eb2",
+      "source": "policies",
+      "names": [
+        "Amoruso Moreno"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "MRSMRN74D04A757A",
+      "fiscal_valid": true,
+      "source_rows": [
+        5938
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4973,
+      "key": "d2df0718b0f3640374c94a00df83b2651213f67a88d3452de46ea7255526db51",
+      "source": "policies",
+      "names": [
+        "NARDELLI GIOVANNI"
+      ],
+      "titles": [
+        "SIGN"
+      ],
+      "fiscal_identifier": "NRDGNN79D03L328G",
+      "fiscal_valid": true,
+      "source_rows": [
+        3518,
+        3519
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 3355,
+          "name": "NARDELLI GIOVANNI",
+          "fiscal_identifier": "NDRGNN79D03L328G",
+          "fiscal_valid": false,
+          "source_rows": [
+            3408
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 3355,
+          "name": "NARDELLI GIOVANNI",
+          "fiscal_identifier": "NDRGNN79D03L328G",
+          "fiscal_valid": false,
+          "source_rows": [
+            3408
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 3355,
+          "name": "NARDELLI GIOVANNI",
+          "fiscal_identifier": "NDRGNN79D03L328G",
+          "fiscal_valid": false,
+          "source_rows": [
+            3408
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4974,
+      "key": "85e7cb864978e13fd31b4c8c7e035a3c449692b55fc7f1de4e6d9508ba24aacb",
+      "source": "policies",
+      "names": [
+        "Antonelli Antonio"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "NTNNTN51L12A662T",
+      "fiscal_valid": true,
+      "source_rows": [
+        375,
+        376,
+        377,
+        6226,
+        6227
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4975,
+      "key": "7112afd6b871144b9192e21efdb4d7c11b416707e1def5957de763784ee03cbb",
+      "source": "policies",
+      "names": [
+        "Poliseno Vincenzo"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "PLSVCN76P05A662A",
+      "fiscal_valid": true,
+      "source_rows": [
+        850,
+        4534
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 3582,
+          "name": "POLISENO VINCENZO",
+          "fiscal_identifier": "PLSVNC48C779A",
+          "fiscal_valid": false,
+          "source_rows": [
+            3826
+          ]
+        }
+      ],
+      "near_fiscal_matches": [],
+      "similar_name_matches": [
+        {
+          "id": 3582,
+          "name": "POLISENO VINCENZO",
+          "fiscal_identifier": "PLSVNC48C779A",
+          "fiscal_valid": false,
+          "source_rows": [
+            3826
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4976,
+      "key": "95c4a3e953c92d72fc16a5ef98446d960ce132e16e54b4faad2df16cff15c47d",
+      "source": "policies",
+      "names": [
+        "Pontrandolfo Maria Antonietta"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "PNTMNT56H67A662K",
+      "fiscal_valid": true,
+      "source_rows": [
+        337,
+        2501,
+        2579,
+        6159
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4977,
+      "key": "f482b4f81f339bcb52ba5b1220a88824716cd6715e5e537fc8528210eb9b4651",
+      "source": "policies",
+      "names": [
+        "PROSPERO LAURA"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "PRSLRA70T50A662K",
+      "fiscal_valid": true,
+      "source_rows": [
+        2348,
+        6288,
+        6289
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4978,
+      "key": "f4fc50e7b7b7003eb5e21e153ad866da981239c5e8714503ec21b2932ccaffac",
+      "source": "policies",
+      "names": [
+        "PROSPERO NICLA"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "PRSNCL74H51A662A",
+      "fiscal_valid": true,
+      "source_rows": [
+        3194,
+        3568,
+        3569
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4979,
+      "key": "a5b3157cdde4bc2fd4b46b69df422663fbb99d24e1d0247510e71a887262f81e",
+      "source": "policies",
+      "names": [
+        "PASSAQUINDICI EMANUELA"
+      ],
+      "titles": [
+        "SIG.RA"
+      ],
+      "fiscal_identifier": "PSSMNL96S45A662Z",
+      "fiscal_valid": false,
+      "source_rows": [
+        2670,
+        6596
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 3786,
+          "name": "PASSAQUINDICI EMANUELA",
+          "fiscal_identifier": "PSSMNL96S45A662C",
+          "fiscal_valid": true,
+          "source_rows": [
+            3634
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 3786,
+          "name": "PASSAQUINDICI EMANUELA",
+          "fiscal_identifier": "PSSMNL96S45A662C",
+          "fiscal_valid": true,
+          "source_rows": [
+            3634
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 3786,
+          "name": "PASSAQUINDICI EMANUELA",
+          "fiscal_identifier": "PSSMNL96S45A662C",
+          "fiscal_valid": true,
+          "source_rows": [
+            3634
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4980,
+      "key": "948d6cd8c89d5136384c852b1f92604d9bb2179085804bfba74d2c30c69350d2",
+      "source": "policies",
+      "names": [
+        "Ricco Stella Maria"
+      ],
+      "titles": [
+        "Dott.ssa"
+      ],
+      "fiscal_identifier": "RCCSLL60M55B9I5F",
+      "fiscal_valid": false,
+      "source_rows": [
+        6600,
+        6601,
+        6602,
+        6603
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4981,
+      "key": "a775c8f6e9415782a157b6cd1db0cec080d7f70c1844d673b5250bcfd14d0b20",
+      "source": "policies",
+      "names": [
+        "Regina Guido"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "RGNGDU44M10A662W",
+      "fiscal_valid": true,
+      "source_rows": [
+        6494
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4982,
+      "key": "51788f45febcda6976ef8cc017518d9382847c17feee4e59dbae4e550a4c9f8e",
+      "source": "policies",
+      "names": [
+        "Rella Vincenzo"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "RLLVCN65H12A662B",
+      "fiscal_valid": true,
+      "source_rows": [
+        728,
+        4434
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": [
+        {
+          "id": 1822,
+          "name": "DI RELLA VINCENZO",
+          "fiscal_identifier": "DRLVCN62D11A662O",
+          "fiscal_valid": true,
+          "source_rows": [
+            1713
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4983,
+      "key": "4ffc232e0b04d2a5874cca4a38a922acae6e3f1df59124a0ab86db3ffc1c3f26",
+      "source": "policies",
+      "names": [
+        "ORSINI ISABELLA"
+      ],
+      "titles": [
+        "SIG.RA"
+      ],
+      "fiscal_identifier": "RSNSLL68D56A892G",
+      "fiscal_valid": true,
+      "source_rows": [
+        2989,
+        3152,
+        3153,
+        6625,
+        6956,
+        6959
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 4094,
+          "name": "ORSINI ISABELLA",
+          "fiscal_identifier": "RSNSLL58D56A892G",
+          "fiscal_valid": false,
+          "source_rows": [
+            3473
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 4094,
+          "name": "ORSINI ISABELLA",
+          "fiscal_identifier": "RSNSLL58D56A892G",
+          "fiscal_valid": false,
+          "source_rows": [
+            3473
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 4094,
+          "name": "ORSINI ISABELLA",
+          "fiscal_identifier": "RSNSLL58D56A892G",
+          "fiscal_valid": false,
+          "source_rows": [
+            3473
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4984,
+      "key": "91ccd44e3dc5d024f7b5290885f11c30ba865db8b300262fa5fa4cd2d324fe72",
+      "source": "policies",
+      "names": [
+        "Soloperto Pasqua"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "SLPPSQ68T52A662M",
+      "fiscal_valid": true,
+      "source_rows": [
+        973,
+        980,
+        3676,
+        3682,
+        3684
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 4314,
+          "name": "Soloperto Pasqua",
+          "fiscal_identifier": "SLPPSQ68T52H662M",
+          "fiscal_valid": false,
+          "source_rows": [
+            4432
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 4314,
+          "name": "Soloperto Pasqua",
+          "fiscal_identifier": "SLPPSQ68T52H662M",
+          "fiscal_valid": false,
+          "source_rows": [
+            4432
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 4314,
+          "name": "Soloperto Pasqua",
+          "fiscal_identifier": "SLPPSQ68T52H662M",
+          "fiscal_valid": false,
+          "source_rows": [
+            4432
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4985,
+      "key": "873922f6805432bcd0e08a3b578f8678ce2389e5655d8c0edb282f40b29c2ada",
+      "source": "policies",
+      "names": [
+        "ESPOSITO DAMIANO"
+      ],
+      "titles": [
+        "SIGN.RA"
+      ],
+      "fiscal_identifier": "SPSDMN65S14F262G",
+      "fiscal_valid": true,
+      "source_rows": [
+        4103
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4986,
+      "key": "0c3aec545e7cbb1b4ff31492b3442ea99823cc5cdb0692750281097ab14a0796",
+      "source": "policies",
+      "names": [
+        "Sirago Massimo"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "SRGMSM73L12A662G",
+      "fiscal_valid": true,
+      "source_rows": [
+        361,
+        362,
+        4104,
+        4106
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4987,
+      "key": "8f85264e05441c0e0f516c1ba1ad9894b8f8124a4714569acb69d8bb5131c964",
+      "source": "policies",
+      "names": [
+        "STOLFA GIOVANNI"
+      ],
+      "titles": [
+        "Spett.le"
+      ],
+      "fiscal_identifier": "STLGNN87E19A662B",
+      "fiscal_valid": true,
+      "source_rows": [
+        4955
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4988,
+      "key": "b17fa1fa4f7dc5a1e19c655b154cd68f5c51aa6a5dc6cd2cc859f24af6ee1403",
+      "source": "policies",
+      "names": [
+        "Troiani Donato"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "TRNDNT35D15A662W",
+      "fiscal_valid": true,
+      "source_rows": [
+        3711
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 4621,
+          "name": "TROIANI DONATO",
+          "fiscal_identifier": "TRNDNT91D27A662L",
+          "fiscal_valid": true,
+          "source_rows": [
+            4708
+          ]
+        }
+      ],
+      "near_fiscal_matches": [],
+      "similar_name_matches": [
+        {
+          "id": 4621,
+          "name": "TROIANI DONATO",
+          "fiscal_identifier": "TRNDNT91D27A662L",
+          "fiscal_valid": true,
+          "source_rows": [
+            4708
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4989,
+      "key": "0e98ba6913a2e924a3cc7f85fa60e15b731e36783ec73d02b0135b51f9356507",
+      "source": "policies",
+      "names": [
+        "Tritto Anita"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "TRTNTA85D44I330F",
+      "fiscal_valid": true,
+      "source_rows": [
+        3265,
+        3266,
+        3268
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4990,
+      "key": "67a2443173bb3aa32a8ee96c96fb825897eb63e9f0ce12fa1e07b23babc29715",
+      "source": "policies",
+      "names": [
+        "Vernola Michelina"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "VRNMHL66B63A662R",
+      "fiscal_valid": true,
+      "source_rows": [
+        2755,
+        3537,
+        3540
+      ],
+      "differences": {},
+      "exact_name_matches": [
+        {
+          "id": 4776,
+          "name": "VERNOLA MICHELINA",
+          "fiscal_identifier": "VRNMKL66B63A662R",
+          "fiscal_valid": false,
+          "source_rows": [
+            4784
+          ]
+        }
+      ],
+      "near_fiscal_matches": [
+        {
+          "id": 4776,
+          "name": "VERNOLA MICHELINA",
+          "fiscal_identifier": "VRNMKL66B63A662R",
+          "fiscal_valid": false,
+          "source_rows": [
+            4784
+          ]
+        }
+      ],
+      "similar_name_matches": [
+        {
+          "id": 4776,
+          "name": "VERNOLA MICHELINA",
+          "fiscal_identifier": "VRNMKL66B63A662R",
+          "fiscal_valid": false,
+          "source_rows": [
+            4784
+          ]
+        }
+      ]
+    },
+    {
+      "entry_id": 4991,
+      "key": "659174f9221dc527c57963a758b03def12dd38511f8a441014467e6f135bed94",
+      "source": "policies",
+      "names": [
+        "Vitti Nicola"
+      ],
+      "titles": [
+        "Sig."
+      ],
+      "fiscal_identifier": "VTTNCL79H29A662I",
+      "fiscal_valid": true,
+      "source_rows": [
+        56,
+        57,
+        58,
+        3691,
+        3692,
+        3693
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    },
+    {
+      "entry_id": 4992,
+      "key": "5d9e8db92d486fb0bb54bdf17914fd279200235a81bb0031105fddc8256db0ec",
+      "source": "policies",
+      "names": [
+        "UVA ROBERTA"
+      ],
+      "titles": [
+        "Sig.ra"
+      ],
+      "fiscal_identifier": "VUARRT62S68A662Z",
+      "fiscal_valid": true,
+      "source_rows": [
+        7084
+      ],
+      "differences": {},
+      "exact_name_matches": [],
+      "near_fiscal_matches": [],
+      "similar_name_matches": []
+    }
+  ]
+}

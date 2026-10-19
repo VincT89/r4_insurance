@@ -1,0 +1,28 @@
+{
+  "flows": [
+    "Nuova polizza: ricerca cliente, collegamenti, classi di merito e due allegati PDF",
+    "Creazione rapida cliente senza perdita dei dati della polizza",
+    "Lettura locale PDF e immagine, conferma separata delle date, documenti valido e scaduto",
+    "Filtri comunicazioni e download bozza cumulativa dopo controllo",
+    "Esportazione report Excel e PDF"
+  ],
+  "layouts": [
+    "dashboard-desktop",
+    "polizza-desktop",
+    "polizza-mobile",
+    "documenti-desktop",
+    "documenti-mobile",
+    "comunicazioni-desktop",
+    "clienti-desktop",
+    "clienti-mobile",
+    "agenzie-desktop",
+    "agenzie-mobile",
+    "report-desktop",
+    "report-mobile",
+    "scadenze-desktop",
+    "scadenze-mobile"
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "ok": true
+}

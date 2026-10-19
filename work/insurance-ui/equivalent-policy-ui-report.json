@@ -1,0 +1,12 @@
+{
+  "flows": [
+    "Una polizza per gruppo; collegamenti tra esito, fonte, scheda, tab e scadenze",
+    "Accorpamento tracciato; entrambe le righe, etichette originali e date rata restano consultabili"
+  ],
+  "layouts": [
+    "desktop",
+    "mobile"
+  ],
+  "errors": [],
+  "ok": true
+}

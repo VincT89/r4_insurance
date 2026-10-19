@@ -1,0 +1,47 @@
+{
+    "counts": {
+        "insurance_policies": 2605,
+        "insurance_policy_imports": 4859,
+        "clients": 4884,
+        "supplier_companies": 20,
+        "supplier_agencies": 16,
+        "supplier_agency_company": 26,
+        "attachments": 0,
+        "client_document_requests": 0,
+        "client_vehicles": 0
+    },
+    "statuses": {
+        "review": 2605
+    },
+    "import_statuses": {
+        "held": 2254,
+        "imported": 2605
+    },
+    "clients_held": 71,
+    "source_rows_preserved": true,
+    "groups_preserved": true,
+    "policy_links_valid": true,
+    "import_links_valid": true,
+    "no_policy_duplicates": true,
+    "pending_migrations": [],
+    "consolidated_groups": 281,
+    "consolidated_source_rows": 564,
+    "consolidated_links_valid": true,
+    "pages": {
+        "\/settings\/insurance-import?section=policies": 200,
+        "\/settings\/insurance-import?section=policies&result=imported": 200,
+        "\/settings\/insurance-import?section=policies&result=held": 200,
+        "\/settings\/insurance-import\/policies\/6": 200,
+        "\/settings\/insurance-import\/policies\/1": 200,
+        "\/clients\/13?tab=policies": 200,
+        "\/clients\/13\/policies\/1": 200,
+        "\/clients\/13\/policies\/1\/edit": 200,
+        "\/clients\/13?tab=deadlines": 200,
+        "\/deadlines?period=all&kind=policy": 200,
+        "\/suppliers\/8": 200,
+        "\/supplier-companies\/13": 200,
+        "\/settings\/insurance-import\/policies\/3": 200,
+        "\/clients\/6\/policies\/2325": 200
+    },
+    "ok": true
+}

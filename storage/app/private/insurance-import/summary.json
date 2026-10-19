@@ -1,0 +1,1212 @@
+{
+  "version": 1,
+  "mode": "preview_only",
+  "counts": {
+    "registry_rows": 4900,
+    "registry_groups": 4891,
+    "client_candidates": 4955,
+    "clients_without_record_issues": 4276,
+    "clients_to_review": 679,
+    "policy_rows": 6465,
+    "financial_rows_excluded": 946,
+    "summary_rows_excluded": 1,
+    "policy_groups": 4859,
+    "policy_repeated_groups": 1495,
+    "policy_candidates_without_record_issues": 595,
+    "policy_groups_to_review": 4264,
+    "policies_needing_status": 4859,
+    "clients_only_in_policies": 64,
+    "raw_branches": 45,
+    "raw_subbranches": 43,
+    "companies_after_expenses": 20,
+    "agencies_after_formatting_and_expenses": 16
+  },
+  "taxonomy": [
+    {
+      "source_branch": "3VIRUS",
+      "source_subbranch": "3VIRUS",
+      "branch": "3VIRUS",
+      "subbranch": "3VIRUS",
+      "rows": 3,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "ABITAZIONE",
+      "source_subbranch": "INCENDIO",
+      "branch": "ABITAZIONE",
+      "subbranch": "INCENDIO",
+      "rows": 10,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "ASSIMEDICI",
+      "source_subbranch": "FATTURA",
+      "branch": null,
+      "subbranch": null,
+      "rows": 2,
+      "result": "esclusa",
+      "reason": "Voce amministrativa, non polizza"
+    },
+    {
+      "source_branch": "AUTO",
+      "source_subbranch": "AUTO",
+      "branch": "Veicoli",
+      "subbranch": "AUTO",
+      "rows": 1,
+      "result": "da_confermare",
+      "reason": "AUTO non identifica da solo la copertura RC: verificare RC auto o altre garanzie"
+    },
+    {
+      "source_branch": "AUTO",
+      "source_subbranch": "CVT",
+      "branch": "Veicoli",
+      "subbranch": "CVT",
+      "rows": 1,
+      "result": "da_confermare",
+      "reason": "AUTO non identifica da solo la copertura RC: verificare RC auto o altre garanzie"
+    },
+    {
+      "source_branch": "Auto",
+      "source_subbranch": "",
+      "branch": "Veicoli",
+      "subbranch": null,
+      "rows": 83,
+      "result": "da_confermare",
+      "reason": "AUTO non identifica da solo la copertura RC: verificare RC auto o altre garanzie"
+    },
+    {
+      "source_branch": "CANE& GATTO",
+      "source_subbranch": "CANE&GATTO",
+      "branch": "CANE&GATTO",
+      "subbranch": "CANE&GATTO",
+      "rows": 3,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "CANE&GATTO",
+      "source_subbranch": "CANE&GATTO",
+      "branch": "CANE&GATTO",
+      "subbranch": "CANE&GATTO",
+      "rows": 1,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "CASA",
+      "source_subbranch": "",
+      "branch": "CASA",
+      "subbranch": null,
+      "rows": 64,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "CASA",
+      "source_subbranch": "CASA",
+      "branch": "CASA",
+      "subbranch": "CASA",
+      "rows": 14,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "CAT-NAT",
+      "source_subbranch": "CAT-NAT",
+      "branch": "CAT-NAT",
+      "subbranch": "CAT-NAT",
+      "rows": 27,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "COMMERCIO",
+      "source_subbranch": "",
+      "branch": "COMMERCIO",
+      "subbranch": null,
+      "rows": 29,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "COMMERCIO",
+      "source_subbranch": "COMMERCIO",
+      "branch": "COMMERCIO",
+      "subbranch": "COMMERCIO",
+      "rows": 37,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "CONDOMINIO",
+      "source_subbranch": "CONDOMINIO",
+      "branch": "CONDOMINIO",
+      "subbranch": "CONDOMINIO",
+      "rows": 13,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "CVT",
+      "source_subbranch": "CVT",
+      "branch": "CVT",
+      "subbranch": "CVT",
+      "rows": 3,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "Commercio",
+      "source_subbranch": "",
+      "branch": "COMMERCIO",
+      "subbranch": null,
+      "rows": 14,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "DANNI",
+      "source_subbranch": "RESIDENT",
+      "branch": "DANNI",
+      "subbranch": "RESIDENT",
+      "rows": 4,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "FATTURA",
+      "source_subbranch": "FATTURA",
+      "branch": null,
+      "subbranch": null,
+      "rows": 1,
+      "result": "esclusa",
+      "reason": "Voce amministrativa, non polizza"
+    },
+    {
+      "source_branch": "FIDEIUSSIONE",
+      "source_subbranch": "",
+      "branch": "Fideiussioni",
+      "subbranch": null,
+      "rows": 3,
+      "result": "da_confermare",
+      "reason": "Uniformazione della denominazione proposta"
+    },
+    {
+      "source_branch": "FIDEIUSSIONE",
+      "source_subbranch": "PROVVIS",
+      "branch": "Fideiussioni",
+      "subbranch": "PROVVIS",
+      "rows": 2,
+      "result": "da_confermare",
+      "reason": "Uniformazione della denominazione proposta"
+    },
+    {
+      "source_branch": "FIDEJUSSIONI",
+      "source_subbranch": "",
+      "branch": "Fideiussioni",
+      "subbranch": null,
+      "rows": 1,
+      "result": "da_confermare",
+      "reason": "Uniformazione della denominazione proposta"
+    },
+    {
+      "source_branch": "FURTO",
+      "source_subbranch": "FURTO",
+      "branch": "FURTO",
+      "subbranch": "FURTO",
+      "rows": 1,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "GLOBALE FABBRICATI",
+      "source_subbranch": "",
+      "branch": "Fabbricati",
+      "subbranch": null,
+      "rows": 13,
+      "result": "da_confermare",
+      "reason": "Accorpamento delle denominazioni da confermare"
+    },
+    {
+      "source_branch": "GLOBALE FABBRICATI",
+      "source_subbranch": "CONDOMINIO",
+      "branch": "Fabbricati",
+      "subbranch": "CONDOMINIO",
+      "rows": 9,
+      "result": "da_confermare",
+      "reason": "Accorpamento delle denominazioni da confermare"
+    },
+    {
+      "source_branch": "GLOBALE FABBRICATI",
+      "source_subbranch": "FABBRICATO",
+      "branch": "Fabbricati",
+      "subbranch": "FABBRICATO",
+      "rows": 8,
+      "result": "da_confermare",
+      "reason": "Accorpamento delle denominazioni da confermare"
+    },
+    {
+      "source_branch": "GLOBALI FABBRICATI",
+      "source_subbranch": "",
+      "branch": "Fabbricati",
+      "subbranch": null,
+      "rows": 62,
+      "result": "da_confermare",
+      "reason": "Accorpamento delle denominazioni da confermare"
+    },
+    {
+      "source_branch": "INCENDIO",
+      "source_subbranch": "COMMERCIO",
+      "branch": "INCENDIO",
+      "subbranch": "COMMERCIO",
+      "rows": 17,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "INCENDIO",
+      "source_subbranch": "INCENDIO",
+      "branch": "INCENDIO",
+      "subbranch": "INCENDIO",
+      "rows": 1,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "INCENDIO/FURTO",
+      "source_subbranch": "INC/FURTO",
+      "branch": "INCENDIO/FURTO",
+      "subbranch": "INC/FURTO",
+      "rows": 6,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "INF COND",
+      "source_subbranch": "INF COND",
+      "branch": "INF COND",
+      "subbranch": "INF COND",
+      "rows": 62,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "INFORT-MALATTIE",
+      "source_subbranch": "INF-MALAT",
+      "branch": "INFORT-MALATTIE",
+      "subbranch": "INF-MALAT",
+      "rows": 6,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "INFORTUNI",
+      "source_subbranch": "",
+      "branch": "INFORTUNI",
+      "subbranch": null,
+      "rows": 876,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "INFORTUNI",
+      "source_subbranch": "INFORTUNI",
+      "branch": "INFORTUNI",
+      "subbranch": "INFORTUNI",
+      "rows": 42,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "INTEGRAZIONE MOBILITÃ",
+      "source_subbranch": "",
+      "branch": "INTEGRAZIONE MOBILITÃ",
+      "subbranch": null,
+      "rows": 1,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "INTEGRAZIONE MOBILITÃ",
+      "source_subbranch": "MULTIRISCH",
+      "branch": "INTEGRAZIONE MOBILITÃ",
+      "subbranch": "MULTIRISCH",
+      "rows": 612,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "PLURIATTIVA INF",
+      "source_subbranch": "PLUINF",
+      "branch": "PLURIATTIVA INF",
+      "subbranch": "PLUINF",
+      "rows": 1,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "QUOTA ASSOCIATIVA",
+      "source_subbranch": "QUOTA ASS",
+      "branch": null,
+      "subbranch": null,
+      "rows": 11,
+      "result": "esclusa",
+      "reason": "Voce amministrativa, non polizza"
+    },
+    {
+      "source_branch": "RC",
+      "source_subbranch": "RC",
+      "branch": "RC",
+      "subbranch": "RC",
+      "rows": 2,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "RC",
+      "source_subbranch": "STUDIO",
+      "branch": "RC",
+      "subbranch": "STUDIO",
+      "rows": 1,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "RC GENERALE",
+      "source_subbranch": "",
+      "branch": "RC GENERALE",
+      "subbranch": null,
+      "rows": 13,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "RCA",
+      "source_subbranch": "AUTO",
+      "branch": "RC auto",
+      "subbranch": "Autovetture",
+      "rows": 1794,
+      "result": "da_confermare",
+      "reason": "Accorpamento RCA/RCAUTO proposto; il dettaglio del veicolo si conserva se indicato"
+    },
+    {
+      "source_branch": "RCA",
+      "source_subbranch": "MOTO",
+      "branch": "RC auto",
+      "subbranch": "Motocicli",
+      "rows": 27,
+      "result": "da_confermare",
+      "reason": "Accorpamento RCA/RCAUTO proposto; il dettaglio del veicolo si conserva se indicato"
+    },
+    {
+      "source_branch": "RCA",
+      "source_subbranch": "RCA",
+      "branch": "RC auto",
+      "subbranch": null,
+      "rows": 2071,
+      "result": "da_confermare",
+      "reason": "Accorpamento RCA/RCAUTO proposto; il dettaglio del veicolo si conserva se indicato"
+    },
+    {
+      "source_branch": "RCAUTO",
+      "source_subbranch": "",
+      "branch": "RC auto",
+      "subbranch": null,
+      "rows": 242,
+      "result": "da_confermare",
+      "reason": "Accorpamento RCA/RCAUTO proposto; il dettaglio del veicolo si conserva se indicato"
+    },
+    {
+      "source_branch": "RCAUTO",
+      "source_subbranch": "RCAUTO",
+      "branch": "RC auto",
+      "subbranch": null,
+      "rows": 20,
+      "result": "da_confermare",
+      "reason": "Accorpamento RCA/RCAUTO proposto; il dettaglio del veicolo si conserva se indicato"
+    },
+    {
+      "source_branch": "RCP",
+      "source_subbranch": "",
+      "branch": "RCP",
+      "subbranch": null,
+      "rows": 39,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "RCP",
+      "source_subbranch": "LIB.PROF",
+      "branch": "RCP",
+      "subbranch": "LIB.PROF",
+      "rows": 19,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "RCP",
+      "source_subbranch": "RCP",
+      "branch": "RCP",
+      "subbranch": "RCP",
+      "rows": 27,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "RCT",
+      "source_subbranch": "RCT",
+      "branch": "RCT",
+      "subbranch": "RCT",
+      "rows": 4,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "RE",
+      "source_subbranch": "AFFITTACAM",
+      "branch": "RE",
+      "subbranch": "AFFITTACAM",
+      "rows": 6,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "RE",
+      "source_subbranch": "INFORTUNI",
+      "branch": "RE",
+      "subbranch": "INFORTUNI",
+      "rows": 5,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "RE",
+      "source_subbranch": "RC CAPOFAM",
+      "branch": "RE",
+      "subbranch": "RC CAPOFAM",
+      "rows": 11,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "SPESE EMISSIONE",
+      "source_subbranch": "SPESE",
+      "branch": null,
+      "subbranch": null,
+      "rows": 932,
+      "result": "esclusa",
+      "reason": "Voce amministrativa, non polizza"
+    },
+    {
+      "source_branch": "TCM",
+      "source_subbranch": "TCM",
+      "branch": "TCM",
+      "subbranch": "TCM",
+      "rows": 4,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "TIROCINIO",
+      "source_subbranch": "TIROCINIO",
+      "branch": "TIROCINIO",
+      "subbranch": "TIROCINIO",
+      "rows": 5,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "TUTELA LEGALE",
+      "source_subbranch": "TUTELA LEG",
+      "branch": "TUTELA LEGALE",
+      "subbranch": "TUTELA LEG",
+      "rows": 8,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "UFFICIO",
+      "source_subbranch": "S. UFFICIO",
+      "branch": "UFFICIO",
+      "subbranch": "S. UFFICIO",
+      "rows": 2,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "UFFICIO",
+      "source_subbranch": "UFFICIO",
+      "branch": "UFFICIO",
+      "subbranch": "UFFICIO",
+      "rows": 1,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "UNICA INFORTUNI",
+      "source_subbranch": "",
+      "branch": "UNICA INFORTUNI",
+      "subbranch": null,
+      "rows": 1,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "UNICA INFORTUNI",
+      "source_subbranch": "UNICA INF",
+      "branch": "UNICA INFORTUNI",
+      "subbranch": "UNICA INF",
+      "rows": 12,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "VIAGGI",
+      "source_subbranch": "VIAGGI",
+      "branch": "Viaggi",
+      "subbranch": "VIAGGI",
+      "rows": 1,
+      "result": "da_confermare",
+      "reason": "Uniformazione singolare/plurale proposta"
+    },
+    {
+      "source_branch": "VIAGGI NOSTOP",
+      "source_subbranch": "VIAGGI",
+      "branch": "VIAGGI NOSTOP",
+      "subbranch": "VIAGGI",
+      "rows": 12,
+      "result": "da_confermare",
+      "reason": "Sigla, prodotto o categoria generica: occorre confermare il ramo e il sottoramo"
+    },
+    {
+      "source_branch": "VIAGGIO",
+      "source_subbranch": "VIAGGIO",
+      "branch": "Viaggi",
+      "subbranch": "VIAGGIO",
+      "rows": 1,
+      "result": "da_confermare",
+      "reason": "Uniformazione singolare/plurale proposta"
+    },
+    {
+      "source_branch": "VITA",
+      "source_subbranch": "P.U.R.",
+      "branch": "VITA",
+      "subbranch": "P.U.R.",
+      "rows": 27,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "VITA",
+      "source_subbranch": "PIP",
+      "branch": "VITA",
+      "subbranch": "PIP",
+      "rows": 74,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    },
+    {
+      "source_branch": "VITA",
+      "source_subbranch": "VITA",
+      "branch": "VITA",
+      "subbranch": "VITA",
+      "rows": 6,
+      "result": "conservata",
+      "reason": "Classificazione originale conservata; uniformati solo maiuscole e spazi"
+    }
+  ],
+  "company_agencies": [
+    {
+      "source_company": "ALLIANZ",
+      "source_agency": "LEONE ASSICURAZIONI",
+      "company": "ALLIANZ",
+      "agency": "LEONE ASSICURAZIONI",
+      "rows": 1,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "ALLIANZ",
+      "source_agency": "MASIELLO GIUSEPPE",
+      "company": "ALLIANZ",
+      "agency": "MASIELLO GIUSEPPE",
+      "rows": 2,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "ALLIANZ VIVA",
+      "source_agency": "CARDASCIO",
+      "company": "ALLIANZ VIVA",
+      "agency": "CARDASCIO",
+      "rows": 1,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "AM TRUST",
+      "source_agency": "ASSIMEDICI",
+      "company": "AM TRUST",
+      "agency": "ASSIMEDICI",
+      "rows": 32,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "AM TRUST",
+      "source_agency": "UA",
+      "company": "AM TRUST",
+      "agency": "UA",
+      "rows": 21,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "AXA",
+      "source_agency": "MINERVA ASSICURAZIONI",
+      "company": "AXA",
+      "agency": "MINERVA ASSICURAZIONI",
+      "rows": 23,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "BHITALIA",
+      "source_agency": "ASSIMEDICI",
+      "company": "BHITALIA",
+      "agency": "ASSIMEDICI",
+      "rows": 1,
+      "result": "da_confermare",
+      "reason": "Confermare la denominazione e il ruolo del soggetto"
+    },
+    {
+      "source_company": "COFACE",
+      "source_agency": "QUIFIDEIUSSIONE",
+      "company": "COFACE",
+      "agency": "QUIFIDEIUSSIONE",
+      "rows": 1,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "DUAL",
+      "source_agency": "CARDASCIO",
+      "company": "DUAL",
+      "agency": "CARDASCIO",
+      "rows": 2,
+      "result": "da_confermare",
+      "reason": "Confermare la denominazione e il ruolo del soggetto"
+    },
+    {
+      "source_company": "DUAL",
+      "source_agency": "MINERVA ASSICURAZIONI",
+      "company": "DUAL",
+      "agency": "MINERVA ASSICURAZIONI",
+      "rows": 3,
+      "result": "da_confermare",
+      "reason": "Confermare la denominazione e il ruolo del soggetto"
+    },
+    {
+      "source_company": "EUROPE",
+      "source_agency": "SPADONE",
+      "company": "EUROPE",
+      "agency": "SPADONE",
+      "rows": 12,
+      "result": "da_confermare",
+      "reason": "Confermare la denominazione e il ruolo del soggetto"
+    },
+    {
+      "source_company": "EUROPE ASSISTANCE",
+      "source_agency": "SPADONE",
+      "company": "EUROPE ASSISTANCE",
+      "agency": "SPADONE",
+      "rows": 617,
+      "result": "da_confermare",
+      "reason": "Confermare la denominazione e il ruolo del soggetto"
+    },
+    {
+      "source_company": "GROUPAMA",
+      "source_agency": "ROSATO",
+      "company": "GROUPAMA",
+      "agency": "ROSATO",
+      "rows": 8,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "HDI",
+      "source_agency": "CARDASCIO",
+      "company": "HDI",
+      "agency": "CARDASCIO",
+      "rows": 2,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "LLOYD'S INSURANCE",
+      "source_agency": "SUD BROKER",
+      "company": "LLOYD'S INSURANCE",
+      "agency": "SUD BROKER",
+      "rows": 1,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "NOBIS COMPAGNIA DI ASSICURAZIONI SPA",
+      "source_agency": "SPADONE",
+      "company": "NOBIS COMPAGNIA DI ASSICURAZIONI SPA",
+      "agency": "SPADONE",
+      "rows": 2820,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "PRIMA",
+      "source_agency": "CAMPA",
+      "company": "PRIMA",
+      "agency": "CAMPA",
+      "rows": 422,
+      "result": "da_confermare",
+      "reason": "Confermare la denominazione e il ruolo del soggetto"
+    },
+    {
+      "source_company": "REALE MUTUA",
+      "source_agency": "RISOLO",
+      "company": "REALE MUTUA",
+      "agency": "RISOLO",
+      "rows": 520,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "REVO",
+      "source_agency": "ASSIMEDICI",
+      "company": "REVO",
+      "agency": "ASSIMEDICI",
+      "rows": 5,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "REVO",
+      "source_agency": "MINERVA ASSICURAZIONI",
+      "company": "REVO",
+      "agency": "MINERVA ASSICURAZIONI",
+      "rows": 1,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "SARA ASSICURAZIONI",
+      "source_agency": "K.COMITE",
+      "company": "SARA ASSICURAZIONI",
+      "agency": "K.COMITE",
+      "rows": 14,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "SPESE",
+      "source_agency": "DI EMISSIONE",
+      "company": "SPESE",
+      "agency": "DI EMISSIONE",
+      "rows": 932,
+      "result": "esclusa",
+      "reason": "Voce amministrativa"
+    },
+    {
+      "source_company": "TOKIO MARINE HCC",
+      "source_agency": "UIA",
+      "company": "TOKIO MARINE HCC",
+      "agency": "UIA",
+      "rows": 39,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "UNIPOL",
+      "source_agency": "NUOVA BARENSE",
+      "company": "UNIPOL",
+      "agency": "NUOVA BARENSE",
+      "rows": 25,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "UNIPOL",
+      "source_agency": "PANARO",
+      "company": "UNIPOL",
+      "agency": "PANARO",
+      "rows": 1740,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "Zurich",
+      "source_agency": "Campa",
+      "company": "ZURICH",
+      "agency": "CAMPA",
+      "rows": 126,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    },
+    {
+      "source_company": "Zurich",
+      "source_agency": "MINERVA ASSICURAZIONI",
+      "company": "ZURICH",
+      "agency": "MINERVA ASSICURAZIONI",
+      "rows": 40,
+      "result": "conservata",
+      "reason": "Nome originale conservato; agenzia unica con più compagnie"
+    }
+  ],
+  "source_statuses": {
+    "Archivio": 3972,
+    "OLD": 2493
+  },
+  "issue_counts": [
+    {
+      "code": "anagrafiche_discordanti_stesso_identificativo",
+      "records": 7
+    },
+    {
+      "code": "classificazione_da_confermare",
+      "records": 3785
+    },
+    {
+      "code": "cliente_assente_in_anagrafica",
+      "records": 64
+    },
+    {
+      "code": "cliente_da_verificare",
+      "records": 696
+    },
+    {
+      "code": "denominazione_compagnia_da_confermare",
+      "records": 841
+    },
+    {
+      "code": "distinguere_codice_fiscale_e_partita_iva",
+      "records": 379
+    },
+    {
+      "code": "email_da_verificare",
+      "records": 2
+    },
+    {
+      "code": "identificativo_fiscale_da_verificare",
+      "records": 387
+    },
+    {
+      "code": "nome_discordante_tra_export",
+      "records": 25
+    },
+    {
+      "code": "numero_polizza_ripetuto",
+      "records": 1495
+    },
+    {
+      "code": "premio_non_valido",
+      "records": 157
+    },
+    {
+      "code": "scadenza_precedente_decorrenza",
+      "records": 2
+    },
+    {
+      "code": "stessa_polizza_intestatari_diversi",
+      "records": 109
+    }
+  ],
+  "decisions": [
+    {
+      "topic": "Agenzie plurimandatarie",
+      "state": "definita",
+      "text": "Una sola anagrafica agenzia collegata a più compagnie, come confermato."
+    },
+    {
+      "topic": "Stato delle polizze",
+      "state": "aperta",
+      "text": "Archivio e OLD conservati; significato da verificare. Nessuno stato in vigore assegnato automaticamente."
+    },
+    {
+      "topic": "Catalogo rami e sottorami",
+      "state": "aperta",
+      "text": "Confermare gli accorpamenti proposti e le sigle generiche; i sottorami mancanti restano vuoti."
+    },
+    {
+      "topic": "Compagnie",
+      "state": "aperta",
+      "text": "Verificare EUROPE/EUROPE ASSISTANCE e il ruolo di PRIMA, DUAL, BHITALIA. Non unificati automaticamente."
+    },
+    {
+      "topic": "Righe ripetute",
+      "state": "aperta",
+      "text": "Stesso numero con date, rate, intestatari o garanzie diverse: conservare tutte le righe e decidere storico/rinnovi prima di importare."
+    },
+    {
+      "topic": "Identità del cliente",
+      "state": "aperta",
+      "text": "Verificare identificativi non validi, nomi discordanti, clienti mancanti e codici numerici: CF e partita IVA non sono intercambiabili."
+    },
+    {
+      "topic": "Integrità file XLS",
+      "state": "aperta",
+      "text": "Contenitore OLE letto con tolleranza: verificare un nuovo salvataggio prima del caricamento definitivo."
+    }
+  ],
+  "mapping": [
+    {
+      "source": "Titolo",
+      "target": "clients.title",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Contraente",
+      "target": "clients.name",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Data Nascita",
+      "target": "clients.birth_date",
+      "rule": "Data ISO; originale conservato"
+    },
+    {
+      "source": "Luogo Nascita",
+      "target": "clients.birth_place",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Telefono",
+      "target": "clients.phone",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Cellulare",
+      "target": "clients.mobile",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "FAX",
+      "target": "clients.fax",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "E-Mail",
+      "target": "clients.email",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Target",
+      "target": "clients.target",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Provincia",
+      "target": "clients.province",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Città",
+      "target": "clients.city",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Indirizzo",
+      "target": "clients.address",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "CAP",
+      "target": "clients.postal_code",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Referente",
+      "target": "clients.reference_person",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "E-Mail Referente",
+      "target": "clients.reference_email",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Ruolo Referente",
+      "target": "clients.reference_role",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Telefono Referente",
+      "target": "clients.reference_phone",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Ufficio",
+      "target": "clients.office",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Consulente",
+      "target": "clients.consultant",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Collaboratore",
+      "target": "clients.collaborator",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Operatore",
+      "target": "clients.operator",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Notizie Salienti",
+      "target": "clients.salient_notes",
+      "rule": "Testo; zeri iniziali conservati"
+    },
+    {
+      "source": "Cod. Fiscale / P. IVA",
+      "target": "Identità cliente",
+      "rule": "16 caratteri: CF con controllo formale. 11 cifre: distinguere CF/P.IVA e tipo soggetto prima del caricamento."
+    },
+    {
+      "source": "Compagnia / Agenzia",
+      "target": "Fornitori e collegamenti",
+      "rule": "Unica agenzia con più compagnie; nessuna gerarchia di subagenzia dedotta."
+    },
+    {
+      "source": "Ramo / Sottoramo",
+      "target": "Tab polizze: category / subcategory",
+      "rule": "Originali conservati; proposte da approvare. Prodotto distinto dalla copertura."
+    },
+    {
+      "source": "Efetto / Scadenza",
+      "target": "Decorrenza / scadenza contratto",
+      "rule": "Date italiane convertite in ISO; non usare le date rata come scadenza della polizza."
+    },
+    {
+      "source": "Premio annuale / Premio Rata",
+      "target": "Premio annuale / dettaglio rata",
+      "rule": "Valori distinti. Le rate non diventano nuove polizze."
+    },
+    {
+      "source": "Documenti Polizza / Doc. Compagnia",
+      "target": "Riferimenti originali",
+      "rule": "Nessun allegato o consenso creato senza documento effettivo."
+    },
+    {
+      "source": "Interesse Assic.",
+      "target": "Soggetto/bene assicurato",
+      "rule": "Testo conservato; nessuna targa o relazione creata per supposizione."
+    },
+    {
+      "source": "Pagamenti / provvigioni / imponibili",
+      "target": "Archivio sorgente",
+      "rule": "Conservati nella fonte; non si riattivano i moduli amministrativi rimossi."
+    }
+  ],
+  "sources": [
+    {
+      "file": "Anagrafica 08_10_2026 10.45 [IVAN SPADONE ].xls",
+      "sha256": "f0155309ce8ac55f614974820087b31e7b23a701dba752b39d9d4a2384a9c114",
+      "sheet": "Dati",
+      "header_row": 7,
+      "headers": [
+        "Titolo",
+        "Contraente",
+        "Cod. Fiscale / P. IVA",
+        "Data Nascita",
+        "Luogo Nascita",
+        "Telefono",
+        "Cellulare",
+        "FAX",
+        "E-Mail",
+        "Target",
+        "Provincia",
+        "Città",
+        "Indirizzo",
+        "CAP",
+        "Referente",
+        "E-Mail Referente",
+        "Ruolo Referente",
+        "Telefono Referente",
+        "Ufficio",
+        "Consulente",
+        "Collaboratore",
+        "Operatore",
+        "Notizie Salienti"
+      ],
+      "rows": 4900,
+      "tolerant_read": true
+    },
+    {
+      "file": "Gestionale 08_10_2026 10.14 [IVAN SPADONE ].xls",
+      "sha256": "9561bc84d4053b48f3be0bf5617afbc36015cddb410574f68cbde27ebcbe2a3e",
+      "sheet": "Dati",
+      "header_row": 7,
+      "headers": [
+        "Polizze",
+        "Protocollo",
+        "Titolo",
+        "Contraente",
+        "Cod. Fiscale / P. IVA",
+        "Target",
+        "Referente",
+        "Gruppo Economico",
+        "Ufficio",
+        "Consulente",
+        "Collaboratore",
+        "Operatore",
+        "Compagnia",
+        "Agenzia",
+        "% Coass.",
+        "Numero Polizza",
+        "Ramo",
+        "Sottoramo",
+        "Interesse Assic.",
+        "Documenti Polizza",
+        "Pag. Da Consulente",
+        "Pag. A Compagnia",
+        "Pag. A Consulente",
+        "Pag. A Collaboratore",
+        "Doc. Compagnia",
+        "Data Consegna Documenti",
+        "Efetto",
+        "Scadenza",
+        "Data Rata Attuale",
+        "Data Rata Futura",
+        "Frazionamento",
+        "Tacito Rinnovo",
+        "Data Copertura",
+        "Decade",
+        "Mese Pagamento",
+        "Premio Rata",
+        "Premio annuale",
+        "Imponibile 1",
+        "Aliquota 1",
+        "Imponibile 2",
+        "Aliquota 2",
+        "Imponibile 3",
+        "Aliquota 3",
+        "Aliquota 1° Anno",
+        "Anni Premiali",
+        "Tipo Pagamento",
+        "Provvigioni Totali",
+        "% Provvigioni Ufficio",
+        "% Provvigioni Consulente",
+        "% Provvigioni Collaboratore",
+        "Provvigioni Ufficio",
+        "Provvigioni Consulente",
+        "Provvigioni Collaboratore",
+        "Note"
+      ],
+      "rows": 7412,
+      "tolerant_read": true
+    }
+  ],
+  "batch_key": "6f46a48e3c55a55e7200a6f5d20e6605d8608640f6dae4ddf0ca59f3898571c2"
+}

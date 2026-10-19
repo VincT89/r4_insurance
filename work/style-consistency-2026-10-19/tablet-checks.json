@@ -1,0 +1,26 @@
+[
+  {
+    "url": "/dashboard",
+    "width": 768,
+    "overflow": false,
+    "error": false
+  },
+  {
+    "error": false,
+    "overflow": false,
+    "url": "/collections",
+    "width": 1024
+  },
+  {
+    "error": false,
+    "overflow": false,
+    "url": "/policies/create?entry_mode=existing",
+    "width": 768
+  },
+  {
+    "error": false,
+    "overflow": false,
+    "url": "/settings/appearance",
+    "width": 1024
+  }
+]

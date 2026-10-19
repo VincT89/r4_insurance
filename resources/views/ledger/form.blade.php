@@ -1,0 +1,8 @@
+<x-app-layout title="Nuovo titolo"><x-page-header><x-slot:title>Nuovo titolo</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route('clients.policies.show',[$policy->client_id,$policy]) }}">Polizza {{ $policy->number }}</a></x-slot:actions></x-page-header>
+<x-panel padded><form method="POST" action="{{ route('titles.store',$policy) }}">@csrf<x-form-section title="Titolo della compagnia"><div class="form-row">
+<x-form-group label="Tipo titolo" name="kind" required><select class="form-sel" name="kind">@foreach(\App\Models\InsuranceTitle::KINDS as $key=>$label)<option value="{{ $key }}" @selected(old('kind')===$key)>{{ $label }}</option>@endforeach</select></x-form-group>
+<x-form-group label="Numero / riferimento" name="reference"><input class="form-in" name="reference" value="{{ old('reference') }}" maxlength="100"></x-form-group>
+@foreach(['due_on'=>'Scadenza pagamento','coverage_from'=>'Copertura dal','coverage_to'=>'Copertura al'] as $key=>$label)<x-form-group :label="$label" :name="$key" required><input class="form-in" type="date" name="{{ $key }}" value="{{ old($key) }}" required></x-form-group>@endforeach
+<x-form-group label="Importo del titolo (€)" name="amount" required><input class="form-in" type="number" step="0.01" min="0.01" max="9999999999.99" name="amount" value="{{ old('amount') }}" required></x-form-group>
+@include('ledger.payment-fields',['model'=>$policy])
+<x-form-group label="Note" name="notes"><textarea class="form-ta" name="notes" rows="2" maxlength="5000">{{ old('notes') }}</textarea></x-form-group></div></x-form-section><div class="insurance-form-actions"><button class="btn btn-p">Registra titolo</button></div></form></x-panel></x-app-layout>

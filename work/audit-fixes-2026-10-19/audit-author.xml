@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="1.005758">
+    <testsuite name="Core" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="1.005758">
+      <testsuite name="Tests\Feature\AuditSafetyRegressionTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AuditSafetyRegressionTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="1.005758">
+        <testcase name="test_audit_author_survives_rejected_deletion_and_admin_can_disable_the_user" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\AuditSafetyRegressionTest.php" line="126" class="Tests\Feature\AuditSafetyRegressionTest" classname="Tests.Feature.AuditSafetyRegressionTest" assertions="8" time="1.005758"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

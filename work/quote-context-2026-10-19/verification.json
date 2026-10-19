@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-19",
+  "scope": "Richieste preventivi: documenti facoltativi multipli, polizza attuale e coperture richieste",
+  "migration": "2026_10_19_180000_extend_quote_request_context",
+  "database": "r4_insurance",
+  "migrationApplied": true,
+  "automated": {
+    "tests": 77,
+    "assertions": 976,
+    "passed": true,
+    "environment": "SQLite temporaneo e posta simulata"
+  },
+  "build": "Completata; resta l'avviso sulle dimensioni dei pacchetti di esportazione",
+  "browser": {
+    "desktop": 1440,
+    "mobile": 390,
+    "pageOverflow": false,
+    "checks": [
+      "Ricerca e selezione cliente",
+      "Polizze limitate al cliente selezionato",
+      "Riferimento esterno disabilitato se si seleziona una polizza",
+      "Tre selettori file multipli e facoltativi",
+      "Due file selezionati e date distinte: valido, scaduto, non leggibile",
+      "Riquadri e campi controllati su desktop e smartphone"
+    ],
+    "savedOperationalRecords": false,
+    "realEmailsSent": false
+  },
+  "screenshots": [
+    "documenti-desktop.png",
+    "documenti-mobile.png"
+  ]
+}

@@ -1,0 +1,1000 @@
+[
+  {
+    "error": false,
+    "heading": "Incassi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/collections",
+    "width": 390,
+    "name": "collections",
+    "image": "phone-collections-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Dashboard",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/dashboard",
+    "width": 390,
+    "name": "dashboard",
+    "image": "phone-dashboard-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Blocco note",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/daily-notes",
+    "width": 390,
+    "name": "notes",
+    "image": "phone-notes-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Utenti",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/users",
+    "width": 390,
+    "name": "users",
+    "image": "phone-users-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Profilo",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/profile",
+    "width": 390,
+    "name": "profile",
+    "image": "phone-profile-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuova polizza",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/policies/create",
+    "width": 390,
+    "name": "policy-start",
+    "image": "phone-policy-start-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Anagrafica clienti",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients",
+    "width": 390,
+    "name": "clients",
+    "image": "phone-clients-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Agenzie",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/suppliers",
+    "width": 390,
+    "name": "agencies",
+    "image": "phone-agencies-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Compagnie",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/supplier-companies",
+    "width": 390,
+    "name": "companies",
+    "image": "phone-companies-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Rami e sottorami",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-catalog",
+    "width": 390,
+    "name": "catalog",
+    "image": "phone-catalog-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Sinistri",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/claims",
+    "width": 390,
+    "name": "claims",
+    "image": "phone-claims-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Preventivi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/quotes",
+    "width": 390,
+    "name": "quotes",
+    "image": "phone-quotes-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Rate e quietanze",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/titles",
+    "width": 390,
+    "name": "titles",
+    "image": "phone-titles-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Incassi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/collections",
+    "width": 390,
+    "name": "collections",
+    "image": "phone-collections-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Polizze",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/policies",
+    "width": 390,
+    "name": "policies",
+    "image": "phone-policies-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Scadenze",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/deadlines",
+    "width": 390,
+    "name": "deadlines",
+    "image": "phone-deadlines-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Report",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/reports",
+    "width": 390,
+    "name": "reports",
+    "image": "phone-reports-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Comunicazioni alle agenzie",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/agency-communications",
+    "width": 390,
+    "name": "communications",
+    "image": "phone-communications-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Comunicazioni rate e incassi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/agency-communications/collections",
+    "width": 390,
+    "name": "communication-collections",
+    "image": "phone-communication-collections-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Storico comunicazioni",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/agency-communications/history",
+    "width": 390,
+    "name": "communication-history",
+    "image": "phone-communication-history-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Registro attività",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/audit-logs",
+    "width": 390,
+    "name": "audit",
+    "image": "phone-audit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Aspetto",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/appearance",
+    "width": 390,
+    "name": "appearance",
+    "image": "phone-appearance-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Impostazioni email",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/email",
+    "width": 390,
+    "name": "email-settings",
+    "image": "phone-email-settings-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modelli documentali",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/forms",
+    "width": 390,
+    "name": "templates",
+    "image": "phone-templates-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Importazione Excel",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-import",
+    "width": 390,
+    "name": "imports",
+    "image": "phone-imports-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuovo cliente",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/create",
+    "width": 390,
+    "name": "client-create",
+    "image": "phone-client-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica anagrafica",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/edit",
+    "width": 390,
+    "name": "client-edit",
+    "image": "phone-client-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886",
+    "width": 390,
+    "name": "client-show",
+    "image": "phone-client-show-390.png"
+  },
+  {
+    "error": false,
+    "heading": "ASSIMEDICI",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/suppliers/4",
+    "width": 390,
+    "name": "agency",
+    "image": "phone-agency-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuova agenzia",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/suppliers/create",
+    "width": 390,
+    "name": "agency",
+    "image": "phone-agency-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica agenzia",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/suppliers/4/edit",
+    "width": 390,
+    "name": "agency-edit",
+    "image": "phone-agency-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "ALLIANZ",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/supplier-companies/1",
+    "width": 390,
+    "name": "company-show",
+    "image": "phone-company-show-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuova compagnia",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/supplier-companies/create",
+    "width": 390,
+    "name": "company-create",
+    "image": "phone-company-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica compagnia",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/supplier-companies/1/edit",
+    "width": 390,
+    "name": "company-edit",
+    "image": "phone-company-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuova polizza",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/policies/create?entry_mode=existing",
+    "width": 390,
+    "name": "policy-existing",
+    "image": "phone-policy-existing-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuovo preventivo",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/quotes/create",
+    "width": 390,
+    "name": "quote-create",
+    "image": "phone-quote-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuovo sinistro",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/claims/create",
+    "width": 390,
+    "name": "claim-create",
+    "image": "phone-claim-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886?tab=registry",
+    "width": 390,
+    "name": "registry",
+    "image": "phone-registry-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886?tab=documents",
+    "width": 390,
+    "name": "client-documents",
+    "image": "phone-client-documents-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886?tab=deadlines",
+    "width": 390,
+    "name": "client-deadlines",
+    "image": "phone-client-deadlines-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886?tab=network",
+    "width": 390,
+    "name": "client-network",
+    "image": "phone-client-network-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886?tab=vehicles",
+    "width": 390,
+    "name": "client-vehicles",
+    "image": "phone-client-vehicles-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886?tab=assets",
+    "width": 390,
+    "name": "client-assets",
+    "image": "phone-client-assets-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886?tab=history",
+    "width": 390,
+    "name": "client-history",
+    "image": "phone-client-history-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886?tab=consents",
+    "width": 390,
+    "name": "client-consents",
+    "image": "phone-client-consents-390.png"
+  },
+  {
+    "error": false,
+    "heading": "ABITAZIONE / SA-2026-001",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/policies/2606",
+    "width": 390,
+    "name": "policy-show",
+    "image": "phone-policy-show-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica polizza",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/policies/2606/edit",
+    "width": 390,
+    "name": "policy-edit",
+    "image": "phone-policy-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Moduli e firme · Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/forms",
+    "width": 390,
+    "name": "client-forms",
+    "image": "phone-client-forms-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Prepara moduli · Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/forms/create?policy=2606",
+    "width": 390,
+    "name": "client-form-create",
+    "image": "phone-client-form-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Provvigioni · ASSIMEDICI",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/suppliers/4/commissions",
+    "width": 390,
+    "name": "commission-list",
+    "image": "phone-commission-list-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Configura aliquote · ASSIMEDICI",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/suppliers/4/commissions/create",
+    "width": 390,
+    "name": "commission-create",
+    "image": "phone-commission-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuovo utente",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/users/create",
+    "width": 390,
+    "name": "user-create",
+    "image": "phone-user-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica utente",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/users/1/edit",
+    "width": 390,
+    "name": "user-edit",
+    "image": "phone-user-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuovo ramo",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-catalog/branch/create",
+    "width": 390,
+    "name": "branch",
+    "image": "phone-branch-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica ramo",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-catalog/branch/1/edit",
+    "width": 390,
+    "name": "branch-edit",
+    "image": "phone-branch-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuovo sottoramo",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-catalog/subbranch/create?branch=1",
+    "width": 390,
+    "name": "subbranch-create",
+    "image": "phone-subbranch-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuovo modello documentale",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/forms/create",
+    "width": 390,
+    "name": "template-create",
+    "image": "phone-template-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Allegato 3 · versione 1",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/forms/1",
+    "width": 390,
+    "name": "template-edit",
+    "image": "phone-template-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Carica documento",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/documents/create",
+    "width": 390,
+    "name": "document-create",
+    "image": "phone-document-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Documenti da ricevere",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/document-requests/create",
+    "width": 390,
+    "name": "document-request",
+    "image": "phone-document-request-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Aggiungi: Referente",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/records/contacts/create",
+    "width": 390,
+    "name": "contact-create",
+    "image": "phone-contact-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Aggiungi: Bene assicurabile",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/records/assets/create",
+    "width": 390,
+    "name": "asset-create",
+    "image": "phone-asset-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Aggiungi: Contatto o nota",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/records/interactions/create",
+    "width": 390,
+    "name": "interaction-create",
+    "image": "phone-interaction-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Aggiungi: Consenso documentato",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/records/consents/create",
+    "width": 390,
+    "name": "consent-create",
+    "image": "phone-consent-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Aggiungi veicolo",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/vehicles/create",
+    "width": 390,
+    "name": "vehicle-create",
+    "image": "phone-vehicle-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Relazione tra clienti",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/relationships/create",
+    "width": 390,
+    "name": "relationship-create",
+    "image": "phone-relationship-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nucleo familiare",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/households/create",
+    "width": 390,
+    "name": "household",
+    "image": "phone-household-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Possibili duplicati di Alessandro Varesi",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/duplicates",
+    "width": 390,
+    "name": "duplicates",
+    "image": "phone-duplicates-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Materiali del cliente",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/clients/4886/materials",
+    "width": 390,
+    "name": "materials",
+    "image": "phone-materials-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuovo titolo",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/policies/2606/titles/create",
+    "width": 390,
+    "name": "title-create",
+    "image": "phone-title-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Anteprima titoli",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/policies/2606/titles/schedule",
+    "width": 390,
+    "name": "title-schedule",
+    "image": "phone-title-schedule-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Rinnova SA-2026-001",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/policies/2606/titles/renewal",
+    "width": 390,
+    "name": "policy-renewal",
+    "image": "phone-policy-renewal-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Sinistro · SN-2026-15",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/claims/1",
+    "width": 390,
+    "name": "qa-claim-show",
+    "image": "phone-qa-claim-show-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica sinistro · SN-2026-15",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/claims/1/edit",
+    "width": 390,
+    "name": "qa-claim-edit",
+    "image": "phone-qa-claim-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Gestisci attività",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/claims/1/activities/1",
+    "width": 390,
+    "name": "qa-claim-activity",
+    "image": "phone-qa-claim-activity-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Nuovo sinistro",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/claims/create?policy=1",
+    "width": 390,
+    "name": "qa-claim-create",
+    "image": "phone-qa-claim-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Assicurazione autovettura",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/quotes/1",
+    "width": 390,
+    "name": "qa-quote-show",
+    "image": "phone-qa-quote-show-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Richiedi preventivo",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/quotes/1/emails/create",
+    "width": 390,
+    "name": "qa-quote-email-compose",
+    "image": "phone-qa-quote-email-compose-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Controlla la richiesta prima di inviarla",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/quote-emails/01a153d3-8028-70de-b7e4-9220d2047adb",
+    "width": 390,
+    "name": "qa-quote-email-review",
+    "image": "phone-qa-quote-email-review-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Emissione #1",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/titles/1",
+    "width": 390,
+    "name": "qa-title-show",
+    "image": "phone-qa-title-show-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Condizioni provvigionali · Agenzia Valserena",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/suppliers/1/commissions/1",
+    "width": 390,
+    "name": "qa-commission-show",
+    "image": "phone-qa-commission-show-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica condizioni · Agenzia Valserena",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/suppliers/1/commissions/1/edit",
+    "width": 390,
+    "name": "qa-commission-edit",
+    "image": "phone-qa-commission-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Fascicolo #1 · Officine Valdoro S.r.l.",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/clients/1/forms/1",
+    "width": 390,
+    "name": "qa-forms-package",
+    "image": "phone-qa-forms-package-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Prepara moduli · Officine Valdoro S.r.l.",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/clients/1/forms/create?policy=1",
+    "width": 390,
+    "name": "qa-forms-create",
+    "image": "phone-qa-forms-create-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica dati documento",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/clients/1/documents/1/edit",
+    "width": 390,
+    "name": "qa-document-edit",
+    "image": "phone-qa-document-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica veicolo",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/clients/1/vehicles/1/edit",
+    "width": 390,
+    "name": "qa-vehicle-edit",
+    "image": "phone-qa-vehicle-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica: Referente",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/clients/1/records/contacts/1/edit",
+    "width": 390,
+    "name": "qa-contact-edit",
+    "image": "phone-qa-contact-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica: Bene assicurabile",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/clients/1/records/assets/1/edit",
+    "width": 390,
+    "name": "qa-asset-edit",
+    "image": "phone-qa-asset-edit-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Verifica RCA · SA-2026-001",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/clients/1/policies/1/coverage-checks",
+    "width": 390,
+    "name": "qa-coverage",
+    "image": "phone-qa-coverage-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Controlla l’email prima di inviarla",
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "url": "/agency-communications/messages/01a153d3-8012-70fe-8ad9-f34ce91eac03",
+    "width": 390,
+    "name": "qa-communication-review",
+    "image": "phone-qa-communication-review-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Rami e sottorami",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-catalog?kind=subbranch",
+    "width": 390,
+    "name": "catalog-subbranches",
+    "image": "phone-catalog-subbranches-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Importazione Excel",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-import?section=overview",
+    "width": 390,
+    "name": "import-overview",
+    "image": "phone-import-overview-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Importazione Excel",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-import?section=registry",
+    "width": 390,
+    "name": "import-registry",
+    "image": "phone-import-registry-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Importazione Excel",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-import?section=policies",
+    "width": 390,
+    "name": "import-policies",
+    "image": "phone-import-policies-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Importazione Excel",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-import?section=branches",
+    "width": 390,
+    "name": "import-branches",
+    "image": "phone-import-branches-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Importazione Excel",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-import?section=providers",
+    "width": 390,
+    "name": "import-providers",
+    "image": "phone-import-providers-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Importazione Excel",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-import?section=issues",
+    "width": 390,
+    "name": "import-issues",
+    "image": "phone-import-issues-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Importazione Excel",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-import?section=mapping",
+    "width": 390,
+    "name": "import-mapping",
+    "image": "phone-import-mapping-390.png"
+  },
+  {
+    "error": false,
+    "heading": "Modifica sottoramo",
+    "origin": "http://127.0.0.1:8001",
+    "overflow": false,
+    "url": "/settings/insurance-catalog/subbranch/1/edit",
+    "width": 390,
+    "name": "subbranch-edit",
+    "image": "phone-subbranch-edit-390.png"
+  },
+  {
+    "name": "login",
+    "url": "/login",
+    "width": 390,
+    "origin": "http://127.0.0.1:8037",
+    "overflow": false,
+    "error": false
+  }
+]

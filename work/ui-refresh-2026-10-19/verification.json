@@ -1,0 +1,360 @@
+{
+  "date": "2026-10-19",
+  "scope": "Revisione visiva del gestionale e correzione degli errori introdotti nelle viste",
+  "theme": "#0b498c",
+  "automated": {
+    "suite": "AppearanceTest, InsuranceWorkspaceTest, InsuranceOperationsTest, InsuranceClaimsTest, InsuranceClientRegistryTest",
+    "tests": 70,
+    "assertions": 2159,
+    "passed": true,
+    "storage": "SQLite temporaneo in memoria"
+  },
+  "build": "Completata; avviso sulle dimensioni dei pacchetti di esportazione già presenti",
+  "interactiveChecks": [
+    "Menu cliente: apertura, chiusura con Escape e disposizione mobile",
+    "Filtri rate: Frazionamento Annuale conservato dopo invio, filtri avanzati aperti",
+    "Report: mese successivo e ritorno a ottobre 2026",
+    "Tema personale: anteprima colore e annullamento con ripristino del blu salvato",
+    "Menu notifiche: apertura e chiusura",
+    "Dashboard tablet 768px: nessuno sforamento orizzontale"
+  ],
+  "pages": [
+    {
+      "page": "Dashboard",
+      "url": "http://127.0.0.1:8001/dashboard",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "primary": "#0b498c",
+      "tableCount": 1,
+      "tableHeader": "rgb(11, 73, 140)",
+      "title": "Dashboard",
+      "width": 1440
+    },
+    {
+      "page": "Blocco Note",
+      "url": "http://127.0.0.1:8001/daily-notes",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "primary": "#0b498c",
+      "tableCount": 0,
+      "tableHeader": null,
+      "title": "Blocco Note",
+      "width": 1440
+    },
+    {
+      "page": "Nuova polizza",
+      "url": "http://127.0.0.1:8001/policies/create",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "primary": "#0b498c",
+      "tableCount": 0,
+      "tableHeader": null,
+      "title": "Nuova polizza",
+      "width": 1440
+    },
+    {
+      "page": "Clienti",
+      "url": "http://127.0.0.1:8001/clients",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "primary": "#0b498c",
+      "tableCount": 1,
+      "tableHeader": "rgb(11, 73, 140)",
+      "title": "Anagrafica clienti",
+      "width": 1440
+    },
+    {
+      "page": "Agenzie",
+      "url": "http://127.0.0.1:8001/suppliers",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "primary": "#0b498c",
+      "tableCount": 1,
+      "tableHeader": "rgb(11, 73, 140)",
+      "title": "Agenzie",
+      "width": 1440
+    },
+    {
+      "page": "Sinistri",
+      "url": "http://127.0.0.1:8001/claims",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "primary": "#0b498c",
+      "tableCount": 1,
+      "tableHeader": "rgb(11, 73, 140)",
+      "title": "Sinistri",
+      "width": 1440
+    },
+    {
+      "page": "Preventivi",
+      "url": "http://127.0.0.1:8001/quotes",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "primary": "#0b498c",
+      "tableCount": 1,
+      "tableHeader": "rgb(11, 73, 140)",
+      "title": "Preventivi",
+      "width": 1440
+    },
+    {
+      "page": "Rate e quietanze",
+      "url": "http://127.0.0.1:8001/titles",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "primary": "#0b498c",
+      "tableCount": 1,
+      "tableHeader": "rgb(11, 73, 140)",
+      "title": "Rate e quietanze",
+      "width": 1440
+    },
+    {
+      "page": "Incassi",
+      "url": "http://127.0.0.1:8001/collections",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Incassi",
+      "width": 1440
+    },
+    {
+      "page": "Polizze",
+      "url": "http://127.0.0.1:8001/policies",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Polizze",
+      "width": 1440
+    },
+    {
+      "page": "Scadenze",
+      "url": "http://127.0.0.1:8001/deadlines",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Scadenze",
+      "width": 1440
+    },
+    {
+      "page": "Comunicazioni",
+      "url": "http://127.0.0.1:8001/agency-communications",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "tableCount": 0,
+      "title": "Comunicazioni alle agenzie",
+      "width": 1440
+    },
+    {
+      "page": "Report",
+      "url": "http://127.0.0.1:8001/reports",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Report",
+      "width": 1440
+    },
+    {
+      "page": "Utenti",
+      "url": "http://127.0.0.1:8001/users",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Gestione Utenti",
+      "width": 1440
+    },
+    {
+      "page": "Registro attività",
+      "url": "http://127.0.0.1:8001/audit-logs",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "tableCount": 0,
+      "title": "Registro attività",
+      "width": 1440
+    },
+    {
+      "page": "Impostazioni",
+      "url": "http://127.0.0.1:8001/profile",
+      "screen": "desktop",
+      "error": false,
+      "overflow": false,
+      "tableCount": 0,
+      "title": "Profilo",
+      "width": 1440
+    },
+    {
+      "page": "Dashboard",
+      "url": "http://127.0.0.1:8001/dashboard",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Dashboard",
+      "width": 390
+    },
+    {
+      "page": "Blocco Note",
+      "url": "http://127.0.0.1:8001/daily-notes",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 0,
+      "title": "Blocco Note",
+      "width": 390
+    },
+    {
+      "page": "Nuova polizza",
+      "url": "http://127.0.0.1:8001/policies/create",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 0,
+      "title": "Nuova polizza",
+      "width": 390
+    },
+    {
+      "page": "Clienti",
+      "url": "http://127.0.0.1:8001/clients",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Anagrafica clienti",
+      "width": 390
+    },
+    {
+      "page": "Agenzie",
+      "url": "http://127.0.0.1:8001/suppliers",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Agenzie",
+      "width": 390
+    },
+    {
+      "page": "Sinistri",
+      "url": "http://127.0.0.1:8001/claims",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Sinistri",
+      "width": 390
+    },
+    {
+      "page": "Preventivi",
+      "url": "http://127.0.0.1:8001/quotes",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Preventivi",
+      "width": 390
+    },
+    {
+      "page": "Rate e quietanze",
+      "url": "http://127.0.0.1:8001/titles",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Rate e quietanze",
+      "width": 390
+    },
+    {
+      "page": "Incassi",
+      "url": "http://127.0.0.1:8001/collections",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Incassi",
+      "width": 390
+    },
+    {
+      "page": "Polizze",
+      "url": "http://127.0.0.1:8001/policies",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Polizze",
+      "width": 390
+    },
+    {
+      "page": "Scadenze",
+      "url": "http://127.0.0.1:8001/deadlines",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Scadenze",
+      "width": 390
+    },
+    {
+      "page": "Comunicazioni",
+      "url": "http://127.0.0.1:8001/agency-communications",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 0,
+      "title": "Comunicazioni alle agenzie",
+      "width": 390
+    },
+    {
+      "page": "Report",
+      "url": "http://127.0.0.1:8001/reports",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Report",
+      "width": 390
+    },
+    {
+      "page": "Utenti",
+      "url": "http://127.0.0.1:8001/users",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 1,
+      "title": "Gestione Utenti",
+      "width": 390
+    },
+    {
+      "page": "Registro attività",
+      "url": "http://127.0.0.1:8001/audit-logs",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 0,
+      "title": "Registro attività",
+      "width": 390
+    },
+    {
+      "page": "Impostazioni",
+      "url": "http://127.0.0.1:8001/profile",
+      "screen": "mobile",
+      "error": false,
+      "overflow": false,
+      "tableCount": 0,
+      "title": "Profilo",
+      "width": 390
+    }
+  ],
+  "limits": "Verifica visiva e delle interazioni indicate. Nessun nuovo incasso, polizza, cliente o invio email nel database di lavoro."
+}

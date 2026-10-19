@@ -1,0 +1,52 @@
+{
+    "engine": "SQLite in memoria; processo PHP locale; una richiesta per pagina; non è un test di carico concorrente",
+    "clients": 10000,
+    "policies": 40000,
+    "requests": [
+        {
+            "url": "\/clients",
+            "status": 200,
+            "seconds": 0.219,
+            "queries": 9,
+            "sql_ms": 47.9,
+            "html_bytes": 55352,
+            "peak_memory_mb": 60
+        },
+        {
+            "url": "\/policies",
+            "status": 200,
+            "seconds": 0.199,
+            "queries": 12,
+            "sql_ms": 133.9,
+            "html_bytes": 40978,
+            "peak_memory_mb": 60
+        },
+        {
+            "url": "\/dashboard",
+            "status": 200,
+            "seconds": 0.243,
+            "queries": 17,
+            "sql_ms": 186.7,
+            "html_bytes": 30924,
+            "peak_memory_mb": 60
+        },
+        {
+            "url": "\/reports?month=2026-01&date_basis=created_at",
+            "status": 200,
+            "seconds": 0.199,
+            "queries": 11,
+            "sql_ms": 156,
+            "html_bytes": 30545,
+            "peak_memory_mb": 60
+        },
+        {
+            "url": "\/agency-communications?period=custom&from=2026-01-01&to=2026-10-18",
+            "status": 200,
+            "seconds": 2.375,
+            "queries": 12,
+            "sql_ms": 137.9,
+            "html_bytes": 1424978,
+            "peak_memory_mb": 94
+        }
+    ]
+}

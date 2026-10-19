@@ -1,0 +1,106 @@
+:root {
+  /* Backgrounds */
+  --bg: #f1f5f9;
+  --bg1: #f8fafc;
+  --bg2: #f4f6f9;
+  --bg3: #e2e8f0;
+  --bg-main: transparent;
+
+  /* Lines / Borders */
+  --line: #e5e7eb;
+  --line2: #d1d5db;
+  --line3: #9ca3af;
+  --border: #e5e7eb;
+
+  /* Text */
+  --text: #1a1a2e;
+  --text1: #1a1a2e;
+  --text2: #6b7280;
+  --text3: #4b5563;
+  --text-inv: #ffffff;
+
+  /* Colori destinati al testo, separati dagli accenti decorativi */
+  --red-text: #b42323;
+  --green-text: #147a52;
+  --blue-text: #2459b8;
+  --orange-text: #a33b00;
+  --purple-text: #6d4db7;
+  --teal-text: #0f766e;
+
+  /* Brand / Accents */
+  --accent: #c8102e;
+  --accent2: #e8304e;
+  --teal: #2dd4aa;
+  --blue: #5b8ef5;
+  --blue-title: #1d4ed8;
+  --yellow: #f5c842;
+  --yellow-text: #854d0e;
+  --orange: #f97316;
+  --red: #f54b4b;
+  --green: #3ecf8e;
+  --purple: #a78bfa;
+  --gray: #9ca3af;
+  --indigo: #6366f1;
+  --amber: #f59e0b;
+  --cyan: #06b6d4;
+  --magenta: #d946ef;
+
+  /* Typography */
+  --serif: 'Ubuntu', sans-serif;
+  --sans: 'Ubuntu', sans-serif;
+  --mono: 'Ubuntu', sans-serif;
+
+  /* Spacing / Radius */
+  --sidebar: 64px;
+  --sidebar-open: 240px;
+  --top: 52px;
+  --r: 6px;
+  --r2: 12px;
+
+  /* Controlli: scala desktop compatta e coerente */
+  --control-h: 34px;
+  --control-h-sm: 30px;
+  --control-h-xs: 28px;
+  --control-h-touch: 44px;
+  --control-px: 12px;
+  --control-px-sm: 10px;
+  --control-px-xs: 8px;
+
+  /* Tabelle: densita condivisa */
+  --table-cell-x: 14px;
+  --table-cell-y: 10px;
+  --table-head-y: 10px;
+  --table-media-y: 6px;
+  --table-thumb: 32px;
+
+  /* Shadows 3D - potenziate per staccare dal canvas */
+  --shadow-sm: 0 2px 6px rgba(10, 20, 40, 0.06), 0 1px 2px rgba(10, 20, 40, 0.04);
+  --shadow-md: 0 8px 24px rgba(10, 20, 40, 0.12), 0 3px 8px rgba(10, 20, 40, 0.06);
+  --shadow-md-hv: 0 16px 40px rgba(10, 20, 40, 0.16), 0 6px 16px rgba(10, 20, 40, 0.08);
+  --shadow-lg: 0 20px 60px rgba(10, 20, 40, 0.20), 0 8px 20px rgba(10, 20, 40, 0.10);
+  --shadow-btn: 0 3px 0 rgba(10, 20, 40, 0.08);
+
+  /* Transitions */
+  --transition: all .15s;
+}
+
+.theme-dark, .lw-modal-hd {
+  --bg: #111115;
+  --bg1: #18181d;
+  --bg2: #1e1e24;
+  --bg3: #26262e;
+  --line: rgba(255, 255, 255, 0.07);
+  --line2: rgba(255, 255, 255, 0.11);
+  --line3: rgba(255, 255, 255, 0.18);
+  --border: rgba(255, 255, 255, 0.07);
+  --text: #f0ede8;
+  --text1: #f0ede8;
+  --text2: #b0afb4;
+  --text3: #a1a1aa;
+  --red-text: #fca5a5;
+  --green-text: #6ee7b7;
+  --blue-text: #93c5fd;
+  --orange-text: #fdba74;
+  --purple-text: #c4b5fd;
+  --teal-text: #5eead4;
+}

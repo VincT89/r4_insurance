@@ -1,0 +1,18 @@
+{
+    "branches_created": 39,
+    "subbranches_created": 48,
+    "excluded_pairs": 4,
+    "unchanged": {
+        "users": true,
+        "clients": true,
+        "insurance_policies": true,
+        "registry_import_entries": true,
+        "supplier_companies": true,
+        "supplier_agencies": true,
+        "supplier_agency_company": true
+    },
+    "branches": 39,
+    "subbranches": 48,
+    "clients_held": 71,
+    "policies": 0
+}

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="16" assertions="214" errors="0" failures="2" skipped="0" time="4.664281">
+    <testsuite name="Core" tests="16" assertions="214" errors="0" failures="2" skipped="0" time="4.664281">
+      <testsuite name="Tests\Feature\QuoteRequestEmailTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" tests="16" assertions="214" errors="0" failures="2" skipped="0" time="4.664281">
+        <testcase name="test_preview_sends_nothing_then_exact_reviewed_email_with_multiple_pdfs_is_sent_once" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="64" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="28" time="2.755022"/>
+        <testcase name="test_other_companies_unlock_only_after_both_priority_emails_are_sent" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="92" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="21" time="0.164162"/>
+        <testcase name="test_manual_contacts_alone_do_not_unlock_emails_but_documented_replies_do" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="105" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="11" time="0.120375"/>
+        <testcase name="test_preexisting_manual_requested_quote_is_reused_after_sending" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="119" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="8" time="0.084522"/>
+        <testcase name="test_parallel_previews_cannot_repeat_a_request" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="129" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="13" time="0.100401"/>
+        <testcase name="test_changed_recipient_client_case_or_sender_invalidates_review" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="140" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="18" time="0.114111"/>
+        <testcase name="test_expired_review_closed_case_and_inactive_company_are_blocked" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="154" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="14" time="0.093386"/>
+        <testcase name="test_unconfigured_smtp_or_missing_recipient_does_not_record_fake_delivery" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="166" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="10" time="0.066893"/>
+        <testcase name="test_only_assigned_operator_can_prepare_and_original_author_can_send" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="178" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="15" time="0.163820"/>
+        <testcase name="test_invalid_or_changed_documents_and_header_injection_are_rejected" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="199" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="4" time="0.101684">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\QuoteRequestEmailTest::test_invalid_or_changed_documents_and_header_injection_are_rejected&#13;
+Session is missing expected key [errors].
+Failed asserting that false is true.
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:46
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:1595
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:1706
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php:203</failure>
+        </testcase>
+        <testcase name="test_uncertain_result_keeps_unique_claim_and_admin_verified_delivery_records_quote" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="217" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="21" time="0.160268"/>
+        <testcase name="test_verified_non_delivery_releases_claim_for_a_new_review_and_send" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="238" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="14" time="0.156166"/>
+        <testcase name="test_stranded_sending_can_only_be_resolved_after_waiting" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="250" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="6" time="0.132477"/>
+        <testcase name="test_outbound_original_documents_cannot_be_edited_or_deleted" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="261" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="6" time="0.089420"/>
+        <testcase name="test_compose_review_history_filters_and_exports_render_and_escape_content" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="272" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="15" time="0.249634">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\QuoteRequestEmailTest::test_compose_review_history_filters_and_exports_render_and_escape_content&#13;
+Header [Cache-Control] was found, but value [max-age=0, must-revalidate, no-cache, no-store, private] does not match [no-store, private].
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+-'no-store, private'
++'max-age=0, must-revalidate, no-cache, no-store, private'
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:46
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:385
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php:280</failure>
+        </testcase>
+        <testcase name="test_real_mail_builder_has_one_recipient_and_both_pdf_attachments_without_network" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\QuoteRequestEmailTest.php" line="283" class="Tests\Feature\QuoteRequestEmailTest" classname="Tests.Feature.QuoteRequestEmailTest" assertions="10" time="0.111939"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

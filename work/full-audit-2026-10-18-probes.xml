@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\FullAuditProbeTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" tests="11" assertions="20" errors="0" failures="5" skipped="0" time="2.654194">
+    <testcase name="test_employee_must_not_delete_a_contact" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="34" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="1" time="1.534930">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FullAuditProbeTest::test_employee_must_not_delete_a_contact&#13;
+Expected response status code [403] but received 302.
+Failed asserting that 302 is identical to 403.
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:46
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:183
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\Concerns\AssertsStatusCodes.php:141
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php:37</failure>
+    </testcase>
+    <testcase name="test_employee_must_not_delete_an_unlinked_vehicle" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="39" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="1" time="0.094390">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FullAuditProbeTest::test_employee_must_not_delete_an_unlinked_vehicle&#13;
+Expected response status code [403] but received 302.
+Failed asserting that 302 is identical to 403.
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:46
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:183
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\Concerns\AssertsStatusCodes.php:141
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php:42</failure>
+    </testcase>
+    <testcase name="test_stale_policy_form_must_not_overwrite_a_later_change" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="44" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="1" time="0.131087">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FullAuditProbeTest::test_stale_policy_form_must_not_overwrite_a_later_change&#13;
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'Nota aggiornata da un altro operatore'
++'Nota iniziale'
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php:49</failure>
+    </testcase>
+    <testcase name="test_outsider_cannot_download_or_open_another_client" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="51" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="2" time="0.132385"/>
+    <testcase name="test_policy_forms_have_no_global_client_data_for_unassigned_operator" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="57" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="2" time="0.101440"/>
+    <testcase name="test_collection_resubmission_does_not_create_a_second_payment" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="62" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="4" time="0.170269"/>
+    <testcase name="test_admin_correction_of_policy_number_keeps_quote_and_title_links" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="73" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="2" time="0.104057"/>
+    <testcase name="test_employee_cannot_modify_a_policy_closed_yesterday" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="80" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="1" time="0.086142"/>
+    <testcase name="test_audit_author_should_survive_user_deletion" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="85" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="2" time="0.074180">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FullAuditProbeTest::test_audit_author_should_survive_user_deletion&#13;
+Un autore con storico deve essere disattivato oppure conservato tramite snapshot, non perdere la propria attribuzione.
+Failed asserting that false is true.
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php:90</failure>
+    </testcase>
+    <testcase name="test_paid_title_should_leave_unread_actionable_reminders" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="92" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="2" time="0.125550">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\FullAuditProbeTest::test_paid_title_should_leave_unread_actionable_reminders&#13;
+L’avviso resta non letto e operativo anche dopo il saldo del titolo.
+Failed asserting that true is false.
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php:102</failure>
+    </testcase>
+    <testcase name="test_browser_selection_does_not_allow_creation_without_approved_quote" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\work\FullAuditProbeTest.php" line="104" class="Tests\Feature\FullAuditProbeTest" classname="Tests.Feature.FullAuditProbeTest" assertions="2" time="0.099764"/>
+  </testsuite>
+</testsuites>

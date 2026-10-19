@@ -1,0 +1,58 @@
+{
+    "notifications_created": 0,
+    "counts": {
+        "clients": 50,
+        "insurance_policies": 50,
+        "insurance_policy_imports": 0,
+        "client_vehicles": 2,
+        "attachments": 0,
+        "insurance_deadline_reminders": 10,
+        "client_import_entries": 0
+    },
+    "demo_only": true,
+    "policy_links_valid": true,
+    "vehicle_links_valid": true,
+    "preserved": {
+        "users": true,
+        "supplier_companies": true,
+        "supplier_agencies": true,
+        "supplier_agency_company": true,
+        "insurance_branches": true,
+        "insurance_subbranches": true,
+        "insurance_catalog_aliases": true
+    },
+    "statuses": {
+        "active": 20,
+        "cancelled": 5,
+        "ceased": 5,
+        "expired": 5,
+        "renewed": 5,
+        "replaced": 5,
+        "suspended": 5
+    },
+    "pending_migrations": [],
+    "pages": {
+        "\/dashboard": 200,
+        "\/policies": 200,
+        "\/policies\/create": 200,
+        "\/clients": 200,
+        "\/clients\/create": 200,
+        "\/clients\/4886?tab=policies": 200,
+        "\/clients\/4886?tab=documents": 200,
+        "\/clients\/4886\/policies\/2606": 200,
+        "\/clients\/4886\/policies\/2606\/edit": 200,
+        "\/clients\/4886\/documents\/create": 200,
+        "\/suppliers": 200,
+        "\/suppliers\/1": 200,
+        "\/supplier-companies\/1": 200,
+        "\/deadlines": 200,
+        "\/reports": 200,
+        "\/agency-communications": 200,
+        "\/agency-communications?period=15": 200,
+        "\/agency-communications?period=month&month=2026-10": 200,
+        "\/settings\/appearance": 200,
+        "\/audit-logs": 200
+    },
+    "app_available": true,
+    "ok": true
+}

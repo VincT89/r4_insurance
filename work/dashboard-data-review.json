@@ -1,0 +1,75 @@
+{
+    "teams": {
+        "teams": 0,
+        "team_user": 0
+    },
+    "source_statuses": {
+        "Archivio \/ OLD": {
+            "policies": 228,
+            "past_expiry": 4,
+            "future_start": 0
+        },
+        "Archivio": {
+            "policies": 1808,
+            "past_expiry": 53,
+            "future_start": 0
+        },
+        "OLD": {
+            "policies": 569,
+            "past_expiry": 384,
+            "future_start": 0
+        }
+    },
+    "payment_fields": {
+        "Frazionamento": {
+            "Semestrale": 1216,
+            "Annuale": 1649,
+            "Unico": 13,
+            "Quadrimestrale": 4,
+            "Trimestrale": 6
+        },
+        "Mese Pagamento": {
+            "Settembre 2026": 222,
+            "Marzo 2026": 249,
+            "Dicembre 2025": 288,
+            "Giugno 2026": 271,
+            "Gennaio 2026": 229,
+            "Ottobre 2025": 221,
+            "Agosto 2026": 132,
+            "Aprile 2026": 268,
+            "Luglio 2026": 281,
+            "Febbraio 2026": 212,
+            "Maggio 2026": 255,
+            "Novembre 2025": 211,
+            "Ottobre 2026": 49
+        },
+        "Tipo Pagamento": {
+            "Bonifico a Compagnia": 160,
+            "Bonifico a Intermediario": 773,
+            "": 65,
+            "Finanziamento": 86,
+            "Assegno a Compagnia": 55,
+            "Contanti a Intermediario": 997,
+            "Assegno a Intermediario": 71,
+            "Carta di credito a Intermediario": 530,
+            "Abbuoni": 143,
+            "Sospeso": 2,
+            "Carta di credito a Compagnia": 3,
+            "Contanti a Compagnia": 2,
+            "Contanti a Cliente": 1
+        }
+    },
+    "team_dependencies": [
+        {
+            "TABLE_NAME": "team_user",
+            "COLUMN_NAME": "team_id",
+            "REFERENCED_TABLE_NAME": "teams"
+        }
+    ],
+    "payload_structure": [
+        "source_file",
+        "candidate",
+        "rows"
+    ],
+    "payload_first_item_keys": []
+}

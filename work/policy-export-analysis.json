@@ -1,0 +1,743 @@
+{
+  "source": "C:\\Users\\vince\\OneDrive\\Desktop\\SODANO\\R4_INSURANCE\\Gestionale 08_10_2026 10.14 [IVAN SPADONE ].xls",
+  "sheet": "Dati",
+  "header_row": 7,
+  "read_note": "XLS letto con tolleranza alle incongruenze del contenitore OLE. File originale invariato; nessuna importazione.",
+  "headers": {
+    "A": "Polizze",
+    "B": "Protocollo",
+    "C": "Titolo",
+    "D": "Contraente",
+    "E": "Cod. Fiscale / P. IVA",
+    "F": "Target",
+    "G": "Referente",
+    "H": "Gruppo Economico",
+    "I": "Ufficio",
+    "J": "Consulente",
+    "K": "Collaboratore",
+    "L": "Operatore",
+    "M": "Compagnia",
+    "N": "Agenzia",
+    "O": "% Coass.",
+    "P": "Numero Polizza",
+    "Q": "Ramo",
+    "R": "Sottoramo",
+    "S": "Interesse Assic.",
+    "T": "Documenti Polizza",
+    "U": "Pag. Da Consulente",
+    "V": "Pag. A Compagnia",
+    "W": "Pag. A Consulente",
+    "X": "Pag. A Collaboratore",
+    "Y": "Doc. Compagnia",
+    "Z": "Data Consegna Documenti",
+    "AA": "Efetto",
+    "AB": "Scadenza",
+    "AC": "Data Rata Attuale",
+    "AD": "Data Rata Futura",
+    "AE": "Frazionamento",
+    "AF": "Tacito Rinnovo",
+    "AG": "Data Copertura",
+    "AH": "Decade",
+    "AI": "Mese Pagamento",
+    "AJ": "Premio Rata",
+    "AK": "Premio annuale",
+    "AL": "Imponibile 1",
+    "AM": "Aliquota 1",
+    "AN": "Imponibile 2",
+    "AO": "Aliquota 2",
+    "AP": "Imponibile 3",
+    "AQ": "Aliquota 3",
+    "AR": "Aliquota 1° Anno",
+    "AS": "Anni Premiali",
+    "AT": "Tipo Pagamento",
+    "AU": "Provvigioni Totali",
+    "AV": "% Provvigioni Ufficio",
+    "AW": "% Provvigioni Consulente",
+    "AX": "% Provvigioni Collaboratore",
+    "AY": "Provvigioni Ufficio",
+    "AZ": "Provvigioni Consulente",
+    "BA": "Provvigioni Collaboratore",
+    "BB": "Note"
+  },
+  "nonempty_data_rows": 7412,
+  "rows_with_policy_number": 7411,
+  "distinct_company_agency_policy_keys": 5691,
+  "repeated_policy_keys": 1494,
+  "distinct_fiscal_identifiers": 2512,
+  "fiscal_identifiers_with_multiple_name_spellings": 18,
+  "rows_without_fiscal_identifier": 0,
+  "branches": [
+    "3VIRUS",
+    "ABITAZIONE",
+    "ASSIMEDICI",
+    "AUTO",
+    "Auto",
+    "CANE& GATTO",
+    "CANE&GATTO",
+    "CASA",
+    "CAT-NAT",
+    "COMMERCIO",
+    "CONDOMINIO",
+    "CVT",
+    "Commercio",
+    "DANNI",
+    "FATTURA",
+    "FIDEIUSSIONE",
+    "FIDEJUSSIONI",
+    "FURTO",
+    "GLOBALE FABBRICATI",
+    "GLOBALI FABBRICATI",
+    "INCENDIO",
+    "INCENDIO/FURTO",
+    "INF COND",
+    "INFORT-MALATTIE",
+    "INFORTUNI",
+    "INTEGRAZIONE MOBILITÃ",
+    "PLURIATTIVA INF",
+    "QUOTA ASSOCIATIVA",
+    "RC",
+    "RC GENERALE",
+    "RCA",
+    "RCAUTO",
+    "RCP",
+    "RCT",
+    "RE",
+    "SPESE EMISSIONE",
+    "TCM",
+    "TIROCINIO",
+    "TUTELA LEGALE",
+    "UFFICIO",
+    "UNICA INFORTUNI",
+    "VIAGGI",
+    "VIAGGI NOSTOP",
+    "VIAGGIO",
+    "VITA"
+  ],
+  "distinct_subbranch_labels": 43,
+  "classifications": [
+    {
+      "branch": "3VIRUS",
+      "subbranch": "3VIRUS",
+      "rows": 3
+    },
+    {
+      "branch": "ABITAZIONE",
+      "subbranch": "INCENDIO",
+      "rows": 10
+    },
+    {
+      "branch": "ASSIMEDICI",
+      "subbranch": "FATTURA",
+      "rows": 2
+    },
+    {
+      "branch": "AUTO",
+      "subbranch": "AUTO",
+      "rows": 1
+    },
+    {
+      "branch": "AUTO",
+      "subbranch": "CVT",
+      "rows": 1
+    },
+    {
+      "branch": "Auto",
+      "subbranch": "",
+      "rows": 83
+    },
+    {
+      "branch": "CANE& GATTO",
+      "subbranch": "CANE&GATTO",
+      "rows": 3
+    },
+    {
+      "branch": "CANE&GATTO",
+      "subbranch": "CANE&GATTO",
+      "rows": 1
+    },
+    {
+      "branch": "CASA",
+      "subbranch": "",
+      "rows": 64
+    },
+    {
+      "branch": "CASA",
+      "subbranch": "CASA",
+      "rows": 14
+    },
+    {
+      "branch": "CAT-NAT",
+      "subbranch": "CAT-NAT",
+      "rows": 27
+    },
+    {
+      "branch": "COMMERCIO",
+      "subbranch": "",
+      "rows": 29
+    },
+    {
+      "branch": "COMMERCIO",
+      "subbranch": "COMMERCIO",
+      "rows": 37
+    },
+    {
+      "branch": "CONDOMINIO",
+      "subbranch": "CONDOMINIO",
+      "rows": 13
+    },
+    {
+      "branch": "CVT",
+      "subbranch": "CVT",
+      "rows": 3
+    },
+    {
+      "branch": "Commercio",
+      "subbranch": "",
+      "rows": 14
+    },
+    {
+      "branch": "DANNI",
+      "subbranch": "RESIDENT",
+      "rows": 4
+    },
+    {
+      "branch": "FATTURA",
+      "subbranch": "FATTURA",
+      "rows": 1
+    },
+    {
+      "branch": "FIDEIUSSIONE",
+      "subbranch": "",
+      "rows": 3
+    },
+    {
+      "branch": "FIDEIUSSIONE",
+      "subbranch": "PROVVIS",
+      "rows": 2
+    },
+    {
+      "branch": "FIDEJUSSIONI",
+      "subbranch": "",
+      "rows": 1
+    },
+    {
+      "branch": "FURTO",
+      "subbranch": "FURTO",
+      "rows": 1
+    },
+    {
+      "branch": "GLOBALE FABBRICATI",
+      "subbranch": "",
+      "rows": 13
+    },
+    {
+      "branch": "GLOBALE FABBRICATI",
+      "subbranch": "CONDOMINIO",
+      "rows": 9
+    },
+    {
+      "branch": "GLOBALE FABBRICATI",
+      "subbranch": "FABBRICATO",
+      "rows": 8
+    },
+    {
+      "branch": "GLOBALI FABBRICATI",
+      "subbranch": "",
+      "rows": 62
+    },
+    {
+      "branch": "INCENDIO",
+      "subbranch": "COMMERCIO",
+      "rows": 17
+    },
+    {
+      "branch": "INCENDIO",
+      "subbranch": "INCENDIO",
+      "rows": 1
+    },
+    {
+      "branch": "INCENDIO/FURTO",
+      "subbranch": "INC/FURTO",
+      "rows": 6
+    },
+    {
+      "branch": "INF COND",
+      "subbranch": "INF COND",
+      "rows": 62
+    },
+    {
+      "branch": "INFORT-MALATTIE",
+      "subbranch": "INF-MALAT",
+      "rows": 6
+    },
+    {
+      "branch": "INFORTUNI",
+      "subbranch": "",
+      "rows": 876
+    },
+    {
+      "branch": "INFORTUNI",
+      "subbranch": "INFORTUNI",
+      "rows": 42
+    },
+    {
+      "branch": "INTEGRAZIONE MOBILITÃ",
+      "subbranch": "",
+      "rows": 1
+    },
+    {
+      "branch": "INTEGRAZIONE MOBILITÃ",
+      "subbranch": "MULTIRISCH",
+      "rows": 612
+    },
+    {
+      "branch": "PLURIATTIVA INF",
+      "subbranch": "PLUINF",
+      "rows": 1
+    },
+    {
+      "branch": "QUOTA ASSOCIATIVA",
+      "subbranch": "QUOTA ASS",
+      "rows": 11
+    },
+    {
+      "branch": "RC",
+      "subbranch": "RC",
+      "rows": 2
+    },
+    {
+      "branch": "RC",
+      "subbranch": "STUDIO",
+      "rows": 1
+    },
+    {
+      "branch": "RC GENERALE",
+      "subbranch": "",
+      "rows": 13
+    },
+    {
+      "branch": "RCA",
+      "subbranch": "AUTO",
+      "rows": 1794
+    },
+    {
+      "branch": "RCA",
+      "subbranch": "MOTO",
+      "rows": 27
+    },
+    {
+      "branch": "RCA",
+      "subbranch": "RCA",
+      "rows": 2071
+    },
+    {
+      "branch": "RCAUTO",
+      "subbranch": "",
+      "rows": 242
+    },
+    {
+      "branch": "RCAUTO",
+      "subbranch": "RCAUTO",
+      "rows": 20
+    },
+    {
+      "branch": "RCP",
+      "subbranch": "",
+      "rows": 39
+    },
+    {
+      "branch": "RCP",
+      "subbranch": "LIB.PROF",
+      "rows": 19
+    },
+    {
+      "branch": "RCP",
+      "subbranch": "RCP",
+      "rows": 27
+    },
+    {
+      "branch": "RCT",
+      "subbranch": "RCT",
+      "rows": 4
+    },
+    {
+      "branch": "RE",
+      "subbranch": "AFFITTACAM",
+      "rows": 6
+    },
+    {
+      "branch": "RE",
+      "subbranch": "INFORTUNI",
+      "rows": 5
+    },
+    {
+      "branch": "RE",
+      "subbranch": "RC CAPOFAM",
+      "rows": 11
+    },
+    {
+      "branch": "SPESE EMISSIONE",
+      "subbranch": "SPESE",
+      "rows": 932
+    },
+    {
+      "branch": "TCM",
+      "subbranch": "TCM",
+      "rows": 4
+    },
+    {
+      "branch": "TIROCINIO",
+      "subbranch": "TIROCINIO",
+      "rows": 5
+    },
+    {
+      "branch": "TUTELA LEGALE",
+      "subbranch": "TUTELA LEG",
+      "rows": 8
+    },
+    {
+      "branch": "UFFICIO",
+      "subbranch": "S. UFFICIO",
+      "rows": 2
+    },
+    {
+      "branch": "UFFICIO",
+      "subbranch": "UFFICIO",
+      "rows": 1
+    },
+    {
+      "branch": "UNICA INFORTUNI",
+      "subbranch": "",
+      "rows": 1
+    },
+    {
+      "branch": "UNICA INFORTUNI",
+      "subbranch": "UNICA INF",
+      "rows": 12
+    },
+    {
+      "branch": "VIAGGI",
+      "subbranch": "VIAGGI",
+      "rows": 1
+    },
+    {
+      "branch": "VIAGGI NOSTOP",
+      "subbranch": "VIAGGI",
+      "rows": 12
+    },
+    {
+      "branch": "VIAGGIO",
+      "subbranch": "VIAGGIO",
+      "rows": 1
+    },
+    {
+      "branch": "VITA",
+      "subbranch": "P.U.R.",
+      "rows": 27
+    },
+    {
+      "branch": "VITA",
+      "subbranch": "PIP",
+      "rows": 74
+    },
+    {
+      "branch": "VITA",
+      "subbranch": "VITA",
+      "rows": 6
+    }
+  ],
+  "companies": [
+    "ALLIANZ",
+    "ALLIANZ VIVA",
+    "AM TRUST",
+    "AXA",
+    "BHITALIA",
+    "COFACE",
+    "DUAL",
+    "EUROPE",
+    "EUROPE ASSISTANCE",
+    "GROUPAMA",
+    "HDI",
+    "LLOYD'S INSURANCE",
+    "NOBIS COMPAGNIA DI ASSICURAZIONI SPA",
+    "PRIMA",
+    "REALE MUTUA",
+    "REVO",
+    "SARA ASSICURAZIONI",
+    "SPESE",
+    "TOKIO MARINE HCC",
+    "UNIPOL",
+    "Zurich"
+  ],
+  "distinct_agency_labels": 18,
+  "company_agencies": [
+    {
+      "company": "ALLIANZ",
+      "agency": "LEONE ASSICURAZIONI",
+      "rows": 1
+    },
+    {
+      "company": "ALLIANZ",
+      "agency": "MASIELLO GIUSEPPE",
+      "rows": 2
+    },
+    {
+      "company": "ALLIANZ VIVA",
+      "agency": "CARDASCIO",
+      "rows": 1
+    },
+    {
+      "company": "AM TRUST",
+      "agency": "ASSIMEDICI",
+      "rows": 32
+    },
+    {
+      "company": "AM TRUST",
+      "agency": "UA",
+      "rows": 21
+    },
+    {
+      "company": "AXA",
+      "agency": "MINERVA ASSICURAZIONI",
+      "rows": 23
+    },
+    {
+      "company": "BHITALIA",
+      "agency": "ASSIMEDICI",
+      "rows": 1
+    },
+    {
+      "company": "COFACE",
+      "agency": "QUIFIDEIUSSIONE",
+      "rows": 1
+    },
+    {
+      "company": "DUAL",
+      "agency": "CARDASCIO",
+      "rows": 2
+    },
+    {
+      "company": "DUAL",
+      "agency": "MINERVA ASSICURAZIONI",
+      "rows": 3
+    },
+    {
+      "company": "EUROPE",
+      "agency": "SPADONE",
+      "rows": 12
+    },
+    {
+      "company": "EUROPE ASSISTANCE",
+      "agency": "SPADONE",
+      "rows": 617
+    },
+    {
+      "company": "GROUPAMA",
+      "agency": "ROSATO",
+      "rows": 8
+    },
+    {
+      "company": "HDI",
+      "agency": "CARDASCIO",
+      "rows": 2
+    },
+    {
+      "company": "LLOYD'S INSURANCE",
+      "agency": "SUD BROKER",
+      "rows": 1
+    },
+    {
+      "company": "NOBIS COMPAGNIA DI ASSICURAZIONI SPA",
+      "agency": "SPADONE",
+      "rows": 2820
+    },
+    {
+      "company": "PRIMA",
+      "agency": "CAMPA",
+      "rows": 422
+    },
+    {
+      "company": "REALE MUTUA",
+      "agency": "RISOLO",
+      "rows": 520
+    },
+    {
+      "company": "REVO",
+      "agency": "ASSIMEDICI",
+      "rows": 5
+    },
+    {
+      "company": "REVO",
+      "agency": "MINERVA ASSICURAZIONI",
+      "rows": 1
+    },
+    {
+      "company": "SARA ASSICURAZIONI",
+      "agency": "K.COMITE",
+      "rows": 14
+    },
+    {
+      "company": "SPESE",
+      "agency": "DI EMISSIONE",
+      "rows": 932
+    },
+    {
+      "company": "TOKIO MARINE HCC",
+      "agency": "UIA",
+      "rows": 39
+    },
+    {
+      "company": "UNIPOL",
+      "agency": "NUOVA BARENSE",
+      "rows": 25
+    },
+    {
+      "company": "UNIPOL",
+      "agency": "PANARO",
+      "rows": 1740
+    },
+    {
+      "company": "Zurich",
+      "agency": "Campa",
+      "rows": 126
+    },
+    {
+      "company": "Zurich",
+      "agency": "MINERVA ASSICURAZIONI",
+      "rows": 40
+    }
+  ],
+  "subbranches_used_under_multiple_branches": {
+    "AUTO": [
+      "AUTO",
+      "RCA"
+    ],
+    "COMMERCIO": [
+      "COMMERCIO",
+      "INCENDIO"
+    ],
+    "INFORTUNI": [
+      "INFORTUNI",
+      "RE"
+    ],
+    "VIAGGI": [
+      "VIAGGI",
+      "VIAGGI NOSTOP"
+    ],
+    "CONDOMINIO": [
+      "CONDOMINIO",
+      "GLOBALE FABBRICATI"
+    ],
+    "CVT": [
+      "AUTO",
+      "CVT"
+    ],
+    "INCENDIO": [
+      "ABITAZIONE",
+      "INCENDIO"
+    ],
+    "CANE&GATTO": [
+      "CANE& GATTO",
+      "CANE&GATTO"
+    ],
+    "FATTURA": [
+      "ASSIMEDICI",
+      "FATTURA"
+    ]
+  },
+  "agencies_used_with_multiple_companies": {
+    "SPADONE": [
+      "EUROPE",
+      "EUROPE ASSISTANCE",
+      "NOBIS COMPAGNIA DI ASSICURAZIONI SPA"
+    ],
+    "MINERVA ASSICURAZIONI": [
+      "AXA",
+      "DUAL",
+      "REVO",
+      "Zurich"
+    ],
+    "ASSIMEDICI": [
+      "AM TRUST",
+      "BHITALIA",
+      "REVO"
+    ],
+    "CARDASCIO": [
+      "ALLIANZ VIVA",
+      "DUAL",
+      "HDI"
+    ]
+  },
+  "distinct_title_labels": 36,
+  "missing_values": {
+    "Compagnia": 0,
+    "Agenzia": 0,
+    "Ramo": 0,
+    "Sottoramo": 1441,
+    "Contraente": 0,
+    "Efetto": 0,
+    "Scadenza": 0
+  },
+  "nonempty_field_counts": {
+    "Polizze": 7411,
+    "Protocollo": 7411,
+    "Titolo": 7409,
+    "Contraente": 7411,
+    "Cod. Fiscale / P. IVA": 7411,
+    "Target": 1237,
+    "Referente": 152,
+    "Gruppo Economico": 0,
+    "Ufficio": 7411,
+    "Consulente": 7411,
+    "Collaboratore": 7411,
+    "Operatore": 7411,
+    "Compagnia": 7411,
+    "Agenzia": 7411,
+    "% Coass.": 7411,
+    "Numero Polizza": 7411,
+    "Ramo": 7411,
+    "Sottoramo": 5970,
+    "Interesse Assic.": 7410,
+    "Documenti Polizza": 7411,
+    "Pag. Da Consulente": 7403,
+    "Pag. A Compagnia": 7403,
+    "Pag. A Consulente": 0,
+    "Pag. A Collaboratore": 0,
+    "Doc. Compagnia": 0,
+    "Data Consegna Documenti": 0,
+    "Efetto": 7411,
+    "Scadenza": 7411,
+    "Data Rata Attuale": 7410,
+    "Data Rata Futura": 7215,
+    "Frazionamento": 7411,
+    "Tacito Rinnovo": 7411,
+    "Data Copertura": 7411,
+    "Decade": 7399,
+    "Mese Pagamento": 7411,
+    "Premio Rata": 7411,
+    "Premio annuale": 7411,
+    "Imponibile 1": 7411,
+    "Aliquota 1": 7411,
+    "Imponibile 2": 7411,
+    "Aliquota 2": 7411,
+    "Imponibile 3": 7411,
+    "Aliquota 3": 7411,
+    "Aliquota 1° Anno": 7411,
+    "Anni Premiali": 7411,
+    "Tipo Pagamento": 7087,
+    "Provvigioni Totali": 7411,
+    "% Provvigioni Ufficio": 7411,
+    "% Provvigioni Consulente": 7411,
+    "% Provvigioni Collaboratore": 7411,
+    "Provvigioni Ufficio": 7411,
+    "Provvigioni Consulente": 7411,
+    "Provvigioni Collaboratore": 7411,
+    "Note": 1633
+  },
+  "registry_match": {
+    "source": "C:\\Users\\vince\\OneDrive\\Desktop\\SODANO\\R4_INSURANCE\\Anagrafica 08_10_2026 10.45 [IVAN SPADONE ].xls",
+    "registry_distinct_fiscal_identifiers": 4878,
+    "policy_identifiers_found_in_registry": 2448,
+    "policy_identifiers_absent_from_registry": 64
+  }
+}

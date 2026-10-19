@@ -1,0 +1,184 @@
+{
+  "flows": [
+    "Accesso admin e dashboard",
+    "Creazione e modifica persone/aziende, persistenza campi Excel",
+    "Due targhe per cliente, normalizzazione e modifica veicolo",
+    "Polizze multiple, tab per ramo, ramo personalizzato e targa corretta",
+    "Upload, download riservato, modifica documento e cancellazioni protette",
+    "Scadenze 7/15/30/45/60 giorni, scadute, intervallo libero, esclusione cessate",
+    "Ricerca per targa e polizza e filtro persone/aziende",
+    "Compagnie, agenzie, subagenzie, selezioni dipendenti e protezione gerarchia",
+    "Eliminazioni consentite e rimozione coerente di documento e scadenza",
+    "Desktop e smartphone, etichette accessibili, collegamenti e accesso anonimo"
+  ],
+  "layouts": [
+    {
+      "path": "/clients/2?tab=policies",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=registry",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=vehicles",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=documents",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=deadlines",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/edit",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2/policies/4",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/supplier-companies",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/supplier-companies/1",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/suppliers",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/suppliers/1",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/suppliers/2/edit",
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "path": "/clients/2?tab=policies",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2?tab=registry",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2?tab=vehicles",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2?tab=documents",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2?tab=deadlines",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/edit",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/clients/2/policies/4",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/supplier-companies",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/supplier-companies/1",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/suppliers",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/suppliers/1",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "path": "/suppliers/2/edit",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "links": [
+    "/clients",
+    "/clients/2/policies/create",
+    "/clients/2/edit",
+    "/clients/2?tab=policies",
+    "/clients/2?tab=registry",
+    "/clients/2?tab=network",
+    "/clients/2?tab=vehicles",
+    "/clients/2?tab=assets",
+    "/clients/2?tab=documents",
+    "/clients/2?tab=deadlines",
+    "/clients/2?tab=history",
+    "/clients/2?tab=consents",
+    "/clients/2?tab=policies&category=RC%20auto",
+    "/clients/2?tab=policies&category=Infortuni",
+    "/clients/2?tab=policies&category=RC%20persone",
+    "/clients/2?tab=policies&category=Ramo%20dimostrativo",
+    "/clients/2/policies/5",
+    "/clients/2/policies/4",
+    "/clients/2/policies/6",
+    "/clients/2/policies/7",
+    "/clients/2/duplicates",
+    "/clients/2/vehicles/create",
+    "/clients/2/vehicles/2/edit",
+    "/clients/2/vehicles/3/edit",
+    "/clients/2/documents/create",
+    "/clients/2/materials",
+    "/clients/2",
+    "/clients/2/policies/4/edit",
+    "/clients/2/documents/create?policy=4",
+    "/supplier-companies/create",
+    "/supplier-companies",
+    "/suppliers",
+    "/supplier-companies/1",
+    "/supplier-companies/2",
+    "/supplier-companies/1/edit",
+    "/suppliers/create?supplier_company_id=1",
+    "/suppliers/1",
+    "/suppliers/create?parent_agency_id=1",
+    "/suppliers/2",
+    "/suppliers/create",
+    "/suppliers/1/edit",
+    "/suppliers/2/edit"
+  ],
+  "javascriptErrors": [],
+  "failedResponses": [],
+  "ok": true,
+  "database": "SQLite separato con dati dimostrativi"
+}

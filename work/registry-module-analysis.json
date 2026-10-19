@@ -1,0 +1,2120 @@
+{
+  "Dati": [
+    {
+      "cell": "B2",
+      "value": "DATI SOCIETA'"
+    },
+    {
+      "cell": "C2",
+      "value": "Broker o Agenzia"
+    },
+    {
+      "cell": "D2",
+      "value": "Soluzioni Assicurative SAS di Ivan Spadone"
+    },
+    {
+      "cell": "C3",
+      "value": "Num. Iscr. Broker/ Agente"
+    },
+    {
+      "cell": "D3",
+      "value": "A000789906"
+    },
+    {
+      "cell": "C4",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "D4",
+      "value": "2017-07-01 00:00:00"
+    },
+    {
+      "cell": "C5",
+      "value": "Indirizzo"
+    },
+    {
+      "cell": "D5",
+      "value": "Via Guido Dorso, 83 - 70125 Bari"
+    },
+    {
+      "cell": "C6",
+      "value": "Telefono"
+    },
+    {
+      "cell": "D6",
+      "value": "080 8835638/080 8837785"
+    },
+    {
+      "cell": "C7",
+      "value": "Email"
+    },
+    {
+      "cell": "D7",
+      "value": "giuseppe@giuseppespadone.it"
+    },
+    {
+      "cell": "C8",
+      "value": "PEC"
+    },
+    {
+      "cell": "D8",
+      "value": "giuseppe.spadone@pec.it"
+    },
+    {
+      "cell": "C9",
+      "value": "Sito Internet"
+    },
+    {
+      "cell": "D9",
+      "value": "www.giuseppespadone.it"
+    },
+    {
+      "cell": "A11",
+      "value": "SEZIONE GESTIONE POLIZZE"
+    },
+    {
+      "cell": "B11",
+      "value": "GESTIONE UTENTI"
+    },
+    {
+      "cell": "C11",
+      "value": "Intermediario assicurativo"
+    },
+    {
+      "cell": "D11",
+      "value": "GIUSEPPE SPADONE"
+    },
+    {
+      "cell": "C12",
+      "value": "In qualità di"
+    },
+    {
+      "cell": "D12",
+      "value": "AgenteGeneraleSez.A"
+    },
+    {
+      "cell": "C13",
+      "value": "Sezione"
+    },
+    {
+      "cell": "D13",
+      "value": "A"
+    },
+    {
+      "cell": "C14",
+      "value": "Iscr. R.u.i"
+    },
+    {
+      "cell": "D14",
+      "value": "A000074463"
+    },
+    {
+      "cell": "C15",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "D15",
+      "value": "2017-10-15 00:00:00"
+    },
+    {
+      "cell": "C16",
+      "value": "Telefono"
+    },
+    {
+      "cell": "D16",
+      "value": "3398359897.0"
+    },
+    {
+      "cell": "C17",
+      "value": "Email"
+    },
+    {
+      "cell": "D17",
+      "value": "giuseppe@giuseppespadone.it"
+    },
+    {
+      "cell": "C18",
+      "value": "Indirizzo"
+    },
+    {
+      "cell": "D18",
+      "value": "Via Guido Dorso, 83"
+    },
+    {
+      "cell": "A20",
+      "value": "SEZIONE GESTIONE POLIZZA"
+    },
+    {
+      "cell": "B20",
+      "value": "DATI COMPAGNIA"
+    },
+    {
+      "cell": "C20",
+      "value": "Compagnia"
+    },
+    {
+      "cell": "D20",
+      "value": "UNIPOL Agenzia: "
+    },
+    {
+      "cell": "C21",
+      "value": "Ramo"
+    },
+    {
+      "cell": "D21",
+      "value": "RCA"
+    },
+    {
+      "cell": "C22",
+      "value": "Num. Polizza"
+    },
+    {
+      "cell": "D22",
+      "value": "215797176"
+    },
+    {
+      "cell": "C23",
+      "value": "Decorrenza"
+    },
+    {
+      "cell": "D23",
+      "value": "2026-06-11 00:00:00"
+    },
+    {
+      "cell": "A25",
+      "value": "SEZIONE ANAGRAFICA"
+    },
+    {
+      "cell": "B25",
+      "value": "ANAGRAFICA CLIENTE"
+    },
+    {
+      "cell": "C25",
+      "value": "Titolo"
+    },
+    {
+      "cell": "D25",
+      "value": "SIGN"
+    },
+    {
+      "cell": "C26",
+      "value": "Contraente"
+    },
+    {
+      "cell": "D26",
+      "value": "SPADONE IVAN"
+    },
+    {
+      "cell": "C27",
+      "value": "Cod. Fiscale/P.Iva"
+    },
+    {
+      "cell": "D27",
+      "value": "SPDVNI00S10A048S"
+    },
+    {
+      "cell": "C28",
+      "value": "Residenza / Sede legale"
+    },
+    {
+      "cell": "D28",
+      "value": "VIA MONTEGRAPPA 107 BARI BA 70124"
+    },
+    {
+      "cell": "C29",
+      "value": "Luogo e data di nascita"
+    },
+    {
+      "cell": "D29",
+      "value": "ACQUAVIVA DELLE FONTI 10/11/2000"
+    },
+    {
+      "cell": "C30",
+      "value": "Referente"
+    },
+    {
+      "cell": "C31",
+      "value": "Ruolo"
+    },
+    {
+      "cell": "A33",
+      "value": "GENERALE"
+    },
+    {
+      "cell": "B33",
+      "value": "DATI GESTIONALE"
+    },
+    {
+      "cell": "C33",
+      "value": "Luogo"
+    },
+    {
+      "cell": "D33",
+      "value": "Bari"
+    },
+    {
+      "cell": "C34",
+      "value": "Data"
+    },
+    {
+      "cell": "D34",
+      "value": "2026-10-08 00:00:00"
+    }
+  ],
+  "Allegato 3": [
+    {
+      "cell": "A1",
+      "value": "INFORMATIVA SUL DISTRIBUTORE"
+    },
+    {
+      "cell": "C1",
+      "value": "ALLEGATO 3 "
+    },
+    {
+      "cell": "A2",
+      "value": "AVVERTENZA"
+    },
+    {
+      "cell": "A3",
+      "value": "Ai sensi della vigente normativa, il distributore ha l'obbligo di consegnare/trasmettere il presente documento Prima della sottoscrizione della prima proposta o, qualora non prevista, del primo contratto di assicurazione:"
+    },
+    {
+      "cell": "A4",
+      "value": "1) di metterlo a disposizione del pubblico nei propri locali, anche mediante apparecchiature tecnoclogiche, oppure di pubblicarlo su un sito internet ove utilizzato per la promozione e collocamento di prodotti assicurativi, dando avviso della pubblicazione nel propi locali."
+    },
+    {
+      "cell": "A5",
+      "value": "2) Nel caso di offerta fuori sede o nel caso in cui la fase precontrattuale si svolga mediante tecniche di comunicazione a distanza, il distributore consegna/ trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non prevista, del contratto di assicurazione."
+    },
+    {
+      "cell": "A6",
+      "value": "SEZIONE I"
+    },
+    {
+      "cell": "A7",
+      "value": "Informazioni generali sull'intermediario che entra in contatto con il contraente"
+    },
+    {
+      "cell": "A8",
+      "value": "Cognome e Nome"
+    },
+    {
+      "cell": "B8",
+      "value": "=Dati!D11"
+    },
+    {
+      "cell": "A9",
+      "value": "In qualità di"
+    },
+    {
+      "cell": "B9",
+      "value": "=Dati!D12"
+    },
+    {
+      "cell": "A10",
+      "value": "Sezione Rui"
+    },
+    {
+      "cell": "B10",
+      "value": "=Dati!D13"
+    },
+    {
+      "cell": "A11",
+      "value": "Numero scrizione RUI"
+    },
+    {
+      "cell": "B11",
+      "value": "=Dati!D14"
+    },
+    {
+      "cell": "A12",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "B12",
+      "value": "=Dati!D15"
+    },
+    {
+      "cell": "A13",
+      "value": "Telefono"
+    },
+    {
+      "cell": "B13",
+      "value": "=Dati!D16"
+    },
+    {
+      "cell": "A14",
+      "value": "E-mail"
+    },
+    {
+      "cell": "B14",
+      "value": "=Dati!D17"
+    },
+    {
+      "cell": "A15",
+      "value": "Indirizzo"
+    },
+    {
+      "cell": "B15",
+      "value": "=Dati!D18"
+    },
+    {
+      "cell": "A16",
+      "value": "Attività svolta per conto di"
+    },
+    {
+      "cell": "A17",
+      "value": "Ragione sociale"
+    },
+    {
+      "cell": "B17",
+      "value": "=Dati!D2"
+    },
+    {
+      "cell": "A18",
+      "value": "Sede legale ed operativa"
+    },
+    {
+      "cell": "B18",
+      "value": "=Dati!D5"
+    },
+    {
+      "cell": "A19",
+      "value": "Numero scrizione RUI"
+    },
+    {
+      "cell": "B19",
+      "value": "=Dati!D3"
+    },
+    {
+      "cell": "A20",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "B20",
+      "value": "=Dati!D4"
+    },
+    {
+      "cell": "A21",
+      "value": "Telefono / Fax"
+    },
+    {
+      "cell": "B21",
+      "value": "=Dati!D6"
+    },
+    {
+      "cell": "A22",
+      "value": "Email"
+    },
+    {
+      "cell": "B22",
+      "value": "=Dati!D7"
+    },
+    {
+      "cell": "A23",
+      "value": "PEC"
+    },
+    {
+      "cell": "B23",
+      "value": "=Dati!D8"
+    },
+    {
+      "cell": "A24",
+      "value": "Sito Internet"
+    },
+    {
+      "cell": "B24",
+      "value": "=Dati!D9"
+    },
+    {
+      "cell": "A25",
+      "value": "Da compilare nel caso in cui l'intermediario che entra in contatto con il cliente sia un addetto/responsabile di un collaboratore dell'Agente, anche a titolo accessorio."
+    },
+    {
+      "cell": "A26",
+      "value": "Cognome e nome/Ragione sociale"
+    },
+    {
+      "cell": "A27",
+      "value": "Sede legale ed operativa"
+    },
+    {
+      "cell": "A28",
+      "value": "Sezione Rui"
+    },
+    {
+      "cell": "A29",
+      "value": "Numero scrizione RUI"
+    },
+    {
+      "cell": "A30",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "A31",
+      "value": "Telefono "
+    },
+    {
+      "cell": "A32",
+      "value": "Email"
+    },
+    {
+      "cell": "A33",
+      "value": "Autorità competente alla vigilanza sull’attività svolta IVASS  Istituto per la vigilanza sulle assicurazioni private e di interesse collettivo."
+    },
+    {
+      "cell": "A34",
+      "value": "Gli estremi identificativi e di iscrizione dell’intermediario possono essere controllati visionando il registro unico degli intermediari assicurativi e riassicurativi sul sito internet dell’IVASS (www.ivass.it)"
+    },
+    {
+      "cell": "A35",
+      "value": "SEZIONE II"
+    },
+    {
+      "cell": "A36",
+      "value": "Informazioni sull’attività svolta dall’intermediario assicurativo e riassicurativo"
+    },
+    {
+      "cell": "A37",
+      "value": "a) L’intermediario assicurativo informa di aver messo a disposizione nei propri locali"
+    },
+    {
+      "cell": "A38",
+      "value": "1. l’elenco recante la denominazione della o delle imprese di assicurazione con le quali ha rapporti d’affari, anche sulla base di una collaborazione orizzontale o di lettere di incarico."
+    },
+    {
+      "cell": "A39",
+      "value": "2. l’allegato 4-ter del Regolamento IVASS n. 40/2018 con l’elenco degli obblighi di comportamento cui l’intermediario deve adempiere."
+    },
+    {
+      "cell": "A40",
+      "value": "b) Nel caso di offerta fuori sede o nel caso in cui la fase precontrattuale si svolga mediante tecniche di comunicazione a distanza il contraente ha la possibilità di richiedere la consegna o la trasmissione dell’elenco sopra indicato"
+    },
+    {
+      "cell": "A41",
+      "value": "SEZIONE III"
+    },
+    {
+      "cell": "A42",
+      "value": "Informazioni relative a potenziali situazioni di conflitto d’interessi"
+    },
+    {
+      "cell": "A43",
+      "value": "L’intermediario assicurativo dichiara che:"
+    },
+    {
+      "cell": "A44",
+      "value": "Non detiene una partecipazione diretta o indiretta pari o superiore al 10% del capitale sociale o dei diritti di voto di un’impresa di assicurazione"
+    },
+    {
+      "cell": "A45",
+      "value": "Nessuna impresa di assicurazione e nessuna impresa controllante di un’impresa di assicurazione detiene una partecipazione diretta o indiretta pari o superiore al 10% del capitale sociale o dei diritti di voto della società di intermediazione per la quale l’intermediario opera"
+    },
+    {
+      "cell": "A46",
+      "value": "SEZIONE IV"
+    },
+    {
+      "cell": "A47",
+      "value": " Informazioni sugli strumenti di tutela del contraente"
+    },
+    {
+      "cell": "A48",
+      "value": "L’intermediario assicurativo informa che: "
+    },
+    {
+      "cell": "A49",
+      "value": "a) l’attività di distribuzione è garantita da un contratto di assicurazione della responsabilità civile che copre i danni arrecati ai contraenti da negligenze ed errori professionali dell’intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o delle persone del cui operato l’intermediario deve rispondere a norma di legge. "
+    },
+    {
+      "cell": "A50",
+      "value": "b) il contraente ha la facoltà, ferma restando la possibilità di rivolgersi all’Autorità Giudiziaria, di inoltrare reclamo per iscritto all’intermediario o all’impresa preponente   nonché la possibilità per il contraente, qualora non dovesse ritenersi soddisfatto dall’esito del reclamo o in caso di assenza di riscontro da parte dell’intermediario o dell’impresa entro il termine di legge (45 giorni), di rivolgersi all’IVASS o alla Consob, secondo quanto indicato nel DIP (Documento Informativo Precontrattuale), allegando la documentazione relativa al reclamo trattato con l’intermediario o con l’impresa preponente."
+    },
+    {
+      "cell": "A51",
+      "value": "=Dati!D2"
+    },
+    {
+      "cell": "B51",
+      "value": "=Dati!D5"
+    },
+    {
+      "cell": "A52",
+      "value": "=Dati!D7"
+    },
+    {
+      "cell": "B52",
+      "value": "=Dati!D8"
+    },
+    {
+      "cell": "A53",
+      "value": "c) il contraente ha la facoltà di avvalersi di altri eventuali sistemi di risoluzione stragiudiziale delle controversie previsti dalla normativa vigente indicati nel DIP (Documento Informativo Precontrattuale)"
+    },
+    {
+      "cell": "A54",
+      "value": "d) gli assicurati hanno la possibilità di rivolgersi al Fondo di Garanzia per l’attività dei mediatori di assicurazione e di riassicurazione (Consap Spa, Fondo di Garanzia per i Mediatori di Assicurazione e Riassicurazione, Via Yser, 14 – 00198 Roma _ PEC consap@pec.consap.it _ mail: fondobrokers@consap.it) per chiedere il risarcimento del danno patrimoniale loro causato dall’esercizio dell’attività di intermediazione, che non sia stato risarcito dall’intermediario stesso o non sia stato indennizzato attraverso il contratto di cui alla precedente lettera a).  "
+    },
+    {
+      "cell": "A56",
+      "value": "=Dati!D2"
+    },
+    {
+      "cell": "A57",
+      "value": "=Dati!D5"
+    },
+    {
+      "cell": "A58",
+      "value": "Numero e data Iscrizione RUI"
+    },
+    {
+      "cell": "B58",
+      "value": "=Dati!D3"
+    },
+    {
+      "cell": "C58",
+      "value": "=Dati!D4"
+    },
+    {
+      "cell": "A59",
+      "value": "=Dati!D8"
+    },
+    {
+      "cell": "B59",
+      "value": "=Dati!D6"
+    }
+  ],
+  "Allegato 4 Ter": [
+    {
+      "cell": "A1",
+      "value": "ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE"
+    },
+    {
+      "cell": "C1",
+      "value": "ALLEGATO 4 TER"
+    },
+    {
+      "cell": "A2",
+      "value": "AVVERTENZA"
+    },
+    {
+      "cell": "A3",
+      "value": "Ai sensi delle disposizioni del D.Lgs. nr. 209/2005 (Codice delle Assicurazioni Private) e del regolamento IVASS nr. 40 del 2 agosto 2018, in tema di norme di comportamento che devono essere osservate, l’intermediario:"
+    },
+    {
+      "cell": "A4",
+      "value": "ha l'obbligo di consegnare/trasmettere il presente documento prima della sottoscrizione della prima proposta o, qualora non prevista, del primo contratto di assicurazione:"
+    },
+    {
+      "cell": "A5",
+      "value": "1) di metterlo a disposizione del pubblico nei propri locali, anche mediante apparecchiature tecnoclogiche, oppure di pubblicarlo su un sito internet ove utilizzato per la promozione e collocamento di prodotti assicurativi, dando avviso della pubblicazione nel propi locali."
+    },
+    {
+      "cell": "A6",
+      "value": "2) Nel caso di offerta fuori sede o nel caso in cui la fase precontrattuale si svolga mediante tecniche di comunicazione a distanza, il distributore consegna/ trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non prevista, del contratto di assicurazione."
+    },
+    {
+      "cell": "A7",
+      "value": "Informazioni generali sull'intermediario che entra in contatto con il contraente"
+    },
+    {
+      "cell": "A8",
+      "value": "Cognome e Nome"
+    },
+    {
+      "cell": "B8",
+      "value": "=Dati!D11"
+    },
+    {
+      "cell": "A9",
+      "value": "In qualità di"
+    },
+    {
+      "cell": "B9",
+      "value": "=Dati!D12"
+    },
+    {
+      "cell": "A10",
+      "value": "Sezione Rui"
+    },
+    {
+      "cell": "B10",
+      "value": "=Dati!D13"
+    },
+    {
+      "cell": "A11",
+      "value": "Numero scrizione RUI"
+    },
+    {
+      "cell": "B11",
+      "value": "=Dati!D14"
+    },
+    {
+      "cell": "A12",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "B12",
+      "value": "=Dati!D15"
+    },
+    {
+      "cell": "A13",
+      "value": "Telefono"
+    },
+    {
+      "cell": "B13",
+      "value": "=Dati!D16"
+    },
+    {
+      "cell": "A14",
+      "value": "E-mail"
+    },
+    {
+      "cell": "B14",
+      "value": "=Dati!D17"
+    },
+    {
+      "cell": "A15",
+      "value": "Indirizzo"
+    },
+    {
+      "cell": "B15",
+      "value": "=Dati!D18"
+    },
+    {
+      "cell": "A16",
+      "value": "SEZIONE I"
+    },
+    {
+      "cell": "A17",
+      "value": " Regole generali per la distribuzione di prodotti assicurativi"
+    },
+    {
+      "cell": "A18",
+      "value": "Ai sensi delle disposizioni del D.Lgs. nr. 209/2005 (Codice delle Assicurazioni Private) e del regolamento IVASS nr. 40 del 2 agosto 2018, in tema di norme di comportamento che devono essere osservate, l’intermediario:"
+    },
+    {
+      "cell": "A19",
+      "value": "a.   ha l’obbligo di consegnare/trasmettere al contraente l’allegato 3 al Regolamento IVASS n. 40 del 2 agosto 2018, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo contratto di assicurazione, e di metterlo a disposizione del pubblico nei locali del distributore, anche mediante apparecchiature tecnologiche, e di pubblicarlo sul sito internet, ove esistente"
+    },
+    {
+      "cell": "A20",
+      "value": "b.   ha l’obbligo di consegna l’allegato 4 al Regolamento IVASS n. 40 del 2 agosto 2018, prima della sottoscrizione di ciascuna proposta di assicurazione o, qualora non prevista, del contratto di assicurazione."
+    },
+    {
+      "cell": "A21",
+      "value": "c.   ha l’obbligo di consegnare copia della documentazione precontrattuale e contrattuale prevista dalle vigenti disposizioni, copia della polizza e di ogni altro atto o documento sottoscritto dal contraente."
+    },
+    {
+      "cell": "A22",
+      "value": "d.   ha l’obbligo di proporre o raccomandare contratti coerenti con le richieste e le esigenze di copertura assicurativa e previdenziale del contraente o dell’assicurato, acquisendo a tal fine, ogni utile informazione."
+    },
+    {
+      "cell": "A23",
+      "value": "e.   ha l’obbligo di informare il contraente se il prodotto assicurativo risponde alle richieste ed esigenze, dandone evidenza in un’apposita dichiarazione; in mancanza di tale dichiarazione, il prodotto assicurativo non può essere distribuito."
+    },
+    {
+      "cell": "A24",
+      "value": "f.     ha l’obbligo di valutare se il contraente rientra nel mercato di riferimento identificato per il contratto di assicurazione proposto e non appartiene alle categorie di clienti per i quali il prodotto non è compatibile, nonché ha l’obbligo di adottare opportune disposizioni per ottenere dai produttori le informazioni di cui all’articolo 30-decies comma 5 del Codice delle Assicurazioni e per comprendere le caratteristiche e il mercato di riferimento individuato per ciascun prodotto."
+    },
+    {
+      "cell": "A25",
+      "value": "g.   ha obbligo di fornire in forma chiara e comprensibile le informazioni oggettive sul prodotto, illustrandone le caratteristiche, la durata, i costi e i limiti della copertura ed ogni altro elemento utile a consentire al contraente di prendere una decisione informata."
+    },
+    {
+      "cell": "A26",
+      "value": "SEZIONE II"
+    },
+    {
+      "cell": "A27",
+      "value": "Regole supplementari per la distribuzione di prodotti di investimento assicurativi"
+    },
+    {
+      "cell": "A28",
+      "value": "Fatte salve le disposizioni di cui alla Sezione I (Regole generali per la distribuzione di prodotti assicurativi) l’intermediario deve attenersi alle seguenti regole supplementari in base alle quali:"
+    },
+    {
+      "cell": "A29",
+      "value": "a.   l’obbligo di consegnare/trasmettere al contraente copia dell’Allegato 4-bis al Regolamento IVASS n. 40 del 2 agosto 2018, prima della sottoscrizione di ciascuna proposta di assicurazione o, qualora non prevista, del contratto."
+    },
+    {
+      "cell": "A30",
+      "value": "b.   l’obbligo di valutare l’adeguatezza oppure l’appropriatezza del prodotto di investimento assicurativo proposto."
+    },
+    {
+      "cell": "A31",
+      "value": "c.   in caso di vendita con consulenza, ha l’obbligo di informare il contraente se il prodotto è adeguato, specificandone i motivi e dandone evidenza in un’apposita dichiarazione. In mancanza di tale dichiarazione, il prodotto assicurativo non può essere distribuito con consulenza."
+    },
+    {
+      "cell": "A32",
+      "value": "d.    in caso di vendita senza consulenza di un prodotto di investimento assicurativo, ha l’obbligo di informare il contraente se il prodotto è inappropriato, dandone evidenza in un’apposita dichiarazione"
+    },
+    {
+      "cell": "A33",
+      "value": "e.   in caso di vendita senza consulenza di un prodotto di investimento assicurativo, ha obbligo di informare il contraente della circostanza che il suo rifiuto di fornire una o più delle informazioni richieste pregiudica la capacità di accertare l’appropriatezza del prodotto d proposto, nel caso di volontà espressa dal contraente di acquisire comunque il prodotto, obbligo di informarlo di tale circostanza, specificandone i motivi e dandone evidenza in un’apposita dichiarazione."
+    },
+    {
+      "cell": "A34",
+      "value": "f.     ha obbligo di fornire le informazioni in relazione ai costi e agli oneri connessi di cui all’articolo 121-sexies, commi 1 e 2, del Codice delle Assicurazioni."
+    },
+    {
+      "cell": "A36",
+      "value": "=Dati!D2"
+    },
+    {
+      "cell": "A37",
+      "value": "=Dati!D5"
+    },
+    {
+      "cell": "A38",
+      "value": "Numero e data Iscrizione RUI"
+    },
+    {
+      "cell": "B38",
+      "value": "=Dati!D3"
+    },
+    {
+      "cell": "C38",
+      "value": "=Dati!D4"
+    },
+    {
+      "cell": "A39",
+      "value": "=Dati!D8"
+    },
+    {
+      "cell": "B39",
+      "value": "=Dati!D6"
+    }
+  ],
+  "Allegato 4bis": [
+    {
+      "cell": "D1",
+      "value": "ALLEGATO 4  BIS"
+    },
+    {
+      "cell": "A2",
+      "value": "INFORMAZIONI SULLA DISTRIBUZIONE DEL PRODOTTO D’INVESTIMENTO ASSICURATIVO  "
+    },
+    {
+      "cell": "A3",
+      "value": "NR. POLIZZA O PROPOSTA"
+    },
+    {
+      "cell": "C3",
+      "value": "=Dati!D22"
+    },
+    {
+      "cell": "A4",
+      "value": "AVVERTENZA"
+    },
+    {
+      "cell": "A5",
+      "value": "Il distributore ha l’obbligo di consegnare/trasmettere al contraente, prima della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita e sulle remunerazioni percepite."
+    },
+    {
+      "cell": "A6",
+      "value": "Informazioni generali sull'intermediario che entra in contatto con il contraente"
+    },
+    {
+      "cell": "A7",
+      "value": "Cognome e Nome"
+    },
+    {
+      "cell": "C7",
+      "value": "=Dati!D11"
+    },
+    {
+      "cell": "A8",
+      "value": "In qualità di"
+    },
+    {
+      "cell": "C8",
+      "value": "=Dati!D12"
+    },
+    {
+      "cell": "A9",
+      "value": "Sezione Rui"
+    },
+    {
+      "cell": "C9",
+      "value": "=Dati!D13"
+    },
+    {
+      "cell": "A10",
+      "value": "Numero scrizione RUI"
+    },
+    {
+      "cell": "C10",
+      "value": "=Dati!D14"
+    },
+    {
+      "cell": "A11",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "C11",
+      "value": "=Dati!D15"
+    },
+    {
+      "cell": "A12",
+      "value": "Telefono"
+    },
+    {
+      "cell": "C12",
+      "value": "=Dati!D16"
+    },
+    {
+      "cell": "A13",
+      "value": "E-mail"
+    },
+    {
+      "cell": "C13",
+      "value": "=Dati!D17"
+    },
+    {
+      "cell": "A14",
+      "value": "Indirizzo"
+    },
+    {
+      "cell": "C14",
+      "value": "=Dati!D18"
+    },
+    {
+      "cell": "A15",
+      "value": "Attività svolta per conto di"
+    },
+    {
+      "cell": "A16",
+      "value": "Ragione sociale"
+    },
+    {
+      "cell": "C16",
+      "value": "=Dati!D2"
+    },
+    {
+      "cell": "A17",
+      "value": "Sede legale ed operativa"
+    },
+    {
+      "cell": "C17",
+      "value": "=Dati!D5"
+    },
+    {
+      "cell": "A18",
+      "value": "Numero scrizione RUI"
+    },
+    {
+      "cell": "C18",
+      "value": "=Dati!D3"
+    },
+    {
+      "cell": "A19",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "C19",
+      "value": "=Dati!D4"
+    },
+    {
+      "cell": "A20",
+      "value": "Telefono / Fax"
+    },
+    {
+      "cell": "C20",
+      "value": "=Dati!D6"
+    },
+    {
+      "cell": "A21",
+      "value": "Email"
+    },
+    {
+      "cell": "C21",
+      "value": "=Dati!D7"
+    },
+    {
+      "cell": "A22",
+      "value": "PEC"
+    },
+    {
+      "cell": "C22",
+      "value": "=Dati!D8"
+    },
+    {
+      "cell": "A23",
+      "value": "Sito Internet"
+    },
+    {
+      "cell": "C23",
+      "value": "=Dati!D9"
+    },
+    {
+      "cell": "A24",
+      "value": "SEZIONE I"
+    },
+    {
+      "cell": "A25",
+      "value": "Informazioni sul modello di distribuzione"
+    },
+    {
+      "cell": "A26",
+      "value": "a) L’intermediario agisce su incarico del cliente"
+    },
+    {
+      "cell": "A27",
+      "value": "b) Collaborazione"
+    },
+    {
+      "cell": "A28",
+      "value": "□     L’attività di distribuzione non è svolta in collaborazione con altri intermediari ai sensi di quanto stabilito dall’art. 22, comma art. 10 del Decreto Legge n. 179 del 18.10.2012 convertito nella Legge n. 221 del 17.12.2012."
+    },
+    {
+      "cell": "A29",
+      "value": "  L’attività di distribuzione è svolta in collaborazione con il seguente intermediario ai sensi di quanto stabilito dall’art. 22, comma art. 10 del Decreto Legge n. 179 del 18.10.2012 convertito nella Legge n. 221 del 17.12.2012."
+    },
+    {
+      "cell": "A30",
+      "value": "-        Nome cognome/denominazione sociale "
+    },
+    {
+      "cell": "A31",
+      "value": "Sede legale"
+    },
+    {
+      "cell": "A32",
+      "value": "Partita Iva"
+    },
+    {
+      "cell": "A33",
+      "value": "-        Sezione di appartenenza e n. di iscrizione al RUI"
+    },
+    {
+      "cell": "A34",
+      "value": "Nell'ambito della collaborazione ……………………………………… svolge il ruolo di Emittente"
+    },
+    {
+      "cell": "A35",
+      "value": "a)               Gli intermediari iscritti nella sezione E indicano"
+    },
+    {
+      "cell": "A36",
+      "value": "Nome e Cognome / denominazione sociale, "
+    },
+    {
+      "cell": "A37",
+      "value": "Sede Legale/ Cod. Fiscale/P.IVA "
+    },
+    {
+      "cell": "A38",
+      "value": "Sezione di appartenenza e n. di iscrizione al RUI dell’intermediario, anche a titolo accessorio, per il quale è svolta l’attività di distribuzione del contratto, e l’eventuale intermediario collaboratore orizzontale dell’intermediario principale."
+    },
+    {
+      "cell": "A39",
+      "value": "SEZIONE II"
+    },
+    {
+      "cell": "A40",
+      "value": "Informazioni sull’attività di distribuzione e consulenza "
+    },
+    {
+      "cell": "A41",
+      "value": "L'intermediario informa:"
+    },
+    {
+      "cell": "A42",
+      "value": "□      Se ha fornito una consulenza ai sensi dell’articolo 119-ter, comma 3, del Codice delle Assicurazioni Private, ovvero una raccomandazione personalizzata "
+    },
+    {
+      "cell": "A43",
+      "value": "In tal caso indicare:"
+    },
+    {
+      "cell": "A44",
+      "value": "-        le attività prestate nell’ambito della consulenza, le caratteristiche e il contenuto delle prestazioni rese;"
+    },
+    {
+      "cell": "A45",
+      "value": "-        se ha fornito una consulenza fondata su un’analisi imparziale e personale ai sensi dell’articolo 119-ter, comma 4, del Codice delle Assicurazioni Private in quanto fondata sull’analisi di un numero sufficiente di prodotti assicurativi disponibili sul mercato che gli consenta di formula una raccomandazione personalizzata secondo criteri professionali in merito al prodotto adeguato a soddisfare le esigenze del cliente."
+    },
+    {
+      "cell": "A46",
+      "value": "□       Se ha fornito una consulenza obbligatoria e gratuita ai sensi dell’art. 121- septies del Codice"
+    },
+    {
+      "cell": "A47",
+      "value": "□       se ha fornito consulenza su base indipendente"
+    },
+    {
+      "cell": "A48",
+      "value": "□       se ha fornito al contraente una valutazione periodica dell'adeguatezza dei prodotti di investimento assicurativi consigliati al contraente medesimo."
+    },
+    {
+      "cell": "A49",
+      "value": "□       Se ha distribuito in modo esclusivo i prodotti d’investimento assicurativi di una o più imprese di assicurazione."
+    },
+    {
+      "cell": "A50",
+      "value": "□       Se ha distribuito prodotti d’investimento assicurativi in assenza di obblighi contrattuali che gli impongano di offrire esclusivamente i prodotti d’investimento assicurativi di una o più imprese di assicurazione."
+    },
+    {
+      "cell": "A51",
+      "value": "□       che ha dato ogni altra informazione utile a garantire il rispetto delle regole di trasparenza previste dall’articolo 119-bis, comma 7, del Codice."
+    },
+    {
+      "cell": "A52",
+      "value": "□       che ha illustrato in forma chiara e comprensibile le informazioni oggettive sul prodotto, le caratteristiche, la durata, i costi e i limiti della copertura ed ogni altro elemento utile a consentire al contraente di prendere una decisione informata"
+    },
+    {
+      "cell": "A53",
+      "value": "□       che ha fornito le indicazioni sulle strategie di investimento proposte, inclusi opportuni orientamenti e avvertenze sui rischi associati ai prodotti d’investimento assicurativi proposti o a determinate strategie di investimento proposte"
+    },
+    {
+      "cell": "A54",
+      "value": "SEZIONE III"
+    },
+    {
+      "cell": "A55",
+      "value": "Informazioni relative alle remunerazioni"
+    },
+    {
+      "cell": "A56",
+      "value": "L’intermediario assicurativo indica"
+    },
+    {
+      "cell": "A57",
+      "value": "La natura del compenso"
+    },
+    {
+      "cell": "A58",
+      "value": "□        onorario corrisposto direttamente dal cliente"
+    },
+    {
+      "cell": "A59",
+      "value": "□        commissione inclusa nel premio assicurativo"
+    },
+    {
+      "cell": "A60",
+      "value": "□        benefici economici di qualsiasi tipo offerti o ricevuti in virtù dell’intermediazione effettuata"
+    },
+    {
+      "cell": "A61",
+      "value": "□        altro tipo di compenso"
+    },
+    {
+      "cell": "A62",
+      "value": "□        combinazione delle diverse tipologie di compensi di cui sopra"
+    },
+    {
+      "cell": "A63",
+      "value": "□        L’importo del compenso corrisposto dal cliente e/o degli incentivi percepiti da un qualsiasi soggetto diverso dal contraente e da una persona che agisce per suo conto o, se non è possibile, il metodo per calcolarli."
+    },
+    {
+      "cell": "A64",
+      "value": "□        L’importo percepito per la valutazione periodica dell’adeguatezza."
+    },
+    {
+      "cell": "A65",
+      "value": "□        Gli importi relativi a costi e oneri (secondo quanto previsto dalle disposizioni dell’Unione Europea direttamente applicabili nonché dall’articolo 121-sexies del Codice e dalle disposizioni regolamentari di attuazione)."
+    },
+    {
+      "cell": "A66",
+      "value": "SEZIONE IV"
+    },
+    {
+      "cell": "A67",
+      "value": " Informazioni sul pagamento dei premi "
+    },
+    {
+      "cell": "A68",
+      "value": "L’intermediario informa:"
+    },
+    {
+      "cell": "A69",
+      "value": "a)    che i premi pagati dal contraente all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle imprese, se regolati per il tramite dell’intermediario (selezionare la singola opzione):"
+    },
+    {
+      "cell": "A70",
+      "value": "□         costituiscono patrimonio autonomo e separato dal patrimonio dell’intermediario stesso"
+    },
+    {
+      "cell": "A71",
+      "value": "□         sono garantiti dalla stipulazione da parte dell’intermediario di una fideiussione bancaria idonea a garantire una capacità finanziaria pari al 4% dei premi incassati, con un minimo di Euro 19.510"
+    },
+    {
+      "cell": "A72",
+      "value": "b)    che le modalità di pagamento dei premi ammesse:"
+    },
+    {
+      "cell": "A73",
+      "value": "1.            assegni bancari, postali o circolari, muniti della clausola di non trasferibilità, intestati o girati all’impresa di assicurazione oppure all’intermediario, espressamente in tale qualità;"
+    },
+    {
+      "cell": "A74",
+      "value": "2.            ordini di bonifico, altri mezzi di pagamento bancario o postale, inclusi gli strumenti di pagamento elettronici, anche nella forma on line, che abbiano quale beneficiario uno dei soggetti indicati al precedente punto 1;"
+    },
+    {
+      "cell": "A75",
+      "value": "c) che:"
+    },
+    {
+      "cell": "A76",
+      "value": "□     non è autorizzato all’incasso ai sensi dell’accordo sottoscritto o ratificato dall’impresa e che il pagamento dei premi effettuato all’intermediario o a un suo collaboratore non ha effetto liberatorio ai sensi dell’art. 118 del Codice delle Assicurazioni Private."
+    },
+    {
+      "cell": "A77",
+      "value": "□     è autorizzato all’incasso ai sensi dell’accordo sottoscritto o ratificato dall’impresa e che il pagamento dei premi effettuato all’intermediario o a un suo collaboratore ha effetto liberatorio ai sensi dell’art. 118 del Codice delle Assicurazioni Private"
+    },
+    {
+      "cell": "A79",
+      "value": "=Dati!D2"
+    },
+    {
+      "cell": "A80",
+      "value": "=Dati!D5"
+    },
+    {
+      "cell": "A81",
+      "value": "N. Iscriz. Rui"
+    },
+    {
+      "cell": "B81",
+      "value": "=Dati!D3"
+    },
+    {
+      "cell": "C81",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "D81",
+      "value": "=Dati!D4"
+    },
+    {
+      "cell": "A82",
+      "value": "=Dati!D6"
+    },
+    {
+      "cell": "C82",
+      "value": "=Dati!D8"
+    }
+  ],
+  "Allegato 4": [
+    {
+      "cell": "D1",
+      "value": "ALLEGATO 4  "
+    },
+    {
+      "cell": "A2",
+      "value": "INFORMAZIONI SULLA DISTRIBUZIONE DEL PRODOTTO ASSICURATIVO NON-IBIPS  "
+    },
+    {
+      "cell": "A3",
+      "value": "NR. POLIZZA O PROPOSTA"
+    },
+    {
+      "cell": "C3",
+      "value": "=Dati!D22"
+    },
+    {
+      "cell": "A4",
+      "value": "AVVERTENZA"
+    },
+    {
+      "cell": "A5",
+      "value": "Il distributore ha l’obbligo di consegnare/trasmettere al contraente, prima della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita e sulle remunerazioni percepite."
+    },
+    {
+      "cell": "A6",
+      "value": "Informazioni generali sull'intermediario che entra in contatto con il contraente"
+    },
+    {
+      "cell": "A7",
+      "value": "Cognome e Nome"
+    },
+    {
+      "cell": "C7",
+      "value": "=Dati!D11"
+    },
+    {
+      "cell": "A8",
+      "value": "In qualità di"
+    },
+    {
+      "cell": "C8",
+      "value": "=Dati!D12"
+    },
+    {
+      "cell": "A9",
+      "value": "Sezione Rui"
+    },
+    {
+      "cell": "C9",
+      "value": "=Dati!D13"
+    },
+    {
+      "cell": "A10",
+      "value": "Numero scrizione RUI"
+    },
+    {
+      "cell": "C10",
+      "value": "=Dati!D14"
+    },
+    {
+      "cell": "A11",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "C11",
+      "value": "=Dati!D15"
+    },
+    {
+      "cell": "A12",
+      "value": "Telefono"
+    },
+    {
+      "cell": "C12",
+      "value": "=Dati!D16"
+    },
+    {
+      "cell": "A13",
+      "value": "E-mail"
+    },
+    {
+      "cell": "C13",
+      "value": "=Dati!D17"
+    },
+    {
+      "cell": "A14",
+      "value": "Indirizzo"
+    },
+    {
+      "cell": "C14",
+      "value": "=Dati!D18"
+    },
+    {
+      "cell": "A15",
+      "value": "Attività svolta per conto di"
+    },
+    {
+      "cell": "A16",
+      "value": "Ragione sociale"
+    },
+    {
+      "cell": "C16",
+      "value": "=Dati!D2"
+    },
+    {
+      "cell": "A17",
+      "value": "Sede legale ed operativa"
+    },
+    {
+      "cell": "C17",
+      "value": "=Dati!D5"
+    },
+    {
+      "cell": "A18",
+      "value": "Numero scrizione RUI"
+    },
+    {
+      "cell": "C18",
+      "value": "=Dati!D3"
+    },
+    {
+      "cell": "A19",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "C19",
+      "value": "=Dati!D4"
+    },
+    {
+      "cell": "A20",
+      "value": "Telefono / Fax"
+    },
+    {
+      "cell": "C20",
+      "value": "=Dati!D6"
+    },
+    {
+      "cell": "A21",
+      "value": "Email"
+    },
+    {
+      "cell": "C21",
+      "value": "=Dati!D7"
+    },
+    {
+      "cell": "A22",
+      "value": "PEC"
+    },
+    {
+      "cell": "C22",
+      "value": "=Dati!D8"
+    },
+    {
+      "cell": "A23",
+      "value": "Sito Internet"
+    },
+    {
+      "cell": "C23",
+      "value": "=Dati!D9"
+    },
+    {
+      "cell": "A24",
+      "value": "SEZIONE I"
+    },
+    {
+      "cell": "A25",
+      "value": " Regole generali per la distribuzione di prodotti assicurativi"
+    },
+    {
+      "cell": "A26",
+      "value": "a) L’intermediario agisce su incarico del cliente"
+    },
+    {
+      "cell": "A27",
+      "value": "b) Collaborazione"
+    },
+    {
+      "cell": "A28",
+      "value": " L’attività di distribuzione non è svolta in collaborazione con altri intermediari ai sensi di quanto stabilito dall’art. 22, comma art. 10 del Decreto Legge n. 179 del 18.10.2012 convertito nella Legge n. 221 del 17.12.2012."
+    },
+    {
+      "cell": "A29",
+      "value": "SEZIONE II"
+    },
+    {
+      "cell": "A30",
+      "value": "Informazioni sull’attività di distribuzione e consulenza "
+    },
+    {
+      "cell": "A31",
+      "value": "L'intermediario dichiara che:"
+    },
+    {
+      "cell": "A32",
+      "value": "Propone contratti in assenza di obblighi contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di assicurazione "
+    },
+    {
+      "cell": "A33",
+      "value": "SEZIONE III"
+    },
+    {
+      "cell": "A34",
+      "value": "Informazioni relative alle remunerazioni"
+    },
+    {
+      "cell": "A35",
+      "value": "Il compenso relativo all'attivitrà svolta dall'Agente per la distribuzione del presente contratto e rappresentato da:"
+    },
+    {
+      "cell": "A36",
+      "value": "a) commissione inclusa nel premio assicurativo"
+    },
+    {
+      "cell": "A37",
+      "value": "b) onorario corrisposto direttamente dal cliente ( solo in caso eccezionali e previo accordo scritto con il cliente)"
+    },
+    {
+      "cell": "A38",
+      "value": "Informazioni relative alla misura delle provvigioni riconosciute dalle imprese per i contratti RCA"
+    },
+    {
+      "cell": "A39",
+      "value": "Per i contratti RC Auto, in attuazione del Reg. n. 23 del 9 maggio 2008 e dell’art. 131 del CAP, viene allegata la Tabella 1 nella quale sono specificati i livelli provvigionali riconosciuti all’intermediario dall’impresa di assicurazione (l’informativa relativa ai livelli provvigionali riguarda anche eventuali differenziazioni in relazione alle diverse categorie di veicoli e natanti assicurati ed alle diverse tipologie contrattuali)"
+    },
+    {
+      "cell": "A40",
+      "value": "SEZIONE IV"
+    },
+    {
+      "cell": "A41",
+      "value": " Informazioni sul pagamento dei premi "
+    },
+    {
+      "cell": "A42",
+      "value": "L’intermediario informa:"
+    },
+    {
+      "cell": "A43",
+      "value": "a)      che i premi pagati dal contraente all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle imprese, se regolati per il tramite dell’intermediario"
+    },
+    {
+      "cell": "A44",
+      "value": "□         costituiscono patrimonio autonomo e separato dal patrimonio dell’intermediario stesso"
+    },
+    {
+      "cell": "A45",
+      "value": "b)      che le modalità di pagamento dei premi ammesse sono le seguenti:"
+    },
+    {
+      "cell": "A46",
+      "value": "1.        assegni bancari, postali o circolari, muniti della clausola di non trasferibilità, intestati o girati all’impresa di assicurazione oppure all’intermediario, espressamente in tale qualità;"
+    },
+    {
+      "cell": "A47",
+      "value": "2.        ordini di bonifico, altri mezzi di pagamento bancario o postale, inclusi gli strumenti di pagamento elettronici, anche nella forma on line, che abbiano quale beneficiario uno dei soggetti indicati al precedente punto 1;"
+    },
+    {
+      "cell": "A48",
+      "value": "3.        denaro contante, esclusivamente per i contratti di assicurazione contro i danni del ramo responsabilità civile auto e relative garanzie accessorie (se ed in quanto riferite allo stesso veicolo assicurato per la responsabilità civile auto) nei limiti della normativa vigente, nonché per i contratti degli altri rami danni con il limite di Euro 750,00 annui per ciascun contratto."
+    },
+    {
+      "cell": "A49",
+      "value": "c) che:"
+    },
+    {
+      "cell": "A50",
+      "value": "□       non è autorizzato all’incasso ai sensi dell’accordo sottoscritto o ratificato dall’impresa e che il pagamento dei premi effettuato all’intermediario o a un suo collaboratore non ha effetto liberatorio ai sensi dell’art. 118 del Codice delle Assicurazioni Private"
+    }
+  ],
+  "Consegna Documenti": [
+    {
+      "cell": "A1",
+      "value": "RICEVUTA DI CONSEGNA DELLA DOCUMENTAZIONE PRECONTRATTUALE"
+    },
+    {
+      "cell": "B2",
+      "value": "Spett.le"
+    },
+    {
+      "cell": "C2",
+      "value": "=Dati!D2"
+    },
+    {
+      "cell": "C3",
+      "value": "=Dati!D5"
+    },
+    {
+      "cell": "A4",
+      "value": "Dati Contraente"
+    },
+    {
+      "cell": "A5",
+      "value": "Il sottoscritto"
+    },
+    {
+      "cell": "B5",
+      "value": "=Dati!D26"
+    },
+    {
+      "cell": "C5",
+      "value": "In qualità di"
+    },
+    {
+      "cell": "D5",
+      "value": "=Dati!D31"
+    },
+    {
+      "cell": "A6",
+      "value": "Per conto del contraente"
+    },
+    {
+      "cell": "B6",
+      "value": "=Dati!D26"
+    },
+    {
+      "cell": "A7",
+      "value": "CF/P. IVA"
+    },
+    {
+      "cell": "B7",
+      "value": "=Dati!D27"
+    },
+    {
+      "cell": "C7",
+      "value": "Residenza o sede legale"
+    },
+    {
+      "cell": "D7",
+      "value": "=Dati!D28"
+    },
+    {
+      "cell": "A9",
+      "value": "Estremi della polizza o dell’appendice cui si riferisce la dichiarazione:"
+    },
+    {
+      "cell": "A10",
+      "value": "Impresa di assicurazione"
+    },
+    {
+      "cell": "B10",
+      "value": "=Dati!D20"
+    },
+    {
+      "cell": "A11",
+      "value": "Ramo"
+    },
+    {
+      "cell": "B11",
+      "value": "=Dati!D21"
+    },
+    {
+      "cell": "C11",
+      "value": "N° Polizza"
+    },
+    {
+      "cell": "D11",
+      "value": "=Dati!D22"
+    },
+    {
+      "cell": "A12",
+      "value": "Decorrenza"
+    },
+    {
+      "cell": "B12",
+      "value": "=Dati!D23"
+    },
+    {
+      "cell": "A13",
+      "value": "In ottemperanza all’art. 56 comma 3 lettera a) e b) del Regolamento IVASS n. 40 del 2/8/2018, \nDICHIARA DI AVER RICEVUTO , VISIONATO E  (ove necessario) COMPILATO E FIRMATO"
+    },
+    {
+      "cell": "A14",
+      "value": "Allegato 3 "
+    },
+    {
+      "cell": "B14",
+      "value": "Allegato 4ter"
+    },
+    {
+      "cell": "C14",
+      "value": "Allegato 4bis (se prodotto di Investimento)"
+    },
+    {
+      "cell": "A16",
+      "value": "Informativa sulla privacy"
+    },
+    {
+      "cell": "B16",
+      "value": "Le condizioni del mandato di brokeraggio assicurativo "
+    },
+    {
+      "cell": "C16",
+      "value": "Questionario Adeguatezza"
+    },
+    {
+      "cell": "D16",
+      "value": "Consenso invio Documentazione Contrattuae in formato elettronico "
+    },
+    {
+      "cell": "A18",
+      "value": "Allegato 4"
+    },
+    {
+      "cell": "B18",
+      "value": "Dip"
+    },
+    {
+      "cell": "C18",
+      "value": "Dip Aggiuntivo"
+    },
+    {
+      "cell": "D18",
+      "value": "Condizioni contrattuali"
+    },
+    {
+      "cell": "A19",
+      "value": " Testo contrattuale della polizza/appendice "
+    },
+    {
+      "cell": "B19",
+      "value": "Dichiarazione di coerenza del contratto offerto"
+    },
+    {
+      "cell": "A20",
+      "value": "Di aver preso visione l’elenco recante la denominazione della o delle imprese di assicurazione con le quali l’intermediario ha rapporti d’affari, anche sulla base di una collaborazione orizzontale o di lettere di incarico"
+    },
+    {
+      "cell": "A22",
+      "value": "Il sottoscritto ha ricevuto le credenziali di accessoal gestionale  per poter visionare le proprie polizze, con i vari documenti allegati: "
+    },
+    {
+      "cell": "A23",
+      "value": "gs.assiprot.com "
+    },
+    {
+      "cell": "A24",
+      "value": "Data e luogo"
+    },
+    {
+      "cell": "C25",
+      "value": "Firma (1)"
+    },
+    {
+      "cell": "A26",
+      "value": "Dichiarazione da sottoscrivere in caso di contratto RCA"
+    },
+    {
+      "cell": "A27",
+      "value": "In ottemperanza all’art 9 comma 4 del Regolamento Isvap 23/2008, dichiara altresì di avere ricevuto la tabella (allegato 1) contenente le informazioni sui livelli provvigionali percepiti dalla Impresa di assicurazione o Agenzia della Impresa di assicurazione con cui ha rapporti di affari nel ramo RCA, così come indicato nella sezione III dell’allegato 4, di cui con la precedente firma abbiamo accusato ricevuta."
+    },
+    {
+      "cell": "C29",
+      "value": "Firma (1)"
+    },
+    {
+      "cell": "A30",
+      "value": "(1) Firma della persona fisica ovvero timbro della persona giuridica e firma di un procuratore."
+    }
+  ],
+  "Dichiarazione Coerenza": [
+    {
+      "cell": "A1",
+      "value": "Dichiarazione di coerenza del contratto offerto"
+    },
+    {
+      "cell": "A2",
+      "value": "Ai sensi dell'art. 68 undecies del Regolamento Ivass n. 40/2018 come modificato dal provvedimento n. 97/2020"
+    },
+    {
+      "cell": "A3",
+      "value": "l'Agente sulla base delle informazioni acquisite tramite il questionario di adeguatezza"
+    },
+    {
+      "cell": "A4",
+      "value": "Dichiara"
+    },
+    {
+      "cell": "A5",
+      "value": "Che il contratto è coerente con le richieste espresse dal Cliente nel questionario di adeguatezza"
+    },
+    {
+      "cell": "A7",
+      "value": "Dati Contraente"
+    },
+    {
+      "cell": "A8",
+      "value": "Il sottoscritto"
+    },
+    {
+      "cell": "B8",
+      "value": "=Dati!D26"
+    },
+    {
+      "cell": "C8",
+      "value": "In qualità di"
+    },
+    {
+      "cell": "D8",
+      "value": "=Dati!D31"
+    },
+    {
+      "cell": "A9",
+      "value": "Per conto del contraente"
+    },
+    {
+      "cell": "B9",
+      "value": "=Dati!D26"
+    },
+    {
+      "cell": "A10",
+      "value": "CF/P. IVA"
+    },
+    {
+      "cell": "B10",
+      "value": "=Dati!D27"
+    },
+    {
+      "cell": "C10",
+      "value": "Residenza o sede legale"
+    },
+    {
+      "cell": "D10",
+      "value": "=Dati!D28"
+    },
+    {
+      "cell": "A13",
+      "value": "Estremi della polizza o dell’appendice cui si riferisce la dichiarazione"
+    },
+    {
+      "cell": "A14",
+      "value": "Impresa di assicurazione"
+    },
+    {
+      "cell": "B14",
+      "value": "=Dati!D20"
+    },
+    {
+      "cell": "A15",
+      "value": "Ramo"
+    },
+    {
+      "cell": "B15",
+      "value": "=Dati!D21"
+    },
+    {
+      "cell": "C15",
+      "value": "N° Polizza"
+    },
+    {
+      "cell": "D15",
+      "value": "=Dati!D22"
+    },
+    {
+      "cell": "A16",
+      "value": "Decorrenza"
+    },
+    {
+      "cell": "B16",
+      "value": "=Dati!D23"
+    },
+    {
+      "cell": "A20",
+      "value": "=Dati!D2"
+    },
+    {
+      "cell": "A21",
+      "value": "=Dati!D5"
+    },
+    {
+      "cell": "A22",
+      "value": "N. Iscriz. Rui"
+    },
+    {
+      "cell": "B22",
+      "value": "=Dati!D3"
+    },
+    {
+      "cell": "C22",
+      "value": "Data Iscrizione"
+    },
+    {
+      "cell": "D22",
+      "value": "=Dati!D4"
+    },
+    {
+      "cell": "A23",
+      "value": "=Dati!D6"
+    },
+    {
+      "cell": "C23",
+      "value": "=Dati!D8"
+    },
+    {
+      "cell": "C24",
+      "value": "Firma Broker"
+    },
+    {
+      "cell": "C25",
+      "value": "Firma Cliente"
+    }
+  ],
+  "Consenso Invio Elettronico": [
+    {
+      "cell": "A1",
+      "value": "CONSENSO ALL’INVIO DELLA DOCUMENTAZIONE CONTRATTUALE IN FORMATO ELETTRONICO (art. 61 Reg. IVASS n .40/2018: Modalità dell’Informativa)"
+    },
+    {
+      "cell": "B2",
+      "value": "Spett.le"
+    },
+    {
+      "cell": "C2",
+      "value": "=Dati!D2"
+    },
+    {
+      "cell": "C3",
+      "value": "=Dati!D5"
+    },
+    {
+      "cell": "A5",
+      "value": "Dati Contraente"
+    },
+    {
+      "cell": "A6",
+      "value": "Il sottoscritto"
+    },
+    {
+      "cell": "B6",
+      "value": "=Dati!D26"
+    },
+    {
+      "cell": "C6",
+      "value": "In qualità di"
+    },
+    {
+      "cell": "D6",
+      "value": "=Dati!D30"
+    },
+    {
+      "cell": "A7",
+      "value": "Per conto del contraente"
+    },
+    {
+      "cell": "B7",
+      "value": "=Dati!D26"
+    },
+    {
+      "cell": "A8",
+      "value": "CF/P. IVA"
+    },
+    {
+      "cell": "B8",
+      "value": "=Dati!D27"
+    },
+    {
+      "cell": "C8",
+      "value": "Residenza o sede legale"
+    },
+    {
+      "cell": "D8",
+      "value": "=Dati!D28"
+    },
+    {
+      "cell": "A10",
+      "value": "Con la presente, consapevole della facoltà di optare per il formato cartaceo, esprimo il mio consenso all’utilizzo dell’invio in formato elettronico di:"
+    },
+    {
+      "cell": "A11",
+      "value": "Tutta la documentazione presente o futura che mi possa riguardare;"
+    },
+    {
+      "cell": "D11",
+      "value": "SI                  NO"
+    },
+    {
+      "cell": "A12",
+      "value": "  La sola documentazione riguardante la trattativa/polizza qui di seguito identificata:"
+    },
+    {
+      "cell": "D12",
+      "value": "SI                  NO"
+    },
+    {
+      "cell": "A13",
+      "value": "Estremi della polizza o dell’appendice cui si riferisce la dichiarazione:"
+    },
+    {
+      "cell": "A14",
+      "value": "Impresa di assicurazione"
+    },
+    {
+      "cell": "B14",
+      "value": "=Dati!D20"
+    },
+    {
+      "cell": "A15",
+      "value": "Ramo"
+    },
+    {
+      "cell": "B15",
+      "value": "=Dati!D21"
+    },
+    {
+      "cell": "C15",
+      "value": "N° Polizza"
+    },
+    {
+      "cell": "D15",
+      "value": "=Dati!D22"
+    },
+    {
+      "cell": "A16",
+      "value": "Decorrenza"
+    },
+    {
+      "cell": "B16",
+      "value": "=Dati!D23"
+    },
+    {
+      "cell": "A18",
+      "value": "Sono informato che questo mio consenso potrà essere da me revocato in qualsiasi momento mediante invio di posta elettronica o registrazione vocale con l’eventuale addebito degli oneri connessi alla stampa e all’eventuale trasmissione della documentazione in formato cartaceo oltre che la perdita dell’eventuale sconto previsto a fronte dell’utilizzo delle modalità elettroniche di ricezione della documentazione."
+    },
+    {
+      "cell": "A19",
+      "value": "Il presente consenso non consente l’invio di materiale promozionale, pubblicitario o di altre comunicazioni di carattere commerciale."
+    },
+    {
+      "cell": "A22",
+      "value": "DATA _______________________"
+    },
+    {
+      "cell": "C22",
+      "value": "Firma (1)"
+    },
+    {
+      "cell": "A25",
+      "value": "(1) Firma della persona fisica ovvero timbro della persona giuridica e firma di un procuratore."
+    }
+  ],
+  "Iter": [
+    {
+      "cell": "A1",
+      "value": "Iter emissione polizza"
+    },
+    {
+      "cell": "A2",
+      "value": "Quando"
+    },
+    {
+      "cell": "B2",
+      "value": "Documento"
+    },
+    {
+      "cell": "C2",
+      "value": "Cosa contiene"
+    },
+    {
+      "cell": "D2",
+      "value": "Note"
+    },
+    {
+      "cell": "A3",
+      "value": "Primo contatto con il cliente"
+    },
+    {
+      "cell": "B3",
+      "value": "Allegato 3"
+    },
+    {
+      "cell": "C3",
+      "value": "Informativa sul distibutore e suoi obblighi con identificazione del distributore"
+    },
+    {
+      "cell": "D3",
+      "value": "Il consulente consegna direttamente al cliente o trasmesso via mail se il cliente ha autorizzato  Deve essere scritta  in maniera chiara e leggibile (caratteri non inferiori na mm1,2)"
+    },
+    {
+      "cell": "B4",
+      "value": "Allegato 4 Ter"
+    },
+    {
+      "cell": "C4",
+      "value": "Regole di comportamento  del distributore, proposta di contratti coerenti, divieto di distribuzione di prodotti non coerenti"
+    },
+    {
+      "cell": "B5",
+      "value": "Allegato 4 Bis"
+    },
+    {
+      "cell": "C5",
+      "value": "Informazioni sul prodotto d'investimento assicurativo"
+    },
+    {
+      "cell": "B6",
+      "value": "Questionarionaio adeguatezza (Test demand & needs) "
+    },
+    {
+      "cell": "C6",
+      "value": "Domande per valutare le esigenze specifiche del cliente in relazione al prodotto proposto"
+    },
+    {
+      "cell": "D6",
+      "value": "Documento obbligatorio, senza di esso non si può procedere alla proposta/emissione"
+    },
+    {
+      "cell": "B7",
+      "value": "Documentazione cliente"
+    },
+    {
+      "cell": "C7",
+      "value": "Privacy, Mandato (con autorizzazione a comunicazioni via mail e indicazioni sito), i documenti personali e/o della società e i documenti necessari all'emissione della proposta/polizza"
+    },
+    {
+      "cell": "D7",
+      "value": "Il cliente consegna i documenti al consulente"
+    },
+    {
+      "cell": "A8",
+      "value": "Fase 2"
+    },
+    {
+      "cell": "B8",
+      "value": "Proposta Polizza"
+    },
+    {
+      "cell": "C8",
+      "value": "Notizie salienti sulla copertura"
+    },
+    {
+      "cell": "B9",
+      "value": "Allegato 4"
+    },
+    {
+      "cell": "C9",
+      "value": "Notizie sul modello di distribuzione, sulla consulenza fornita e remunerazione percepita e mezzi di pagamento"
+    },
+    {
+      "cell": "D9",
+      "value": "Documento personalizzato in base alla polizza proposta"
+    },
+    {
+      "cell": "B10",
+      "value": "Dichiarazione di coerenza del contratto"
+    },
+    {
+      "cell": "C10",
+      "value": "Verifica della coerenza tra esigenze del cliente e prodotto proposto"
+    },
+    {
+      "cell": "B11",
+      "value": "Set Informativo"
+    },
+    {
+      "cell": "C11",
+      "value": "Dip, Dip Aggiuntivo e fascicolo Informativo"
+    },
+    {
+      "cell": "B12",
+      "value": " POG (Product Oversight Governance)"
+    },
+    {
+      "cell": "C12",
+      "value": "Riguarda lo scambio dei flussi informativi - Prevede l'obbligo per gli intermediari di identificare per ciascun prodotto proposto il target market effettivo e il target market effettivo negativo"
+    },
+    {
+      "cell": "D12",
+      "value": "E' preparato dalle Compagnie per il singolo prodotto"
+    },
+    {
+      "cell": "A13",
+      "value": "Fase 3"
+    },
+    {
+      "cell": "B13",
+      "value": "Polizza o proposta"
+    },
+    {
+      "cell": "C13",
+      "value": "Notizie salienti sulla copertura"
+    },
+    {
+      "cell": "D13",
+      "value": "Da ritirare firmata dal cliente"
+    },
+    {
+      "cell": "B14",
+      "value": "Ricevuta consegna documenti"
+    },
+    {
+      "cell": "C14",
+      "value": "La dichiarazione da parte del cliente della consegna di tutti i documenti precontrattuali e contrattuali"
+    },
+    {
+      "cell": "A15",
+      "value": "Documenti da visualizzare in sede o su sito"
+    },
+    {
+      "cell": "A16",
+      "value": "Dove"
+    },
+    {
+      "cell": "C16",
+      "value": "Documenti"
+    },
+    {
+      "cell": "A17",
+      "value": "In Agenzia o sul sito ufficiale se esiste. Deve essere scritta  in maniera chiara e leggibile ( caratteri non inferiori na mm1,2)."
+    },
+    {
+      "cell": "C17",
+      "value": "Allegato 3 non personalizzato"
+    },
+    {
+      "cell": "C18",
+      "value": "Elenco Compagnie aggiornato trimestralmente , anche di collaboratori orizzontali (altri Broker)"
+    },
+    {
+      "cell": "C19",
+      "value": "Allegato 4 Ter"
+    }
+  ]
+}

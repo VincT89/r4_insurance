@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="8" assertions="76" errors="0" failures="0" skipped="0" time="4.888402">
+    <testsuite name="Core" tests="8" assertions="76" errors="0" failures="0" skipped="0" time="4.888402">
+      <testsuite name="Tests\Feature\PolicyExcelImporterTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\PolicyExcelImporterTest.php" tests="8" assertions="76" errors="0" failures="0" skipped="0" time="4.888402">
+        <testcase name="test_import_uses_approved_original_pairs_and_keeps_all_ambiguous_groups_on_hold" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\PolicyExcelImporterTest.php" line="19" class="Tests\Feature\PolicyExcelImporterTest" classname="Tests.Feature.PolicyExcelImporterTest" assertions="25" time="0.832529"/>
+        <testcase name="test_rerun_does_not_duplicate_or_overwrite_an_operator_change" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\PolicyExcelImporterTest.php" line="42" class="Tests\Feature\PolicyExcelImporterTest" classname="Tests.Feature.PolicyExcelImporterTest" assertions="4" time="0.137163"/>
+        <testcase name="test_modified_imported_source_aborts_without_partial_imports" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\PolicyExcelImporterTest.php" line="51" class="Tests\Feature\PolicyExcelImporterTest" classname="Tests.Feature.PolicyExcelImporterTest" assertions="3" time="0.108979"/>
+        <testcase name="test_tampered_files_and_changed_batch_are_rejected" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\PolicyExcelImporterTest.php" line="61" class="Tests\Feature\PolicyExcelImporterTest" classname="Tests.Feature.PolicyExcelImporterTest" assertions="4" time="0.084943"/>
+        <testcase name="test_missing_mandate_and_preexisting_policy_are_held_without_guessing_links" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\PolicyExcelImporterTest.php" line="72" class="Tests\Feature\PolicyExcelImporterTest" classname="Tests.Feature.PolicyExcelImporterTest" assertions="5" time="0.103624"/>
+        <testcase name="test_current_client_identifier_changes_are_not_ignored" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\PolicyExcelImporterTest.php" line="85" class="Tests\Feature\PolicyExcelImporterTest" classname="Tests.Feature.PolicyExcelImporterTest" assertions="3" time="0.103730"/>
+        <testcase name="test_policy_sources_are_admin_only_and_review_state_is_explicit_in_deadlines" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\PolicyExcelImporterTest.php" line="95" class="Tests\Feature\PolicyExcelImporterTest" classname="Tests.Feature.PolicyExcelImporterTest" assertions="21" time="3.376388"/>
+        <testcase name="test_agency_company_links_are_validated_and_cannot_be_orphaned" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\PolicyExcelImporterTest.php" line="114" class="Tests\Feature\PolicyExcelImporterTest" classname="Tests.Feature.PolicyExcelImporterTest" assertions="11" time="0.141047"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

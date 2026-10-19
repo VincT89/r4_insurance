@@ -1,0 +1,38 @@
+{
+    "merged": [
+        "RC auto",
+        "Fideiussioni",
+        "Globale fabbricati",
+        "Viaggi",
+        "Cane e gatto"
+    ],
+    "already_applied": [],
+    "repeat_import": {
+        "branches_created": 0,
+        "subbranches_created": 0,
+        "excluded_pairs": 4
+    },
+    "other_catalog_entries_unchanged": true,
+    "unchanged": {
+        "users": true,
+        "clients": true,
+        "insurance_policies": true,
+        "registry_import_entries": true,
+        "supplier_companies": true,
+        "supplier_agencies": true,
+        "supplier_agency_company": true,
+        "attachments": true,
+        "client_document_requests": true
+    },
+    "aliases_valid": true,
+    "counts": {
+        "branches": 34,
+        "subbranches": 44,
+        "aliases": 21,
+        "branches_to_review": 12,
+        "subbranches_to_review": 17,
+        "policies": 0
+    },
+    "pending_migrations": [],
+    "ok": true
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "file": "claims-list",
+    "xlsx_rows": 1,
+    "pdf_pages": 1,
+    "outside_page": 0
+  },
+  {
+    "file": "claims-history",
+    "xlsx_rows": 8,
+    "pdf_pages": 1,
+    "outside_page": 0
+  }
+]

@@ -1,0 +1,20 @@
+.client-identity-line { margin: -8px 0 20px; color: var(--text2); overflow-wrap: anywhere; }
+.client-section-nav { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+.client-section-nav a { padding: 12px 2px; color: var(--text2); border-bottom: 2px solid transparent; }
+.client-section-nav a[aria-current="page"] { color: var(--text); border-bottom-color: currentColor; font-weight: 600; }
+.client-section-nav a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.client-policy-nav { margin-top: -8px; }
+.client-subcategory-heading { margin: 16px 14px 8px; }
+.client-detail-section + .client-detail-section { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); }
+.client-table-scroll { overflow-x: auto; max-width: 100%; }
+.client-table-scroll .t-table { min-width: 660px; }
+.client-overdue { color: var(--red-text); font-weight: 600; }
+.insurance-form-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+.registry-merge-choice { display: flex; align-items: flex-start; gap: 12px; margin: 12px 0; overflow-wrap: anywhere; }
+.registry-merge-choice input { flex: 0 0 auto; margin-top: 4px; }
+.client-registry-details dd { overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+    .client-section-nav { gap: 4px 14px; }
+    .insurance-form-actions > * { width: 100%; }
+    .client-identity-line { margin-top: 0; }
+}

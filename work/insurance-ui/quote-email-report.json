@@ -1,0 +1,34 @@
+{
+  "flows": [
+    "Nobis ed Europe Assistance prima delle altre compagnie; anteprima e conferma, allegati multipli e invio simulato con messaggio reale.",
+    "Storico filtrato per compagnia, stato e mese con esportazioni Excel e PDF.",
+    "Richiesta inviata, preventivo ricevuto, approvazione documentata e polizza con premio e storico allegati conservati."
+  ],
+  "layouts": [
+    "compose-desktop",
+    "compose-desktop-bottom",
+    "compose-mobile",
+    "compose-mobile-bottom",
+    "review-desktop",
+    "review-desktop-bottom",
+    "review-mobile",
+    "review-mobile-bottom",
+    "sent-desktop",
+    "sent-desktop-bottom",
+    "sent-mobile",
+    "sent-mobile-bottom",
+    "history-desktop",
+    "history-desktop-bottom",
+    "history-mobile",
+    "history-mobile-bottom",
+    "history-filtered-desktop",
+    "history-filtered-desktop-bottom",
+    "history-filtered-mobile",
+    "history-filtered-mobile-bottom"
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "labelIssues": [],
+  "realEmailsSent": 0,
+  "ok": true
+}

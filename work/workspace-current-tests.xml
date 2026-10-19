@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\phpunit.xml" tests="24" assertions="308" errors="0" failures="1" skipped="0" time="21.163990">
+    <testsuite name="Core" tests="24" assertions="308" errors="0" failures="1" skipped="0" time="21.163990">
+      <testsuite name="Tests\Feature\ClientMaterialsTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" tests="10" assertions="123" errors="0" failures="0" skipped="0" time="8.987687">
+        <testsuite name="Tests\Feature\ClientMaterialsTest::test_design_materials_are_private_downloads_with_their_original_name" tests="5" assertions="70" errors="0" failures="0" skipped="0" time="4.771108">
+          <testcase name="test_design_materials_are_private_downloads_with_their_original_name with data set #0" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" line="50" class="Tests\Feature\ClientMaterialsTest" classname="Tests.Feature.ClientMaterialsTest" assertions="14" time="4.013217"/>
+          <testcase name="test_design_materials_are_private_downloads_with_their_original_name with data set #1" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" line="50" class="Tests\Feature\ClientMaterialsTest" classname="Tests.Feature.ClientMaterialsTest" assertions="14" time="0.212279"/>
+          <testcase name="test_design_materials_are_private_downloads_with_their_original_name with data set #2" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" line="50" class="Tests\Feature\ClientMaterialsTest" classname="Tests.Feature.ClientMaterialsTest" assertions="14" time="0.280285"/>
+          <testcase name="test_design_materials_are_private_downloads_with_their_original_name with data set #3" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" line="50" class="Tests\Feature\ClientMaterialsTest" classname="Tests.Feature.ClientMaterialsTest" assertions="14" time="0.153496"/>
+          <testcase name="test_design_materials_are_private_downloads_with_their_original_name with data set #4" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" line="50" class="Tests\Feature\ClientMaterialsTest" classname="Tests.Feature.ClientMaterialsTest" assertions="14" time="0.111831"/>
+        </testsuite>
+        <testcase name="test_commercial_can_manage_only_their_client_materials_and_not_legacy_internal_attachments" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" line="61" class="Tests\Feature\ClientMaterialsTest" classname="Tests.Feature.ClientMaterialsTest" assertions="11" time="2.795815"/>
+        <testcase name="test_marketing_and_photographer_can_manage_materials_without_exposing_client_internal_details" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" line="83" class="Tests\Feature\ClientMaterialsTest" classname="Tests.Feature.ClientMaterialsTest" assertions="9" time="0.336086"/>
+        <testcase name="test_administration_and_assigned_developer_are_read_only_and_foreign_developer_is_denied" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" line="94" class="Tests\Feature\ClientMaterialsTest" classname="Tests.Feature.ClientMaterialsTest" assertions="12" time="0.162186"/>
+        <testcase name="test_search_and_category_filter_do_not_include_other_clients_or_general_attachments" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" line="112" class="Tests\Feature\ClientMaterialsTest" classname="Tests.Feature.ClientMaterialsTest" assertions="9" time="0.699631"/>
+        <testcase name="test_disallowed_extensions_invalid_categories_and_oversized_uploads_are_rejected" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\ClientMaterialsTest.php" line="125" class="Tests\Feature\ClientMaterialsTest" classname="Tests.Feature.ClientMaterialsTest" assertions="12" time="0.222862"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\DocumentWorkflowTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" tests="7" assertions="119" errors="0" failures="0" skipped="0" time="5.056373">
+        <testcase name="test_requests_versions_and_validation_keep_original_files_and_require_new_review" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="29" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="33" time="0.249554"/>
+        <testcase name="test_foreign_clients_context_changes_duplicate_versions_and_expired_validation_are_rejected" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="60" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="17" time="0.631741"/>
+        <testcase name="test_checklists_are_configured_explicitly_and_do_not_duplicate_requests" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="81" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="12" time="0.284848"/>
+        <testcase name="test_global_deadlines_enforce_visibility_filters_and_ignore_replaced_files_and_received_requests" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="100" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="19" time="2.142607"/>
+        <testcase name="test_request_due_dates_are_editable_without_changing_document_context" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="123" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="13" time="1.268924"/>
+        <testcase name="test_policy_checklist_stays_consistent_when_classification_changes" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="140" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="8" time="0.123281"/>
+        <testcase name="test_merging_clients_preserves_request_version_links_and_checklist_idempotency" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\DocumentWorkflowTest.php" line="156" class="Tests\Feature\DocumentWorkflowTest" classname="Tests.Feature.DocumentWorkflowTest" assertions="17" time="0.355417"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\InsuranceWorkspaceTest" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" tests="7" assertions="66" errors="0" failures="1" skipped="0" time="7.119930">
+        <testcase name="test_direct_form_client_lookup_quick_creation_and_policy_attachments" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="22" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="16" time="3.678415"/>
+        <testcase name="test_portfolio_context_and_global_save_enforce_client_scope_and_links" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="38" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="10" time="0.105634"/>
+        <testcase name="test_month_report_includes_last_day_and_excludes_next_month_with_distinct_agencies" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="55" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="5" time="0.079464"/>
+        <testcase name="test_reminders_cover_fifteen_days_once_respect_scope_and_ignore_replaced_documents" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="68" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="6" time="0.056698"/>
+        <testcase name="test_daily_agency_email_is_a_reviewed_draft_scoped_by_agency_and_date" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="85" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="10" time="2.938860">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\InsuranceWorkspaceTest::test_daily_agency_email_is_a_reviewed_draft_scoped_by_agency_and_date&#13;
+Expected response status code [200] but received 500.
+Failed asserting that 500 is identical to 200.&#13;
+&#13;
+The following exception occurred during the last request:
+
+ErrorException: Undefined variable $date in C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\storage\framework\views\57c7fa9f41ee710a91608a950fd1a18e.php:45
+Stack trace:
+#0 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Bootstrap\HandleExceptions.php(263): Illuminate\Foundation\Bootstrap\HandleExceptions-&gt;handleError()
+#1 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\storage\framework\views\57c7fa9f41ee710a91608a950fd1a18e.php(45): Illuminate\Foundation\Bootstrap\HandleExceptions-&gt;Illuminate\Foundation\Bootstrap\{closure}()
+#2 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php(123): require('...')
+#3 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Filesystem\Filesystem.php(124): Illuminate\Filesystem\Filesystem::Illuminate\Filesystem\{closure}()
+#4 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php(57): Illuminate\Filesystem\Filesystem-&gt;getRequire()
+#5 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php(22): Illuminate\View\Engines\PhpEngine-&gt;evaluatePath()
+#6 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php(76): Livewire\Mechanisms\ExtendBlade\ExtendedCompilerEngine-&gt;evaluatePath()
+#7 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php(10): Illuminate\View\Engines\CompilerEngine-&gt;get()
+#8 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\View.php(208): Livewire\Mechanisms\ExtendBlade\ExtendedCompilerEngine-&gt;get()
+#9 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\View.php(191): Illuminate\View\View-&gt;getContents()
+#10 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\View.php(160): Illuminate\View\View-&gt;renderContents()
+#11 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Response.php(82): Illuminate\View\View-&gt;render()
+#12 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Response.php(40): Illuminate\Http\Response-&gt;setContent()
+#13 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(939): Illuminate\Http\Response-&gt;__construct()
+#14 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(906): Illuminate\Routing\Router::toResponse()
+#15 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Routing\Router-&gt;prepareResponse()
+#16 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Routing\Router-&gt;Illuminate\Routing\{closure}()
+#17 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Auth\Middleware\Authorize.php(59): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#18 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Auth\Middleware\Authorize-&gt;handle()
+#19 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\app\Http\Middleware\ForcePasswordChange.php(23): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#20 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\ForcePasswordChange-&gt;handle()
+#21 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\app\Http\Middleware\RememberAppearance.php(14): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#22 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\RememberAppearance-&gt;handle()
+#23 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Middleware\SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#24 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings-&gt;handle()
+#25 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Auth\Middleware\Authenticate.php(63): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#26 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Auth\Middleware\Authenticate-&gt;handle()
+#27 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestForgery.php(104): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#28 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestForgery-&gt;handle()
+#29 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\Middleware\ShareErrorsFromSession.php(48): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#30 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\View\Middleware\ShareErrorsFromSession-&gt;handle()
+#31 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Session\Middleware\StartSession.php(120): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#32 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Session\Middleware\StartSession.php(63): Illuminate\Session\Middleware\StartSession-&gt;handleStatefulRequest()
+#33 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Session\Middleware\StartSession-&gt;handle()
+#34 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse.php(36): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#35 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse-&gt;handle()
+#36 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Cookie\Middleware\EncryptCookies.php(74): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#37 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Cookie\Middleware\EncryptCookies-&gt;handle()
+#38 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#39 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Pipeline\Pipeline-&gt;then()
+#40 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(800): Illuminate\Routing\Router-&gt;runRouteWithinStack()
+#41 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(764): Illuminate\Routing\Router-&gt;runRoute()
+#42 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(753): Illuminate\Routing\Router-&gt;dispatchToRoute()
+#43 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(200): Illuminate\Routing\Router-&gt;dispatch()
+#44 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Foundation\Http\Kernel-&gt;Illuminate\Foundation\Http\{closure}()
+#45 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\livewire\livewire\src\Features\SupportDisablingBackButtonCache\DisableBackButtonCacheMiddleware.php(19): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#46 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Livewire\Features\SupportDisablingBackButtonCache\DisableBackButtonCacheMiddleware-&gt;handle()
+#47 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\app\Http\Middleware\SecurityHeaders.php(13): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#48 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\SecurityHeaders-&gt;handle()
+#49 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#50 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest-&gt;handle()
+#51 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull-&gt;handle()
+#52 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#53 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest-&gt;handle()
+#54 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings-&gt;handle()
+#55 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#56 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize-&gt;handle()
+#57 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#58 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance-&gt;handle()
+#59 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Middleware\HandleCors.php(61): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#60 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\HandleCors-&gt;handle()
+#61 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Middleware\TrustProxies.php(58): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#62 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies-&gt;handle()
+#63 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#64 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks-&gt;handle()
+#65 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePathEncoding.php(28): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#66 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding-&gt;handle()
+#67 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#68 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(175): Illuminate\Pipeline\Pipeline-&gt;then()
+#69 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(144): Illuminate\Foundation\Http\Kernel-&gt;sendRequestThroughRouter()
+#70 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(638): Illuminate\Foundation\Http\Kernel-&gt;handle()
+#71 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(368): Illuminate\Foundation\Testing\TestCase-&gt;call()
+#72 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php(97): Illuminate\Foundation\Testing\TestCase-&gt;get()
+#73 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestCase.php(1335): Tests\Feature\InsuranceWorkspaceTest-&gt;test_daily_agency_email_is_a_reviewed_draft_scoped_by_agency_and_date()
+#74 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestCase.php(519): PHPUnit\Framework\TestCase-&gt;runTest()
+#75 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestRunner\TestRunner.php(99): PHPUnit\Framework\TestCase-&gt;runBare()
+#76 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestCase.php(359): PHPUnit\Framework\TestRunner-&gt;run()
+#77 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase-&gt;run()
+#78 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite-&gt;run()
+#79 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite-&gt;run()
+#80 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite-&gt;run()
+#81 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\TextUI\Application.php(229): PHPUnit\TextUI\TestRunner-&gt;run()
+#82 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application-&gt;run()
+#83 {main}
+
+Next Illuminate\View\ViewException: Undefined variable $date (View: C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\resources\views\agency-communications\index.blade.php) in C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\storage\framework\views\57c7fa9f41ee710a91608a950fd1a18e.php:45
+Stack trace:
+#0 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php(58): Illuminate\View\Engines\CompilerEngine-&gt;handleViewException()
+#1 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\Engines\PhpEngine.php(59): Livewire\Mechanisms\ExtendBlade\ExtendedCompilerEngine-&gt;handleViewException()
+#2 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php(22): Illuminate\View\Engines\PhpEngine-&gt;evaluatePath()
+#3 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\Engines\CompilerEngine.php(76): Livewire\Mechanisms\ExtendBlade\ExtendedCompilerEngine-&gt;evaluatePath()
+#4 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\livewire\livewire\src\Mechanisms\ExtendBlade\ExtendedCompilerEngine.php(10): Illuminate\View\Engines\CompilerEngine-&gt;get()
+#5 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\View.php(208): Livewire\Mechanisms\ExtendBlade\ExtendedCompilerEngine-&gt;get()
+#6 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\View.php(191): Illuminate\View\View-&gt;getContents()
+#7 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\View.php(160): Illuminate\View\View-&gt;renderContents()
+#8 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Response.php(82): Illuminate\View\View-&gt;render()
+#9 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Response.php(40): Illuminate\Http\Response-&gt;setContent()
+#10 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(939): Illuminate\Http\Response-&gt;__construct()
+#11 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(906): Illuminate\Routing\Router::toResponse()
+#12 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Routing\Router-&gt;prepareResponse()
+#13 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Routing\Router-&gt;Illuminate\Routing\{closure}()
+#14 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Auth\Middleware\Authorize.php(59): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#15 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Auth\Middleware\Authorize-&gt;handle()
+#16 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\app\Http\Middleware\ForcePasswordChange.php(23): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#17 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\ForcePasswordChange-&gt;handle()
+#18 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\app\Http\Middleware\RememberAppearance.php(14): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#19 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\RememberAppearance-&gt;handle()
+#20 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Middleware\SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#21 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings-&gt;handle()
+#22 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Auth\Middleware\Authenticate.php(63): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#23 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Auth\Middleware\Authenticate-&gt;handle()
+#24 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestForgery.php(104): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#25 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestForgery-&gt;handle()
+#26 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\View\Middleware\ShareErrorsFromSession.php(48): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#27 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\View\Middleware\ShareErrorsFromSession-&gt;handle()
+#28 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Session\Middleware\StartSession.php(120): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#29 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Session\Middleware\StartSession.php(63): Illuminate\Session\Middleware\StartSession-&gt;handleStatefulRequest()
+#30 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Session\Middleware\StartSession-&gt;handle()
+#31 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse.php(36): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#32 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse-&gt;handle()
+#33 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Cookie\Middleware\EncryptCookies.php(74): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#34 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Cookie\Middleware\EncryptCookies-&gt;handle()
+#35 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#36 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Pipeline\Pipeline-&gt;then()
+#37 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(800): Illuminate\Routing\Router-&gt;runRouteWithinStack()
+#38 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(764): Illuminate\Routing\Router-&gt;runRoute()
+#39 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Routing\Router.php(753): Illuminate\Routing\Router-&gt;dispatchToRoute()
+#40 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(200): Illuminate\Routing\Router-&gt;dispatch()
+#41 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Foundation\Http\Kernel-&gt;Illuminate\Foundation\Http\{closure}()
+#42 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\livewire\livewire\src\Features\SupportDisablingBackButtonCache\DisableBackButtonCacheMiddleware.php(19): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#43 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Livewire\Features\SupportDisablingBackButtonCache\DisableBackButtonCacheMiddleware-&gt;handle()
+#44 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\app\Http\Middleware\SecurityHeaders.php(13): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#45 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): App\Http\Middleware\SecurityHeaders-&gt;handle()
+#46 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#47 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest-&gt;handle()
+#48 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull-&gt;handle()
+#49 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#50 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest-&gt;handle()
+#51 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings-&gt;handle()
+#52 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#53 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize-&gt;handle()
+#54 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#55 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance-&gt;handle()
+#56 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Middleware\HandleCors.php(61): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#57 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\HandleCors-&gt;handle()
+#58 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Middleware\TrustProxies.php(58): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#59 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies-&gt;handle()
+#60 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#61 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks-&gt;handle()
+#62 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePathEncoding.php(28): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#63 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding-&gt;handle()
+#64 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline-&gt;Illuminate\Pipeline\{closure}()
+#65 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(175): Illuminate\Pipeline\Pipeline-&gt;then()
+#66 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(144): Illuminate\Foundation\Http\Kernel-&gt;sendRequestThroughRouter()
+#67 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(638): Illuminate\Foundation\Http\Kernel-&gt;handle()
+#68 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(368): Illuminate\Foundation\Testing\TestCase-&gt;call()
+#69 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php(97): Illuminate\Foundation\Testing\TestCase-&gt;get()
+#70 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestCase.php(1335): Tests\Feature\InsuranceWorkspaceTest-&gt;test_daily_agency_email_is_a_reviewed_draft_scoped_by_agency_and_date()
+#71 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestCase.php(519): PHPUnit\Framework\TestCase-&gt;runTest()
+#72 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestRunner\TestRunner.php(99): PHPUnit\Framework\TestCase-&gt;runBare()
+#73 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestCase.php(359): PHPUnit\Framework\TestRunner-&gt;run()
+#74 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase-&gt;run()
+#75 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite-&gt;run()
+#76 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite-&gt;run()
+#77 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite-&gt;run()
+#78 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\src\TextUI\Application.php(229): PHPUnit\TextUI\TestRunner-&gt;run()
+#79 C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\phpunit\phpunit\phpunit(104): PHPUnit\TextUI\Application-&gt;run()
+#80 {main}
+
+----------------------------------------------------------------------------------
+
+Undefined variable $date (View: C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\resources\views\agency-communications\index.blade.php)
+&#13;
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:45
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:176
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\vendor\laravel\framework\src\Illuminate\Testing\Concerns\AssertsStatusCodes.php:16
+C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php:97</failure>
+        </testcase>
+        <testcase name="test_expired_identity_warns_unknown_cannot_be_validated_and_non_pdf_policy_upload_is_rejected" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="101" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="9" time="0.175513"/>
+        <testcase name="test_source_status_frequency_and_method_do_not_invent_paid_or_resolve_mixed_groups" file="C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\tests\Feature\InsuranceWorkspaceTest.php" line="116" class="Tests\Feature\InsuranceWorkspaceTest" classname="Tests.Feature.InsuranceWorkspaceTest" assertions="10" time="0.085344"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

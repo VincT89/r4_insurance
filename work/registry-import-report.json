@@ -1,0 +1,27 @@
+{
+    "batch_hash": "0de691eb05cc7d270572bc7addc009e26675ac7fa293989740dfdfdc39b628ab",
+    "created": {
+        "client": 4884,
+        "agency": 16,
+        "company": 20
+    },
+    "held": {
+        "client": 71,
+        "agency": 0,
+        "company": 0
+    },
+    "already_imported": 0,
+    "policies_unchanged": true,
+    "admin_unchanged": true,
+    "users_unchanged": true,
+    "database_counts": {
+        "clients": 4884,
+        "supplier_companies": 20,
+        "supplier_agencies": 16,
+        "supplier_agency_company": 26,
+        "insurance_policies": 0
+    },
+    "source_readers_match": true,
+    "backup_created": true,
+    "ok": true
+}
