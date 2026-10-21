@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class AuditLog extends Model
 {
     public const ACTIONS = [
+        'agency_email_attachments',
         'roles_migrated',
         'claim_created','claim_updated','claim_status','claim_note','claim_activity_added','claim_activity_completed','claim_activity_rescheduled','claim_activity_cancelled',
         'form_template_saved','form_template_approved','form_template_retired','forms_prepared','forms_received','forms_reviewed','coverage_checked',
-        'commission_created','commission_revised','commission_voided',
+        'commission_created','commission_revised','commission_voided','commission_calculated','commission_base_recorded','commission_accrued','commission_confirmed','commission_settled','commission_reversed','commission_adjusted',
         'quote_email_review','quote_email_sending','quote_email_sent','quote_email_uncertain','quote_email_resolved',
         'policy_work_closed', 'policy_correction_requested', 'policy_correction_resolved', 'policy_corrected',
         'quote_updated','titles_generated','title_created','title_cancelled','collection_recorded','collection_voided','policy_renewed','policy_recorded',
@@ -89,6 +90,13 @@ class AuditLog extends Model
             'commission_created' => 'ha configurato le condizioni provvigionali di un’agenzia.',
             'commission_revised' => 'ha revisionato le condizioni provvigionali conservando la versione precedente.',
             'commission_voided' => 'ha annullato una configurazione provvigionale indicando il motivo.',
+            'commission_calculated' => 'ha calcolato una provvigione conservando le condizioni applicate.',
+            'commission_base_recorded' => 'ha registrato la base provvigionale di una rata.',
+            'commission_accrued' => 'ha aggiornato la maturazione in base ai movimenti del premio.',
+            'commission_confirmed' => 'ha registrato una conferma di maturazione del mandante.',
+            'commission_settled' => 'ha registrato una liquidazione provvigionale.',
+            'commission_reversed' => 'ha stornato un movimento provvigionale conservandone lo storico.',
+            'commission_adjusted' => 'ha aggiornato una provvigione dopo l’annullamento del titolo.',
             'quote_email_review' => 'ha preparato una richiesta di preventivo da controllare.',
             'quote_email_sending' => 'ha confermato l’invio di una richiesta di preventivo.',
             'quote_email_sent' => 'ha inviato una richiesta di preventivo al server di posta.',
@@ -122,6 +130,7 @@ class AuditLog extends Model
             'logout' => "ha terminato la sessione.",
             'policy_import_consolidated' => 'ha accorpato le righe Excel equivalenti in una polizza da verificare.',
             'policy_operational_details' => 'ha applicato gli stati polizza e i dati di pagamento confermati.',
+            'agency_email_attachments' => 'ha aggiornato gli allegati di un riepilogo da controllare.',
             'agency_email_review' => 'ha preparato un riepilogo da controllare.',
             'agency_email_sending' => 'ha confermato l’invio cumulativo.',
             'agency_email_sent' => 'ha inviato il riepilogo al server di posta.',
@@ -135,11 +144,12 @@ class AuditLog extends Model
     public function getDisplayActionLabelAttribute(): string
     {
         return match ($this->action) {
+            'agency_email_attachments' => 'Allegati comunicazione',
             'roles_migrated' => 'Ruoli e permessi',
             'claim_created','claim_updated','claim_status','claim_note','claim_activity_added','claim_activity_completed','claim_activity_rescheduled','claim_activity_cancelled' => 'Sinistri',
             'form_template_saved','form_template_approved','form_template_retired','forms_prepared','forms_received','forms_reviewed' => 'Moduli e firme',
             'coverage_checked' => 'Verifica RCA',
-            'commission_created','commission_revised','commission_voided' => 'Provvigioni',
+            'commission_created','commission_revised','commission_voided','commission_calculated','commission_base_recorded','commission_accrued','commission_confirmed','commission_settled','commission_reversed','commission_adjusted' => 'Provvigioni',
             'quote_email_review','quote_email_sending','quote_email_sent','quote_email_uncertain','quote_email_resolved' => 'Email preventivo',
             'policy_work_closed' => 'Fine lavorazione',
             'policy_correction_requested', 'policy_correction_resolved', 'policy_corrected' => 'Correzione polizza',

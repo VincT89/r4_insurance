@@ -23,24 +23,28 @@ class InsuranceQuoteController extends Controller
     }
     public function create(Request $request)
     {
-        $this->authorize('create',Client::class);$request->validate(['client_id'=>['nullable','integer']]);
+        $this->authorize('create',Client::class);$request->validate(['client_id'=>['nullable','integer'],'purpose'=>['nullable',Rule::in(array_keys(InsuranceQuoteCase::PURPOSES))],'current_policy_id'=>['nullable','integer']]);
         $clientId=$request->input('client_id', $request->old('client_id'));
         $client=$clientId ? Client::current()->visibleTo($request->user())->findOrFail($clientId) : new Client;
         if($client->exists)$this->authorize('updateRegistry',$client);
-        return view('quotes.create',['client'=>$client,'currentPolicies'=>$client->exists ? $client->policies()->orderBy('number')->get() : collect(),'branches'=>InsuranceBranch::where('status','active')->with(['subbranches'=>fn($q)=>$q->where('status','active')])->orderBy('name')->get()]);
+        $currentPolicies=$client->exists ? $client->policies()->orderBy('number')->get() : collect();
+        $source=$request->filled('current_policy_id') ? $currentPolicies->firstWhere('id',$request->integer('current_policy_id')) : null;
+        abort_if($request->filled('current_policy_id') && !$source,404);
+        return view('quotes.create',['client'=>$client,'currentPolicies'=>$currentPolicies,'source'=>$source,'purpose'=>$request->input('purpose','new'),'branches'=>InsuranceBranch::where('status','active')->with(['subbranches'=>fn($q)=>$q->where('status','active')])->orderBy('name')->get()]);
     }
     public function store(Request $request)
     {
         $data=$request->validate([
             'client_id'=>['required','integer'],
+            'purpose'=>['sometimes',Rule::in(array_keys(InsuranceQuoteCase::PURPOSES))],
             'insurance_branch_id'=>['required','integer',Rule::exists('insurance_branches','id')->where('status','active')],
             'insurance_subbranch_id'=>['nullable','integer',Rule::exists('insurance_subbranches','id')->where('insurance_branch_id',$request->input('insurance_branch_id'))->where('status','active')],
             'subject'=>['required','string','max:255'],'notes'=>['nullable','string','max:5000'],
             'requester_name'=>['nullable','string','max:255'],
-            'current_policy_id'=>['nullable','integer',Rule::exists('insurance_policies','id')->where('client_id',$request->input('client_id'))],
+            'current_policy_id'=>[Rule::requiredIf(in_array($request->input('purpose'),['replacement','addition'],true)),'nullable','integer',Rule::exists('insurance_policies','id')->where('client_id',$request->input('client_id'))],
             'current_policy_reference'=>['nullable','string','max:500',Rule::prohibitedIf($request->filled('current_policy_id'))],
             'current_coverages'=>['nullable','string','max:5000'],
-            'additional_coverages'=>['nullable','string','max:5000'],
+            'additional_coverages'=>['required_if:purpose,addition','nullable','string','max:5000'],
         ] + QuoteRequestDocuments::rules());
         $client=Client::current()->findOrFail($data['client_id']);$this->authorize('updateRegistry',$client);
         $documents=app(QuoteRequestDocuments::class); $uploads=QuoteRequestDocuments::uploads($request); $documents->check($uploads); $stored=[];
@@ -49,6 +53,10 @@ class InsuranceQuoteController extends Controller
             $case=DB::transaction(function () use ($client,$values,$request,$documents,$uploads,&$stored) {
                 $client=Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
                 $policy=!empty($values['current_policy_id']) ? $client->policies()->whereKey($values['current_policy_id'])->lockForUpdate()->firstOrFail() : null;
+                if (in_array($values['purpose']??'new',['replacement','addition'],true)) {
+                    app(\App\Services\InsurancePolicyChanges::class)->check($policy,$values['purpose']);
+                    if ($values['purpose']==='addition' && (!$policy->supplier_company_id || (int)$policy->insurance_branch_id !== (int)$values['insurance_branch_id'] || (int)$policy->insurance_subbranch_id !== (int)($values['insurance_subbranch_id']??null))) throw \Illuminate\Validation\ValidationException::withMessages(['current_policy_id'=>'Per un’aggiunta conserva compagnia, ramo e sottoramo della polizza. Per un altro ramo apri una nuova polizza.']);
+                }
                 /** Keep the references used for the request without changing the existing contract or its coverage. */
                 $snapshot=$policy ? ['number'=>$policy->number,'company'=>$policy->company,'category'=>$policy->category,'plate'=>$policy->vehicle?->plate,'expires_on'=>$policy->expires_on->toDateString()] : null;
                 $case=$client->quoteCases()->create($values+['created_by'=>$request->user()->id,'current_policy_snapshot'=>$snapshot]);
@@ -86,8 +94,8 @@ class InsuranceQuoteController extends Controller
     }
     public function show(Request $request, InsuranceQuoteCase $quoteCase)
     {
-        $this->authorize('view',$quoteCase->client);$quoteCase->load(['branch','subbranch','currentPolicy','documents.uploader','quotes.company.agencies','quotes.agency','quotes.documents','quotes.policy']);
-        $companies=SupplierCompany::where('status','active')->orderByDesc('quote_priority')->orderBy('name')->get();
+        $this->authorize('view',$quoteCase->client);$quoteCase->load(['branch','subbranch','currentPolicy','documents.uploader','quotes.company.agencies','quotes.agency','quotes.documents','quotes.policy','quotes.policyChange']);
+        $companies=$quoteCase->availableCompanies()->get();
         $emailFilters = $request->validate(['email_company'=>['nullable','integer'],'email_state'=>['nullable','in:'.implode(',',array_keys(\App\Models\InsuranceQuoteEmail::STATUSES))],'email_month'=>['nullable','date_format:Y-m']]);
         $emails = $quoteCase->emails()->with(['company','user'])->when($emailFilters['email_company']??null,fn($q,$id)=>$q->where('supplier_company_id',$id))->when($emailFilters['email_state']??null,fn($q,$state)=>$q->where('status',$state));
         if($month=$emailFilters['email_month']??null){$start=\Illuminate\Support\Carbon::createFromFormat('!Y-m',$month);$emails->where('created_at','>=',$start)->where('created_at','<',$start->copy()->addMonth());}
@@ -103,7 +111,7 @@ class InsuranceQuoteController extends Controller
         $this->authorize('updateRegistry',$quote->quoteCase->client);
         $files=['files'=>['required','array','min:1','max:10'],'files.*'=>['file','max:10240','mimes:pdf','extensions:pdf']];
         $rules=match($action){
-            'receive'=>['supplier_agency_id'=>['nullable','integer'],'reference'=>['required','string','max:100'],'product'=>['required','string','max:255'],'starts_on'=>['required','date_format:Y-m-d'],'expires_on'=>['required','date_format:Y-m-d','after:starts_on'],'valid_until'=>['required','date_format:Y-m-d','after_or_equal:received_on'],'received_on'=>['required','date_format:Y-m-d','before_or_equal:today'],'premium'=>['required','numeric','min:0.01','max:9999999999.99','decimal:0,2'],'payment_frequency'=>['required',Rule::in(InsurancePolicy::PAYMENT_FREQUENCIES)]]+$files,
+            'receive'=>['supplier_agency_id'=>['nullable','integer'],'reference'=>['required','string','max:100'],'product'=>['required','string','max:255'],'starts_on'=>['required','date_format:Y-m-d'],'expires_on'=>['required','date_format:Y-m-d','after:starts_on'],'valid_until'=>['required','date_format:Y-m-d','after_or_equal:received_on'],'received_on'=>['required','date_format:Y-m-d','before_or_equal:today'],'premium'=>['required','numeric',$quote->quoteCase->purpose==='addition' ? 'min:0' : 'min:0.01','max:9999999999.99','decimal:0,2'],'payment_frequency'=>['required',Rule::in(InsurancePolicy::PAYMENT_FREQUENCIES)]]+$files,
             'submit'=>['confirmed'=>['accepted']],
             'approve'=>['approved_on'=>['required','date_format:Y-m-d','before_or_equal:today'],'approval_note'=>['nullable','string','max:5000'],'confirmed'=>['accepted']]+$files,
             'reject'=>['approval_note'=>['required','string','min:5','max:5000']],default=>abort(404)};

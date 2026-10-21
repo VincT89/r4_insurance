@@ -52,8 +52,8 @@ class AgencyCommissionTest extends TestCase
         $schedule = $this->create();
         foreach ([UserRole::Operator] as $role) {
             $this->actingAs(User::factory()->create(['role'=>$role,'status'=>'active']));
-            $response = $this->get(route('suppliers.commissions.index',$this->agency));
-            $response->assertOk()->assertDontSee('Configura aliquote');
+            $response = $this->get(route('suppliers.show',[$this->agency,'tab'=>'commissions']));
+            $response->assertOk()->assertSee('12,3456 %')->assertDontSee('Configura aliquote')->assertDontSee('Report provvigioni');
             $this->get(route('suppliers.commissions.create',$this->agency))->assertForbidden();
             $this->get(route('suppliers.commissions.edit',[$this->agency,$schedule]))->assertForbidden();
             $this->post(route('suppliers.commissions.store',$this->agency),$this->data())->assertForbidden();
@@ -164,8 +164,72 @@ class AgencyCommissionTest extends TestCase
         $this->get(route('suppliers.commissions.create',$this->agency))->assertOk();
         $this->get(route('suppliers.commissions.edit',[$this->agency,$schedule]))->assertOk();
         $this->get(route('suppliers.commissions.show',[$this->agency,$schedule]))->assertOk()->assertDontSee('<script>alert(1)</script>',false);
-        $this->get(route('suppliers.commissions.index',[$this->agency,'company'=>$this->company->id,'branch'=>$this->branch->id,'on'=>'2026-10-01','basis'=>'net_premium','_table_all'=>1]))->assertOk()->assertViewHas('rates',fn($r)=>$r->total()===1);
-        $this->get(route('suppliers.commissions.index',[$this->agency,'on'=>'2027-01-01']))->assertOk()->assertViewHas('rates',fn($r)=>$r->isEmpty());
+        $this->get(route('suppliers.show',[$this->agency,'tab'=>'commissions','company'=>$this->company->id,'branch'=>$this->branch->id,'on'=>'2026-10-01','basis'=>'net_premium','_table_all'=>1]))->assertOk()->assertViewHas('rates',fn($r)=>$r->total()===1);
+        $this->get(route('suppliers.show',[$this->agency,'tab'=>'commissions','on'=>'2027-01-01']))->assertOk()->assertViewHas('rates',fn($r)=>$r->isEmpty());
         $this->withSession(['_old_input'=>['notes'=>['invalid'],'valid_from'=>['invalid'],'form_complete'=>1,'entries'=>[['issue_rate'=>['invalid'],'basis'=>['invalid']]]]])->get(route('suppliers.commissions.create',$this->agency))->assertOk();
+    }
+
+    public function test_agency_tab_contains_rates_and_old_links_preserve_filters(): void
+    {
+        $schedule = $this->create(['mandate_reference'=>'MANDATO-COLLAUDO-26']);
+        $tabUrl = route('suppliers.show', [$this->agency, 'tab'=>'commissions']);
+        $this->get(route('suppliers.show', $this->agency))->assertOk()->assertSee($tabUrl, false)->assertDontSee('MANDATO-COLLAUDO-26');
+        $this->get($tabUrl)->assertOk()->assertViewIs('suppliers.show')->assertViewHas('tab', 'commissions')
+            ->assertSee('MANDATO-COLLAUDO-26')->assertSee('Configura aliquote')->assertSee('Report provvigioni')
+            ->assertSee('name="tab" value="commissions"', false)->assertDontSee('Elimina agenzia');
+        $filters = ['company'=>$this->company->id, 'branch'=>$this->branch->id, 'on'=>'2026-10-01', 'state'=>'history', 'page'=>2, '_table_all'=>1];
+        $this->get(route('suppliers.commissions.index', [$this->agency, ...$filters]))
+            ->assertRedirect(route('suppliers.show', [...$filters, 'supplier'=>$this->agency, 'tab'=>'commissions']));
+        foreach ([
+            route('suppliers.commissions.create', $this->agency),
+            route('suppliers.commissions.edit', [$this->agency, $schedule]),
+            route('suppliers.commissions.show', [$this->agency, $schedule]),
+        ] as $url) $this->get($url)->assertOk()->assertSee($tabUrl, false)->assertSee('Sezioni della scheda agenzia');
+    }
+
+    public function test_agency_rates_pagination_and_export_remain_scoped_and_filtered(): void
+    {
+        $entries = [$this->row()];
+        for ($i=1; $i<=26; $i++) {
+            $sub = $this->branch->subbranches()->create(['name'=>'Garanzia '.$i, 'name_key'=>hash('sha256', 'GARANZIA '.$i), 'status'=>'active']);
+            $entries[] = $this->row(['subbranch_id'=>$sub->id, 'basis'=>'gross_premium']);
+        }
+        $schedule = $this->create(['entries'=>$entries]);
+        $other = SupplierAgency::create(['name'=>'Agenzia Borgoluce', 'status'=>'active', 'supplier_company_id'=>$this->company->id]);
+        $this->post(route('suppliers.commissions.store', $other), $this->data(['mandate_reference'=>'SOLO-ALTRA-AGENZIA']))->assertSessionHasNoErrors();
+        $params = [$this->agency, 'tab'=>'commissions', 'company'=>$this->company->id, 'state'=>'current'];
+        $page = $this->get(route('suppliers.show', $params))->assertOk()->assertDontSee('SOLO-ALTRA-AGENZIA')
+            ->assertViewHas('rates', fn ($rates) => $rates->total() === 27 && $rates->count() === 25);
+        $next = $page->viewData('rates')->nextPageUrl();
+        $this->assertStringContainsString('tab=commissions', $next);
+        $this->assertStringContainsString('company='.$this->company->id, $next);
+        $this->get($next)->assertOk()->assertViewHas('rates', fn ($rates) => $rates->count() === 2);
+        $this->get(route('suppliers.show', $params + ['_table_all'=>1]))
+            ->assertViewHas('rates', fn ($rates) => $rates->count() === 25);
+        $this->get(route('suppliers.show', $params + ['_table_all'=>1]), ['X-Table-Export'=>'1'])
+            ->assertViewHas('rates', fn ($rates) => $rates->count() === 27 && $rates->every(fn ($rate) => $rate->agency_commission_schedule_id === $schedule->id));
+        $this->get(route('suppliers.show', $params + ['branch'=>$this->branch->id, 'subbranch'=>$sub->id, 'basis'=>'gross_premium', 'on'=>'2026-10-20', '_table_all'=>1]), ['X-Table-Export'=>'1'])
+            ->assertViewHas('rates', fn ($rates) => $rates->total() === 1 && $rates->first()->insurance_subbranch_id === $sub->id);
+        $this->get(route('suppliers.show', [$other, 'tab'=>'commissions', 'subbranch'=>$sub->id]))
+            ->assertViewHas('rates', fn ($rates) => $rates->total() === 0);
+    }
+
+    public function test_agency_tab_separates_current_previous_and_voided_conditions(): void
+    {
+        $original = $this->create();
+        $this->patch(route('suppliers.commissions.update', [$this->agency, $original]), $this->data(['revision_reason'=>'Aggiornamento condizioni del mandato', 'entries'=>[$this->row(['issue_rate'=>'15'])]]))
+            ->assertSessionHasNoErrors();
+        $current = $original->replacement()->sole();
+        $this->get(route('suppliers.show', [$this->agency, 'tab'=>'commissions']))
+            ->assertViewHas('rates', fn ($rates) => $rates->pluck('agency_commission_schedule_id')->all() === [$current->id]);
+        $this->get(route('suppliers.show', [$this->agency, 'tab'=>'commissions', 'state'=>'history']))
+            ->assertSee('12,3456 %')->assertViewHas('rates', fn ($rates) => $rates->pluck('agency_commission_schedule_id')->all() === [$original->id]);
+        $this->post(route('suppliers.commissions.void', [$this->agency, $current]), ['confirmed'=>1, 'reason'=>'Condizioni da conservare soltanto nello storico'])->assertSessionHasNoErrors();
+        $this->get(route('suppliers.show', [$this->agency, 'tab'=>'commissions']))->assertViewHas('rates', fn ($rates) => $rates->isEmpty());
+        $this->get(route('suppliers.show', [$this->agency, 'tab'=>'commissions', 'state'=>'voided']))->assertSee('15 %')
+            ->assertViewHas('rates', fn ($rates) => $rates->pluck('agency_commission_schedule_id')->all() === [$current->id]);
+        $this->get(route('suppliers.show', [$this->agency, 'tab'=>'commissions', 'state'=>'all']))->assertViewHas('rates', fn ($rates) => $rates->total() === 2);
+        $this->getJson(route('suppliers.show', [$this->agency, 'tab'=>'unknown']))->assertUnprocessable();
+        $this->getJson(route('suppliers.show', [$this->agency, 'tab'=>'commissions', 'basis'=>'invalid']))->assertUnprocessable();
     }
 }

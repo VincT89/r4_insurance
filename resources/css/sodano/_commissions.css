@@ -5,9 +5,18 @@
 .commission-option { padding:10px 0; }
 .commission-selection { display:flex; align-items:flex-start; gap:8px; line-height:1.5; cursor:pointer; }
 .commission-selection input { flex-shrink:0; margin-top:4px; accent-color:var(--ap-primary); }
-.commission-rate-fields { display:grid; grid-template-columns:minmax(0,2fr) repeat(2,minmax(0,1fr)); gap:12px; padding:12px 0 4px 24px; }
+.commission-rate-fields { display:grid; grid-template-columns:minmax(0,2fr) repeat(3,minmax(0,1fr)); align-items:end; gap:12px; padding:12px 0 4px 24px; }
+.commission-maturity-fields { grid-column:1 / -1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
 .commission-basis-note { grid-column:1 / -1; }
+.commission-summary-line { display:block; margin-top:8px; }
+.commission-overview-scope { padding:14px 18px 0; margin:0; font-size:12px; color:var(--ap-text); line-height:1.6; }
+.commission-overview-values { padding:14px 18px 0; }
+.commission-overview-note { padding:0 18px; margin:12px 0; font-size:12px; line-height:1.6; }
+.commission-overview .collection-summary-note { padding-top:10px; }
+.commission-overview-empty { padding:14px 18px; margin:0; line-height:1.6; }
+.commission-reversal { min-width:220px; max-width:320px; display:grid; gap:12px; padding-top:12px; }
 @media (max-width:640px) {
     .commission-rate-fields { grid-template-columns:minmax(0,1fr); padding-left:0; }
+    .commission-maturity-fields { grid-template-columns:minmax(0,1fr); }
     .commission-picker-tools .btn { width:100%; }
 }

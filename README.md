@@ -8,7 +8,295 @@ La scheda comprende persone fisiche e aziende, polizze suddivise in tab per ramo
 veicoli e targhe, documenti riservati e scadenze ricavate dai dati registrati.
 I ruoli esistenti e l'identità grafica del gestionale sono conservati.
 
-## Stato aggiornato al 18 ottobre 2026
+## Prestazioni delle pagine: aggiornamento del 21 ottobre 2026
+
+Ridotte le letture ripetute del portafoglio in dashboard e del menu notifiche.
+Elenco degli avvisi e contatore dei non letti usano la stessa lettura dei dati
+attuali. Non viene introdotta una cache che ritardi incassi, storni o cambi di
+permessi. Gli esiti delle comunicazioni vengono risolti per insieme, conservando
+la distinzione fra agenzie e l'ordine dello storico anche con invii incerti.
+
+Le ricerche per mese e intervallo interrogano direttamente le colonne delle
+date. Il limite finale comprende l'intera giornata richiesta ed esclude quella
+successiva. Lo scadenzario applica i filtri a ciascuna origine prima di unire
+polizze, rate, documenti e richieste; le scelte nei menu restano riferite alle
+scadenze accessibili. Grafica, campi e comandi del frontend non sono cambiati.
+
+La migrazione `2026_10_21_100000_index_insurance_reporting_periods` aggiunge cinque
+indici per decorrenza e inserimento delle polizze, periodo delle rate, movimenti
+provvigionali e inserimento delle variazioni. Applicata al database di collaudo
+e a quello del gestionale, senza modificare i dati delle anagrafiche o i movimenti.
+
+Confronto locale sullo stesso archivio sintetico di 40.000 polizze e con un
+arretrato esteso. Ogni pagina viene richiesta una volta inizialmente e tre
+volte successive nello stesso processo; la tabella riporta la mediana di queste
+ultime, in secondi. Le richieste attraversano il kernel HTTP, le viste e il menu
+delle notifiche, ma non misurano il caricamento grafico nel browser.
+
+| Pagina | Prima | Dopo |
+| --- | ---: | ---: |
+| Dashboard | 10,73 | 5,81 |
+| Polizze | 11,93 | 4,31 |
+| Polizze con filtro mensile e ramo | 6,28 | 4,79 |
+| Clienti | 5,11 | 4,04 |
+| Rate e quietanze | 5,47 | 3,04 |
+| Incassi | 4,79 | 3,22 |
+| Report portafoglio | 5,23 | 4,23 |
+| Report provvigioni | 6,49 | 2,93 |
+| Scadenze | 11,64 | 5,28 |
+| Comunicazioni | 7,78 | 4,99 |
+| Scheda cliente | 4,68 | 2,92 |
+| Scheda polizza | 6,20 | 3,01 |
+
+Tutte le 48 richieste finali hanno risposto con HTTP 200. Superati 97 test
+applicativi mirati, con 1.184 asserzioni, e 13 test frontend. Le verifiche
+comprendono limiti delle date, esclusione dei clienti accorpati, conteggi,
+filtri per agenzia e ramo, paginazione, selezioni fra pagine, esportazioni dei
+risultati completi e file Excel riaperti con date e importi tipizzati. Controllati
+anche incasso parziale e completo, storno, promemoria, permessi, invii incerti
+e storico della comunicazione dopo un cambio di agenzia. Il confronto delle
+letture del menu ha confermato gli stessi identificativi e lo stesso contatore.
+
+I tempi dipendono dalla macchina locale e non equivalgono a un collaudo con
+utenti simultanei; alcune pagine restano sopra i cinque secondi nello scenario
+di arretrato. Nessuna nuova verifica visiva è stata eseguita: l'accesso al
+browser era stato bloccato e non è stato aggirato. Nessuna sessione browser o
+server web di collaudo aperta in questo intervento; verificate libere le porte
+8028 e 8029. I risultati dettagliati rimangono nella cartella privata di collaudo,
+fuori dal repository.
+
+## Comunicazioni delle variazioni: aggiornamento del 20 ottobre 2026
+
+Comunicazioni > Polizze, rinnovi e variazioni include le aggiunte di coperture
+nella data in cui vengono registrate, anche per contratti inseriti in precedenza.
+Ogni appendice ha una riga indipendente, con riferimento, numero della polizza
+invariato e premio aggiuntivo. Si possono filtrare le sole aggiunte, il periodo,
+l'agenzia, la compagnia e il contraente, con paginazione ed esportazioni Excel/PDF.
+
+Polizze e appendici della stessa agenzia possono essere riunite in un unico
+riepilogo. L'anteprima distingue i premi del contratto dagli importi delle
+coperture aggiunte e riporta descrizione e date delle variazioni. Il riepilogo
+non registra un incasso e non attesta l'emissione di una quietanza.
+
+Si possono selezionare più documenti già presenti nel cliente, nella polizza
+e nelle appendici scelte, oppure caricare più file. Se sono selezionate soltanto
+alcune appendici, i documenti di altre appendici dello stesso contratto non
+sono proposti. I file scelti sono conservati come copie private nello storico;
+una modifica degli allegati richiede un nuovo controllo prima della conferma.
+
+L'invio rimane manuale e riservato all'admin secondo i permessi esistenti.
+Le appendici hanno un controllo autonomo contro duplicati e selezioni
+sovrapposte: il cambio dell'indirizzo email non abilita il reinvio dello stesso
+evento alla stessa agenzia. Dati cambiati, allegati mancanti o un esito incerto
+bloccano l'invio e richiedono una nuova verifica. Lo storico distingue il numero
+di polizze selezionate da quello delle appendici, senza ricontare il contratto
+di riferimento come nuova operazione.
+
+Superati 56 test mirati sul flusso assicurativo e sulle comunicazioni e 13 test
+frontend; compilazione completata. Verificati nel browser filtri, selezione
+mista, controllo degli allegati, invio simulato, blocco dei duplicati, storico,
+Excel/PDF e layout a 1440 e 390 px. La migrazione
+`2026_10_20_140000_link_policy_changes_to_agency_communications` è applicata
+anche al database principale. I dati e gli invii di collaudo sono isolati:
+restano da configurare la casella SMTP reale e da verificarne la consegna.
+
+## Sostituzioni, coperture aggiuntive e aspetto: aggiornamento del 20 ottobre 2026
+
+Dalla scheda polizza si può preparare una sostituzione o un'aggiunta di
+coperture, partendo da un preventivo approvato con proposta e prova
+dell'approvazione allegate. La sostituzione crea una nuova polizza con
+numero diverso e collega la precedente, che passa allo stato Sostituita.
+La conferma è disponibile dalla decorrenza della nuova polizza: i preventivi
+possono essere preparati prima senza cessare anticipatamente la precedente.
+
+L'aggiunta mantiene numero, periodo e premio del contratto di base e registra
+un'appendice con coperture, periodo e premio aggiuntivo concordato. I suoi
+titoli si inseriscono esplicitamente, anche se il periodo coincide con rate
+del contratto, entro l'importo approvato. Non prolungano la copertura di base.
+Le rate, gli incassi e le provvigioni preesistenti sono conservati; rate
+residue e rimborsi della sostituzione richiedono la verifica manuale concordata.
+
+Lo storico conserva i dati dell'operazione, il preventivo, l'autore e gli
+allegati. I nuovi moduli e le relative firme sono collegati alla variazione
+e rimangono consultabili anche dalla scheda cliente. Le firme dei moduli
+precedenti non attestano automaticamente le nuove coperture. Sono disponibili
+allegati multipli, filtri ed esportazioni dello storico. Restano validi i
+permessi e il blocco delle modifiche dal giorno dopo la chiusura lavorazione.
+
+In Impostazioni > Aspetto si possono scegliere anche le tonalità delle
+intestazioni e dei riepiloghi. Bordi, pulsanti e hover seguono il tema
+personale, con anteprima e adattamento del contrasto. Le scelte già salvate
+mantengono le sfumature precedenti finché non vengono cambiate esplicitamente.
+I colori degli avvisi conservano il loro significato.
+
+Superati 96 test mirati (2.598 asserzioni) su variazioni, moduli, preventivi,
+contabilità, permessi e aspetto; compilazione frontend completata. Verificati
+nel browser i flussi di sostituzione per un privato e aggiunta per un'azienda,
+i moduli generati, i filtri e le esportazioni Excel/PDF, e le schermate a
+1440 e 390 px. Excel conserva date e premi come valori tipizzati. Il collaudo
+usa dati fittizi in un database isolato; la migrazione strutturale è applicata
+anche al database principale. Eseguiti logout, chiusura del browser e arresto
+del server di collaudo sulla porta 8028.
+
+## Riepilogo provvigioni in cliente e polizza: aggiornamento del 20 ottobre 2026
+
+Le schede cliente, nelle tab Anagrafica e Polizze, mostrano all'admin le
+provvigioni previste, maturate e liquidate dell'intero portafoglio del cliente.
+La scheda polizza mostra gli stessi saldi limitati alle sue rate, inclusi i
+rinnovi. Si leggono i saldi già registrati, una sola volta per rata, senza
+generare calcoli o movimenti durante la consultazione.
+
+Le tre voci rappresentano fasi dello stesso importo e non si sommano. Le rate
+senza condizioni sufficienti risultano da configurare; se solo parte delle
+rate è calcolata, il riepilogo avvisa che i totali sono parziali. Un'aliquota
+effettivamente pari a zero resta distinta da una condizione mancante. I residui
+da liquidare e le liquidazioni da riconciliare dopo storni sono evidenziati
+in rosso, senza compensarli fra rate diverse.
+
+Il collegamento al dettaglio apre il report sull'intero storico del cliente
+o della singola polizza. I vincoli restano applicati cambiando periodo,
+raggruppamento o vista, azzerando gli altri filtri e nelle esportazioni
+Excel/PDF. Le schede e il report mantengono la visibilità riservata all'admin.
+Nessuna nuova migrazione o aliquota inserita nel database principale:
+le condizioni reali dei mandati restano da concordare con il cliente.
+
+Superati 53 test mirati complessivi su anagrafica, polizze, permessi e
+provvigioni, oltre ai 12 test frontend e alla compilazione. Verificati nel
+browser i riepiloghi a 1440 e 390 px, i collegamenti al report, il filtro
+mensile e il suo ripristino, gli importi e i filtri dei file Excel/PDF.
+Le prove usano dati fittizi nel database temporaneo. Al termine effettuati
+logout, chiusura delle schede del browser e arresto del server di collaudo.
+
+## Provvigioni nella scheda agenzia: aggiornamento del 20 ottobre 2026
+
+La scheda Agenzia contiene le tab Anagrafica e Provvigioni. La seconda
+riunisce le aliquote per compagnia, mandato, ramo e sottoramo, con filtri
+per validità, base di calcolo e versioni correnti, precedenti o annullate.
+L'admin configura e revisiona le condizioni e accede al report già filtrato
+per l'agenzia; gli operatori possono consultarle. Il percorso precedente
+reindirizza alla tab conservando filtri e pagina.
+
+Le revisioni conservano lo storico e i calcoli già registrati. I valori
+contrattuali non definiti restano da concordare con il cliente. Non è
+necessaria una migrazione e non sono state inserite aliquote nel database
+principale.
+
+La tabella mantiene paginazione, filtri avanzati ed esportazioni della
+ricerca completa. Excel conserva date e percentuali come valori utilizzabili;
+i PDF con più di dieci colonne usano il formato A3 orizzontale per mantenere
+leggibili le intestazioni. Verificati filtri, versione precedente ed esclusione
+delle azioni dai file scaricati.
+
+Superati 37 test mirati su agenzie, condizioni e registro provvigioni
+(483 asserzioni), i 12 test frontend e la compilazione. Controllati nel browser
+la navigazione fra scheda, storico e revisione, i filtri, le esportazioni e il
+layout a 1440 e 390 px, senza overflow della pagina. I dati del collaudo sono
+fittizi e isolati dal database principale.
+
+## Rinnovi e verifiche contabili: aggiornamento del 20 ottobre 2026
+
+Il rinnovo registra la propria data di operazione, conserva le rate e i
+movimenti del periodo precedente e genera i nuovi titoli dopo anteprima e
+conferma. L'anteprima è legata alla polizza e ai dati del contraente: una
+modifica intervenuta nel frattempo richiede un nuovo controllo. Il blocco
+della lavorazione resta quello richiesto nelle task, dal giorno successivo
+alla chiusura per gli operatori; una polizza bloccata si rinnova tramite admin,
+senza riapertura automatica della lavorazione.
+
+Comunicazioni → Polizze e rinnovi comprende gli inserimenti e i rinnovi
+registrati nel periodo, con un filtro per separarli e la colonna Ultimo rinnovo.
+Anche una polizza importata può comparire dopo un rinnovo effettivo. Non sono
+state ricostruite date di rinnovo passate. L'anteprima dell'email riporta il
+rinnovo e conserva i controlli contro dati modificati e invii duplicati.
+Le comunicazioni degli incassi riportano anche lo stato attuale della polizza.
+
+Annullamento e sostituzione conservano rate, incassi, provvigioni e documenti.
+La scheda mostra una verifica contabile con numero e totale delle rate residue
+in rosso e collegamenti filtrati ai movimenti. Non offre la generazione di
+nuovi titoli o il rinnovo di un contratto chiuso. Gli importi ancora dovuti
+e i rimborsi richiedono la verifica manuale concordata con l'utente.
+Lo storno corregge un incasso errato: non esegue né registra un rimborso
+al contraente. Le provvigioni già liquidate rimangono da riconciliare.
+Il collegamento esplicito fra contratto sostituito e nuovo contratto resta
+da completare; una richiesta di coperture aggiuntive non equivale a una
+sostituzione automatica.
+
+La regola di numerazione confermata distingue i contratti dalle operazioni
+sullo stesso contratto: una nuova stipula dopo cessazione e una sostitutiva
+devono avere un numero diverso dal precedente, assegnato dalla compagnia.
+Rinnovo e aggiunta di coperture mantengono invece il numero esistente.
+Il rinnovo conserva già la stessa scheda e rifiuta richieste che tentano
+di assegnare un numero. Il collegamento fra i contratti e la registrazione
+delle aggiunte sul contratto originario devono rispettare questa distinzione;
+non va usata la conversione generica in una nuova polizza per un'aggiunta.
+Verificato il vincolo del rinnovo sia in anteprima sia in conferma:
+8 test del ciclo di vita superati, con 168 asserzioni.
+
+Il collaudo verifica rinnovo e quietanza, condizioni provvigionali del nuovo
+periodo, documenti da aggiornare, promemoria, comunicazioni e report mensili.
+Una rata successiva pagata non può superare un periodo precedente insoluto:
+lo storno ricalcola la copertura registrata senza saltare il debito riaperto.
+Sono verificati anche permessi, conferme obsolete e tentativi ripetuti.
+Passano 329 test applicativi (5.421 asserzioni); dopo l'ultima correzione del
+riepilogo sono ripassati i 7 test del ciclo di vita (152 asserzioni). Passano
+12 test frontend e la compilazione. Controllati browser desktop e smartphone
+da 390 px, selezioni, collegamenti, Excel con date effettive e PDF filtrato.
+Le prove usano dati fittizi isolati e posta simulata, senza invii reali.
+
+Applicata la migrazione `2026_10_20_120000_track_policy_renewal_date`.
+La verifica in sola lettura sul database principale conferma 50 clienti,
+50 polizze e nessun rinnovo di collaudo. Restano da confermare con il cliente
+le condizioni dei mandati e gli eventuali rimborsi; per l'invio effettivo
+servono la casella SMTP e i destinatari approvati.
+
+## Moduli e checklist: aggiornamento del 20 ottobre 2026
+
+La checklist si configura dall'admin nel catalogo rami e sottorami. Comprende
+documenti comuni, aggiunte per privati e aggiunte per aziende. Il sottoramo
+si somma al ramo senza duplicare categorie. Scegliendo una polizza, ramo e
+sottoramo seguono il contratto anche se il sottoramo viene omesso nella richiesta.
+Le richieste già registrate non vengono cancellate o riscritte quando cambia
+la configurazione.
+
+La scheda polizza mostra richieste, file ricevuti e stato del controllo,
+insieme ai fascicoli del cliente e della polizza. Ogni richiesta accetta più
+file e permette di collegare documenti esistenti della stessa categoria,
+appartenenti all'anagrafica o alla polizza selezionata. Il collegamento
+conserva l'originale, la scadenza, la validazione e lo storico; non equivale
+a una validazione. I file di altri clienti, altre polizze o archivi riservati
+a sinistri, contabilità e firme vengono esclusi. Una versione sostituita
+richiede un nuovo collegamento esplicito; i documenti scaduti sono segnalati
+in rosso e non possono essere validati. Le richieste ricevute cessano di
+comparire fra i documenti ancora da ricevere, mantenendo la relativa storia.
+
+I modelli documentali distinguono privati, aziende o entrambi, oltre a
+cliente/polizza e ramo/sottoramo. Restano approvazione dell'admin, preparazione
+PDF, firmatario e qualifica per l'azienda, caricamenti multipli, controllo
+manuale delle firme e versioni storiche. Gli allegati del preventivo restano
+facoltativi. Il riepilogo documentale non introduce un blocco automatico
+dell'emissione o della chiusura per documenti mancanti.
+
+Verificati due flussi isolati, privato e azienda: creazione anagrafica,
+preventivo con documenti, proposta, approvazione allegata, conversione in
+polizza, checklist, collegamento e validazione multipla, moduli cliente e
+polizza, firme con controllo, rate semestrali, incasso, copertura registrata,
+comunicazione cumulativa controllata e blocco delle modifiche il giorno dopo.
+La posta è simulata; nessuna email reale è stata inviata. I testi usati nei
+test sono chiaramente di collaudo e non sono stati attivati nel database locale.
+Passano 322 test applicativi (5.272 asserzioni) e 12 test frontend; dopo le
+rifiniture visive sono ripassati i 42 test documentali pertinenti.
+Controllati inoltre desktop, viewport smartphone da 390 px, PDF dei moduli,
+caricamento multiplo e corrispondenza tra filtro della checklist e Excel/PDF.
+
+La migrazione `2026_10_20_110000_complete_insurance_document_checklists` è stata
+applicata al database locale. Verifica in sola lettura: 50 clienti, 50 polizze,
+2 modelli in bozza, 5 modelli precedenti e nessuna checklist configurata.
+Per l'uso operativo il cliente deve definire i documenti per ramo/sottoramo
+e tipo di contraente, confermare i testi aggiornati dei moduli, precisare
+chi può firmare per le aziende e indicare se le mancanze debbano avvisare
+o bloccare emissione/chiusura. Nessun obbligo documentale è stato presunto.
+
+## Stato precedente al 18 ottobre 2026
 
 Il database locale contiene 50 clienti con nomi di fantasia (35 persone e
 15 aziende) e 50 polizze con numerazione SA-2026-001–050, collegate ai rami,
@@ -894,3 +1182,157 @@ nessuna migrazione pendente e 14 pagine correttamente raggiungibili.
 Evidenze: work/equivalent-policy-suite.xml,
 work/equivalent-policy-import-report.json, work/policy-import-live-report.json,
 work/insurance-ui/equivalent-policy-ui-report.json.
+
+## Backup cifrato e ripristino isolato
+
+`insurance:backup` usa Restic per conservare copie cifrate e deduplicate del
+database e dei dischi `attachments`, `local` e `public`. Include la chiave
+applicativa e le precedenti chiavi necessarie a leggere i campi cifrati.
+Non include il codice del gestionale: conservare separatamente la versione
+del progetto e le dipendenze corrispondenti. Il manifest registra l'impronta
+di `composer.lock`, i conteggi e le impronte SHA-256 di dati e documenti.
+
+Richiede Restic e i programmi `mysqldump` e `mysql` della stessa famiglia del
+server. La prima implementazione supporta MySQL/MariaDB locale, tabelle
+InnoDB e archivi documentali locali. Rifiuta schemi con viste, trigger,
+procedure o eventi, che richiederebbero una procedura dedicata.
+Non configura account cloud, trasferimenti esterni o esecuzioni automatiche.
+
+Variabili da configurare nell'ambiente di installazione:
+
+| Variabile | Contenuto |
+| --- | --- |
+| `INSURANCE_BACKUP_RESTIC` | Percorso del programma Restic |
+| `INSURANCE_BACKUP_MYSQLDUMP` | Percorso di mysqldump |
+| `INSURANCE_BACKUP_MYSQL` | Percorso del client mysql |
+| `INSURANCE_BACKUP_REPOSITORY` | Percorso assoluto di una destinazione locale, disco esterno o volume montato |
+| `INSURANCE_BACKUP_WORK_DIRECTORY` | Cartella temporanea privata, esterna al progetto e agli archivi |
+| `INSURANCE_BACKUP_PASSWORD_FILE` | File privato con una password casuale robusta, almeno 20 caratteri |
+
+Repository, cartella di lavoro e file password devono essere separati fra
+loro e dagli archivi del gestionale. Su Windows limitare esplicitamente le
+ACL all'account del servizio e agli amministratori autorizzati: i permessi
+PHP non sostituiscono le ACL. La cartella di lavoro contiene temporaneamente
+SQL, documenti e chiavi in chiaro; viene ripulita alla fine dell'operazione.
+Una cartella temporanea rimasta dopo un'interruzione blocca il nuovo backup
+finché non viene esaminata. Non versionare copie o password in Git.
+Custodire una seconda copia della password fuori dal computer: senza di essa
+il repository cifrato non è recuperabile.
+
+Quando possibile, la preparazione utilizza hard link temporanei sullo stesso
+filesystem; altrimenti copia i file. Non modifica contenuto, permessi o date
+degli originali. Restic archivia i contenuti cifrati, indipendentemente dai
+collegamenti temporanei, che vengono poi rimossi. Gli hash vengono
+controllati anche dopo l'archiviazione. Gli allegati devono quindi restare
+fermi fino al termine dell'intera operazione, come il database.
+
+Inizializzare una destinazione nuova:
+
+```console
+php artisan insurance:backup init
+```
+
+Prima di creare una copia, mettere l'applicazione in manutenzione, sospendere
+scheduler e worker e attendere la conclusione delle richieste già avviate.
+Il flag conferma che queste operazioni sono state realmente eseguite.
+Riattivare l'applicazione e i servizi anche se il backup non riesce.
+
+```console
+php artisan down
+php artisan insurance:backup create --writers-stopped
+php artisan up
+php artisan insurance:backup check
+```
+
+`check` legge e verifica tutti i dati cifrati del repository. La creazione
+confronta il database prima e dopo la copia, controlla che i documenti
+collegati esistano e salva `last-backup.json` nella cartella di lavoro.
+Non cancella automaticamente copie precedenti.
+
+La prova di ripristino richiede l'identificativo completo della copia, una
+cartella nuova e un database nuovo con prefisso `r4_restore_`. I valori tra
+parentesi angolari nell'esempio sono segnaposto da sostituire.
+
+```console
+php artisan insurance:backup restore-test --snapshot=<identificativo-completo> --target=<nuova-cartella-privata-assoluta> --database=r4_restore_20261020a
+```
+
+Il ripristino rifiuta destinazioni già esistenti, non sovrascrive il database
+operativo e non avvia email o processi applicativi. Confronta ogni tabella
+e documento con il manifest, controlla i collegamenti del database e la
+decifrabilità dei campi applicativi. Salva `verification.json` nella
+destinazione e `last-restore-test.json` nella cartella di lavoro.
+In caso di errore conserva la destinazione parziale per l'analisi.
+La destinazione ripristinata contiene dati in chiaro e deve restare privata.
+
+Il caricamento SQL usa un account casuale temporaneo, limitato al nuovo
+database e alle connessioni locali. Non dispone di permessi sugli altri
+database, di eliminazione delle tabelle o di lettura dei file del server.
+Viene rimosso sia dopo il caricamento sia in caso di errore. La connessione
+amministrativa usata per questa prova deve poter creare e rimuovere questi
+account e concedere i permessi sul nuovo database. Le credenziali temporanee
+non vengono salvate nei report o nei log applicativi. Un'interruzione forzata
+richiede anche il controllo degli eventuali account `r4restore_*` rimasti.
+
+Questa procedura non equivale a un servizio di conservazione attivato per
+dieci anni. Prima dell'uso operativo servono una destinazione fuori dal PC,
+una capacità dimensionata su documenti reali, una finestra concordata, un
+controllo degli errori e prove periodiche di recupero. La riattivazione su un
+altro server richiede anche il codice corrispondente, la configurazione
+dell'ambiente, i permessi degli archivi e una verifica prima di riabilitare
+scheduler, accessi e invio delle email.
+
+## Collaudo di capacità isolato
+
+`scripts/capacity-check.php` e `CapacitySeeder` operano esclusivamente su
+database `r4_capacity_*` distinti dal database operativo, con archivi esterni
+al progetto e una chiave applicativa dedicata. Il seeder rifiuta database
+già popolati. Il server di collaudo accetta soltanto connessioni locali e
+mantiene il normale accesso con autenticazione e protezione CSRF.
+
+Il campione contiene 10.000 clienti, 40.000 polizze su dieci anni, 60.000
+rate, 53.853 incassi, 60.000 posizioni provvigionali, 107.224 movimenti,
+50.000 PDF e 40.000 eventi di attività. Sono dati sintetici; i PDF ridotti
+servono a verificare collegamenti e integrità e non stimano lo spazio
+necessario per scansioni reali. Lo scenario conserva volutamente un forte
+arretrato di notifiche e comunicazioni.
+
+Le misure includono le viste reali di dodici pagine e quattro richieste per
+pagina. Non sono un test di accessi simultanei né una garanzia di tempi in
+produzione. La migrazione `2026_10_20_150000` collega i promemoria alle
+notifiche con un indice dedicato; i promemoria vengono generati in blocchi
+transazionali, senza duplicare quelli già letti. Le esportazioni continuano
+a rispettare i permessi e non rigenerano il menu delle notifiche per ogni
+pagina di dati.
+
+Esito del collaudo del 20 ottobre 2026: dodici pagine hanno risposto con HTTP
+200. Nello scenario con arretrato esteso, le mediane delle richieste dopo il
+primo caricamento vanno da 3,6 a 9,5 secondi: il risultato non costituisce
+un'approvazione delle prestazioni per la produzione. Sono passati 49 test
+mirati distinti. Il browser ha completato l'esportazione di 40.000 righe;
+un campione filtrato di 66 polizze è stato inoltre verificato nei file Excel
+e PDF effettivamente scaricati. Il campione PDF è stato controllato anche
+visivamente. Verificati il menu notifiche su smartphone e l'assenza di
+scorrimento orizzontale nella pagina controllata.
+
+Il 21 ottobre 2026 è stato completato il ripristino isolato della copia
+cifrata scritta prima dell'interruzione del giorno precedente. Il controllo
+Restic con lettura integrale è riuscito. Il ripristino definitivo ha
+verificato 69 tabelle, 50.000 allegati (68.088.894 byte), 144 vincoli di
+relazione e il valore cifrato presente nel campione; durata 290,3 secondi.
+La copia include i 40.000 contratti e gli altri dati di collaudo sopra
+descritti. Nessun dato operativo è stato sostituito.
+
+La prova ha rilevato e permesso di correggere un'incompatibilità fra le
+opzioni `--binary-mode` e `--one-database` del client MariaDB utilizzato,
+che terminava senza errori lasciando vuoto il database di destinazione.
+L'isolamento è ora garantito dall'account temporaneo con permessi limitati;
+restano attivi la modalità binaria e il divieto di caricamento di file locali.
+Una prova nativa ha confermato il caricamento corretto, il rifiuto di accesso
+al database originale e la rimozione degli account dopo successo ed errore.
+Superati 13 test mirati del backup, con 43 asserzioni, compresa la pulizia
+dopo un errore durante la concessione dei permessi.
+
+Nessuna destinazione esterna o esecuzione automatica è stata attivata.
+Il server locale usato per la prova è MariaDB 10.4.32, una versione fuori
+supporto: prevedere un aggiornamento collaudato prima dell'uso in produzione.

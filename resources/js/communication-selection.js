@@ -11,13 +11,27 @@ export class CommunicationSelection {
     }
     add(id, agency) {
         id = String(id); agency = String(agency);
-        if (!/^[1-9]\d*$/.test(id) || !/^[1-9]\d*$/.test(agency)) return false;
+        if (!/^(?:[1-9]\d*|change-[1-9]\d*)$/.test(id) || !/^[1-9]\d*$/.test(agency)) return false;
         if (this.items.get(id) === agency) return true;
         if (this.forAgency(agency).length >= limit) return false;
         this.items.set(id, agency); return true;
     }
     forAgency(agency) { return [...this.items].filter(([, value]) => value === String(agency)).map(([id]) => id); }
     snapshot(now = Date.now()) { return { scope: this.scope, expires: now + duration, items: [...this.items] }; }
+}
+
+export function withoutClaimed(saved, ids) {
+    if (!saved || !Array.isArray(saved.items) || !Array.isArray(ids)) return saved;
+    const claimed = new Set(ids.map(String));
+    return { ...saved, items: saved.items.filter(row => Array.isArray(row) && !claimed.has(String(row[0]))) };
+}
+
+function clearClaimed(root) {
+    const key = `communication-selection:${root.dataset.selectionUser}:${root.dataset.selectionPath}`;
+    try {
+        const saved = JSON.parse(sessionStorage.getItem(key));
+        if (saved) sessionStorage.setItem(key, JSON.stringify(withoutClaimed(saved, JSON.parse(root.dataset.claimedIds))));
+    } catch { /** Storage restrictions cannot bypass the server's delivery checks. */ }
 }
 
 function initialize(root) {
@@ -72,10 +86,21 @@ function initialize(root) {
         render();
         if (!selection.forAgency(form.dataset.reviewAgency).length) event.preventDefault();
     });
-    window.addEventListener('pageshow', render);
+    window.addEventListener('pageshow', event => {
+        if (event.persisted) {
+            try {
+                const restored = new CommunicationSelection(selection.scope, JSON.parse(sessionStorage.getItem(key)));
+                selection.items = restored.items;
+            } catch { selection.items.clear(); }
+        }
+        render();
+    });
     render();
 }
 
-const init = () => document.querySelectorAll('[data-communication-selection]').forEach(initialize);
+const init = () => {
+    document.querySelectorAll('[data-communication-claimed]').forEach(clearClaimed);
+    document.querySelectorAll('[data-communication-selection]').forEach(initialize);
+};
 document.addEventListener('DOMContentLoaded', init);
 document.addEventListener('livewire:navigated', init);

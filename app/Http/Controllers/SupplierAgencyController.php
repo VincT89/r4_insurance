@@ -64,11 +64,20 @@ class SupplierAgencyController extends Controller
         return redirect()->route('suppliers.show', $supplier)->with('success', 'Agenzia aggiunta ai fornitori.');
     }
 
-    public function show(SupplierAgency $supplier): View
+    public function show(Request $request, SupplierAgency $supplier, \App\Domain\Core\Queries\AgencyCommissionQuery $commissions): View
     {
         $this->authorize('view', $supplier);
+        $tab = $request->validate(['tab'=>['nullable','in:registry,commissions']])['tab'] ?? 'registry';
+        if ($tab === 'commissions') {
+            $filters = $commissions->filters($request);
+            return view('suppliers.show', compact('supplier', 'tab', 'filters') + [
+                'rates'=>$commissions->forAgency($supplier, $filters)->paginate(\App\Support\TableListing::perPage(25))->withQueryString(),
+                'companies'=>$supplier->companies()->orderBy('name')->get(),
+                'branches'=>\App\Models\InsuranceBranch::with('subbranches')->orderBy('name')->get(),
+            ]);
+        }
         $supplier->load(['companies', 'parentAgency', 'subagencies' => fn ($q) => $q->orderBy('name')->orderBy('id')]);
-        return view('suppliers.show', compact('supplier'));
+        return view('suppliers.show', compact('supplier', 'tab'));
     }
 
     public function edit(SupplierAgency $supplier): View

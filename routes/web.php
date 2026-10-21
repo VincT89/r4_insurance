@@ -96,6 +96,14 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::post('/policies', [\App\Http\Controllers\PolicyPortfolioController::class, 'store'])->name('policies.store');
     Route::get('/clients/{client}/policy-context', [\App\Http\Controllers\PolicyPortfolioController::class, 'clientContext'])->name('clients.policy-context');
     Route::get('/reports', \App\Http\Controllers\InsuranceReportController::class)->middleware('can:system.admin')->name('reports.index');
+    Route::middleware('can:system.admin')->group(function () {
+        Route::get('/reports/commissions', [\App\Http\Controllers\InsuranceCommissionController::class, 'index'])->name('commissions.index');
+        Route::post('/reports/commissions/calculate', [\App\Http\Controllers\InsuranceCommissionController::class, 'calculate'])->name('commissions.calculate');
+        Route::get('/titles/{title}/commission', [\App\Http\Controllers\InsuranceCommissionController::class, 'show'])->name('commissions.show');
+        Route::post('/titles/{title}/commission/calculate', [\App\Http\Controllers\InsuranceCommissionController::class, 'prepare'])->name('commissions.prepare');
+        Route::post('/titles/{title}/commission/movements/{kind}', [\App\Http\Controllers\InsuranceCommissionController::class, 'record'])->where('kind', 'accrual|settlement')->name('commissions.record');
+        Route::post('/titles/{title}/commission/reverse/{movement}', [\App\Http\Controllers\InsuranceCommissionController::class, 'reverse'])->name('commissions.reverse');
+    });
     Route::get('/agency-communications', [\App\Http\Controllers\AgencyCommunicationController::class, 'index'])->middleware('can:system.admin')->name('agency-communications.index');
     Route::get('/agency-communications/collections',[\App\Http\Controllers\AgencyCollectionCommunicationController::class,'index'])->middleware('can:system.admin')->name('agency-communications.collections');
     Route::post('/agency-communications/{agency}/collections-review',[\App\Http\Controllers\AgencyCollectionCommunicationController::class,'review'])->middleware(['can:system.admin','throttle:30,1'])->name('agency-communications.collections-review');
@@ -103,6 +111,8 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('/agency-communications/history', [\App\Http\Controllers\AgencyCommunicationController::class, 'history'])->middleware('can:system.admin')->name('agency-communications.history');
     Route::post('/agency-communications/{agency}/review', [\App\Http\Controllers\AgencyCommunicationController::class, 'review'])->middleware(['can:system.admin','throttle:30,1'])->name('agency-communications.review');
     Route::get('/agency-communications/messages/{communication}', [\App\Http\Controllers\AgencyCommunicationController::class, 'show'])->middleware('can:system.admin')->name('agency-communications.show');
+    Route::post('/agency-communications/messages/{communication}/documents', [\App\Http\Controllers\AgencyCommunicationController::class, 'documents'])->middleware(['can:system.admin','throttle:10,1'])->name('agency-communications.documents');
+    Route::get('/agency-communications/messages/{communication}/documents/{document}', [\App\Http\Controllers\AgencyCommunicationController::class, 'download'])->middleware('can:system.admin')->name('agency-communications.documents.download');
     Route::post('/agency-communications/messages/{communication}/send', [\App\Http\Controllers\AgencyCommunicationController::class, 'send'])->middleware(['can:system.admin','throttle:10,1'])->name('agency-communications.send');
     Route::post('/agency-communications/messages/{communication}/resolve', [\App\Http\Controllers\AgencyCommunicationController::class, 'resolve'])->middleware(['can:system.admin','throttle:10,1'])->name('agency-communications.resolve');
     Route::get('/settings/email', [\App\Http\Controllers\EmailSettingsController::class, 'edit'])->middleware('can:system.admin')->name('email-settings.edit');
@@ -144,6 +154,10 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('clients/{client}/merge', [\App\Http\Controllers\ClientMergeController::class, 'preview'])->name('clients.merge.preview');
     Route::post('clients/{client}/merge', [\App\Http\Controllers\ClientMergeController::class, 'store'])->name('clients.merge.store');
     Route::resource('clients.policies', \App\Http\Controllers\InsurancePolicyController::class)->except('index');
+    Route::get('clients/{client}/policies/{policy}/changes/create', [\App\Http\Controllers\InsurancePolicyChangeController::class,'create'])->name('clients.policies.changes.create');
+    Route::post('clients/{client}/policies/{policy}/changes', [\App\Http\Controllers\InsurancePolicyChangeController::class,'store'])->name('clients.policies.changes.store');
+    Route::get('clients/{client}/policy-changes/{change}', [\App\Http\Controllers\InsurancePolicyChangeController::class,'show'])->name('clients.policy-changes.show');
+    Route::post('clients/{client}/policy-changes/{change}/documents', [\App\Http\Controllers\InsurancePolicyChangeController::class,'documents'])->middleware('throttle:10,1')->name('clients.policy-changes.documents');
     Route::post('clients/{client}/policies/{policy}/close-work', [\App\Http\Controllers\InsurancePolicyWorkflowController::class, 'close'])->name('clients.policies.close-work');
     Route::post('clients/{client}/policies/{policy}/corrections', [\App\Http\Controllers\InsurancePolicyWorkflowController::class, 'report'])->middleware('throttle:20,1')->name('clients.policies.corrections.store');
     Route::post('clients/{client}/policies/{policy}/corrections/{correction}/resolve', [\App\Http\Controllers\InsurancePolicyWorkflowController::class, 'resolve'])->name('clients.policies.corrections.resolve');
@@ -155,6 +169,7 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::post('clients/{client}/document-requests/checklist', [\App\Http\Controllers\ClientDocumentRequestController::class, 'apply'])->name('clients.document-requests.apply');
     Route::get('clients/{client}/document-requests/{documentRequest}/edit', [\App\Http\Controllers\ClientDocumentRequestController::class, 'edit'])->name('clients.document-requests.edit');
     Route::patch('clients/{client}/document-requests/{documentRequest}', [\App\Http\Controllers\ClientDocumentRequestController::class, 'update'])->name('clients.document-requests.update');
+    Route::post('clients/{client}/document-requests/{documentRequest}/files', [\App\Http\Controllers\ClientDocumentRequestController::class, 'link'])->name('clients.document-requests.link');
     Route::delete('clients/{client}/document-requests/{documentRequest}', [\App\Http\Controllers\ClientDocumentRequestController::class, 'destroy'])->name('clients.document-requests.destroy');
     Route::get('clients/{client}/materials', [ClientMaterialController::class, 'index'])->name('clients.materials.index');
     Route::post('clients/{client}/materials', [ClientMaterialController::class, 'store'])->name('clients.materials.store');

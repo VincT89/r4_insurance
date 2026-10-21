@@ -26,6 +26,7 @@ class SaveInsurancePolicyRequest extends ClientInsuranceRequest
         return [
             'policy_revision' => $this->isMethod('POST') ? ['prohibited'] : ['required', 'string', 'regex:/\A[a-f0-9]{64}\z/'],
             'work_closed_at' => ['prohibited'], 'work_closed_by' => ['prohibited'],
+            'last_renewed_at' => ['prohibited'],
             'correction_reason' => $this->isMethod('POST') ? ['prohibited'] : ['nullable', Rule::requiredIf(fn () => (bool) $this->route('policy')?->work_closed_at && $this->user()->canManageSystem()), 'string', 'min:10', 'max:3000'],
             'entry_mode'=>$this->isMethod('POST') ? ['required','in:new,existing'] : ['prohibited'],
             'insurance_quote_id'=>$this->isMethod('POST') ? ['nullable','required_if:entry_mode,new','integer'] : ['prohibited'],

@@ -24,12 +24,16 @@ class InsuranceFormController extends Controller
     public function create(Request $request,Client $client,InsuranceForms $forms)
     {
         $this->authorize('updateRegistry',$client); $policy=$this->policy($request,$client); if($policy)abort_unless($policy->editableBy($request->user()),403);
-        return view('insurance-forms.create',['client'=>$client,'policy'=>$policy,'templates'=>$forms->available($policy),'contextHash'=>$forms->contextHash($client,$policy)]);
+        $request->validate(['change'=>['nullable','integer']]);
+        $change=$policy?->incomingChanges()->latest('id')->first();
+        abort_if($request->filled('change') && (int)$change?->id!==$request->integer('change'),404);
+        return view('insurance-forms.create',['client'=>$client,'policy'=>$policy,'change'=>$change,'templates'=>$forms->available($policy, $client),'contextHash'=>$forms->contextHash($client,$policy)]);
     }
     public function store(Request $request,Client $client,InsuranceForms $forms)
     {
         $this->authorize('updateRegistry',$client); $policy=$this->policy($request,$client);
         $data=$request->validate(['context_hash'=>['required','string','size:64'],'request_key'=>['required','uuid'],'templates'=>['required','array','min:1','max:12'],'templates.*'=>['required','integer','distinct'],'reason'=>['required',Rule::in(array_keys(InsuranceFormPackage::REASONS))],'note'=>['nullable','string','max:2000'],'signer_name'=>['required','string','max:150'],'signer_role'=>['nullable','string','max:150'],'place'=>['required','string','max:150'],'document_date'=>['required','date_format:Y-m-d'],'confirmed'=>['accepted']]);
+        $request->validate(['change'=>['nullable','integer']]); $data['change_id']=$request->integer('change') ?: null;
         $package=$forms->createPackage($client,$policy,$data); return to_route('clients.forms.show',[$client,$package])->with('success','Moduli preparati e conservati nel fascicolo.');
     }
     public function show(Client $client,InsuranceFormPackage $package)
@@ -51,7 +55,7 @@ class InsuranceFormController extends Controller
     }
     public function templates(Request $request)
     {
-        $this->authorize('system.admin'); $data=$request->validate(['status'=>['nullable',Rule::in(array_keys(InsuranceFormTemplate::STATUSES))],'scope'=>['nullable','in:client,policy']]);
+        $this->authorize('system.admin'); $data=$request->validate(['status'=>['nullable',Rule::in(array_keys(InsuranceFormTemplate::STATUSES))],'scope'=>['nullable','in:client,policy'],'client_type'=>['nullable',Rule::in(array_keys(InsuranceFormTemplate::CLIENT_TYPES))]]);
         $query=InsuranceFormTemplate::with(['branch','subbranch']); foreach($data as $field=>$value)if($value)$query->where($field,$value);
         return view('insurance-forms.templates.index',['templates'=>$query->orderBy('title')->orderByDesc('version')->get(),'filters'=>$data]);
     }
@@ -63,7 +67,9 @@ class InsuranceFormController extends Controller
     public function templateSave(Request $request,InsuranceForms $forms,?InsuranceFormTemplate $template=null)
     {
         $this->authorize('system.admin');
+        $request->validate(['client_type'=>['sometimes',Rule::in(array_keys(InsuranceFormTemplate::CLIENT_TYPES))]]);
         $data=$request->validate(['title'=>['required','string','max:150'],'category'=>['required',Rule::in(array_keys(Attachment::DOCUMENT_CATEGORIES))],'scope'=>['required','in:client,policy'],'insurance_branch_id'=>['nullable','integer'],'insurance_subbranch_id'=>['nullable','integer'],'body'=>['required','string','max:50000'],'signature_required'=>['required','boolean'],'required'=>['required','boolean'],'revision_reason'=>['nullable','string','max:2000'],'revise'=>['nullable','in:1']]);
+        $data['client_type'] = $request->input('client_type', $template?->client_type ?? 'all');
         $revision=$request->boolean('revise'); unset($data['revise']);
         if($revision)$request->validate(['revision_reason'=>['required','string','min:10','max:2000']]);
         $result=$forms->saveTemplate($data,$template,$revision); return to_route('form-templates.edit',$result)->with('success','Bozza salvata. Controllala prima di abilitarla per l’uso.');

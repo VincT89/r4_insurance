@@ -220,9 +220,10 @@ body {
   font-family: var(--sans);
   font-size: 9px;
   font-weight: 700;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 3px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;

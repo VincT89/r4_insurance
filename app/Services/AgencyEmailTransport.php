@@ -12,6 +12,7 @@ class AgencyEmailTransport
         $sent = $mailer->raw($payload['body'], function ($message) use ($payload) {
             $message->from($payload['from']['address'], $payload['from']['name'])
                 ->to($payload['recipient']['address'], $payload['recipient']['name'])->subject($payload['subject']);
+            foreach ($payload['_attachments'] ?? [] as $file) $message->attachData($file['bytes'], $file['name'], ['mime'=>$file['mime']]);
         });
         if (!$sent) throw new \RuntimeException('Invio non confermato.');
         return $sent->getMessageId();

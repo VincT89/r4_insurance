@@ -10,7 +10,7 @@ const validColor = value => /^#[0-9a-f]{6}$/i.test(value);
 
 /** Il contrasto dell’anteprima deve coincidere con quello calcolato da Support/Appearance. */
 function variables(colors) {
-    colors = { ...colors, section: mix(colors.primary, colors.panel, 0.16), section_end: mix(colors.primary, colors.panel, 0.04) };
+    colors = { ...colors, section: colors.section || mix(colors.primary, colors.panel, 0.16), section_end: colors.section_end || mix(colors.primary, colors.panel, 0.04) };
     const vars = {};
     for (const key of Object.keys(colors).filter(key => !['primary', 'primary_hover', 'heading', 'link_hover', 'text'].includes(key))) {
         const background = colors[key];
@@ -66,13 +66,25 @@ function initAppearance() {
     };
     const setColors = colors => {
         form.dataset.previousPrimary = colors.primary;
+        form.dataset.previousPanel = colors.panel;
         values.forEach(input => { input.value = colors[input.dataset.colorValue]; });
         preview();
     };
     form.addEventListener('input', event => {
         const key = event.target.dataset.colorPicker;
         const changed = key || event.target.dataset.colorValue;
-        if (changed === 'primary') {
+        if (['primary','panel'].includes(changed) && validColor(event.target.value)) {
+            const previousPrimary = form.dataset.previousPrimary || saved.primary;
+            const previousPanel = form.dataset.previousPanel || saved.panel;
+            const nextPrimary = changed === 'primary' ? event.target.value : previousPrimary;
+            const nextPanel = changed === 'panel' ? event.target.value : previousPanel;
+            for (const [shade, weight] of [['section',0.16],['section_end',0.04]]) {
+                const input = form.querySelector(`[data-color-value="${shade}"]`);
+                if (input && input.value.toLowerCase() === mix(previousPrimary,previousPanel,weight)) input.value = mix(nextPrimary,nextPanel,weight);
+            }
+            form.dataset.previousPanel = nextPanel;
+        }
+        if (changed === 'primary' && validColor(event.target.value)) {
             const border = form.querySelector('[data-color-value="form_border"]');
             const previous = form.dataset.previousPrimary || saved.primary;
             if (border && border.value.toLowerCase() === previous.toLowerCase()) border.value = event.target.value;

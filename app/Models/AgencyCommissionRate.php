@@ -8,7 +8,7 @@ class AgencyCommissionRate extends Model
 {
     public const BASES = ['net_premium'=>'Premio imponibile','gross_premium'=>'Premio totale','other'=>'Altra base contrattuale'];
     protected $guarded = ['id'];
-    protected function casts(): array { return ['issue_rate_units'=>'integer','renewal_rate_units'=>'integer']; }
+    protected function casts(): array { return ['issue_rate_units'=>'integer','renewal_rate_units'=>'integer','quietance_rate_units'=>'integer']; }
     public function schedule() { return $this->belongsTo(AgencyCommissionSchedule::class,'agency_commission_schedule_id'); }
     public function branch() { return $this->belongsTo(InsuranceBranch::class,'insurance_branch_id'); }
     public function subbranch() { return $this->belongsTo(InsuranceSubbranch::class,'insurance_subbranch_id'); }

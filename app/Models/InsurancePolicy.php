@@ -18,11 +18,14 @@ class InsurancePolicy extends Model
     protected static function booted(): void
     {
         static::deleting(function (InsurancePolicy $policy) {
+            if ($policy->changes()->exists() || $policy->incomingChanges()->exists()) throw \Illuminate\Validation\ValidationException::withMessages(['policy'=>'La polizza appartiene allo storico di sostituzioni o aggiunte e deve essere conservata.']);
             if (InsuranceQuoteCase::where('current_policy_id',$policy->id)->exists()) throw \Illuminate\Validation\ValidationException::withMessages(['policy'=>'La polizza è un riferimento di una pratica preventivi e deve essere conservata.']);
         });
     }
     public function supplierCompany(): BelongsTo { return $this->belongsTo(SupplierCompany::class); }
     public function titles(): HasMany { return $this->hasMany(InsuranceTitle::class); }
+    public function changes(): HasMany { return $this->hasMany(InsurancePolicyChange::class, 'source_policy_id'); }
+    public function incomingChanges(): HasMany { return $this->hasMany(InsurancePolicyChange::class, 'result_policy_id'); }
     public function formPackages(): HasMany { return $this->hasMany(InsuranceFormPackage::class); }
     public function coverageChecks(): HasMany { return $this->hasMany(InsuranceCoverageCheck::class); }
     public function claims(): HasMany { return $this->hasMany(InsuranceClaim::class); }
@@ -49,7 +52,7 @@ class InsurancePolicy extends Model
 
     protected function casts(): array
     {
-        return ['starts_on' => 'date', 'expires_on' => 'date', 'premium' => 'decimal:2', 'installment_premium' => 'decimal:2', 'tacit_renewal' => 'boolean', 'ad_horas' => 'boolean', 'merit_class_cu' => 'integer','coverage_until'=>'date','coverage_origin_on'=>'date','closed_at'=>'datetime','work_closed_at'=>'datetime'];
+        return ['starts_on' => 'date', 'expires_on' => 'date', 'premium' => 'decimal:2', 'installment_premium' => 'decimal:2', 'tacit_renewal' => 'boolean', 'ad_horas' => 'boolean', 'merit_class_cu' => 'integer','coverage_until'=>'date','coverage_origin_on'=>'date','closed_at'=>'datetime','work_closed_at'=>'datetime','last_renewed_at'=>'datetime'];
     }
 
     public function client(): BelongsTo

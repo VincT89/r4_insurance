@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\{AgencyCommissionRate, AgencyCommissionSchedule, InsuranceBranch, SupplierAgency};
 use App\Services\AgencyCommissionRegistry;
-use App\Support\TableListing;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -13,18 +12,10 @@ class AgencyCommissionController extends Controller
     public function index(Request $request, SupplierAgency $supplier)
     {
         $this->authorize('view',$supplier);
-        $filters = $request->validate(['company'=>['nullable','integer'],'branch'=>['nullable','integer'],'subbranch'=>['nullable','integer'],'on'=>['nullable','date_format:Y-m-d'],'state'=>['nullable','in:current,history,voided,all'],'basis'=>['nullable',Rule::in(array_keys(AgencyCommissionRate::BASES))]]);
-        $query = AgencyCommissionRate::with(['schedule.company','branch','subbranch'])->whereHas('schedule',function($q) use ($supplier,$filters) {
-            $q->where('supplier_agency_id',$supplier->id);
-            $state = $filters['state']??'current';
-            if ($state === 'current') $q->current();
-            elseif ($state === 'history') $q->whereNotNull('superseded_at');
-            elseif ($state === 'voided') $q->whereNotNull('voided_at');
-            if ($filters['company']??null) $q->where('supplier_company_id',$filters['company']);
-            if ($day=$filters['on']??null) $q->whereDate('valid_from','<=',$day)->where(fn($q)=>$q->whereNull('valid_to')->orWhereDate('valid_to','>=',$day));
-        });
-        foreach (['branch'=>'insurance_branch_id','subbranch'=>'insurance_subbranch_id','basis'=>'basis'] as $filter=>$column) if ($filters[$filter]??null) $query->where($column,$filters[$filter]);
-        return view('suppliers.commissions.index',['supplier'=>$supplier,'filters'=>$filters,'rates'=>$query->orderByDesc('agency_commission_schedule_id')->orderBy('insurance_branch_id')->orderBy('insurance_subbranch_id')->paginate(TableListing::perPage(25))->withQueryString(),'companies'=>$supplier->companies,'branches'=>InsuranceBranch::with('subbranches')->orderBy('name')->get()]);
+        return to_route('suppliers.show', [
+            ...$request->only(['company','branch','subbranch','on','state','basis','page','_table_all']),
+            'supplier'=>$supplier, 'tab'=>'commissions',
+        ]);
     }
 
     public function create(SupplierAgency $supplier) { $this->authorize('system.admin'); return $this->form($supplier,new AgencyCommissionSchedule); }
@@ -48,7 +39,7 @@ class AgencyCommissionController extends Controller
             foreach ([null,...$branch->subbranches->all()] as $sub) {
                 $key = $branch->id.':'.($sub?->id??0); $rate = $selected->get($key);
                 $group['indices'][] = count($entries);
-                $entries[] = ['branch_id'=>$branch->id,'subbranch_id'=>$sub?->id,'selected'=>(bool)$rate,'label'=>($sub?->name??'Ramo senza sottoramo specificato').(($sub?->status??$branch->status)==='inactive' ? ' (inattivo, già configurato)' : ''),'basis'=>$rate?->basis??'','basis_note'=>$rate?->basis_note??'','issue_rate'=>AgencyCommissionRate::percent($rate?->issue_rate_units),'renewal_rate'=>AgencyCommissionRate::percent($rate?->renewal_rate_units)];
+                $entries[] = ['branch_id'=>$branch->id,'subbranch_id'=>$sub?->id,'selected'=>(bool)$rate,'label'=>($sub?->name??'Ramo senza sottoramo specificato').(($sub?->status??$branch->status)==='inactive' ? ' (inattivo, già configurato)' : ''),'basis'=>$rate?->basis??'','basis_note'=>$rate?->basis_note??'','issue_rate'=>AgencyCommissionRate::percent($rate?->issue_rate_units),'renewal_rate'=>AgencyCommissionRate::percent($rate?->renewal_rate_units),'quietance_rate'=>AgencyCommissionRate::percent($rate?->quietance_rate_units),'accrual_event'=>$rate?->accrual_event,'collection_mode'=>$rate?->collection_mode];
             }
             $groups[] = $group;
         }
@@ -58,7 +49,7 @@ class AgencyCommissionController extends Controller
 
     private function values(Request $request, bool $revision): array
     {
-        $data = $request->validate(['form_complete'=>['accepted'],'supplier_company_id'=>['required','integer'],'valid_from'=>['required','date_format:Y-m-d'],'valid_to'=>['nullable','date_format:Y-m-d','after_or_equal:valid_from'],'accrual_event'=>['nullable',Rule::in(array_keys(AgencyCommissionSchedule::ACCRUAL_EVENTS))],'notes'=>['nullable','string','max:3000'],'revision_reason'=>$revision ? ['required','string','min:10','max:1000'] : ['nullable','string','max:1000'],'entries'=>['required','array','max:100'],'entries.*'=>['array:branch_id,subbranch_id,selected,basis,basis_note,issue_rate,renewal_rate'],'entries.*.branch_id'=>['required','integer'],'entries.*.subbranch_id'=>['nullable','integer'],'entries.*.selected'=>['nullable','boolean'],'entries.*.basis'=>['nullable',Rule::in(array_keys(AgencyCommissionRate::BASES))],'entries.*.basis_note'=>['nullable','string','max:500'],'entries.*.issue_rate'=>['nullable','string','max:15'],'entries.*.renewal_rate'=>['nullable','string','max:15']],['form_complete.accepted'=>'Il modulo ricevuto è incompleto. Ricarica la pagina e seleziona meno voci per ciascuna configurazione.','entries.required'=>'Seleziona almeno un ramo o sottoramo.','entries.max'=>'Seleziona al massimo 100 voci per configurazione.']);
+        $data = $request->validate(['form_complete'=>['accepted'],'supplier_company_id'=>['required','integer'],'valid_from'=>['required','date_format:Y-m-d'],'valid_to'=>['nullable','date_format:Y-m-d','after_or_equal:valid_from'],'accrual_event'=>['nullable',Rule::in(array_keys(AgencyCommissionSchedule::ACCRUAL_EVENTS))],'collection_mode'=>['nullable',Rule::in(array_keys(AgencyCommissionSchedule::COLLECTION_MODES))],'mandate_reference'=>['nullable','string','max:150'],'notes'=>['nullable','string','max:3000'],'revision_reason'=>$revision ? ['required','string','min:10','max:1000'] : ['nullable','string','max:1000'],'entries'=>['required','array','max:80'],'entries.*'=>['array:branch_id,subbranch_id,selected,basis,basis_note,issue_rate,renewal_rate,quietance_rate,accrual_event,collection_mode'],'entries.*.branch_id'=>['required','integer'],'entries.*.subbranch_id'=>['nullable','integer'],'entries.*.selected'=>['nullable','boolean'],'entries.*.basis'=>['nullable',Rule::in(array_keys(AgencyCommissionRate::BASES))],'entries.*.basis_note'=>['nullable','string','max:500'],'entries.*.issue_rate'=>['nullable','string','max:15'],'entries.*.renewal_rate'=>['nullable','string','max:15'],'entries.*.quietance_rate'=>['nullable','string','max:15'],'entries.*.accrual_event'=>['nullable',Rule::in(array_keys(AgencyCommissionSchedule::ACCRUAL_EVENTS))],'entries.*.collection_mode'=>['nullable',Rule::in(array_keys(AgencyCommissionSchedule::COLLECTION_MODES))]],['form_complete.accepted'=>'Il modulo ricevuto è incompleto. Ricarica la pagina e seleziona meno voci per ciascuna configurazione.','entries.required'=>'Seleziona almeno un ramo o sottoramo.','entries.max'=>'Seleziona al massimo 80 voci per configurazione.']);
         return $data;
     }
 

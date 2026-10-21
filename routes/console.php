@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Schedule;
-Schedule::command('insurance:deadline-reminders')->dailyAt('07:00')->timezone('Europe/Rome')->withoutOverlapping();
+Schedule::command('insurance:deadline-reminders')->everyFiveMinutes()->timezone('Europe/Rome')->withoutOverlapping(30)->onOneServer();
 
 Schedule::command('system:scheduler-heartbeat')->everyMinute();
 Schedule::command('system:dispatch-queue-heartbeats')->everyMinute()->withoutOverlapping();

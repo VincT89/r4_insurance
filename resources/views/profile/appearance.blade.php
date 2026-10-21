@@ -6,6 +6,7 @@
     <p class="appearance-intro">Personalizza i colori del tuo account. Le scelte ti seguono su ogni dispositivo e non cambiano l’aspetto degli altri utenti.</p>
     <p class="appearance-intro">Anche il login usa questi colori: in quel browser conserva l’ultimo tema utilizzato. Su un nuovo browser il tuo tema viene caricato dopo l’accesso.</p>
     <p class="appearance-intro">L’anteprima aggiorna questa pagina. Il testo si adatta automaticamente quando il colore preferito non è abbastanza leggibile sullo sfondo scelto. I colori degli avvisi mantengono il loro significato.</p>
+    <p class="appearance-intro">I colori dei riquadri valgono anche per sostituzioni, coperture aggiuntive, moduli e riepiloghi. Puoi scegliere le due tonalità delle intestazioni; impostale uguali per uno sfondo uniforme. Se una sfumatura riduce la leggibilità, l’anteprima usa la prima tonalità.</p>
     <form method="POST" action="{{ route('appearance.update') }}" data-appearance-editor data-defaults="{{ json_encode($defaults) }}" data-saved="{{ json_encode($colors) }}">
         @csrf
         @method('PATCH')
@@ -25,6 +26,13 @@
             @endforeach
         </div>
         <p id="color-format" class="appearance-help">Scegli dal selettore oppure inserisci un codice colore di sei caratteri, preceduto da #.</p>
+        <x-panel title="Anteprima riquadri e pulsanti" class="appearance-preview" padded>
+            <p>Anteprima dimostrativa di una variazione della polizza. Passa sui pulsanti o usa il tasto Tab per controllare gli stati interattivi.</p>
+            <x-form-section title="Coperture aggiuntive">
+                <div class="form-row"><x-form-group label="Riferimento dell’appendice" name="preview-reference" for="preview-reference"><input id="preview-reference" class="form-in" placeholder="Riferimento della compagnia" readonly></x-form-group><x-form-group label="Coperture concordate" name="preview-coverages" for="preview-coverages"><input id="preview-coverages" class="form-in" placeholder="Descrizione delle garanzie" readonly></x-form-group></div>
+                <div class="dashboard-section-actions"><button type="button" class="btn btn-p" aria-label="Esempio di pulsante principale">Pulsante principale</button><button type="button" class="btn btn-g" aria-label="Esempio di pulsante secondario">Pulsante secondario</button></div>
+            </x-form-section>
+        </x-panel>
         <x-panel title="Anteprima tabella" class="appearance-preview">
             <p>Esempio dimostrativo, senza dati reali.</p>
             <div class="appearance-preview-scroll">

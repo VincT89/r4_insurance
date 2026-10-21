@@ -5,7 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class InsuranceFormPackage extends Model
 {
-    public const REASONS = ['initial'=>'Nuova emissione','change'=>'Variazione della polizza','renewal'=>'Rinnovo','client'=>'Documenti del cliente'];
+    public const REASONS = ['initial'=>'Nuova emissione','change'=>'Variazione della polizza','replacement'=>'Sostituzione','addition'=>'Aggiunta di coperture','renewal'=>'Rinnovo','client'=>'Documenti del cliente'];
+    public function policyChange() { return $this->belongsTo(InsurancePolicyChange::class, 'insurance_policy_change_id'); }
     protected $guarded = ['id'];
     protected function casts(): array { return ['snapshot'=>'encrypted:array']; }
     public function client() { return $this->belongsTo(Client::class); }

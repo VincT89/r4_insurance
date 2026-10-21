@@ -19,8 +19,9 @@ class InsuranceQuoteWorkflow
             $case=InsuranceQuoteCase::whereKey($case->id)->lockForUpdate()->firstOrFail();
             if($case->status!=='open') $this->fail('La pratica ha già una proposta approvata o una polizza.');
             $company=SupplierCompany::whereKey($companyId)->where('status','active')->firstOrFail();
+            if ($case->purpose==='addition' && !$case->availableCompanies()->whereKey($companyId)->exists()) $this->fail('Le coperture aggiuntive vanno richieste alla compagnia della polizza attuale.');
             $priorities=SupplierCompany::where('quote_priority',true)->where('status','active')->pluck('id');
-            if(!$company->quote_priority && $priorities->diff($case->quotes()->pluck('supplier_company_id'))->isNotEmpty()) $this->fail('Registra prima le richieste alle compagnie prioritarie dell’agenzia.');
+            if($case->purpose!=='addition' && !$company->quote_priority && $priorities->diff($case->quotes()->pluck('supplier_company_id'))->isNotEmpty()) $this->fail('Registra prima le richieste alle compagnie prioritarie dell’agenzia.');
             if($case->quotes()->where('supplier_company_id',$company->id)->exists()) $this->fail('La richiesta a questa compagnia è già presente.');
             $quote=$case->quotes()->create(['supplier_company_id'=>$company->id,'priority'=>$company->quote_priority,'requested_at'=>$requestedOn,'status'=>'requested']);
             $this->log($case,'registrata richiesta a '.$company->name.'.',['requested_on'=>$requestedOn]); return $quote;
@@ -38,6 +39,11 @@ class InsuranceQuoteWorkflow
                 $agency=$data['supplier_agency_id']??null;
                 if($agency && !$quote->company->agencies()->where('supplier_agencies.id',$agency)->where('supplier_agencies.status','active')->exists()) $this->fail('L’agenzia non è collegata alla compagnia della proposta.');
                 if($data['received_on']<$quote->requested_at->toDateString()) $this->fail('La ricezione non può precedere la richiesta.');
+                if ($case->purpose==='addition') {
+                    $policy = $case->currentPolicy;
+                    if (!$policy || (int)$policy->supplier_company_id !== (int)$quote->supplier_company_id || (int)$policy->supplier_agency_id !== (int)$agency) $this->fail('L’appendice mantiene compagnia e agenzia della polizza.');
+                    if ($data['starts_on'] < $policy->starts_on->toDateString() || $data['expires_on'] > $policy->expires_on->toDateString()) $this->fail('Il periodo delle coperture aggiuntive deve rientrare nella polizza attuale.');
+                }
                 $values=$data; unset($values['received_on'],$values['premium']);
                 $quote->update($values+['premium_cents'=>Money::cents($data['premium']),'received_at'=>$data['received_on'],'status'=>'received']);
                 $stored=app(ClientDocumentRegistry::class)->uploadMany($case->client,$files,['document_category'=>'quote','insurance_quote_id'=>$quote->id]);
@@ -61,19 +67,26 @@ class InsuranceQuoteWorkflow
     {
         return ['category'=>$quote->quoteCase->branch->name,'subcategory'=>$quote->quoteCase->subbranch?->name,'company'=>$quote->company->name,'supplier_agency_id'=>$quote->supplier_agency_id,'product'=>$quote->product,'starts_on'=>$quote->starts_on->toDateString(),'expires_on'=>$quote->expires_on->toDateString(),'premium'=>Money::decimal($quote->premium_cents),'payment_frequency'=>$quote->payment_frequency,'installment_premium'=>null];
     }
-    public function createPolicy(Client $client,array $values,int $quoteId): InsurancePolicy
+    public function approvedQuote(Client $client, int $quoteId): InsuranceQuote
     {
         /** Lock the case before the proposal so concurrent approvals and conversions use the same order. */
         $candidate=InsuranceQuote::whereKey($quoteId)->firstOrFail();
         $case=InsuranceQuoteCase::whereKey($candidate->insurance_quote_case_id)->lockForUpdate()->firstOrFail();
         if($case->client_id!==$client->id) $this->fail('Il preventivo appartiene a un altro cliente.');
         $quote=InsuranceQuote::whereKey($quoteId)->lockForUpdate()->firstOrFail();
-        if($quote->status!=='approved' || $case->status!=='approved' || $quote->policy()->exists()) $this->fail('Seleziona un preventivo approvato, non ancora trasformato in polizza.');
+        if($quote->status!=='approved' || $case->status!=='approved' || $quote->policy()->exists() || $quote->policyChange()->exists()) $this->fail('Seleziona un preventivo approvato, non ancora utilizzato.');
         if($quote->valid_until->lt(today())) $this->fail('Il preventivo approvato è scaduto: occorre una proposta aggiornata.');
         foreach(['quote','quote_approval'] as $category) {
             $docs=$quote->documents()->where('document_category',$category)->get();
             if($docs->isEmpty() || $docs->contains(fn($doc)=>!Storage::disk($doc->disk)->exists($doc->path))) $this->fail('Manca il documento del preventivo o la prova di approvazione.');
         }
+        return $quote->setRelation('quoteCase', $case);
+    }
+    public function createPolicy(Client $client,array $values,int $quoteId): InsurancePolicy
+    {
+        $quote = $this->approvedQuote($client, $quoteId);
+        $case = $quote->quoteCase;
+        if ($case->purpose !== 'new') $this->fail('Questo preventivo richiede il percorso Sostituzione o Aggiunta di coperture dalla polizza attuale.');
         $values=array_replace($values,$this->policyValues($quote));
         if($client->policies()->where('company',$values['company'])->where('number',$values['number'])->exists()) $this->fail('Questo numero di polizza è già presente per cliente e compagnia.');
         if(!in_array($values['status'],['active','renewed'],true)) $this->fail('Una nuova stipula deve essere attiva o rinnovata.');

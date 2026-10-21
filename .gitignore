@@ -28,3 +28,6 @@ Thumbs.db
 /database/*.sqlite
 /storage/framework/
 /storage/logs/
+/work/commission-ledger-2026-10-19/
+/work/operational-reminders-2026-10-19/
+/work/documentation-flow-2026-10-20/

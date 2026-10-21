@@ -13,13 +13,28 @@
             </div>
             <x-form-group label="Note" name="notes"><textarea class="form-ta" id="field-notes" name="notes" rows="3" maxlength="10000">{{ old('notes', $record->notes) }}</textarea></x-form-group>
             </x-form-section>
+            @can('system.admin')
             <x-form-section title="Checklist documentale">
-                <p class="u-text-meta">Seleziona i documenti concordati con l’agenzia. La lista verrà usata solo quando un operatore applica la checklist a un cliente. I sottorami aggiungono le proprie categorie a quelle del ramo.</p>
+                <p class="u-text-meta">Seleziona i documenti concordati con l’agenzia. I documenti del sottoramo si aggiungono a quelli del ramo; le voci ripetute compaiono una sola volta.</p>
                 <input type="hidden" name="document_checklist_present" value="1">
+                <h3 class="u-mt-md">Comuni a privati e aziende</h3>
                 <div class="agency-company-options">@foreach(\App\Models\Attachment::DOCUMENT_CATEGORIES as $value => $name)<label><input type="checkbox" name="document_categories[]" value="{{ $value }}" @checked(in_array($value, (array)old('document_categories', $record->document_categories ?? []), true))><span>{{ $name }}</span></label>@endforeach</div>
                 @error('document_categories')<p class="invalid-feedback">{{ $message }}</p>@enderror
                 @error('document_categories.*')<p class="invalid-feedback">{{ $message }}</p>@enderror
+                <input type="hidden" name="typed_checklist_present" value="1">
+                @foreach(['person_document_categories'=>'In aggiunta per i privati', 'company_document_categories'=>'In aggiunta per le aziende'] as $checklistField=>$checklistTitle)
+                    <details class="document-checklist-config">
+                        <summary>{{ $checklistTitle }}</summary>
+                        <div class="agency-company-options">@foreach(\App\Models\Attachment::DOCUMENT_CATEGORIES as $value=>$name)
+                            <label><input type="checkbox" name="{{ $checklistField }}[]" value="{{ $value }}" @checked(in_array($value, (array)old($checklistField, $record->$checklistField ?? []), true))><span>{{ $name }}</span></label>
+                        @endforeach</div>
+                        @error($checklistField)<p class="invalid-feedback">{{ $message }}</p>@enderror
+                        @error($checklistField.'.*')<p class="invalid-feedback">{{ $message }}</p>@enderror
+                    </details>
+                @endforeach
+                <p class="u-text-meta u-mt-md">La configurazione si applica ai nuovi inserimenti della checklist. Le richieste e i file già registrati restano nello storico.</p>
             </x-form-section>
+            @endcan
             <div class="insurance-form-actions"><a class="btn btn-g" href="{{ route('insurance-catalog.index', ['kind'=>$kind]) }}">Annulla</a><button class="btn btn-p" type="submit">Salva {{ $label }}</button></div>
         </form>
     </x-panel>

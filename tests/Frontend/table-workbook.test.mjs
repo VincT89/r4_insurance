@@ -39,8 +39,8 @@ test('the rebuilt browser library writes valid files, conditional UUIDs and prot
 test('Excel dates and euro amounts survive a real workbook round trip as usable values', async () => {
     const workbook = tableWorkbook({
         title: 'Polizze', stamp: '19/10/2026', filters: 'Premio: almeno 100', searchFilters: 'Compagnia: Nobis',
-        headers: ['Polizza', 'Codice fiscale', 'Scadenza', 'Premio di polizza', 'Importo', 'Aliquota', 'Polizze', 'Preparata il'],
-        rows: [['0000123', '00123456789', '29/02/2028', '1.234,56 €', '-25,50 €', '12,50 %', '42', '19/10/2026 18:05']],
+        headers: ['Polizza', 'Codice fiscale', 'Scadenza', 'Premio di polizza', 'Importo', 'Aliquota', 'Polizze', 'Preparata il', 'Ultimo rinnovo'],
+        rows: [['0000123', '00123456789', '29/02/2028', '1.234,56 €', '-25,50 €', '12,50 %', '42', '19/10/2026 18:05', '20/10/2026']],
     });
     const reopened = new ExcelJS.Workbook();
     await reopened.xlsx.load(await workbook.xlsx.writeBuffer());
@@ -53,6 +53,8 @@ test('Excel dates and euro amounts survive a real workbook round trip as usable 
     assert.equal(sheet.getCell('F6').value, 0.125);
     assert.equal(sheet.getCell('G6').value, 42);
     assert.equal(sheet.getCell('H6').value.toISOString(), '2026-10-19T18:05:00.000Z');
+    assert.equal(sheet.getCell('I6').value.toISOString(), '2026-10-20T00:00:00.000Z');
+    assert.equal(sheet.getCell('I6').numFmt, 'dd/mm/yyyy');
     assert.equal(sheet.getCell('D6').numFmt, '#,##0.00 "€"');
     assert.equal(sheet.getCell('F6').numFmt, '0.00%');
     assert.equal(reopened.getWorksheet('Filtri').getCell('B5').value, 'Compagnia: Nobis');
@@ -87,7 +89,8 @@ test('workbooks never turn untrusted strings into executable formulas', async ()
 
 test('table column semantics distinguish counters and dates from policy identifiers', () => {
     for (const header of ['Polizza', 'Numero polizza', 'Codice fiscale', 'Partita IVA', 'Telefono', 'Periodo']) assert.equal(exportColumnType(header), 'text');
-    for (const header of ['Data', 'Scadenza', 'Data incasso', 'Inserita il', 'Dal']) assert.equal(exportColumnType(header), 'date');
+    for (const header of ['Data', 'Scadenza', 'Data incasso', 'Inserita il', 'Registrata il', 'Ultimo rinnovo', 'Dal']) assert.equal(exportColumnType(header), 'date');
+    assert.equal(exportColumnType('Appendici'), 'integer');
     for (const header of ['Premio di polizza', 'Premi di polizza', 'Importo', 'Residuo']) assert.equal(exportColumnType(header), 'currency');
     for (const header of ['Polizze', 'Clienti distinti', 'Premio non indicato', 'Non pagate']) assert.equal(exportColumnType(header), 'integer');
     assert.equal(excelCell('17,25 %').value, 0.1725);

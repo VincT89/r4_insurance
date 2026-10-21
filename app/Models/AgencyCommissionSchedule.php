@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class AgencyCommissionSchedule extends Model
 {
     public const ACCRUAL_EVENTS = ['collection'=>'All’incasso del premio','title'=>'All’emissione del titolo','confirmation'=>'Alla conferma della compagnia o agenzia'];
+    public const COLLECTION_MODES = ['proportional'=>'In proporzione al premio incassato', 'full'=>'Solo a saldo completo della rata'];
     protected $guarded = ['id'];
     protected function casts(): array { return ['valid_from'=>'date','valid_to'=>'date','superseded_at'=>'datetime','voided_at'=>'datetime']; }
     public function agency() { return $this->belongsTo(SupplierAgency::class,'supplier_agency_id'); }

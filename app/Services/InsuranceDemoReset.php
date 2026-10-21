@@ -7,16 +7,18 @@ use Illuminate\Support\Facades\{Crypt, DB, Schema, Storage};
 
 class InsuranceDemoReset
 {
-    public const TABLES = ['insurance_claims','insurance_claim_activities','insurance_claim_events','insurance_claim_reminders','insurance_form_packages','insurance_form_documents','insurance_form_submissions','insurance_coverage_checks','insurance_quote_emails','insurance_policy_corrections','agency_communication_collections','insurance_quote_cases','insurance_quotes','insurance_titles','insurance_collections','client_consents', 'attachments', 'client_document_requests', 'insurance_policy_imports', 'insurance_policies', 'client_relationships', 'client_household_members', 'client_households', 'client_merges', 'client_contacts', 'client_interactions', 'client_assets', 'client_vehicles', 'client_user', 'clients', 'insurance_deadline_reminders', 'agency_communication_policies'];
+    public const TABLES = ['client_document_request_files','agency_communication_attachments','insurance_commission_movements','insurance_commissions','insurance_claims','insurance_claim_activities','insurance_claim_events','insurance_claim_reminders','insurance_form_packages','insurance_form_documents','insurance_form_submissions','insurance_coverage_checks','insurance_quote_emails','insurance_policy_corrections','agency_communication_collections','insurance_quote_cases','insurance_quotes','insurance_titles','insurance_collections','client_consents', 'attachments', 'client_document_requests', 'insurance_policy_imports', 'insurance_policies', 'client_relationships', 'client_household_members', 'client_households', 'client_merges', 'client_contacts', 'client_interactions', 'client_assets', 'client_vehicles', 'client_user', 'clients', 'insurance_deadline_reminders', 'agency_communication_policies'];
     public const PRESERVED = ['insurance_form_templates','users', 'supplier_companies', 'supplier_agencies', 'supplier_agency_company', 'insurance_branches', 'insurance_subbranches', 'insurance_catalog_aliases','agency_commission_schedules','agency_commission_rates'];
 
     public function apply(User $actor): array
     {
+        if (DB::table('client_document_request_files')->exists()) throw new \RuntimeException('Reset non disponibile: collegamenti alle checklist documentali da conservare.');
+        if (DB::table('agency_communication_attachments')->exists()) throw new \RuntimeException('Reset non disponibile: comunicazioni con allegati da conservare.');
         if (DB::table('insurance_claims')->exists()) throw new \RuntimeException('Reset non disponibile: sinistri e attività da conservare.');
         if (!$actor->isAdmin() || $actor->status !== 'active') throw new \RuntimeException('Richiesto amministratore attivo.');
         if (DB::table('insurance_form_packages')->exists() || DB::table('insurance_coverage_checks')->exists()) throw new \RuntimeException('Reset non disponibile: moduli o controlli RCA da conservare.');
         if (InsurancePolicy::whereNotNull('work_closed_at')->exists() || DB::table('insurance_policy_corrections')->exists()) throw new \RuntimeException('Reset non disponibile: lavorazioni chiuse o segnalazioni da conservare.');
-        foreach(['insurance_quote_cases','insurance_quotes','insurance_titles','insurance_collections'] as $table) if(DB::table($table)->exists()) throw new \RuntimeException('Reset non disponibile: sono presenti preventivi o movimenti contabili da conservare.');
+        foreach(['insurance_commissions','insurance_commission_movements','insurance_quote_cases','insurance_quotes','insurance_titles','insurance_collections'] as $table) if(DB::table($table)->exists()) throw new \RuntimeException('Reset non disponibile: sono presenti preventivi o movimenti contabili da conservare.');
         $backup = 'insurance-demo-backup-'.now()->format('Ymd-His').'-'.bin2hex(random_bytes(4));
         $disk = Storage::disk('local'); $files = []; $manifest = [];
         $result = DB::transaction(function () use ($actor, $backup, $disk, &$files, &$manifest) {

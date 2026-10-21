@@ -6,6 +6,7 @@
 >
     <testsuites>
         <testsuite name="Core">
+            <file>tests/Feature/BackupSafetyTest.php</file>
             <file>tests/Unit/PhoneNormalizerTest.php</file>
             <file>tests/Feature/Auth/AuthenticationTest.php</file>
             <file>tests/Feature/Auth/PasswordUpdateTest.php</file>
@@ -34,12 +35,20 @@
             <file>tests/Feature/InsuranceWorkspaceTest.php</file>
             <file>tests/Feature/InsuranceDemoAndUploadsTest.php</file>
             <file>tests/Feature/AgencyEmailWorkflowTest.php</file>
+            <file>tests/Feature/AgencyCommunicationDocumentsTest.php</file>
+            <file>tests/Feature/AgencyPolicyChangeCommunicationTest.php</file>
             <file>tests/Feature/CommunicationPaginationTest.php</file>
             <file>tests/Feature/InsuranceOperationsTest.php</file>
+            <file>tests/Feature/OperationalReminderFlowTest.php</file>
+            <file>tests/Feature/InsuranceReadPerformanceTest.php</file>
             <file>tests/Feature/InsurancePolicyWorkflowTest.php</file>
             <file>tests/Feature/QuoteRequestEmailTest.php</file>
             <file>tests/Feature/AgencyCommissionTest.php</file>
+            <file>tests/Feature/InsuranceCommissionLedgerTest.php</file>
             <file>tests/Feature/InsuranceSigningTest.php</file>
+            <file>tests/Feature/InsuranceDocumentationFlowTest.php</file>
+            <file>tests/Feature/InsuranceLifecycleFlowTest.php</file>
+            <file>tests/Feature/InsurancePolicyChangesTest.php</file>
             <file>tests/Feature/InsuranceClaimsTest.php</file>
         </testsuite>
     </testsuites>

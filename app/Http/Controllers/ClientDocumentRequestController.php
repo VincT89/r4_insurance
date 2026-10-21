@@ -9,10 +9,12 @@ use Illuminate\Validation\{Rule, ValidationException};
 
 class ClientDocumentRequestController extends Controller
 {
-    public function create(Client $client)
+    public function create(Request $request, Client $client)
     {
         $this->authorize('updateRegistry', $client);
-        return view('clients.documents.request', ['client' => $client, 'policies' => $client->policies()->orderBy('number')->get(),
+        $request->validate(['policy'=>['nullable','integer']]);
+        $selectedPolicy = $request->filled('policy') ? $client->policies()->findOrFail($request->integer('policy')) : null;
+        return view('clients.documents.request', ['client' => $client, 'selectedPolicy'=>$selectedPolicy, 'policies' => $client->policies()->orderBy('number')->get(),
             'branches' => InsuranceBranch::where('status', 'active')->with(['subbranches' => fn ($q) => $q->where('status', 'active')])->orderBy('name')->get()]);
     }
 
@@ -23,7 +25,7 @@ class ClientDocumentRequestController extends Controller
             'insurance_policy_id' => ['nullable', 'integer', Rule::exists('insurance_policies', 'id')->where('client_id', $client->id)],
             'due_on' => ['nullable', 'date_format:Y-m-d'], 'notes' => ['nullable', 'string', 'max:2000']]);
         DB::transaction(function () use ($client, $values) {
-            Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
+            $client = Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
             $item = $client->documentRequests()->create($values + ['requested_by' => auth()->id()]);
             $this->log($client, 'Registrato documento da ricevere: '.$item->label);
         });
@@ -34,7 +36,19 @@ class ClientDocumentRequestController extends Controller
     {
         $this->authorize('updateRegistry', $client);
         abort_unless((int) $documentRequest->client_id === (int) $client->id, 404);
-        return view('clients.documents.request-edit', compact('client', 'documentRequest'));
+        $documentRequest->load(['documents.newerVersion', 'linkedDocuments.newerVersion']);
+        $existing = $documentRequest->documents->pluck('id')->merge($documentRequest->linkedDocuments->pluck('id'));
+        $availableDocuments = app(\App\Services\InsuranceDocumentation::class)->candidates($documentRequest)->whereNotIn('id', $existing)->latest('id')->get();
+        return view('clients.documents.request-edit', compact('client', 'documentRequest', 'availableDocuments'));
+    }
+
+    public function link(Request $request, Client $client, ClientDocumentRequest $documentRequest)
+    {
+        $this->authorize('updateRegistry', $client);
+        abort_unless((int)$documentRequest->client_id === (int)$client->id, 404);
+        $data = $request->validate(['documents'=>['required','array','min:1','max:50'], 'documents.*'=>['required','integer','distinct'], 'confirmed'=>['accepted']]);
+        app(\App\Services\InsuranceDocumentation::class)->link($client, $documentRequest, $data['documents']);
+        return to_route('clients.document-requests.edit', [$client, $documentRequest])->with('success', 'Documenti collegati. Gli originali e il loro stato di verifica sono conservati.');
     }
 
     public function update(Request $request, Client $client, ClientDocumentRequest $documentRequest)
@@ -44,7 +58,7 @@ class ClientDocumentRequestController extends Controller
         $values = $request->validate(['label' => ['required', 'string', 'max:255'], 'due_on' => ['nullable', 'date_format:Y-m-d'],
             'notes' => ['nullable', 'string', 'max:2000'], 'document_category' => ['prohibited'], 'insurance_policy_id' => ['prohibited'], 'insurance_branch_id' => ['prohibited']]);
         DB::transaction(function () use ($client, $documentRequest, $values) {
-            Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
+            $client = Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
             $item = $client->documentRequests()->whereKey($documentRequest->id)->lockForUpdate()->firstOrFail();
             $oldDue = $item->due_on?->format('d/m/Y') ?? 'non indicato';
             $item->fill($values);
@@ -64,11 +78,17 @@ class ClientDocumentRequestController extends Controller
             'insurance_policy_id' => ['nullable', 'integer', Rule::exists('insurance_policies', 'id')->where('client_id', $client->id)], 'due_on' => ['nullable', 'date_format:Y-m-d']]);
         $count = DB::transaction(function () use ($client, $values) {
             $branch = InsuranceBranch::whereKey($values['insurance_branch_id'])->where('status', 'active')->lockForUpdate()->firstOrFail();
-            Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
+            $client = Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
             $sub = !empty($values['insurance_subbranch_id']) ? $branch->subbranches()->whereKey($values['insurance_subbranch_id'])->where('status', 'active')->firstOrFail() : null;
             $policy = !empty($values['insurance_policy_id']) ? $client->policies()->findOrFail($values['insurance_policy_id']) : null;
             if ($policy && (\App\Services\InsuranceCatalog::key($policy->category) !== $branch->name_key || ($sub && \App\Services\InsuranceCatalog::key($policy->subcategory ?? '') !== $sub->name_key))) throw ValidationException::withMessages(['insurance_policy_id' => 'La polizza deve appartenere al ramo e sottoramo scelti.']);
-            $categories = array_unique(array_merge($branch->document_categories ?? [], $sub?->document_categories ?? []));
+            /** A policy always includes its actual subbranch; a blank selector must not omit its configured documents. */
+            if ($policy) {
+                if ($policy->insurance_branch_id && (int)$policy->insurance_branch_id !== (int)$branch->id) throw ValidationException::withMessages(['insurance_policy_id'=>'Il ramo non corrisponde alla polizza.']);
+                if ($sub && (int)$policy->insurance_subbranch_id !== (int)$sub->id) throw ValidationException::withMessages(['insurance_subbranch_id'=>'Il sottoramo non corrisponde alla polizza.']);
+                $sub = $policy->subbranch;
+            }
+            $categories = app(\App\Services\InsuranceDocumentation::class)->categories($client, $branch, $sub);
             if (!$categories) throw ValidationException::withMessages(['insurance_branch_id' => 'La checklist è vuota. Configura i documenti richiesti nel catalogo rami e sottorami.']);
             $count = 0;
             foreach ($categories as $category) {
@@ -92,7 +112,7 @@ class ClientDocumentRequestController extends Controller
         DB::transaction(function () use ($client, $documentRequest) {
             Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
             $documentRequest = ClientDocumentRequest::whereKey($documentRequest->id)->lockForUpdate()->firstOrFail();
-            if ($documentRequest->documents()->exists()) throw ValidationException::withMessages(['document' => 'La richiesta ha già documenti ricevuti e viene conservata nello storico.']);
+            if ($documentRequest->documents()->exists() || $documentRequest->linkedDocuments()->exists()) throw ValidationException::withMessages(['document' => 'La richiesta ha già documenti ricevuti e viene conservata nello storico.']);
             $this->log($client, 'Rimossa richiesta documentale senza file: '.$documentRequest->label);
             $documentRequest->delete();
         });

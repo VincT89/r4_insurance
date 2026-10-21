@@ -67,7 +67,9 @@
       </div>
       <div class="topbar-right">
         <span class="tb-date">{{ strtoupper(now()->locale('it')->isoFormat('ddd D MMM YYYY')) }}</span>
-        @livewire('notifications.notification-dropdown')
+        @unless(\App\Support\TableListing::exporting())
+          @livewire('notifications.notification-dropdown')
+        @endunless
 
         <div class="dropdown" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="if(open){ open = false; $nextTick(() => $refs.profileTrigger.focus()) }">
           <button
@@ -165,7 +167,7 @@
           <x-nav-item href="{{ route('collections.index') }}" icon="wallet" label="Incassi" :active="request()->routeIs('collections.*')" />
           <x-nav-item href="{{ route('policies.index') }}" icon="files" label="Polizze" :active="request()->routeIs('policies.index', 'clients.policies.show', 'clients.policies.edit')" />
           <x-nav-item href="{{ route('deadlines.index') }}" icon="clock" label="Scadenze" :active="request()->routeIs('deadlines.*')" />
-          @can('system.admin')<x-nav-item href="{{ route('agency-communications.index') }}" icon="mail" label="Comunicazioni" :active="request()->routeIs('agency-communications.*')" /><x-nav-item href="{{ route('reports.index') }}" icon="chart-no-axes-combined" label="Report" :active="request()->routeIs('reports.*')" />@endcan
+          @can('system.admin')<x-nav-item href="{{ route('agency-communications.index') }}" icon="mail" label="Comunicazioni" :active="request()->routeIs('agency-communications.*')" /><x-nav-item href="{{ route('reports.index') }}" icon="chart-no-axes-combined" label="Report" :active="request()->routeIs('reports.*','commissions.*')" />@endcan
         </div>
       @endcan
       @can('system.admin')

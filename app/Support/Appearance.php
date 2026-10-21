@@ -13,11 +13,13 @@ final class Appearance
         'page' => ['label' => 'Sfondo generale', 'group' => 'Contenuto', 'default' => '#ffffff'],
         'panel' => ['label' => 'Pannelli e schede', 'group' => 'Contenuto', 'default' => '#ffffff'],
         'field' => ['label' => 'Campi dei moduli', 'group' => 'Contenuto', 'default' => '#ffffff'],
+        'section' => ['label' => 'Intestazioni dei riquadri e filtri', 'group' => 'Riquadri e riepiloghi', 'default' => '#d8e2ed'],
+        'section_end' => ['label' => 'Sfumatura finale e sfondo dei riepiloghi', 'group' => 'Riquadri e riepiloghi', 'default' => '#f5f8fa'],
         'table_header' => ['label' => 'Intestazioni delle tabelle', 'group' => 'Tabelle', 'default' => '#0b498c'],
         'table_body' => ['label' => 'Righe delle tabelle', 'group' => 'Tabelle', 'default' => '#ffffff'],
         'table_hover' => ['label' => 'Riga al passaggio del puntatore', 'group' => 'Tabelle', 'default' => '#e2edf8'],
         'primary' => ['label' => 'Pulsanti principali e accenti', 'group' => 'Testi e azioni', 'default' => '#0b498c'],
-        'form_border' => ['label' => 'Bordi dei riquadri dei moduli', 'group' => 'Contenuto', 'default' => '#0b498c'],
+        'form_border' => ['label' => 'Bordi dei riquadri dei moduli', 'group' => 'Riquadri e riepiloghi', 'default' => '#0b498c'],
         'heading' => ['label' => 'Titoli e collegamenti', 'group' => 'Testi e azioni', 'default' => '#0b498c'],
         'text' => ['label' => 'Testo preferito', 'group' => 'Testi e azioni', 'default' => '#1a1a2e'],
         'sidebar_hover' => ['label' => 'Voce del menu al passaggio', 'group' => 'Passaggio del puntatore', 'default' => '#26262e'],
@@ -54,6 +56,10 @@ final class Appearance
         }
 
         if (!isset($stored['form_border'])) $colors['form_border'] = $colors['primary'];
+        /** Existing personal themes keep their derived shades until the user chooses explicit section colors. */
+        foreach (['section'=>0.16, 'section_end'=>0.04] as $key=>$weight) {
+            if (!is_string($stored[$key]??null) || !preg_match('/\A#[0-9a-fA-F]{6}\z/', $stored[$key])) $colors[$key] = self::mix($colors['primary'],$colors['panel'],$weight);
+        }
         return $colors;
     }
 
@@ -101,9 +107,6 @@ final class Appearance
     public static function variables(?array $stored): array
     {
         $colors = self::colors($stored);
-        /** Le superfici di sezione seguono il colore personale e mantengono un contrasto calcolato. */
-        $colors['section'] = self::mix($colors['primary'], $colors['panel'], 0.16);
-        $colors['section_end'] = self::mix($colors['primary'], $colors['panel'], 0.04);
         $vars = [];
         foreach (array_diff(array_keys($colors), ['primary', 'primary_hover', 'heading', 'link_hover', 'text']) as $key) {
             $background = $colors[$key];

@@ -71,10 +71,17 @@ class InsuranceCatalogController extends Controller
 
     private function values(Request $request, string $kind): array
     {
-        if ($request->input('document_checklist_present') === '1' && !$request->has('document_categories')) $request->merge(['document_categories' => []]);
+        if ($request->hasAny(['document_checklist_present', 'typed_checklist_present', 'document_categories', 'person_document_categories', 'company_document_categories'])) $this->authorize('system.admin');
+        if ($request->boolean('document_checklist_present') && !$request->has('document_categories')) $request->merge(['document_categories' => []]);
+        $rules = [];
+        foreach (['person_document_categories', 'company_document_categories'] as $field) {
+            if ($request->boolean('typed_checklist_present') && !$request->has($field)) $request->merge([$field=>[]]);
+            $rules[$field] = ['sometimes', 'array'];
+            $rules[$field.'.*'] = ['string', 'distinct', \Illuminate\Validation\Rule::in(array_keys(\App\Models\Attachment::DOCUMENT_CATEGORIES))];
+        }
         return $request->validate(['name' => ['required', 'string', 'max:100'], 'status' => ['required', 'in:active,inactive'],
             'needs_review' => ['required', 'boolean'], 'notes' => ['nullable', 'string', 'max:10000'],
             'insurance_branch_id' => $kind === 'subbranch' ? ['required', 'integer', 'exists:insurance_branches,id'] : ['prohibited'],
-            'document_categories' => ['sometimes', 'array'], 'document_categories.*' => ['string', 'distinct', \Illuminate\Validation\Rule::in(array_keys(\App\Models\Attachment::DOCUMENT_CATEGORIES))]]);
+            'document_categories' => ['sometimes', 'array'], 'document_categories.*' => ['string', 'distinct', \Illuminate\Validation\Rule::in(array_keys(\App\Models\Attachment::DOCUMENT_CATEGORIES))]] + $rules);
     }
 }

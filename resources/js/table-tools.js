@@ -236,13 +236,14 @@ function initialize(table, index) {
             info.textContent = `Preparazione ${format === 'xlsx' ? 'Excel' : 'PDF'}: ${rows.length} ${rows.length === 1 ? 'riga' : 'righe'}…`;
             const operators = { contains:'contiene', not_contains:'non contiene', starts:'inizia con', eq:'uguale a', ne:'diverso da', gt:'maggiore / dopo', gte:'maggiore o uguale', lt:'minore / prima', lte:'minore o uguale', between:'compreso tra', empty:'vuoto', filled:'compilato' };
             const filtersText = state.applied.map(r => `${columns.find(c=>c.index===r.column)?.name}: ${operators[r.operator]} ${r.value}${r.to ? ' e '+r.to : ''}`).join(state.mode === 'any' ? ' oppure ' : '; ');
-            const searchLabels = { search:'Ricerca', client_type:'Tipo cliente', status:'Stato', category:'Ramo', subcategory:'Sottoramo', period:'Periodo', date:'Giornata', month:'Mese', date_basis:'Data di riferimento', agency:'Agenzia', payment_frequency:'Frazionamento', from:'Dal', to:'Al', supplier_company_id:'Compagnia', company:'Compagnia', responsible:'Responsabile cliente', branch:'Ramo principale', review:'Solo da verificare', document_view:'Versioni documenti', unassigned:'Compagnia da assegnare', import_review:'Dati importati da verificare', kind:'Anagrafica', result:'Esito' };
+            const searchLabels = { search:'Ricerca', client:'Cliente', policy:'Polizza', client_type:'Tipo cliente', status:'Stato', category:'Ramo', subcategory:'Sottoramo', period:'Periodo', operation:'Operazione', date:'Giornata', month:'Mese', date_basis:'Data di riferimento', agency:'Agenzia', payment_frequency:'Frazionamento', from:'Dal', to:'Al', supplier_company_id:'Compagnia', company:'Compagnia', responsible:'Responsabile cliente', branch:'Ramo principale', subbranch:'Sottoramo', basis:'Base di calcolo', on:'Valide alla data', state:'Stato', review:'Solo da verificare', document_view:'Versioni documenti', unassigned:'Compagnia da assegnare', import_review:'Dati importati da verificare', kind:'Anagrafica', result:'Esito' };
             const searchFilters = [...new URL(location.href).searchParams].filter(([key,value]) => searchLabels[key] && value).map(([key,value]) => {
                 const field = [...document.querySelectorAll('form[method="GET"] [name]')].find(el => el.name === key);
+                if (field?.disabled) return null;
                 const label = field?.dataset.exportLabel || text(field?.labels?.[0]?.textContent) || searchLabels[key];
                 const display = field?.dataset.exportValue || field?.selectedOptions?.[0]?.textContent || (key === 'document_view' ? ({ current:'Documenti correnti', history:'Tutte le versioni' }[value] || value) : value);
                 return `${label}: ${display}`;
-            }).join('; ');
+            }).filter(Boolean).join('; ');
             const { exportTable } = await import('./table-export.js');
             await exportTable({ format, title, headers: columns.map(c => c.name), columnTypes: columns.map(c => c.exportType), rows, filters: filtersText, searchFilters });
             info.textContent = `Esportazione completata: ${rows.length} ${rows.length === 1 ? 'riga' : 'righe'}.`;

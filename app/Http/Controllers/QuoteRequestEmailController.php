@@ -13,7 +13,7 @@ class QuoteRequestEmailController extends Controller
         $this->authorize('updateRegistry',$quoteCase->client);
         abort_unless($quoteCase->status === 'open',409);
         $quoteCase->load('documents');
-        $companies = SupplierCompany::where('status','active')->orderByDesc('quote_priority')->orderBy('name')->get();
+        $companies = $quoteCase->availableCompanies()->get();
         $claimed = $quoteCase->emails()->whereNotNull('delivery_key')->pluck('supplier_company_id');
         $answered = $quoteCase->quotes()->where('status','!=','requested')->pluck('supplier_company_id');
         return response()->view('quotes.email-compose',['case'=>$quoteCase,'companies'=>$companies,'unavailable'=>$claimed->merge($answered), 'remaining'=>$workflow->remainingPriorities($quoteCase), 'sender'=>$configuration->sender(), 'mailReady'=>$configuration->ready()])->header('Cache-Control','no-store, private');

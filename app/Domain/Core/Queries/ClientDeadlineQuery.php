@@ -23,7 +23,7 @@ class ClientDeadlineQuery
                 'detail' => $document->insurancePolicy?->number ?? $document->vehicle?->plate,
                 'url' => $document->downloadUrl(),
             ]);
-        $requests = $client->documentRequests()->whereNotNull('due_on')->whereDoesntHave('documents')->get()->map(fn ($item) => [
+        $requests = $client->documentRequests()->whereNotNull('due_on')->whereDoesntHave('documents')->whereDoesntHave('linkedDocuments')->get()->map(fn ($item) => [
             'date' => $item->due_on, 'kind' => 'Documento da ricevere', 'title' => $item->label, 'detail' => $item->notes,
             'url' => route('clients.show', [$client, 'tab' => 'documents']).'#document-request-'.$item->id,
         ]);

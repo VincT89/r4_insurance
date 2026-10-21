@@ -4,6 +4,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class InsuranceQuoteCase extends Model
 {
+    public const PURPOSES = ['new'=>'Nuova polizza', 'replacement'=>'Sostituzione di una polizza', 'addition'=>'Aggiunta di coperture'];
+    public function availableCompanies()
+    {
+        return SupplierCompany::where('status','active')->when($this->purpose==='addition', fn($q)=>$q->whereKey($this->currentPolicy?->supplier_company_id ?? 0))->orderByDesc('quote_priority')->orderBy('name');
+    }
     protected $guarded=['id'];
     protected function casts(): array { return ['current_policy_snapshot'=>'encrypted:array']; }
     public function client(){return $this->belongsTo(Client::class);}
@@ -18,6 +23,8 @@ class InsuranceQuoteCase extends Model
     public function requestContext(): string
     {
         $lines = [];
+        if (in_array($this->purpose, ['replacement','addition'], true)) $lines[] = 'Richiesta: '.self::PURPOSES[$this->purpose];
+        if ($this->purpose === 'addition') $lines[] = 'Quotare il solo premio aggiuntivo per il periodo indicato, mantenendo il numero della polizza.';
         if ($this->requester_name) $lines[] = 'Richiedente: '.$this->requester_name;
         if ($snapshot = $this->current_policy_snapshot) {
             $lines[] = 'Polizza attuale: '.$snapshot['number'].' / '.$snapshot['company'];

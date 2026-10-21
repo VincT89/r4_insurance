@@ -2,9 +2,19 @@
     <div class="page-back-row"><a href="{{ route('suppliers.index') }}" class="btn btn-g">Agenzie</a></div>
     <x-page-header>
         <x-slot:title>{{ $supplier->name }}</x-slot:title>
-        <x-slot:actions><a href="{{ route('suppliers.commissions.index', $supplier) }}" class="btn btn-g">Provvigioni</a>@can('update', $supplier)<a href="{{ route('suppliers.edit', $supplier) }}" class="btn btn-p">Modifica agenzia</a>@endcan</x-slot:actions>
+        <x-slot:actions>
+            @if($tab === 'commissions')
+                @can('system.admin')<a class="btn btn-g" href="{{ route('commissions.index', ['agency'=>$supplier->id]) }}">Report provvigioni</a><a class="btn btn-p" href="{{ route('suppliers.commissions.create', $supplier) }}">Configura aliquote</a>@endcan
+            @else
+                @can('update', $supplier)<a href="{{ route('suppliers.edit', $supplier) }}" class="btn btn-p">Modifica agenzia</a>@endcan
+            @endif
+        </x-slot:actions>
     </x-page-header>
     <p class="client-identity-line">{{ $supplier->type_label }} {{ strtolower($supplier->status_label) }}</p>
+    @include('suppliers.section-navigation')
+    @if($tab === 'commissions')
+        @include('suppliers.commissions.list')
+    @else
     <x-panel padded>
         <section class="client-detail-section">
             <h2 class="sec-lbl">Compagnia e collegamenti</h2>
@@ -51,4 +61,5 @@
             <button type="button" class="btn btn-g btn-danger-outline">Elimina agenzia</button>
         </x-delete-modal>
     @endcan
+    @endif
 </x-app-layout>

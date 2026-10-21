@@ -38,8 +38,8 @@ class PolicyPortfolioQuery
         elseif (filled($filters['payment_status'] ?? null)) $query->where('payment_status', $filters['payment_status']);
         $today = today()->toDateString();
         match ($filters['status'] ?? null) {
-            'active' => $query->whereIn('status', ['active', 'renewed'])->whereRaw("DATE(CASE WHEN status='renewed' THEN COALESCE(coverage_origin_on,starts_on) ELSE starts_on END) <= ?",[$today])->whereDate('expires_on', '>=', $today),
-            'future' => $query->whereIn('status', ['active', 'renewed'])->whereRaw("DATE(CASE WHEN status='renewed' THEN COALESCE(coverage_origin_on,starts_on) ELSE starts_on END) > ?",[$today]),
+            'active' => $query->whereIn('status', ['active', 'renewed'])->whereRaw("(CASE WHEN status='renewed' THEN COALESCE(coverage_origin_on,starts_on) ELSE starts_on END) < ?",[today()->addDay()->toDateString()])->where('expires_on', '>=', $today),
+            'future' => $query->whereIn('status', ['active', 'renewed'])->whereRaw("(CASE WHEN status='renewed' THEN COALESCE(coverage_origin_on,starts_on) ELSE starts_on END) >= ?",[today()->addDay()->toDateString()]),
             'expired' => $query->where(fn ($q) => $q->where('status', 'expired')->orWhere(fn ($q) => $q->whereIn('status', ['active', 'renewed'])->where('expires_on', '<', $today))),
             'renewed', 'suspended', 'ceased', 'replaced', 'cancelled', 'review' => $query->where('status', $filters['status']),
             default => null,
@@ -50,11 +50,11 @@ class PolicyPortfolioQuery
             $query->where($column, '>=', $start->toDateString())->where($column, '<', $start->copy()->addMonth()->toDateString());
         }
         $period = $filters['period'] ?? 'all';
-        if (ctype_digit($period)) $query->whereDate('expires_on', '>=', $today)->whereDate('expires_on','<=',today()->addDays((int) $period)->toDateString());
+        if (ctype_digit($period)) $query->where('expires_on', '>=', $today)->where('expires_on','<',today()->addDays((int) $period+1)->toDateString());
         elseif ($period === 'overdue') $query->where('expires_on', '<', $today);
         if ($period === 'custom' || (in_array($period, ['all', null], true) && (filled($filters['from'] ?? null) || filled($filters['to'] ?? null)))) {
-            if (filled($filters['from'] ?? null)) $query->whereDate('expires_on', '>=', $filters['from']);
-            if (filled($filters['to'] ?? null)) $query->whereDate('expires_on', '<=', $filters['to']);
+            if (filled($filters['from'] ?? null)) $query->where('expires_on', '>=', $filters['from']);
+            if (filled($filters['to'] ?? null)) $query->where('expires_on', '<', \Illuminate\Support\Carbon::parse($filters['to'])->addDay()->toDateString());
         }
         if (filled($filters['search'] ?? null)) {
             $term = '%'.trim($filters['search']).'%';

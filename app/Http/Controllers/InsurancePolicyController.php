@@ -46,9 +46,17 @@ class InsurancePolicyController extends Controller
     {
         $this->authorize('view', $client);
         abort_unless((int) $policy->client_id === (int) $client->id, 404);
-        $policy->load(['workClosedBy', 'vehicle', 'asset', 'supplierCompany', 'supplierAgency', 'importEntry', 'documents' => fn ($q) => $q->whereDoesntHave('newerVersion')->with(['uploader', 'newerVersion', 'validator'])]);
+        $commissionSummary = auth()->user()->can('system.admin')
+            ? app(\App\Domain\Core\Queries\InsuranceCommissionQuery::class)->summary($client, $policy)
+            : null;
+        $policy->load(['workClosedBy', 'vehicle', 'asset', 'supplierCompany', 'supplierAgency', 'importEntry', 'documents' => fn ($q) => $q->whereDoesntHave('newerVersion')->with(['uploader', 'newerVersion', 'validator'])->withExists('checklistRequests')]);
         $corrections = $policy->corrections()->with(['requester', 'resolver'])->latest()->paginate(10, ['*'], 'corrections_page')->withQueryString();
-        return view('clients.policies.show', compact('client', 'policy', 'corrections'));
+        $changes = \App\Models\InsurancePolicyChange::where(fn($q)=>$q->where('source_policy_id',$policy->id)->orWhere('result_policy_id',$policy->id))->with(['sourcePolicy','resultPolicy','author'])->latest('id')->paginate(\App\Support\TableListing::perPage(10),['*'],'changes_page')->withQueryString();
+        $accountingReview = in_array($policy->status, InsurancePolicy::CLOSED_STATUSES, true)
+            ? $policy->titles()->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents')
+                ->selectRaw('COUNT(*) as open_titles, COALESCE(SUM(amount_cents-collected_cents),0) as balance_cents')->toBase()->first()
+            : null;
+        return view('clients.policies.show', compact('client', 'policy', 'corrections', 'accountingReview', 'commissionSummary', 'changes'));
     }
 
     public function edit(Client $client, InsurancePolicy $policy): View
@@ -81,11 +89,13 @@ class InsurancePolicyController extends Controller
                 && $locked->documents()->whereNotNull('vehicle_id')->exists()) {
                 throw ValidationException::withMessages(['vehicle_id' => 'La polizza ha documenti collegati al veicolo. Aggiorna prima i loro collegamenti.']);
             }
-            if($locked->titles()->exists() || $locked->insurance_quote_id) {
+            if($locked->titles()->exists() || $locked->insurance_quote_id || $locked->changes()->exists() || $locked->incomingChanges()->exists()) {
                 $candidate=clone $locked; $candidate->fill($data);
-                foreach(['starts_on','expires_on','premium','payment_frequency','installment_premium','supplier_company_id','supplier_agency_id','category','subcategory'] as $field) if($candidate->isDirty($field)) throw ValidationException::withMessages([$field=>'La polizza ha titoli o un preventivo approvato: conserva i dati contrattuali. Per il periodo successivo usa Rinnova.']);
+                foreach(['starts_on','expires_on','premium','payment_frequency','installment_premium','supplier_company_id','supplier_agency_id','insurance_branch_id','insurance_subbranch_id','category','subcategory'] as $field) if($candidate->isDirty($field)) throw ValidationException::withMessages([$field=>'La polizza ha titoli o un preventivo approvato: conserva i dati contrattuali. Per il periodo successivo usa Rinnova.']);
             }
             $locked->fill($data);
+            if (($locked->changes()->exists() || $locked->incomingChanges()->exists()) && $locked->isDirty('number')) throw ValidationException::withMessages(['number'=>'Il numero è collegato allo storico contrattuale. Per cambiarlo usa Sostituisci polizza.']);
+            if ($locked->getOriginal('status')==='replaced' && $locked->changes()->where('kind','replacement')->exists() && $locked->isDirty('status')) throw ValidationException::withMessages(['status'=>'La polizza ha una sostitutiva collegata. Conserva lo stato Sostituita.']);
             if(in_array($locked->status,InsurancePolicy::CLOSED_STATUSES,true) && !$locked->closed_at)$locked->closed_at=now();
             $locked->save();
             if ($locked->work_closed_at && auth()->user()->canManageSystem()) app(\App\Services\InsuranceLedger::class)->log($locked, 'policy_corrected', 'correzione admin dopo la fine lavorazione: '.$request->input('correction_reason'));
@@ -122,7 +132,7 @@ class InsurancePolicyController extends Controller
         request()->validate(['entry_mode' => ['nullable', 'in:new,existing'], 'quote_id' => ['nullable', 'integer', 'min:1']]);
         $existingEntry = !$policy->exists && (request('entry_mode') ?? old('entry_mode')) === 'existing';
         if ($existingEntry) $this->authorize('system.admin');
-        $approvedQuotes=\App\Models\InsuranceQuote::where('status','approved')->whereDate('valid_until','>=',today())->whereDoesntHave('policy')->whereHas('quoteCase',fn($q)=>$q->where('status','approved')->visibleTo(auth()->user())->when($client->exists,fn($q)=>$q->where('client_id',$client->id)))->with(['quoteCase.client','company'])->orderByDesc('id')->get()->filter(fn($quote)=>auth()->user()->can('updateRegistry',$quote->quoteCase->client));
+        $approvedQuotes=\App\Models\InsuranceQuote::where('status','approved')->whereDate('valid_until','>=',today())->whereDoesntHave('policy')->whereDoesntHave('policyChange')->whereHas('quoteCase',fn($q)=>$q->where('purpose','new')->where('status','approved')->visibleTo(auth()->user())->when($client->exists,fn($q)=>$q->where('client_id',$client->id)))->with(['quoteCase.client','company'])->orderByDesc('id')->get()->filter(fn($quote)=>auth()->user()->can('updateRegistry',$quote->quoteCase->client));
         $selectedQuote=null;
         if(!$policy->exists && ($quoteId=request()->integer('quote_id') ?: (int)old('insurance_quote_id'))) {
             $selectedQuote=$approvedQuotes->firstWhere('id',$quoteId);abort_unless($selectedQuote,404);

@@ -12,6 +12,20 @@ class AppearanceTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_section_colors_are_personal_persisted_and_safely_applied_to_new_panels(): void
+    {
+        $user=User::factory()->create();
+        $colors=array_replace(Appearance::defaults(),['section'=>'#c4d9ee','section_end'=>'#edf4fc','form_border'=>'#125b9a','primary_hover'=>'#123d67']);
+        $this->actingAs($user)->patch(route('appearance.update'),['colors'=>$colors])->assertSessionHasNoErrors();
+        $this->get(route('appearance.edit'))->assertOk()->assertSee('--ap-section:#c4d9ee;',false)
+            ->assertSee('--ap-section-end:#edf4fc;',false)->assertSee('--ap-primary-hover:#123d67;',false)->assertSee('Anteprima riquadri e pulsanti');
+        $this->assertSame('#c4d9ee',$user->fresh()->appearance['section']);
+        $legacy=Appearance::variables(['primary'=>'#125b9a','panel'=>'#ffffff']);
+        $this->assertNotSame(Appearance::defaults()['section'],$legacy['--ap-section']);
+        $unsafe=Appearance::variables(['section'=>'#ffffff','section_end'=>'#000000']);
+        $this->assertSame('#ffffff',$unsafe['--ap-section-gradient-end']);
+    }
+
     public function test_section_heading_keeps_contrast_across_the_entire_personal_gradient(): void
     {
         foreach (['#ffffff', '#666666', '#777777', '#000000', '#0b498c'] as $panel) {

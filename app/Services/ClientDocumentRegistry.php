@@ -39,7 +39,7 @@ class ClientDocumentRegistry
                 if (!empty($values['previous_version_id']) && (!$previous || $previous->newerVersion()->exists())) throw ValidationException::withMessages(['previous_version_id' => 'La versione non è disponibile o è già stata sostituita. Riapri il documento corrente.']);
                 if ($previous) {
                     if ($previous->insurance_quote_case_id) throw ValidationException::withMessages(['previous_version_id'=>'Aggiungi il documento aggiornato dalla pratica preventivi, conservando l’originale.']);
-                    if ($previous->insurance_claim_id || $previous->insurance_form_document_id || $previous->insurance_coverage_check_id) throw ValidationException::withMessages(['previous_version_id'=>'Aggiungi le nuove copie dalla scheda del sinistro, dei moduli o del controllo RCA.']);
+                    if ($previous->insurance_policy_change_id || $previous->insurance_claim_id || $previous->insurance_form_document_id || $previous->insurance_coverage_check_id) throw ValidationException::withMessages(['previous_version_id'=>'Aggiungi le nuove copie dalla scheda della variazione, del sinistro, dei moduli o del controllo RCA.']);
                     if ($previous->insurance_quote_email_id) throw ValidationException::withMessages(['previous_version_id'=>'Conserva gli allegati originali delle richieste di preventivo.']);
                     if ($previous->insurance_quote_id || $previous->insurance_title_id || $previous->insurance_collection_id) throw ValidationException::withMessages(['previous_version_id'=>'Gli originali di preventivi e movimenti devono essere conservati. Aggiungi altri documenti dalla relativa scheda.']);
                     if (isset($values['document_request_id']) && $values['document_request_id'] != $previous->document_request_id) throw ValidationException::withMessages(['document_request_id' => 'Conserva la richiesta collegata alla versione precedente.']);
@@ -53,7 +53,6 @@ class ClientDocumentRegistry
                 if (!empty($values['document_request_id']) && !$request) throw ValidationException::withMessages(['document_request_id' => 'Richiesta non disponibile per questo cliente.']);
                 if ($request) {
                     if ($request->document_category !== $values['document_category'] || $request->insurance_policy_id != ($values['insurance_policy_id'] ?? null)) throw ValidationException::withMessages(['document_request_id' => 'Categoria e polizza devono corrispondere alla richiesta.']);
-                    if (!$previous && $request->documents()->exists()) throw ValidationException::withMessages(['document_request_id' => 'Questa richiesta ha già un file. Usa Nuova versione sul documento corrente.']);
                 }
                 $directory = 'client/'.$client->id.'/insurance';
                 $path = $file->store($directory, 'attachments');
@@ -75,11 +74,11 @@ class ClientDocumentRegistry
         DB::transaction(function () use ($document, $values) {
             $document = Attachment::whereKey($document->id)->lockForUpdate()->firstOrFail();
             if ($document->insurance_quote_case_id) throw ValidationException::withMessages(['document'=>'Conserva il documento originale della pratica preventivi. Aggiungi una nuova copia dalla pratica.']);
-            if ($document->insurance_claim_id || $document->insurance_form_document_id || $document->insurance_coverage_check_id) throw ValidationException::withMessages(['document'=>'Conserva il documento originale nello storico del sinistro, dei moduli o del controllo RCA.']);
+            if ($document->insurance_policy_change_id || $document->insurance_claim_id || $document->insurance_form_document_id || $document->insurance_coverage_check_id) throw ValidationException::withMessages(['document'=>'Conserva il documento originale nello storico della variazione, del sinistro, dei moduli o del controllo RCA.']);
             if ($document->insurance_quote_email_id) throw ValidationException::withMessages(['document'=>'Conserva l’allegato originale della richiesta di preventivo.']);
             if ($document->insurance_quote_id || $document->insurance_title_id || $document->insurance_collection_id) throw ValidationException::withMessages(['document'=>'Conserva il documento originale del preventivo o del movimento contabile. Aggiungi gli eventuali ulteriori allegati dalla relativa scheda.']);
             if ($document->newerVersion()->exists()) throw ValidationException::withMessages(['document' => 'Questa è una versione storica. Modifica il documento corrente.']);
-            if ($document->document_request_id || $document->previous_version_id) {
+            if ($document->document_request_id || $document->previous_version_id || $document->checklistRequests()->exists()) {
                 foreach (['document_category', 'insurance_policy_id', 'vehicle_id'] as $field) if (array_key_exists($field, $values) && $values[$field] != $document->$field) throw ValidationException::withMessages([$field => 'Conserva i collegamenti della richiesta e dello storico documentale.']);
             }
             $document->fill($values);

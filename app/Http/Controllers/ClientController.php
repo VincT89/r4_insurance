@@ -58,6 +58,9 @@ class ClientController extends Controller
             'to' => ['nullable', 'date_format:Y-m-d', ...($request->filled('from') ? ['after_or_equal:from'] : [])],
         ]);
         $tab = $filters['tab'] ?? 'policies';
+        $commissionSummary = $request->user()->can('system.admin') && in_array($tab, ['policies', 'registry'], true)
+            ? app(\App\Domain\Core\Queries\InsuranceCommissionQuery::class)->summary($client)
+            : null;
         $client->load('commercialUser:id,name');
         $policies = $tab === 'policies' ? $client->policies()->with(['vehicle', 'asset', 'supplierAgency'])->orderBy('category')->orderBy('subcategory')->orderBy('expires_on')->get() : collect();
         $policyCategories = (\App\Models\InsuranceBranch::exists() ? collect() : collect(\App\Models\InsurancePolicy::CATEGORY_SUGGESTIONS))->merge($policies->pluck('category'))->unique()->values();
@@ -69,8 +72,8 @@ class ClientController extends Controller
         $vehicles = $tab === 'vehicles' ? $client->vehicles()->withCount('policies')->orderBy('plate')->get() : collect();
         $documents = $tab === 'documents' ? $client->attachments()->whereNull('client_material_category')
             ->when(($filters['document_view'] ?? 'current') === 'current', fn ($q) => $q->whereDoesntHave('newerVersion'))
-            ->with(['uploader', 'insurancePolicy.vehicle', 'vehicle', 'newerVersion', 'validator'])->latest()->get() : collect();
-        $documentRequests = $tab === 'documents' ? $client->documentRequests()->with(['documents', 'insurancePolicy', 'branch', 'requester'])->orderBy('due_on')->get() : collect();
+            ->with(['uploader', 'insurancePolicy.vehicle', 'vehicle', 'newerVersion', 'validator'])->withExists('checklistRequests')->latest()->get() : collect();
+        $documentRequests = $tab === 'documents' ? $client->documentRequests()->with(['documents.newerVersion', 'linkedDocuments.newerVersion', 'insurancePolicy', 'branch', 'requester'])->orderBy('due_on')->get() : collect();
         $deadlines = $tab === 'deadlines' ? $deadlineQuery->forClient($client, $filters) : collect();
         $contacts = $tab === 'network' ? $client->contacts()->orderBy('name')->get() : collect();
         $relationships = $tab === 'network' ? $client->relationships()->with(['client', 'relatedClient'])->get()
@@ -80,7 +83,7 @@ class ClientController extends Controller
         $assets = $tab === 'assets' ? $client->assets()->with('policies')->orderBy('name')->get() : collect();
         $interactions = $tab === 'history' ? $client->interactions()->with('author')->orderByDesc('event_at')->orderByDesc('id')->paginate(\App\Support\TableListing::perPage(15))->withQueryString() : collect();
         $consents = $tab === 'consents' ? $client->consents()->with(['author', 'attachment', 'insurancePolicy'])->orderByDesc('event_at')->orderByDesc('id')->paginate(\App\Support\TableListing::perPage(15))->withQueryString() : collect();
-        return view('clients.show', compact('client', 'tab', 'policies', 'policyCategories', 'policySubcategories', 'vehicles', 'documents', 'documentRequests', 'deadlines', 'contacts', 'relationships', 'households', 'assets', 'interactions', 'consents'));
+        return view('clients.show', compact('client', 'tab', 'policies', 'policyCategories', 'policySubcategories', 'vehicles', 'documents', 'documentRequests', 'deadlines', 'contacts', 'relationships', 'households', 'assets', 'interactions', 'consents', 'commissionSummary'));
     }
 
     public function destroy(Client $client, \App\Domain\Core\Actions\DeleteClientAction $action): RedirectResponse

@@ -8,18 +8,20 @@ use Illuminate\Validation\ValidationException;
 
 class InsuranceForms
 {
-    public const TOKENS = ['contraente','codice_fiscale_piva','indirizzo','nascita','titolo_cliente','email','telefono','firmatario','qualifica_firmatario','luogo','data_documento','compagnia','agenzia','ramo','sottoramo','numero_polizza','decorrenza','scadenza','premio','targa'];
+    public const TOKENS = ['contraente','codice_fiscale_piva','indirizzo','nascita','titolo_cliente','email','telefono','firmatario','qualifica_firmatario','luogo','data_documento','compagnia','agenzia','ramo','sottoramo','numero_polizza','decorrenza','scadenza','premio','targa','operazione','riferimento_variazione','coperture_aggiuntive','decorrenza_variazione','scadenza_variazione','premio_variazione','polizza_precedente'];
 
     public function context(Client $client, ?InsurancePolicy $policy): array
     {
         /** Operational notes and receipts do not invalidate signed contractual documents. */
         $contractFields = array_diff((new InsurancePolicy)->getFillable(), ['notes','payment_status','ad_horas']);
-        return ['client'=>$client->only(['name','client_type','title','tax_code','vat_number','address','city','postal_code','province','country','birth_date','birth_place','email','phone','reference_person','reference_role']), 'policy'=>$policy?->only($contractFields), 'plate'=>$policy?->vehicle?->plate, 'agency'=>$policy?->supplierAgency?->name];
+        $context = ['client'=>$client->only(['name','client_type','title','tax_code','vat_number','address','city','postal_code','province','country','birth_date','birth_place','email','phone','reference_person','reference_role']), 'policy'=>$policy?->only($contractFields), 'plate'=>$policy?->vehicle?->plate, 'agency'=>$policy?->supplierAgency?->name];
+        if ($change = $policy?->incomingChanges()->latest('id')->first()) $context['contract_change'] = $change->only(['id','kind','reference','description','effective_on','expires_on','premium_cents']);
+        return $context;
     }
     public function contextHash(Client $client, ?InsurancePolicy $policy): string { return hash('sha256',json_encode($this->context($client,$policy),JSON_THROW_ON_ERROR)); }
-    public function available(?InsurancePolicy $policy)
+    public function available(?InsurancePolicy $policy, ?Client $client = null)
     {
-        return InsuranceFormTemplate::where('status','active')->with(['branch','subbranch'])->orderBy('title')->get()->filter(fn($t)=>$t->applies($policy));
+        return InsuranceFormTemplate::where('status','active')->with(['branch','subbranch'])->orderBy('title')->get()->filter(fn($t)=>$t->applies($policy, $client));
     }
     private function fail(string $message, string $field='forms'): never { throw ValidationException::withMessages([$field=>$message]); }
     public function validateBody(string $body): void
@@ -71,6 +73,8 @@ class InsuranceForms
     {
         $values = ['contraente'=>$client->name,'codice_fiscale_piva'=>implode(' / ',array_filter([$client->tax_code,$client->vat_number])),'indirizzo'=>implode(', ',array_filter([$client->address,$client->postal_code,$client->city,$client->province,$client->country])), 'nascita'=>trim(($client->birth_place??'').' '.($client->birth_date?->format('d/m/Y')??'')),'titolo_cliente'=>$client->title,'email'=>$client->email,'telefono'=>$client->phone,
             'firmatario'=>$data['signer_name'],'qualifica_firmatario'=>$data['signer_role']??null,'luogo'=>$data['place'],'data_documento'=>\Carbon\Carbon::parse($data['document_date'])->format('d/m/Y'),'compagnia'=>$policy?->company,'agenzia'=>$policy?->supplierAgency?->name,'ramo'=>$policy?->category,'sottoramo'=>$policy?->subcategory,'numero_polizza'=>$policy?->number,'decorrenza'=>$policy?->starts_on?->format('d/m/Y'),'scadenza'=>$policy?->expires_on?->format('d/m/Y'),'premio'=>$policy?->premium === null ? null : number_format((float)$policy->premium,2,',','.').' EUR','targa'=>$policy?->vehicle?->plate];
+        $change = !empty($data['change_id']) ? $policy?->incomingChanges()->find($data['change_id']) : null;
+        $values += ['operazione'=>$change ? \App\Models\InsurancePolicyChange::KINDS[$change->kind] : null,'riferimento_variazione'=>$change?->reference,'coperture_aggiuntive'=>$change?->description,'decorrenza_variazione'=>$change?->effective_on->format('d/m/Y'),'scadenza_variazione'=>$change?->expires_on->format('d/m/Y'),'premio_variazione'=>$change ? \App\Support\Money::format($change->premium_cents) : null,'polizza_precedente'=>$change?->snapshot['before']['policy']['number']??null];
         $result=[]; foreach($values as $name=>$value) $result['{{'.$name.'}}']=filled($value)?(string)$value:'________________'; return $result;
     }
     public function createPackage(Client $client, ?InsurancePolicy $policy, array $data): InsuranceFormPackage
@@ -81,24 +85,28 @@ class InsuranceForms
             Gate::authorize('updateRegistry',$client);
             $policy=$policy ? $client->policies()->whereKey($policy->id)->lockForUpdate()->firstOrFail() : null;
             if($policy) abort_unless($policy->editableBy(auth()->user()),403);
+            $change = $policy?->incomingChanges()->latest('id')->first();
+            if ((int)($data['change_id']??null) !== (int)$change?->id) $this->fail('Collega i moduli all’ultima variazione della polizza e ricontrolla i dati.');
+            if ($change && !in_array($data['reason'],[$change->kind,'renewal'],true)) $this->fail('Indica il motivo della variazione collegata oppure il rinnovo successivo.');
+            if (!$change && in_array($data['reason'],['replacement','addition'],true)) $this->fail('Registra prima la variazione contrattuale.');
             if(InsuranceFormPackage::where('request_key',$data['request_key'])->exists()) $this->fail('Il fascicolo è già stato preparato. Apri lo storico prima di ripetere.');
             if(!hash_equals($data['context_hash'],$this->contextHash($client,$policy))) $this->fail('I dati sono cambiati. Riapri il modulo e controllali nuovamente.');
             if($client->client_type === 'company' && empty($data['signer_role'])) $this->fail('Indica la qualifica del firmatario per l’azienda.','signer_role');
             $templates=InsuranceFormTemplate::whereIn('id',$data['templates'])->orderBy('id')->lockForUpdate()->get();
             if($templates->count()!==count($data['templates'])) $this->fail('Uno dei modelli selezionati non è disponibile.');
-            foreach($templates as $template) if($template->status !== 'active' || !$template->applies($policy)) $this->fail('Seleziona modelli approvati e compatibili con questo cliente o polizza.');
-            foreach($this->available($policy) as $template) if($template->required && !$templates->contains('id',$template->id)) $this->fail('Il modello '.$template->title.' è richiesto dalla configurazione.');
+            foreach($templates as $template) if($template->status !== 'active' || !$template->applies($policy, $client)) $this->fail('Seleziona modelli approvati e compatibili con questo cliente o polizza.');
+            foreach($this->available($policy, $client) as $template) if($template->required && !$templates->contains('id',$template->id)) $this->fail('Il modello '.$template->title.' è richiesto dalla configurazione.');
             if(($policy && $data['reason']==='client') || (!$policy && $data['reason']!=='client')) $this->fail('Motivo non compatibile con il fascicolo.');
             if(in_array($data['reason'],['change','renewal'],true) && mb_strlen(trim($data['note']??''))<10) $this->fail('Descrivi la variazione o il rinnovo (almeno 10 caratteri).','note');
             $tokens=$this->tokens($client,$policy,$data);
-            $package=InsuranceFormPackage::create(['client_id'=>$client->id,'insurance_policy_id'=>$policy?->id,'reason'=>$data['reason'],'note'=>$data['note']??null,'snapshot'=>['context'=>$this->context($client,$policy),'tokens'=>$tokens],'context_hash'=>$this->contextHash($client,$policy),'request_key'=>$data['request_key'],'created_by'=>auth()->id()]);
+            $package=InsuranceFormPackage::create(['client_id'=>$client->id,'insurance_policy_id'=>$policy?->id,'insurance_policy_change_id'=>$change?->id,'reason'=>$data['reason'],'note'=>$data['note']??null,'snapshot'=>['context'=>$this->context($client,$policy),'tokens'=>$tokens],'context_hash'=>$this->contextHash($client,$policy),'request_key'=>$data['request_key'],'created_by'=>auth()->id()]);
             foreach($templates as $template) {
                 $document=$package->documents()->create(['insurance_form_template_id'=>$template->id,'title'=>$template->title,'template_version'=>$template->version,'body'=>strtr($template->body,$tokens),'signature_required'=>$template->signature_required]);
-                $pdf=$this->pdf($document->title,$document->body,'Modello v'.$template->version.' / Fascicolo '.$package->id.' / '.$tokens['{{data_documento}}']);
+                $pdf=$this->pdf($document->title,$document->body,'Modello v'.$template->version.' / Fascicolo '.$package->id.' / '.$tokens['{{data_documento}}'].($change ? ' / Variazione #'.$change->id : ''));
                 $directory='client/'.$client->id.'/forms'; $path=$directory.'/'.Str::uuid().'.pdf';
                 if(!Storage::disk('attachments')->put($path,$pdf)) $this->fail('Impossibile conservare il PDF. Riprova.');
                 $paths[]=$path;
-                $client->attachments()->create(['insurance_policy_id'=>$policy?->id,'insurance_form_document_id'=>$document->id,'document_category'=>$template->category,'type'=>'document','uploaded_by'=>auth()->id(),'disk'=>'attachments','directory'=>$directory,'path'=>$path,'stored_name'=>basename($path),'original_name'=>Str::slug($document->title).'-f'.$package->id.'-v'.$template->version.'.pdf','mime_type'=>'application/pdf','extension'=>'pdf','size'=>strlen($pdf),'review_status'=>'generated']);
+                $client->attachments()->create(['insurance_policy_id'=>$policy?->id,'insurance_policy_change_id'=>$change?->id,'insurance_form_document_id'=>$document->id,'document_category'=>$template->category,'type'=>'document','uploaded_by'=>auth()->id(),'disk'=>'attachments','directory'=>$directory,'path'=>$path,'stored_name'=>basename($path),'original_name'=>Str::slug($document->title).'-f'.$package->id.'-v'.$template->version.'.pdf','mime_type'=>'application/pdf','extension'=>'pdf','size'=>strlen($pdf),'review_status'=>'generated']);
                 $document->update(['pdf_hash'=>hash('sha256',$pdf)]);
             }
             $this->log($client,$policy,'forms_prepared','Preparato fascicolo moduli #'.$package->id.'.');
@@ -127,7 +135,7 @@ class InsuranceForms
             if($package->client->client_type==='company' && empty($data['signer_role'])) $this->fail('Indica la qualifica del firmatario.','signer_role');
             if(collect($files)->sum(fn($file)=>$file->getSize())>50*1024*1024) $this->fail('Il totale dei file non può superare 50 MB.','files');
             $submission=$document->submissions()->create(array_intersect_key($data,array_flip(['signer_name','signer_role','signed_on','note','request_key']))+['version'=>($last?->version??0)+1,'created_by'=>auth()->id(),'file_hashes'=>[]]);
-            $stored=app(PrivateAttachmentBatch::class)->upload($package->client,$files,['type'=>'document','document_category'=>$document->template->category,'insurance_policy_id'=>$package->insurance_policy_id,'insurance_form_document_id'=>$document->id,'insurance_form_submission_id'=>$submission->id,'review_status'=>'received','version_number'=>$submission->version]);
+            $stored=app(PrivateAttachmentBatch::class)->upload($package->client,$files,['type'=>'document','document_category'=>$document->template->category,'insurance_policy_id'=>$package->insurance_policy_id,'insurance_policy_change_id'=>$package->insurance_policy_change_id,'insurance_form_document_id'=>$document->id,'insurance_form_submission_id'=>$submission->id,'review_status'=>'received','version_number'=>$submission->version]);
             $hashes=[]; foreach($stored as $file) $hashes[$file->id]=hash('sha256',Storage::disk($file->disk)->get($file->path)); $submission->update(['file_hashes'=>$hashes]);
             $this->log($package->client,$package->policy,'forms_received','Ricevuti '.count($stored).' file per '.$document->title.', versione firmata '.$submission->version.'.');
             return $submission;

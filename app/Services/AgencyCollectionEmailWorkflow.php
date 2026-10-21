@@ -13,8 +13,7 @@ class AgencyCollectionEmailWorkflow
     public function deliveryKey(InsuranceCollection $payment,string $recipient): string {return hash('sha256','collection|'.$payment->id.'|'.strtolower($recipient));}
     public function existingDeliveries(Collection $payments): Collection
     {
-        $keys=$payments->filter(fn($p)=>$p->title->policy->supplierAgency?->email)->map(fn($p)=>$this->deliveryKey($p,$p->title->policy->supplierAgency->email));
-        return DB::table('agency_communication_collections as l')->join('agency_communications as c','c.id','=','l.agency_communication_id')->whereIn('l.delivery_key',$keys)->get(['l.insurance_collection_id','c.id','c.status'])->keyBy('insurance_collection_id');
+        return app(CollectionCommunicationStatus::class)->deliveries($payments);
     }
     private function snapshot(SupplierAgency $agency,Collection $payments,string $range): array
     {
@@ -23,6 +22,7 @@ class AgencyCollectionEmailWorkflow
         $rows=$payments->sortBy('id')->map(fn($p)=>[
             'id'=>$p->id,'title_id'=>$p->insurance_title_id,'policy_id'=>$p->title->insurance_policy_id,'number'=>$p->title->policy->number,'client'=>$p->title->policy->client->name,'company'=>$p->title->policy->company,
             'kind'=>InsuranceTitle::KINDS[$p->title->kind],'date'=>$p->received_on->format('d/m/Y'),'amount'=>Money::format($p->amount_cents),'payment_method'=>$p->payment_method,'recipient'=>InsuranceCollection::RECIPIENTS[$p->recipient],
+            'policy_status'=>$p->title->policy->status_label,
             'document_type'=>InsuranceCollection::DOCUMENT_TYPES[$p->document_type],'reference'=>$p->reference,'frequency'=>$p->title->payment_frequency,'coverage_from'=>$p->title->coverage_from->format('d/m/Y'),'coverage_to'=>$p->title->coverage_to->format('d/m/Y'),'balance'=>Money::format($p->title->balance_cents),'ad_horas'=>(bool)$p->title->policy->ad_horas,
         ])->values()->all();
         $lines=['Buongiorno,','','riepilogo degli incassi registrati nel periodo '.$range.':',''];
@@ -30,7 +30,8 @@ class AgencyCollectionEmailWorkflow
         foreach($rows as $raw){$r=array_map($clean,$raw);$lines[]=($raw['ad_horas']?'AD HORAS - ':'').$r['number'].' | '.$r['client'].' | '.$r['company'];
             $lines[]=$r['kind'].' #'.$r['title_id'].'; periodo '.$r['coverage_from'].' – '.$r['coverage_to'].'; frazionamento '.$r['frequency'].'.';
             $lines[]='Incasso del '.$r['date'].': '.$r['amount'].'; metodo: '.$r['payment_method'].'; destinatario: '.$r['recipient'].'.';
-            $lines[]='Documento: '.$r['document_type'].($r['reference']?' / '.$r['reference']:'').'; residuo del titolo: '.$r['balance'].'.';$lines[]='';}
+            $lines[]='Documento: '.$r['document_type'].($r['reference']?' / '.$r['reference']:'').'; residuo del titolo: '.$r['balance'].'.';
+            $lines[]='Stato attuale della polizza: '.$r['policy_status'].'.';$lines[]='';}
         $lines[]='Il riepilogo riporta i movimenti registrati; gli allegati riservati del cliente non sono inclusi.';$lines[]='';$lines[]=config('branding.wordmark');
         $policies=$payments->map(fn($p)=>$p->title->policy)->unique('id')->map(fn($p)=>['id'=>$p->id,'client_id'=>$p->client_id,'number'=>$p->number,'client'=>$p->client->name,'company'=>$p->company,'starts_on'=>$p->starts_on->format('d/m/Y'),'expires_on'=>$p->expires_on->format('d/m/Y'),'frequency'=>$p->payment_frequency,'ad_horas'=>(bool)$p->ad_horas])->values()->all();
         $payload=['kind'=>'collections','from'=>app(AgencyMailConfiguration::class)->sender(),'recipient'=>['address'=>$agency->email,'name'=>$agency->name],'range'=>$range,'policies'=>$policies,'collections'=>$rows,'subject'=>($payments->contains(fn($p)=>$p->title->policy->ad_horas)?'Ad horas - ':'').'Riepilogo incassi '.$range.' - '.config('branding.wordmark'),'body'=>implode("\n",$lines)];
@@ -56,6 +57,7 @@ class AgencyCollectionEmailWorkflow
         if($payments->count()!==count($ids))$this->fail('Alcuni incassi non sono più disponibili. Riapri il controllo.');
         [,$fingerprint]=$this->snapshot($agency,$payments,$message->payload['range']);
         if(!hash_equals($message->fingerprint,$fingerprint))$this->fail('Incassi, titoli, polizze o destinatario sono cambiati: prepara un nuovo riepilogo.');
+        if ($this->existingDeliveries($payments)->isNotEmpty()) $this->fail('Un incasso è già stato comunicato a questa agenzia o ha un invio da controllare. Consulta lo storico.');
         foreach($payments as $payment){$key=$this->deliveryKey($payment,$agency->email);if(DB::table('agency_communication_collections')->where('delivery_key',$key)->exists())$this->fail('Un incasso è già stato inviato o ha un invio in corso. Controlla lo storico.');
             DB::table('agency_communication_collections')->where('agency_communication_id',$message->id)->where('insurance_collection_id',$payment->id)->update(['delivery_key'=>$key]);}
         $message->update(['status'=>'sending','reviewed_at'=>now(),'sending_at'=>now()]);

@@ -40,8 +40,8 @@ class SaveClientDocumentRequest extends ClientInsuranceRequest
             }
             $document = $this->route('document');
             $files = $this->file('files', []);
-            if (count($files) > 1 && ($this->filled('previous_version_id') || $this->filled('document_request_id'))) {
-                $validator->errors()->add('files', 'Per sostituire una versione o rispondere a una singola richiesta scegli un solo documento. Puoi unire fronte e retro in un PDF.');
+            if (count($files) > 1 && $this->filled('previous_version_id')) {
+                $validator->errors()->add('files', 'Per sostituire la versione di un singolo file scegli il suo aggiornamento. Gli altri allegati si aggiungono alla richiesta con selezione multipla.');
             }
             if (count((array)$this->input('file_details', [])) > count($files)) $validator->errors()->add('file_details', 'Le scadenze devono corrispondere ai file selezionati.');
             foreach (array_merge($files, $this->hasFile('file') ? [$this->file('file')] : []) as $file) {

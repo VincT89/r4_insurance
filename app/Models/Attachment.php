@@ -31,6 +31,7 @@ class Attachment extends Model
     ];
 
     protected $fillable = [
+        'insurance_policy_change_id',
         'insurance_claim_id','insurance_claim_event_id',
         'insurance_form_document_id','insurance_form_submission_id','insurance_coverage_check_id',
         'insurance_quote_email_id','insurance_quote_case_id',
@@ -59,15 +60,18 @@ class Attachment extends Model
         'validated_at' => 'datetime',
     ];
 
+    public function policyChange() { return $this->belongsTo(InsurancePolicyChange::class, 'insurance_policy_change_id'); }
+
     protected static function booted(): void
     {
         static::deleting(function (Attachment $attachment) {
+            if ($attachment->insurance_policy_change_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'L’allegato appartiene allo storico di una variazione contrattuale e deve essere conservato.']);
             if ($attachment->insurance_quote_case_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Il documento appartiene a una pratica preventivi e deve restare nello storico.']);
             if ($attachment->insurance_claim_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Il documento appartiene allo storico di un sinistro e deve essere conservato.']);
             if ($attachment->insurance_form_document_id || $attachment->insurance_coverage_check_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Il documento appartiene allo storico dei moduli o dei controlli RCA e deve essere conservato.']);
             if ($attachment->insurance_quote_email_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'L’allegato appartiene a una richiesta di preventivo controllata e deve restare nello storico.']);
             if ($attachment->insurance_quote_id || $attachment->insurance_title_id || $attachment->insurance_collection_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Il documento appartiene a un preventivo o allo storico contabile e deve essere conservato.']);
-            if ($attachment->previous_version_id || $attachment->newerVersion()->exists() || $attachment->document_request_id) {
+            if ($attachment->previous_version_id || $attachment->newerVersion()->exists() || $attachment->document_request_id || $attachment->checklistRequests()->exists()) {
                 throw \Illuminate\Validation\ValidationException::withMessages(['document' => 'Il file appartiene a uno storico di versioni o a una richiesta documentale e deve essere conservato.']);
             }
             if (ClientConsent::where('attachment_id', $attachment->id)->exists()) {
@@ -115,6 +119,7 @@ class Attachment extends Model
     public function formDocument(): BelongsTo { return $this->belongsTo(InsuranceFormDocument::class,'insurance_form_document_id'); }
     public function newerVersion(): \Illuminate\Database\Eloquent\Relations\HasOne { return $this->hasOne(self::class, 'previous_version_id'); }
     public function documentRequest(): BelongsTo { return $this->belongsTo(ClientDocumentRequest::class, 'document_request_id'); }
+    public function checklistRequests() { return $this->belongsToMany(ClientDocumentRequest::class, 'client_document_request_files'); }
     public function validator(): BelongsTo { return $this->belongsTo(User::class, 'validated_by'); }
 
     public function auditLogs(): MorphMany

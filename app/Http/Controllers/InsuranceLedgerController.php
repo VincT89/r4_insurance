@@ -26,8 +26,8 @@ class InsuranceLedgerController extends Controller
     }
     private function dates($query,string $column,array $filters): void
     {
-        if($filters['month']??null){$start=\Illuminate\Support\Carbon::createFromFormat('!Y-m',$filters['month']);$query->whereDate($column,'>=',$start)->whereDate($column,'<',$start->copy()->addMonth());}
-        if($filters['from']??null)$query->whereDate($column,'>=',$filters['from']);if($filters['to']??null)$query->whereDate($column,'<=',$filters['to']);
+        if($filters['month']??null){$start=\Illuminate\Support\Carbon::createFromFormat('!Y-m',$filters['month']);$query->where($column,'>=',$start->toDateString())->where($column,'<',$start->copy()->addMonth()->toDateString());}
+        if($filters['from']??null)$query->where($column,'>=',$filters['from']);if($filters['to']??null)$query->where($column,'<',\Illuminate\Support\Carbon::parse($filters['to'])->addDay()->toDateString());
     }
     public function index(Request $request)
     {
@@ -35,7 +35,7 @@ class InsuranceLedgerController extends Controller
         foreach(['kind','payment_method','payment_frequency'] as $key)if($filters[$key]??null)$query->where($key,$filters[$key]);
         match($filters['state']??null){
             'cancelled'=>$query->whereNotNull('cancelled_at'), 'paid'=>$query->whereNull('cancelled_at')->whereColumn('collected_cents','amount_cents'),
-            'overdue'=>$query->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents')->whereDate('due_on','<',today()),
+            'overdue'=>$query->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents')->where('due_on','<',today()->toDateString()),
             'partial'=>$query->whereNull('cancelled_at')->where('collected_cents','>',0)->whereColumn('collected_cents','<','amount_cents'),
             'open'=>$query->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents'), default=>null};
         $titles=$query->with(['policy.client','policy.supplierAgency'])->orderBy('due_on')->orderBy('id')->paginate(TableListing::perPage(25))->withQueryString();
@@ -45,16 +45,29 @@ class InsuranceLedgerController extends Controller
     {
         return ['agencies'=>\App\Models\SupplierAgency::orderBy('name')->get(['id','name']),'companies'=>\App\Models\SupplierCompany::orderBy('name')->get(['id','name']),'consultants'=>User::where('status','active')->orderBy('name')->get(['id','name']),'branches'=>\App\Models\InsuranceBranch::with('subbranches')->orderBy('name')->get()];
     }
-    public function show(InsuranceTitle $title){$this->access($title);$title->load(['policy.client','policy.supplierAgency','collections.consultant','collections.documents','documents']);return view('ledger.show',compact('title')+$this->options());}
+    public function show(InsuranceTitle $title)
+    {
+        $this->access($title);
+        $title->load(['policy.client','policy.supplierAgency','collections.consultant','collections.documents','documents']);
+        foreach ($title->collections as $payment) $payment->setRelation('title', $title);
+        $deliveries = app(\App\Services\CollectionCommunicationStatus::class)->deliveries($title->collections);
+        return view('ledger.show',compact('title','deliveries')+$this->options());
+    }
     public function schedule(InsurancePolicy $policy,InsuranceLedger $ledger)
     {
-        $this->authorize('ledger.manage');$this->authorize('view',$policy->client);$rows=$ledger->plan($policy);$fingerprint=hash('sha256',json_encode($rows));return view('ledger.schedule',compact('policy','rows','fingerprint'));
+        $this->authorize('ledger.manage');$this->authorize('view',$policy->client);$rows=$ledger->plan($policy);$fingerprint=$ledger->previewFingerprint($policy,$rows);return view('ledger.schedule',compact('policy','rows','fingerprint'));
     }
     public function generate(Request $request,InsurancePolicy $policy,InsuranceLedger $ledger){$this->authorize('ledger.manage');$data=$request->validate(['confirmed'=>['accepted'],'fingerprint'=>['required','string','size:64']]);$ledger->generate($policy,$data['fingerprint']);return to_route('titles.index',['policy'=>$policy->id])->with('success','Titoli generati.');}
-    public function create(InsurancePolicy $policy){$this->authorize('ledger.manage');return view('ledger.form',compact('policy'));}
+    public function create(Request $request,InsurancePolicy $policy)
+    {
+        $this->authorize('ledger.manage');$request->validate(['change'=>['nullable','integer']]);
+        $change=$request->filled('change') ? $policy->incomingChanges()->where('kind','addition')->findOrFail($request->integer('change')) : null;
+        return view('ledger.form',compact('policy','change'));
+    }
     public function store(Request $request,InsurancePolicy $policy,InsuranceLedger $ledger)
     {
         $this->authorize('ledger.manage');$data=$request->validate(['kind'=>['required',Rule::in(array_keys(InsuranceTitle::KINDS))],'reference'=>['nullable','string','max:100'],'due_on'=>['required','date_format:Y-m-d'],'coverage_from'=>['required','date_format:Y-m-d'],'coverage_to'=>['required','date_format:Y-m-d','after:coverage_from'],'amount'=>['required','regex:/\A\d{1,10}([.,]\d{1,2})?\z/'],'payment_method'=>['required',Rule::in(InsurancePolicy::PAYMENT_METHODS)],'payment_frequency'=>['required',Rule::in(InsurancePolicy::PAYMENT_FREQUENCIES)],'notes'=>['nullable','string','max:5000']]);
+        $request->validate(['insurance_policy_change_id'=>['nullable','integer']]);$data['insurance_policy_change_id']=$request->integer('insurance_policy_change_id') ?: null;
         $data['amount_cents']=Money::cents($data['amount']);unset($data['amount']);if($data['amount_cents']<1)throw \Illuminate\Validation\ValidationException::withMessages(['amount'=>'L’importo deve essere positivo.']);
         return to_route('titles.show',$ledger->manual($policy,$data))->with('success','Titolo registrato.');
     }
@@ -84,11 +97,11 @@ class InsuranceLedgerController extends Controller
     public function renewal(InsurancePolicy $policy){$this->authorize('ledger.manage');abort_unless($policy->editableBy(auth()->user()),403);return view('ledger.renewal',compact('policy'));}
     private function renewalData(Request $request): array
     {
-        return $request->validate(['starts_on'=>['required','date_format:Y-m-d'],'expires_on'=>['required','date_format:Y-m-d','after:starts_on'],'premium'=>['required','numeric','min:0.01','max:9999999999.99','decimal:0,2'],'payment_frequency'=>['required',Rule::in(InsurancePolicy::PAYMENT_FREQUENCIES)],'payment_method'=>['required',Rule::in(InsurancePolicy::PAYMENT_METHODS)]]);
+        return $request->validate(['number'=>['prohibited'],'starts_on'=>['required','date_format:Y-m-d'],'expires_on'=>['required','date_format:Y-m-d','after:starts_on'],'premium'=>['required','numeric','min:0.01','max:9999999999.99','decimal:0,2'],'payment_frequency'=>['required',Rule::in(InsurancePolicy::PAYMENT_FREQUENCIES)],'payment_method'=>['required',Rule::in(InsurancePolicy::PAYMENT_METHODS)]], ['number.prohibited'=>'Il rinnovo mantiene il numero della polizza esistente. Un contratto sostitutivo o successivo a una cessazione va registrato come nuova polizza.']);
     }
     public function renewalPreview(Request $request,InsurancePolicy $policy,InsuranceLedger $ledger)
     {
-        $this->authorize('ledger.manage');abort_unless($policy->editableBy(auth()->user()),403);$renewal=$this->renewalData($request);$rows=$ledger->renewalPlan($policy,$renewal);$fingerprint=hash('sha256',json_encode($rows));return view('ledger.schedule',compact('policy','renewal','rows','fingerprint'));
+        $this->authorize('ledger.manage');abort_unless($policy->editableBy(auth()->user()),403);$renewal=$this->renewalData($request);$rows=$ledger->renewalPlan($policy,$renewal);$fingerprint=$ledger->previewFingerprint($policy,$rows);return view('ledger.schedule',compact('policy','renewal','rows','fingerprint'));
     }
     public function renew(Request $request,InsurancePolicy $policy,InsuranceLedger $ledger)
     {

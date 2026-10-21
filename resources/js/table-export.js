@@ -21,7 +21,8 @@ export async function exportTable({ format, title, headers, rows, filters, searc
     const response = await fetch(fontUrl); if (!response.ok) throw new Error('Carattere PDF non disponibile. Riprova.');
     const bytes = new Uint8Array(await response.arrayBuffer());
     let binary = ''; for (let i=0; i<bytes.length; i+=8192) binary += String.fromCharCode(...bytes.subarray(i,i+8192));
-    const doc = new jsPDF({ orientation: headers.length >= 4 ? 'landscape' : 'portrait', compress: true, putOnlyUsedFonts: true });
+    /** Wide tables need more page width to keep percentages, dates and headings readable. */
+    const doc = new jsPDF({ format: headers.length > 10 ? 'a3' : 'a4', orientation: headers.length >= 4 ? 'landscape' : 'portrait', compress: true, putOnlyUsedFonts: true });
     doc.addFileToVFS('Ubuntu-R.ttf', btoa(binary)); doc.addFont('Ubuntu-R.ttf', 'Ubuntu', 'normal'); doc.setFont('Ubuntu');
     const width = doc.internal.pageSize.getWidth();
     doc.setFontSize(15); const titleLines = doc.splitTextToSize(title, width-24); doc.text(titleLines,12,15);

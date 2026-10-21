@@ -214,7 +214,7 @@ class InsuranceOperationsTest extends TestCase
         $rows[1]->update(['due_on'=>'2026-10-31']);$rows[2]->update(['due_on'=>'2026-10-30']);$rows[3]->update(['due_on'=>'2026-10-29']);
         $this->post(route('titles.collect',$rows[2]),$this->payment($rows[2]->amount_cents));$this->post(route('titles.cancel',$rows[3]),['reason'=>'Titolo non dovuto']);
         app(DeadlineReminders::class)->forUser($this->admin);app(DeadlineReminders::class)->forUser($this->admin);
-        $this->assertSame(1,$this->admin->notifications()->where('data->kind','title')->count());
+        $this->assertEqualsCanonicalizing([$rows[0]->id,$rows[1]->id],$this->admin->notifications()->where('data->kind','title')->get()->map(fn($notification)=>(int)$notification->data['source_id'])->all());
         $this->get(route('deadlines.index',['kind'=>'title','period'=>'15']))->assertOk()->assertViewHas('deadlines',fn($r)=>$r->total()===1);
         $this->get(route('dashboard'))->assertOk()->assertSee('Rate scadute e in scadenza');$this->get(route('clients.show',[$this->client,'tab'=>'deadlines']))->assertOk()->assertSee('Residuo');
     }

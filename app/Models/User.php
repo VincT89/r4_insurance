@@ -70,11 +70,13 @@ class User extends Authenticatable
     public function visibleNotifications(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->notifications()->where(function ($query) {
-            $query->whereNotIn('type', [\App\Services\ClaimReminders::TYPE, \App\Services\DeadlineReminders::TYPE, InsurancePolicyCorrection::NOTIFICATION_TYPE])
+            $query->whereNotIn('type', [\App\Services\ClaimReminders::TYPE, \App\Services\DeadlineReminders::TYPE, InsurancePolicyCorrection::NOTIFICATION_TYPE, \App\Services\CollectionCommunicationReminders::TYPE, \App\Services\CollectionCommunicationReminders::REVERSAL_TYPE])
                 ->orWhere(function ($query) {
                     $query->where('type', InsurancePolicyCorrection::NOTIFICATION_TYPE)->whereIn('data->client_id', Client::current()->visibleTo($this)->select('id'));
                 })->orWhere(function ($query) {
                     app(\App\Services\DeadlineReminders::class)->pending($query, $this);
+                })->orWhere(function ($query) {
+                    app(\App\Services\CollectionCommunicationReminders::class)->pending($query, $this);
                 })->orWhere(function ($query) {
                     $query->where('type',\App\Services\ClaimReminders::TYPE)->whereIn('data->activity_id',InsuranceClaimActivity::pending()->visibleTo($this)->whereHas('claim',fn($q)=>$q->when(!$this->isAdmin(),fn($q)=>$q->where('assigned_to',$this->id)))->select('id'));
                     if (!$this->can('viewAny',Client::class) || $this->status!=='active') $query->whereRaw('1=0');
@@ -114,6 +116,7 @@ class User extends Authenticatable
             'client_consents' => ['created_by'],
             'client_merges' => ['created_by'],
             'client_document_requests' => ['requested_by'],
+            'client_document_request_files' => ['linked_by'],
             'outbound_mail_settings' => ['updated_by'],
             'agency_communications' => ['user_id'],
             'insurance_quote_cases' => ['created_by'],
@@ -124,6 +127,7 @@ class User extends Authenticatable
             'insurance_policy_corrections' => ['requested_by', 'resolved_by'],
             'insurance_quote_emails' => ['user_id'],
             'agency_commission_schedules' => ['created_by', 'voided_by'],
+            'insurance_commission_movements' => ['created_by'],
             'insurance_form_templates' => ['created_by', 'approved_by'],
             'insurance_form_packages' => ['created_by'],
             'insurance_form_submissions' => ['created_by', 'reviewed_by'],

@@ -30,7 +30,7 @@ class InsuranceCatalog
             if ($record->exists && ($record->name !== $values['name'] || $moves) && $this->used($record)) {
                 throw ValidationException::withMessages(['name' => 'Questa voce è usata da polizze, richieste documentali o accorpamenti approvati dell’Excel. Conserva la denominazione e disattivala se non serve più; puoi creare una nuova voce.']);
             }
-            $old = $record->exists ? $record->only(['name', 'status', 'needs_review', 'notes', 'insurance_branch_id', 'document_categories']) : null;
+            $old = $record->exists ? $record->only(['name', 'status', 'needs_review', 'notes', 'insurance_branch_id', 'document_categories', 'person_document_categories', 'company_document_categories']) : null;
             $record->fill($values)->save();
             app(AuditLogService::class)->log($old ? 'catalog_updated' : 'catalog_created', $record, $old, $values, ($old ? 'Aggiornato ' : 'Creato ').($record instanceof InsuranceBranch ? 'il ramo ' : 'il sottoramo ').$record->name);
             return $record;

@@ -36,6 +36,7 @@
             </div>
         </details>
     </nav>
+    @include('commissions.summary', ['commissionPolicy'=>null])
     @if($tab === 'registry')
         <x-panel padded>
             @include('clients.partials.registry-details')

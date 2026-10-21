@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 globalThis.document = { addEventListener() {} };
-const { CommunicationSelection } = await import('../../resources/js/communication-selection.js');
+const { CommunicationSelection, withoutClaimed } = await import('../../resources/js/communication-selection.js');
 
 test('selection survives page navigation and remains separated by agency', () => {
     const first = new CommunicationSelection('period-and-filters');
@@ -31,4 +31,27 @@ test('selection rejects invalid identifiers, duplicates and more than 500 rows p
     assert.equal(selection.add('<script>', 2), false);
     assert.equal(selection.add(502, null), false);
     assert.equal(selection.items.size, 501);
+});
+
+test('confirmed rows disappear from cross-page selection while other agencies and pending rows remain', () => {
+    const selection = new CommunicationSelection('pending');
+    selection.add(1,10); selection.add(28,10); selection.add(29,10); selection.add(60,20);
+    const saved = selection.snapshot(100);
+    const afterSend = withoutClaimed(saved,[1,28]);
+    const restored = new CommunicationSelection('pending',afterSend,200);
+    assert.deepEqual(restored.forAgency(10),['29']);
+    assert.deepEqual(restored.forAgency(20),['60']);
+    assert.equal(afterSend.expires,saved.expires);
+    assert.equal(withoutClaimed(null,[1]),null);
+});
+
+test('appendices keep independent selections and claims even when their numeric id matches a policy', () => {
+    const selection = new CommunicationSelection('daily');
+    assert.equal(selection.add('1', 10), true);
+    assert.equal(selection.add('change-1', 10), true);
+    assert.equal(selection.add('change-2', 10), true);
+    for (const invalid of ['change-0', 'change--1', 'change-1x', 'change-01', 'change-<script>']) assert.equal(selection.add(invalid, 10), false);
+    const saved = withoutClaimed(selection.snapshot(100), ['change-1']);
+    const restored = new CommunicationSelection('daily', saved, 200);
+    assert.deepEqual(restored.forAgency(10), ['1', 'change-2']);
 });

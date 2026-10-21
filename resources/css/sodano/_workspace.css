@@ -203,10 +203,11 @@
 .email-message-body { margin: 0; font: inherit; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
 .email-review-confirm { display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
 .email-review-confirm input { margin-top: 4px; flex-shrink: 0; accent-color: var(--ap-primary); }
-.app-body .topbar #notifications-panel { width: min(420px, calc(100vw - 24px)); min-width: 0; max-height: min(560px, calc(100dvh - 80px)); border: 1px solid var(--ap-form-border, var(--ap-primary)); border-radius: 8px; box-shadow: 0 8px 26px #0002; background: var(--ap-panel); color: var(--ap-panel-text); }
+.app-body .topbar #notifications-panel { display: flex; flex-direction: column; width: min(420px, calc(100vw - 24px)); min-width: 0; max-height: min(560px, calc(100dvh - 80px)); border: 1px solid var(--ap-form-border, var(--ap-primary)); border-radius: 8px; box-shadow: 0 8px 26px #0002; background: var(--ap-panel); color: var(--ap-panel-text); }
+#notifications-panel > .dropdown-header, #notifications-panel > .notification-links { flex-shrink: 0; }
 #notifications-panel .dropdown-header { gap: 12px; flex-wrap: wrap; padding: 14px 16px; background: var(--ap-table-header); color: var(--ap-table-header-text); border-color: var(--ap-table-header-border); }
 #notifications-panel .dropdown-header-title { color: inherit; font-size: 14px; }
-#notifications-panel .dropdown-body { max-height: min(440px, calc(100dvh - 160px)); overscroll-behavior: contain; }
+#notifications-panel .dropdown-body { flex: 1 1 auto; min-height: 0; max-height: min(440px, calc(100dvh - 160px)); overscroll-behavior: contain; }
 #notifications-panel .notif-count-badge { background: transparent; color: inherit; padding: 0; border-radius: 0; font: inherit; font-size: 12px; }
 #notifications-panel .notif-mark-all { color: inherit; font-family: inherit; font-size: 12px; min-height: 34px; padding: 6px 8px; border: 1px solid currentColor; border-radius: 5px; text-decoration: none; }
 #notifications-panel .notif-mark-all:hover { background: var(--ap-primary-hover); color: var(--ap-primary-hover-text); border-color: var(--ap-primary-hover); }
@@ -285,12 +286,69 @@
 .communication-selection-groups form > div:first-of-type { flex: 1 1 240px; min-width: 0; overflow-wrap: anywhere; }
 .communication-selection-groups form .btn { white-space: normal; }
 .communication-pagination-summary { padding: 14px 16px 0; color: var(--ap-text); }
+.communication-followup-actions, .deadline-quick-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.communication-document-source h3 { margin: 0 0 10px; color: var(--ap-section-heading); font-size: 14px; }
+.communication-document-group { border: 1px solid var(--ap-section-line); border-radius: 6px; margin-top: 10px; overflow: hidden; }
+.communication-document-group summary { cursor: pointer; padding: 12px 14px; background: var(--ap-section); color: var(--ap-section-heading); font-weight: 600; overflow-wrap: anywhere; }
+.communication-document-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--ap-panel-line); }
+.communication-document-row:last-child { border-bottom: 0; }
+.communication-document-row > label, .communication-document-label { display: flex; flex: 1; align-items: flex-start; gap: 10px; min-width: 0; }
+.communication-document-row label { cursor: pointer; }
+.communication-document-row strong, .communication-document-row small { display: block; overflow-wrap: anywhere; }
+.communication-document-row small { margin-top: 4px; line-height: 1.5; color: var(--ap-panel-muted); }
+.communication-document-row input { margin-top: 3px; flex-shrink: 0; width: 17px; height: 17px; accent-color: var(--ap-primary); }
+.communication-document-row > .btn { flex-shrink: 0; }
+.deadline-table td:nth-child(1), .deadline-table td:nth-child(8), .deadline-table td:nth-child(9) { white-space: nowrap; }
+.deadline-policy-reference { white-space: nowrap; }
+@media (max-width: 640px) {
+    .communication-document-row { flex-wrap: wrap; padding: 12px; }
+    .communication-document-row > label, .communication-document-label { flex-basis: 100%; }
+    .communication-document-row > .btn { margin-left: 27px; min-height: 40px; }
+}
+.deadline-notice { margin-bottom: 18px; padding: 12px 16px; background: var(--ap-panel-soft); border: 1px solid var(--ap-section-line); border-left: 3px solid var(--ap-primary); border-radius: var(--r2); color: var(--ap-panel-text); }
+.deadline-notice p + p { margin-top: 6px; }
+.notification-links { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 10px 14px; background: var(--ap-panel-soft); border-top: 1px solid var(--ap-panel-line); }
+.notification-links a { display: inline-flex; align-items: center; min-height: 36px; color: var(--ap-primary); font-size: 12px; font-weight: 600; }
+@media (max-width: 640px) { .notification-links a { min-height: 44px; } .communication-followup-actions > .btn, .deadline-quick-actions > .btn { flex: 1 1 auto; } }
 .policy-start-intro { margin: 0 0 24px; line-height: 1.6; }
 .policy-start-empty { padding: 18px; background: var(--ap-section-end); border: 1px solid var(--ap-section-line); border-radius: 6px; color: var(--ap-section-end-text); }
 .policy-start-empty p + p { margin-top: 10px; }
 .policy-start .insurance-form-actions { margin-top: 16px; }
 #notifications-panel .notif-item.is-alert { border-left-color: #b42323; }
 #notifications-panel .notif-item.is-alert .notif-item-title { color: #a51f28; background: #fff0f1; padding: 3px 5px; border-radius: 3px; }
+.document-checklist-intro { padding: 14px 16px; background: var(--ap-panel-soft); border-bottom: 1px solid var(--ap-section-line); }
+.document-checklist-intro p + p { margin-top: 8px; }
+.document-forms-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 16px; border-top: 1px solid var(--ap-section-line); }
+.document-form-status { min-width: 0; overflow-wrap: anywhere; }
+.document-form-status h3 { margin: 0 0 10px; font-size: 15px; color: var(--ap-section-heading); }
+.document-form-status p + p { margin-top: 8px; }
+.document-form-status .insurance-form-actions { margin-top: 12px; gap: 8px; }
+.document-checklist-file { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--ap-section-line); }
+.document-checklist-file > div { min-width: 0; overflow-wrap: anywhere; }
+.document-checklist-options { display: grid; gap: 8px; margin: 12px 0; }
+.document-checklist-options > label { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px; border: 1px solid var(--ap-form-border); border-radius: var(--r2); background: var(--ap-panel); cursor: pointer; }
+.document-checklist-options input { width: 17px; height: 17px; margin-top: 3px; accent-color: var(--ap-primary); }
+.document-checklist-options span { display: block; overflow-wrap: anywhere; }
+.document-checklist-options small { display: block; margin-top: 4px; line-height: 1.5; }
+.document-checklist-preview { margin-top: 12px; padding: 12px; background: var(--ap-panel-soft); border: 1px solid var(--ap-section-line); border-radius: var(--r2); }
+.document-checklist-preview ul { margin: 8px 0 0; padding-left: 20px; columns: 2; }
+.document-checklist-preview li { margin-bottom: 6px; break-inside: avoid; }
+.document-checklist-config { margin-top: 12px; border: 1px solid var(--ap-section-line); border-radius: var(--r2); }
+.document-checklist-config > summary { padding: 12px; cursor: pointer; background: var(--ap-section); color: var(--ap-section-heading); font-weight: 600; }
+.document-checklist-config > div { padding: 14px; }
+.document-request-files { margin-top: 8px; }
+.document-request-files summary { cursor: pointer; color: var(--ap-primary); }
+.document-request-files ul { margin: 8px 0 0; padding-left: 16px; }
+.document-request-files li { margin-bottom: 8px; white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 800px) { .document-forms-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+    .document-checklist-file { flex-wrap: wrap; }
+    .document-checklist-file > div { flex-basis: 100%; }
+    .document-checklist-options > label { grid-template-columns: 18px minmax(0, 1fr); }
+    .document-checklist-options > label > a { grid-column: 2; justify-self: start; min-height: 40px; }
+    .document-checklist-preview ul { columns: 1; }
+    .document-request-files summary { min-height: 40px; padding-top: 10px; }
+}
 @media (max-width: 640px) {
     .policy-start-empty { padding: 14px; }
     .policy-start .insurance-form-actions { justify-content: stretch; }
