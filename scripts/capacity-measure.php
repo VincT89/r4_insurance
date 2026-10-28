@@ -54,6 +54,18 @@ if ($label==='profile-menu') {
     file_put_contents($workspace.'/notification-query-profiles.json',json_encode(['samples_ms'=>$profiles,'visible_count'=>$reference[1],'same_rows'=>true],JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR));
     return;
 }
+if (str_starts_with($label, 'inbox-')) {
+    $samples = [];
+    for ($i=0; $i<4; $i++) {
+        $queries=0; $sqlMs=0; $slow=[]; $start=microtime(true);
+        $data = app(\App\Livewire\Notifications\NotificationDropdown::class)->render()->getData();
+        $samples[] = ['ms'=>round((microtime(true)-$start)*1000,1), 'queries'=>$queries, 'sql_ms'=>round($sqlMs,1),
+            'unread'=>$data['unreadNotificationsCount'], 'displayed'=>$data['latestNotifications']->count()];
+        echo 'notifiche richiesta '.($i+1).': '.$samples[$i]['ms']." ms\n";
+    }
+    file_put_contents($workspace.'/measure-'.$label.'.json', json_encode(['method'=>'notification refresh and current inbox query, independently from page HTML', 'samples'=>$samples], JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR));
+    return;
+}
 $routes=['dashboard'=>'/dashboard','policies'=>'/policies','policies_filtered'=>'/policies?month=2026-10&date_basis=starts_on&category=RC%20auto',
     'clients'=>'/clients','titles'=>'/titles?month=2026-10','collections'=>'/collections?month=2026-10',
     'reports'=>'/reports?month=2026-10','commissions'=>'/reports/commissions?month=2026-10',
@@ -61,7 +73,7 @@ $routes=['dashboard'=>'/dashboard','policies'=>'/policies','policies_filtered'=>
     'client'=>'/clients/1','policy'=>'/clients/1/policies/1'];
 if (isset($argv[5])) $routes=array_intersect_key($routes,array_flip(explode(',',$argv[5])));
 $results=['database'=>$database,'generated_at'=>now()->toIso8601String(),'policies'=>DB::table('insurance_policies')->count(),
-    'method'=>'single-process HTTP kernel including views and notification component; one cold and three warm requests per route','routes'=>[]];
+    'method'=>'single-process HTTP kernel including page views and deferred notification placeholder; inbox processing measured separately; one cold and three warm requests per route','routes'=>[]];
 foreach ($routes as $name=>$uri) {
     $samples=[];
     for($i=0;$i<4;$i++) { [$sample]=$request($uri); $samples[]=$sample; echo $name.' richiesta '.($i+1).': '.$sample['ms']." ms\n"; }

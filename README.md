@@ -8,6 +8,105 @@ La scheda comprende persone fisiche e aziende, polizze suddivise in tab per ramo
 veicoli e targhe, documenti riservati e scadenze ricavate dai dati registrati.
 I ruoli esistenti e l'identità grafica del gestionale sono conservati.
 
+## Audit per la presentazione: 22 ottobre 2026
+
+Verificati i flussi del gestionale su dati separati da quelli operativi,
+con accessi admin e due operatori. Suite finale: 364 test superati e
+5.897 verifiche, escludendo il modulo backup dal perimetro concordato.
+Superati anche 13 test frontend di tabelle, selezioni ed Excel e la build
+di produzione. Dopo la sola aggiunta della pagina 403 italiana, ripetuti
+gli 8 test dei permessi: 113 verifiche superate.
+
+Navigazione nel browser interno delle 16 pagine principali, con larghezze
+1440 e 390 pixel; controlli mirati su moduli, allegati multipli, notifiche,
+accesso e pagine di dettaglio. Provata una polizza da preventivo approvato,
+due rate semestrali, l'incasso, la comunicazione con documenti esistenti e
+nuovi allegati, lo storico e l'uscita dagli invii pendenti. Provati anche
+l'approvazione con due PDF e la creazione della polizza per un'azienda.
+I test funzionali coprono il percorso completo di privato e azienda,
+comprese checklist, moduli, firme, incassi e riepilogo cumulativo.
+Le email del collaudo sono intercettate: nessun invio SMTP reale.
+
+Correzioni dell'audit:
+
+- Il riepilogo degli incassi conserva e mostra anche il premio della polizza,
+  distinto dall'importo effettivamente incassato.
+- La nuova stipula da preventivo propone soltanto gli stati accettati dal
+  flusso; se il premio rata manca nella proposta, indica dove controllare
+  gli importi calcolati prima della conferma delle rate.
+- Gli accessi negati mostrano una pagina italiana coerente con il tema.
+- Il reset dei dati di prova riconosce le tabelle delle variazioni e rifiuta
+  l'operazione quando contengono storico da conservare. Nessun reset eseguito
+  sul database operativo.
+- Vite aggiornato da 8.1.5 a 8.1.6. Audit npm e Composer senza segnalazioni
+  al momento del controllo; questo non costituisce una certificazione di
+  assenza di vulnerabilità del gestionale.
+
+Nel database operativo, verificato in sola lettura, rimangono 50 clienti e
+50 polizze. Nessuna incongruenza nei nove controlli di relazioni, date e saldi.
+Per l'utilizzo reale restano SMTP e destinatari delle agenzie, checklist per
+ramo/tipo cliente, attivazione dei moduli approvati e account degli operatori.
+Al 22 ottobre: nessuna email valida nelle 16 agenzie attive, checklist vuote,
+2 modelli da revisionare e 5 precedenti, nessun modello utilizzabile, un solo
+utente admin attivo. Le condizioni provvigionali restano da definire come
+concordato. Configurazione HTTPS, debug disattivato e pianificazione dei
+promemoria vanno verificate sull'ambiente di pubblicazione.
+
+Report e prove visive sono conservati nella cartella di collaudo esterna al
+repository. Le sessioni di prova sono state disconnesse e il server locale
+di collaudo è stato arrestato.
+
+## Collaudo concorrente: 21 ottobre 2026
+
+Il collaudo usa processi PHP indipendenti con un admin e due operatori, sullo
+stesso database MySQL di prova. Le richieste attraversano il kernel HTTP,
+i controlli dei permessi, i controller e le viste. Alcuni casi riproducono
+anche due schede dello stesso utente. Barriere controllate fanno coincidere
+le scritture nei punti critici; i tempi e gli identificativi dei processi
+sono registrati nel report esterno al repository.
+
+Esito finale: 18 scenari concorrenti superati, 52 richieste HTTP senza errori
+del server, 90 test funzionali superati con 1.037 verifiche e 13 test delle
+tabelle e dei file Excel superati. I rifiuti previsti per dati superati o
+accessi non consentiti sono verificati esplicitamente, non conteggiati come
+salvataggi riusciti.
+
+Correzioni verificate:
+
+- Un incasso registrato mentre l'admin conferma una comunicazione invalida
+  il precedente riepilogo: residuo, rata e polizza vengono ricontrollati
+  sui dati correnti, chiedendo una nuova revisione se sono cambiati.
+- Anche una modifica contemporanea all'anagrafica del contraente richiede
+  un nuovo controllo prima dell'invio.
+- Un aggiornamento lento delle notifiche non può sovrascrivere il riepilogo
+  più recente degli incassi da comunicare. La scansione e la pubblicazione
+  sono serializzate per amministratore, conservando un solo avviso per agenzia.
+- Incasso con allegati, modifica della polizza e conferma della comunicazione
+  acquisiscono i blocchi su cliente e polizza nello stesso ordine, evitando
+  il conflitto che causava un errore durante i salvataggi contemporanei.
+
+I casi comprendono doppio incasso, pagamenti parziali, reinvio della stessa
+richiesta, doppia emissione dal medesimo preventivo approvato, modifiche
+sovrapposte, allegati multipli, doppio storno, blocco dal giorno successivo,
+invii cumulativi sovrapposti, storno durante un invio già confermato, avvisi
+riaperti dopo lo storno, proprietà delle notifiche e divieti degli operatori.
+Paginazione, selezioni ed esportazioni vengono confrontate con i filtri
+applicati, anche durante nuovi incassi. I test delle tabelle generano e
+riaprono file XLSX, verificando importi, date, identificativi e protezione
+dalle formule provenienti dai dati.
+
+Il comando `scripts/concurrency-check.php` accetta esclusivamente database
+con prefisso `r4_concurrency_`, diversi da quello operativo, e una cartella
+esterna con il marcatore `.concurrency-workspace`. `create` rifiuta database
+già esistenti; `run` aggiunge fixture isolate e salva un report per esecuzione.
+Un argomento opzionale dopo il database limita `run` ai nomi degli scenari
+che contengono quel testo. Non usare il comando sul database del gestionale.
+
+Le email usano un trasporto simulato, con traccia locale degli identificativi:
+questo collaudo non verifica la consegna SMTP reale. Non apre server o porte
+HTTP e non comprende una nuova verifica grafica nel browser. Aspetto,
+personalizzazione e dati del database operativo non sono modificati.
+
 ## Prestazioni delle pagine: aggiornamento del 21 ottobre 2026
 
 Ridotte le letture ripetute del portafoglio in dashboard e del menu notifiche.
@@ -1336,3 +1435,91 @@ dopo un errore durante la concessione dei permessi.
 Nessuna destinazione esterna o esecuzione automatica è stata attivata.
 Il server locale usato per la prova è MariaDB 10.4.32, una versione fuori
 supporto: prevedere un aggiornamento collaudato prima dell'uso in produzione.
+
+## Percorso operativo e prestazioni: verifica del 27 ottobre 2026
+
+La scheda cliente espone direttamente Nuovo preventivo e la lista dei suoi
+preventivi. L'elenco, la creazione della richiesta e il percorso Nuova polizza
+mantengono il contraente selezionato; Azzera filtri conserva il contesto,
+mentre Tutti i preventivi riapre esplicitamente il portafoglio generale.
+Nelle sostituzioni e nelle aggiunte, la scelta del contratto riprende ramo e
+sottoramo anche dopo una ricerca del cliente. La validazione sul server resta
+obbligatoria, comprese appartenenza del contratto e classificazione delle aggiunte.
+
+Nella pratica preventivi richieste e proposte precedono gli archivi documentali.
+Dopo ricezione, presentazione al cliente e approvazione si torna alla proposta
+interessata. Dalla polizza si accede subito alla preparazione delle rate o alle
+rate esistenti. Liste, filtri rapidi e passaggio agli incassi mantengono il
+contratto o il cliente selezionato. La chiusura della lavorazione segue dati,
+moduli, rate e documenti; il blocco dal giorno successivo resta invariato.
+
+Collaudo nel browser su dati sintetici separati: privato, richiesta Nobis,
+due PDF della proposta, approvazione documentata, contratto di 800 euro con
+due rate semestrali da 400 euro, incasso della prima rata e controllo della
+comunicazione cumulativa con due allegati recuperati dal fascicolo. Nessun
+invio reale. Provati ricerca aziendale e classificazione per le aggiunte,
+navigazione come operatore e chiusura della lavorazione dal modulo effettivo.
+Verificati desktop 1440x1000 e smartphone 390x844. Il file Excel scaricato con
+filtro Incassato contiene la sola rata attesa, importo numerico 400 e residuo 0.
+
+Verifiche automatiche: 368 test applicativi e 5964 asserzioni nella suite senza
+BackupSafetyTest, escluso dal perimetro richiesto. Dopo la verifica finale della
+chiusura sono passati altri 49 test mirati (788 asserzioni), inclusa una nuova
+regressione che usa la revisione presente nella pagina resa all'operatore.
+Passati anche i 13 test frontend delle tabelle e la build di produzione.
+
+Le notifiche si aggiornano in una richiesta autenticata separata, senza
+bloccare il caricamento delle liste; il contatore usa gli stessi criteri di
+visibilità dei messaggi. Le opzioni delle scadenze evitano la ripetizione di
+tutte le righe documentali. Gli indici delle migrazioni 2026_10_27_100000 e
+2026_10_27_110000 sono stati applicati anche al database locale operativo.
+
+Sul campione isolato di 40.000 polizze, quattro richieste per ciascuna delle
+dodici pagine hanno risposto HTTP 200. Mediane delle tre richieste successive
+alla prima, in millisecondi: dashboard 1246,9; polizze 862,2; polizze filtrate
+525,8; clienti 33,3; rate 61,6; incassi 47; report 478,2; provvigioni 35,6;
+scadenze 542,3; comunicazioni 588,2; scheda cliente 32,6; scheda polizza 57,1.
+Queste misure riguardano la risposta HTML, non il completamento del menu
+notifiche o i tempi percepiti nel browser. Con 38.818 notifiche non lette,
+l'aggiornamento separato del menu richiede una mediana di 3583,2 ms: resta
+un costo rilevante nello scenario di arretrato esteso. Le misure sono locali,
+non costituiscono una garanzia di tempi in produzione o con utenti simultanei.
+
+## Presentazione e promemoria automatici: 27 ottobre 2026
+
+Il comando `insurance:deadline-reminders` produce soltanto notifiche interne.
+Su Windows, `scripts/install-reminder-task.ps1 -PhpPath "C:\percorso\php.exe"`
+registra un'attività per il checkout corrente, ogni cinque minuti e all'accesso
+dell'utente. Usa privilegi limitati, non salva credenziali, esclude esecuzioni
+sovrapposte e avvia il controllo in modalità nascosta. Sono necessari PC acceso,
+utente connesso e database disponibile. L'attività non avvia email, backup o
+gli altri comandi dello scheduler Laravel. Esecuzioni ed errori restano nel
+registro dei comandi; Scadenze mostra l'ultimo controllo riuscito.
+
+Verificata l'esecuzione effettiva tramite l'attività Windows e il registro del
+gestionale, con esiti riusciti e nessuna configurazione SMTP attiva. L'ambiente
+di presentazione rimane esterno al repository, con database SQLite, chiave,
+allegati e sessioni dedicati; le credenziali di prova non sono versionate.
+Il launcher della presentazione esegue gli stessi promemoria sul suo database
+ogni cinque minuti. I due contratti e incassi di prova non sono stati aggiunti
+al database operativo.
+
+Collaudati due percorsi: privato con premio 800 euro e primo incasso di 400
+alla nostra agenzia; azienda con premio 1200 euro e primo incasso di 600
+direttamente alla compagnia. In entrambi i casi: preventivi e approvazione,
+due rate semestrali, copertura aggiornata, documenti multipli, checklist,
+moduli di collaudo e copie firmate, chiusura della lavorazione da due operatori
+distinti. L'admin ha preparato un riepilogo unico con entrambi gli incassi e
+sei allegati. Nessuna email inviata: senza SMTP il pulsante resta disabilitato.
+
+Gli avvisi dei documenti mostrano anche il nome del file, distinguendo fronte
+e retro senza perdere lo stato di lettura delle notifiche già esistenti.
+Gli allegati visualizzati vengono recuperati in blocco, limitatamente alla
+pagina delle notifiche e ai clienti visibili. I documenti scaduti restano
+evidenziati in rosso; le rate incassate escono dagli avvisi pendenti.
+
+Passati 45 test del percorso (644 asserzioni) e, dopo la correzione dei nomi
+negli avvisi, 18 test mirati (150 asserzioni, in parte sovrapposti alla prima
+esecuzione). Verificati browser desktop e smartphone, filtro per polizza,
+selezione cumulativa e file Excel effettivo con un solo incasso aziendale da
+600 euro. Il controllo ripetuto dei promemoria non ha creato duplicati.

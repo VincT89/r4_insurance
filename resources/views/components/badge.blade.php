@@ -81,6 +81,7 @@ $map = [
     'partial'         => 'br',
     'renewed'         => 'bg',
     'future'          => 'bb',
+    'due_today'       => 'br',
     'suspended'       => 'ba',
     'replaced'        => 'bd',
     'ceased'          => 'bd',

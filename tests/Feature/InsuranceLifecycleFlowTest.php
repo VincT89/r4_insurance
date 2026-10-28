@@ -237,7 +237,7 @@ class InsuranceLifecycleFlowTest extends TestCase
         $this->assertSame(5000, $commission->fresh()->settled_cents);
         $this->assertSame(5000, $commission->fresh()->accrued_cents);
         $this->assertNull($payment->fresh()->voided_at);
-        $this->get(route('clients.policies.show', [$this->client, $this->policy]))->assertOk()->assertSee('Verifica contabile')->assertDontSee('Anteprima titoli')
+        $this->get(route('clients.policies.show', [$this->client, $this->policy]))->assertOk()->assertSee('Verifica contabile')->assertDontSee('Prepara rate e quietanze')
             ->assertViewHas('accountingReview', fn ($review) => (int) $review->open_titles === 1 && (int) $review->balance_cents === 50000);
         $this->get(route('titles.show', $title))->assertOk()->assertSee('La polizza è annullata');
         $this->post(route('titles.cancel', $title), ['reason'=>'Titolo ancora incassato'])->assertSessionHasErrors('ledger');
@@ -277,7 +277,7 @@ class InsuranceLifecycleFlowTest extends TestCase
         $this->assertSame(2, $this->admin->visibleNotifications()->where('data->kind', 'title')->count());
         $this->assertSame('Dati aggiornati: predisporre nuovi moduli', $package->fresh()->state_label);
         $this->post(route('titles.renewal-preview', $this->policy), $this->renewal())->assertSessionHasErrors('ledger');
-        $this->get(route('clients.policies.show', [$this->client, $this->policy]))->assertOk()->assertSee('Verifica contabile')->assertDontSee('Anteprima titoli')
+        $this->get(route('clients.policies.show', [$this->client, $this->policy]))->assertOk()->assertSee('Verifica contabile')->assertDontSee('Prepara rate e quietanze')
             ->assertSee('900,00 €')->assertViewHas('accountingReview', fn ($review) => (int) $review->open_titles === 2 && (int) $review->balance_cents === 90000);
         $this->delete(route('clients.policies.destroy', [$this->client, $this->policy]))->assertSessionHasErrors('policy');
         $this->post(route('agency-communications.review', $this->agency), [

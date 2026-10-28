@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-use App\Domain\Core\Queries\PolicyPortfolioQuery;
-use App\Models\{AgencyCommunication, InsurancePolicy, InsurancePolicyChange, SupplierAgency, User};
+use App\Models\{AgencyCommunication, Client, InsurancePolicy, InsurancePolicyChange, SupplierAgency, User};
 use App\Support\Money;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
@@ -31,6 +30,17 @@ class AgencyEmailWorkflow
     public function deliveryKey(InsurancePolicy $policy, string $recipient): string
     {
         return hash('sha256', $policy->id.'|'.$this->policyFingerprint($policy).'|'.strtolower($recipient));
+    }
+
+    public function lockedPolicies(AgencyCommunication $message, User $user): Collection
+    {
+        $reviewed = collect($message->payload['policies']);
+        /** Lock clients before contracts, as in the registry workflow; normal eager reads could retain an older MySQL snapshot. */
+        $clients = Client::current()->visibleTo($user)->whereIn('id', $reviewed->pluck('client_id'))->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+        $policies = InsurancePolicy::whereIn('id', $reviewed->pluck('id'))->whereIn('client_id', $clients->keys())->orderBy('id')->lockForUpdate()->get();
+        if ($policies->count() !== $reviewed->count()) throw ValidationException::withMessages(['email'=>'Alcune polizze o anagrafiche sono cambiate o non sono più disponibili. Riapri il controllo.']);
+        foreach ($policies as $policy) $policy->setRelation('client', $clients->get($policy->client_id));
+        return $policies;
     }
 
     public function existingDeliveries(Collection $policies): Collection
@@ -160,12 +170,11 @@ class AgencyEmailWorkflow
                 /** Verify private copies before claiming SMTP delivery; missing files must not produce an uncertain send. */
                 $files = $documents->checkedFiles($message);
                 $deliveryPayload = $message->deliveryPayload();
+                $policies = $this->lockedPolicies($message, $user);
                 $agency = SupplierAgency::whereKey($message->supplier_agency_id)->lockForUpdate()->first();
                 if (!$agency) throw ValidationException::withMessages(['email'=>'L’agenzia non è più disponibile.']);
-                if(($message->payload['kind']??null)==='collections') return app(AgencyCollectionEmailWorkflow::class)->claim($message,$user,$agency);
+                if(($message->payload['kind']??null)==='collections') return app(AgencyCollectionEmailWorkflow::class)->claim($message,$user,$agency,$policies);
                 $ids = array_column($message->payload['policies'], 'id');
-                $policies = app(PolicyPortfolioQuery::class)->forUser($user, [])->whereIn('id',$ids)->with('client')->orderBy('id')->lockForUpdate()->get();
-                if ($policies->count() !== count($ids)) throw ValidationException::withMessages(['email'=>'Alcune polizze non sono più disponibili. Riapri la selezione.']);
                 $this->validateSelection($agency,$policies);
                 $changeIds = array_column($message->payload['changes'] ?? [], 'id');
                 $changes = InsurancePolicyChange::whereIn('id', $changeIds)->whereIn('result_policy_id', $ids)->orderBy('id')->lockForUpdate()->get();
@@ -189,7 +198,7 @@ class AgencyEmailWorkflow
                 $message->update(['status'=>'sending','reviewed_at'=>now(),'sending_at'=>now()]);
                 $this->audit('agency_email_sending',$message,'Confermato l’invio di '.($selectedPolicies->count() + $changes->count()).' operazioni a '.$agency->name.'.');
                 return true;
-            });
+            }, 3);
         } catch (QueryException $exception) {
             if (in_array((string)$exception->getCode(), ['23000','23505'], true)) throw ValidationException::withMessages(['policies'=>'Invio già prenotato per una delle polizze. Aggiorna la selezione.']);
             throw $exception;

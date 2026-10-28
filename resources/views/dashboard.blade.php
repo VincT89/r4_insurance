@@ -9,11 +9,12 @@
                 ['Clienti', $overview['clients'], route('clients.index'), false],
                 ['Polizze', $overview['policies'], route('policies.index'), false],
                 ['In vigore', $overview['active'], route('policies.index', ['status'=>'active']), false],
-                ['Non pagate', $overview['unpaid'], route('policies.index', ['payment_status'=>'unpaid']), $overview['unpaid'] > 0],
+                ['Polizze in scadenza entro '.$period.' giorni', $overview['due'], route('deadlines.index', ['kind'=>'policy','period'=>$period]), false],
             ] as [$label, $value, $url, $alert])
                 <a href="{{ $url }}" @class(['overview-total', 'is-alert' => $alert])><span>{{ $label }}</span><strong @class(['status-alert' => $alert])>{{ number_format($value, 0, ',', '.') }}</strong></a>
             @endforeach
         </section>
+        <x-payment-summary :summary="$paymentSummary" />
         <div class="workspace-columns">
             <section class="workspace-primary" aria-label="Operatività e scadenze">
                 <x-dashboard-section title="Polizze inserite oggi" :empty="$todayPolicies->isEmpty()" message="Nessuna polizza aperta oggi e ancora attiva.">
@@ -23,7 +24,7 @@
                 </tbody></table></div></x-dashboard-section>
                 <x-dashboard-section title="Rate scadute e in scadenza" :empty="$dueTitles->isEmpty()" :message="'Nessuna rata scaduta o in scadenza entro '.$period.' giorni.'">
                 <x-slot:actions><a class="btn btn-g btn-sm" href="{{ route('titles.index',['state'=>'open']) }}">Tutte le rate da incassare</a></x-slot:actions>
-                <div class="client-table-scroll" role="region" aria-label="Rate da incassare" tabindex="0"><table class="t-table"><thead><tr><th>Scadenza</th><th>Cliente</th><th>Polizza / rata</th><th>Frazionamento</th><th>Residuo</th><th>Stato</th></tr></thead><tbody>@forelse($dueTitles as $title)<tr><td><x-status-text :alert="$title->state === 'overdue'">{{ $title->due_on->format('d/m/Y') }}</x-status-text></td><td>{{ $title->policy->client->name }}</td><td><a href="{{ route('titles.show',$title) }}">{{ $title->policy->number }} / #{{ $title->id }}</a></td><td>{{ $title->payment_frequency }}</td><td><x-status-text :alert="in_array($title->state, ['open', 'partial', 'overdue'], true)">{{ \App\Support\Money::format($title->balance_cents) }}</x-status-text></td><td><x-badge :status="in_array($title->state, ['open', 'partial'], true) ? 'unpaid' : $title->state" :label="$title->state_label" /></td></tr>@empty<tr><td colspan="6">Nessuna rata scaduta o in scadenza entro {{ $period }} giorni.</td></tr>@endforelse</tbody></table></div>{{ $dueTitles->links() }}</x-dashboard-section>
+                <div class="client-table-scroll" role="region" aria-label="Rate da incassare" tabindex="0"><table class="t-table"><thead><tr><th>Scadenza</th><th>Cliente</th><th>Polizza / rata</th><th>Frazionamento</th><th>Residuo</th><th>Stato</th></tr></thead><tbody>@forelse($dueTitles as $title)<tr><td><x-status-text :alert="$title->state === 'overdue'">{{ $title->due_on->format('d/m/Y') }}</x-status-text></td><td>{{ $title->policy->client->name }}</td><td><a href="{{ route('titles.show',$title) }}">{{ $title->policy->number }} / #{{ $title->id }}</a></td><td>{{ $title->payment_frequency }}</td><td><x-status-text :alert="in_array($title->state, ['due_today', 'partial', 'overdue'], true)">{{ \App\Support\Money::format($title->balance_cents) }}</x-status-text></td><td><x-title-status :title="$title" /></td></tr>@empty<tr><td colspan="6">Nessuna rata scaduta o in scadenza entro {{ $period }} giorni.</td></tr>@endforelse</tbody></table></div>{{ $dueTitles->links() }}</x-dashboard-section>
                 <x-dashboard-section title="Prossime scadenze" :empty="$duePolicies->isEmpty()" message="Nessuna polizza in scadenza nel periodo.">
                 <x-slot:actions>
                     <nav class="period-options" aria-label="Periodo scadenze">@foreach(['7','15','30','60'] as $days)<a href="{{ route('dashboard', ['period'=>$days]) }}" class="btn btn-g btn-sm" @if($period===$days) aria-current="page" @endif>{{ $days }} giorni</a>@endforeach</nav>
@@ -43,7 +44,7 @@
             <aside class="workspace-secondary">
                 @can('system.admin')@livewire('dashboard.recent-activity')@endcan
                 <x-panel title="Da seguire" padded>
-                    <a class="work-queue-link" href="{{ route('policies.index', ['payment_status'=>'unpaid']) }}"><span>Polizze non pagate</span><strong><x-status-text :alert="$overview['unpaid'] > 0">{{ number_format($overview['unpaid'],0,',','.') }}</x-status-text></strong></a>
+                    <a class="work-queue-link" href="{{ route('titles.index', ['state'=>'overdue']) }}"><span>Rate scadute</span><strong><x-status-text :alert="$paymentSummary['overdue']['count'] > 0">{{ number_format($paymentSummary['overdue']['count'],0,',','.') }}</x-status-text></strong></a>
                     <a class="work-queue-link" href="{{ route('policies.index', ['status'=>'review']) }}"><span>Stato da chiarire</span><strong>{{ number_format($overview['review'],0,',','.') }}</strong></a>
                     <a class="work-queue-link" href="{{ route('deadlines.index', ['kind'=>'request','period'=>'overdue']) }}"><span>Documenti da ricevere</span><span>Apri</span></a>
                 </x-panel>

@@ -54,6 +54,15 @@ class InsurancePolicyWorkflowTest extends TestCase
         $this->assertSame('Ultima nota prima di mezzanotte', $this->policy->fresh()->notes);
     }
 
+    public function test_completion_uses_the_revision_rendered_in_the_actual_policy_page(): void
+    {
+        $page=$this->get($this->path('show'))->assertOk()->assertSee('Prepara rate e quietanze');
+        $this->assertSame(1,preg_match('/name="fingerprint" value="([a-f0-9]{64})"/',$page->getContent(),$match));
+        $this->post($this->path('close-work'),['confirmed'=>1,'fingerprint'=>$match[1]])->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertNotNull($this->policy->fresh()->work_closed_at);
+        $this->assertSame('active',$this->policy->fresh()->status);
+    }
+
     public function test_contract_status_and_legacy_closure_do_not_complete_work(): void
     {
         $this->policy->forceFill(['status' => 'ceased', 'closed_at' => today()->subDays(2)])->save();

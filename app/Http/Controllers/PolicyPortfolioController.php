@@ -43,7 +43,7 @@ class PolicyPortfolioController extends Controller
         return response()->json([
             'vehicles' => $client->vehicles()->orderBy('plate')->get(['id', 'plate', 'make', 'model']),
             'assets' => $client->assets()->orderBy('name')->get(['id', 'name', 'category']),
-            'policies' => $client->policies()->orderBy('number')->get(['id', 'number', 'company', 'category']),
+            'policies' => $client->policies()->orderBy('number')->get(['id', 'number', 'company', 'category', 'insurance_branch_id', 'insurance_subbranch_id']),
         ])->header('Cache-Control', 'no-store, private');
     }
 }

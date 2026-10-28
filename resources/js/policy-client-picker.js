@@ -31,7 +31,12 @@ function initPolicyClientPicker() {
                 selected.value = String(client.id);
                 for (const vehicle of data.vehicles) form.elements.vehicle_id?.add(new Option([vehicle.plate, vehicle.make, vehicle.model].filter(Boolean).join(' / '), vehicle.id));
                 for (const asset of data.assets) form.elements.client_asset_id?.add(new Option(`${asset.name} / ${asset.category}`, asset.id));
-                for (const policy of data.policies || []) form.elements.current_policy_id?.add(new Option(`${policy.number} / ${policy.company} / ${policy.category}`, policy.id));
+                for (const policy of data.policies || []) {
+                    const option = new Option(`${policy.number} / ${policy.company} / ${policy.category}`, policy.id);
+                    option.dataset.branch = policy.insurance_branch_id || '';
+                    option.dataset.subbranch = policy.insurance_subbranch_id || '';
+                    form.elements.current_policy_id?.add(option);
+                }
                 status.textContent = `Cliente selezionato: ${client.name}`;
                 if (quick) quick.hidden = true;
                 root.querySelector('[data-new-client]')?.setAttribute('aria-expanded', 'false');

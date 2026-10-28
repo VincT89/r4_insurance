@@ -23,7 +23,7 @@
                 <div class="policy-start-empty">
                     <p>Non ci sono proposte approvate e ancora valide{{ $client->exists ? ' per questo cliente' : '' }} da trasformare in polizza.</p>
                     <p>Puoi richiedere un preventivo oppure completare l’approvazione di una proposta ricevuta, allegando la prova del cliente.</p>
-                    <div class="insurance-form-actions"><a class="btn btn-g" href="{{ route('quotes.index') }}">Consulta i preventivi</a><a class="btn btn-p" href="{{ route('quotes.create', $client->exists ? ['client_id'=>$client->id] : []) }}">Richiedi preventivo</a></div>
+                    <div class="insurance-form-actions"><a class="btn btn-g" href="{{ route('quotes.index', $client->exists ? ['client'=>$client->id] : []) }}">Consulta i preventivi</a><a class="btn btn-p" href="{{ route('quotes.create', $client->exists ? ['client_id'=>$client->id] : []) }}">Richiedi preventivo</a></div>
                 </div>
             @endif
         </x-panel>

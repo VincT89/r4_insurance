@@ -13,7 +13,7 @@
 <section data-communication-selection data-selection-user="{{ auth()->id() }}" data-selection-scope="{{ $selectionScope }}" data-selection-field="collections">
 @include('agency-communications.selection-actions', ['reviewRoute'=>'agency-communications.collections-review','reviewAgencies'=>$agencies])
 <x-panel :title="$filters['scope']==='period' ? 'Incassi del periodo' : 'Incassi da completare'">
-<p class="communication-pagination-summary" data-table-page-summary>{{ number_format($payments->total(),0,',','.') }} incassi · Pagina {{ $payments->currentPage() }} di {{ $payments->lastPage() }}</p>
+<p class="communication-pagination-summary" data-table-page-summary>{{ number_format($payments->total(),0,',','.') }} {{ $payments->total() === 1 ? 'incasso' : 'incassi' }} · Pagina {{ $payments->currentPage() }} di {{ $payments->lastPage() }}</p>
 <div class="client-table-scroll" role="region" aria-label="Incassi da comunicare alle agenzie" tabindex="0"><table class="t-table"><thead><tr><th>Seleziona</th><th>Data</th><th>Agenzia</th><th>Contraente</th><th>Polizza / titolo</th><th>Compagnia</th><th>Frazionamento</th><th>Importo</th><th>Metodo pagamento</th><th>Destinatario pagamento</th><th>Comunicazione</th></tr></thead><tbody>
 @forelse($payments as $payment)
 @php($agency=$payment->title->policy->supplierAgency)

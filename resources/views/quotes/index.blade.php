@@ -1,11 +1,11 @@
 <x-app-layout title="Preventivi">
-<x-page-header><x-slot:title>Preventivi</x-slot:title><x-slot:actions>@can('create',\App\Models\Client::class)<a class="btn btn-p" href="{{ route('quotes.create') }}">Nuovo preventivo</a>@endcan</x-slot:actions></x-page-header>
+<x-page-header><x-slot:title>Preventivi{{ $selectedClient ? ' / '.$selectedClient->name : '' }}</x-slot:title><x-slot:actions>@if($selectedClient)<a class="btn btn-g" href="{{ route('clients.show',$selectedClient) }}">Scheda cliente</a><a class="btn btn-g" href="{{ route('quotes.index') }}">Tutti i preventivi</a>@endif @can('create',\App\Models\Client::class)<a class="btn btn-p" href="{{ route('quotes.create', $selectedClient ? ['client_id'=>$selectedClient->id] : []) }}">Nuovo preventivo</a>@endcan</x-slot:actions></x-page-header>
 <form method="GET" class="client-search-form" aria-label="Filtra preventivi">
 @if($filters['client']??null)<input type="hidden" name="client" value="{{ $filters['client'] }}">@endif
 <x-form-group label="Cliente o oggetto" name="search"><input class="form-in" name="search" value="{{ $filters['search']??'' }}"></x-form-group>
 <x-form-group label="Stato pratica" name="status"><select class="form-sel" name="status"><option value="">Tutti</option>@foreach(['open'=>'Aperta','approved'=>'Approvata','closed'=>'Polizza stipulata'] as $key=>$label)<option value="{{ $key }}" @selected(($filters['status']??'')===$key)>{{ $label }}</option>@endforeach</select></x-form-group>
 <x-form-group label="Compagnia" name="company"><select class="form-sel" name="company"><option value="">Tutte</option>@foreach($companies as $company)<option value="{{ $company->id }}" @selected(($filters['company']??'')==$company->id)>{{ $company->name }}</option>@endforeach</select></x-form-group>
-<div class="search-form-actions"><button class="btn btn-p">Applica filtri</button><a class="btn btn-g" href="{{ route('quotes.index') }}">Azzera</a></div>
+<div class="search-form-actions"><button class="btn btn-p">Applica filtri</button><a class="btn btn-g" href="{{ route('quotes.index', $selectedClient ? ['client'=>$selectedClient->id] : []) }}">Azzera filtri</a></div>
 <details class="search-more" @if(filled($filters['from']??null) || filled($filters['to']??null)) open @endif>
 <summary class="btn btn-g">Altri filtri</summary><div class="search-more-fields">
 @foreach(['from'=>'Apertura dal','to'=>'Al'] as $key=>$label)<x-form-group :label="$label" :name="$key"><input class="form-in" type="date" name="{{ $key }}" value="{{ $filters[$key]??'' }}"></x-form-group>@endforeach

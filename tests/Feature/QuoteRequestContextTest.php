@@ -92,6 +92,36 @@ class QuoteRequestContextTest extends TestCase
         $this->get(route('clients.policy-context',$this->client))->assertOk();
     }
 
+    public function test_client_context_is_retained_between_registry_quotes_filters_and_new_policy(): void
+    {
+        $own=$this->createCase(['subject'=>'Coperture Officine Valdoro']);
+        $other=Client::factory()->create();
+        $other->quoteCases()->create(['subject'=>'Pratica altro contraente','insurance_branch_id'=>$this->branch->id]);
+        $this->actingAs(User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']));
+        $list=route('quotes.index',['client'=>$this->client->id]);
+        $create=route('quotes.create',['client_id'=>$this->client->id]);
+        $this->get(route('clients.show',$this->client))->assertOk()->assertSee($list,false)->assertSee($create,false);
+        $this->get($list)->assertOk()->assertSee('Preventivi / '.$this->client->name)->assertSee($create,false)
+            ->assertSee('href="'.$list.'">Azzera filtri',false)
+            ->assertViewHas('cases',fn($cases)=>$cases->modelKeys()===[$own->id]);
+        $this->get($create)->assertOk()->assertViewHas('client',fn($client)=>$client->is($this->client))->assertSee($list,false);
+        $this->get(route('clients.policies.create',$this->client))->assertOk()->assertSee($list,false);
+        $this->get(route('quotes.index',['client'=>999999]))->assertNotFound();
+    }
+
+    public function test_selected_contract_context_contains_its_classification_and_excludes_other_clients(): void
+    {
+        $policy=$this->policy();
+        $other=$this->policy(Client::factory()->create());
+        $subbranch=$this->branch->subbranches()->create(['name'=>'Autovetture','name_key'=>hash('sha256','AUTOVETTURE'),'status'=>'active']);
+        $policy->update(['insurance_subbranch_id'=>$subbranch->id,'subcategory'=>$subbranch->name]);
+        $this->get(route('clients.policy-context',$this->client))->assertOk()
+            ->assertJsonCount(1,'policies')->assertJsonPath('policies.0.id',$policy->id)
+            ->assertJsonPath('policies.0.insurance_branch_id',$this->branch->id)
+            ->assertJsonPath('policies.0.insurance_subbranch_id',$subbranch->id);
+        $this->get(route('quotes.create',['client_id'=>$this->client->id,'purpose'=>'addition','current_policy_id'=>$other->id]))->assertNotFound();
+    }
+
     public function test_email_includes_only_explicitly_selected_files_and_preserves_immutable_copies(): void
     {
         $this->mock(QuoteRequestEmailTransport::class)->shouldNotReceive('send');

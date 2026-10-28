@@ -27,7 +27,9 @@ class OperationalReminderFlowTest extends TestCase
         $this->get(route('policies.index',['_table_all'=>1]),['X-Table-Export'=>'1'])->assertOk()->assertSee($this->policy->number);
         $this->assertSame(0,DB::table('insurance_deadline_reminders')->count());
         $this->assertSame(0,$this->admin->notifications()->count());
-        $this->get(route('policies.index'))->assertOk();
+        $this->get(route('policies.index'))->assertOk()->assertSee('Caricamento notifiche');
+        $this->assertSame(0,DB::table('insurance_deadline_reminders')->count());
+        Livewire::test(NotificationDropdown::class)->assertViewHas('unreadNotificationsCount', 1);
         $this->assertSame(1,DB::table('insurance_deadline_reminders')->count());
     }
 
@@ -293,5 +295,24 @@ class OperationalReminderFlowTest extends TestCase
         $this->assertSame(2,DB::table('system_command_runs')->where('command','insurance:deadline-reminders')->where('status','succeeded')->count());
         $this->get(route('deadlines.index',['period'=>'overdue','kind'=>'title','agency'=>$this->agency->id]))->assertOk()->assertSee('Ultimo controllo notifiche')->assertViewHas('deadlines',fn($rows)=>$rows->total()===1 && (int)$rows->first()->balance_cents===9900);
         $this->assertSame(0,AgencyCommunication::count());
+    }
+
+    public function test_document_alerts_identify_each_file_and_keep_read_history_when_the_deadline_passes(): void
+    {
+        foreach (['identita-fronte.pdf','identita-retro.pdf'] as $name) {
+            $this->policy->client->attachments()->create(['type'=>'document','uploaded_by'=>$this->admin->id,'document_category'=>'identity','original_name'=>$name,
+                'stored_name'=>$name,'disk'=>'attachments','directory'=>'reminders','path'=>'reminders/'.$name,
+                'mime_type'=>'application/pdf','extension'=>'pdf','size'=>10,'expires_on'=>today()->addDays(15)]);
+        }
+        $this->artisan('insurance:deadline-reminders')->assertSuccessful();
+        $documents=$this->admin->visibleNotifications()->where('data->kind','document')->get();
+        $this->assertCount(2,$documents);
+        $documents->first()->markAsRead();
+        Livewire::test(NotificationDropdown::class)->assertSee('identita-fronte.pdf')->assertSee('identita-retro.pdf')->assertSee('Documento in scadenza');
+        $this->travel(16)->days();
+        $this->artisan('insurance:deadline-reminders')->assertSuccessful();
+        Livewire::test(NotificationDropdown::class)->assertSee('Documento scaduto')->assertSee('identita-fronte.pdf')->assertSee('identita-retro.pdf')->assertSee('is-alert',false);
+        $this->assertNotNull($documents->first()->fresh()->read_at);
+        $this->assertSame(2,$this->admin->visibleNotifications()->where('data->kind','document')->count());
     }
 }

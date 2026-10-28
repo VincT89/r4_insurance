@@ -84,6 +84,22 @@ class InsuranceDemoAndUploadsTest extends TestCase
         $this->assertDatabaseHas('clients',['id'=>$client->id]); $this->assertDatabaseHas('attachments',['id'=>$file->id]); Storage::disk('attachments')->assertExists($file->path);
     }
 
+    public function test_reset_refuses_existing_policy_changes_without_touching_their_history(): void
+    {
+        [$branch,$company,$agency]=$this->catalog();
+        $client=Client::factory()->create();
+        $policy=$client->policies()->create(['number'=>'SA-2026-501','category'=>$branch->name,'company'=>$company->name,'starts_on'=>today(),'expires_on'=>today()->addYear(),'status'=>'active']);
+        $case=$client->quoteCases()->create(['insurance_branch_id'=>$branch->id,'subject'=>'Copertura cristalli','purpose'=>'addition','current_policy_id'=>$policy->id,'status'=>'closed','created_by'=>$this->admin->id]);
+        $quote=$case->quotes()->create(['supplier_company_id'=>$company->id,'status'=>'converted','priority'=>false,'requested_at'=>today()]);
+        $change=\App\Models\InsurancePolicyChange::create(['source_policy_id'=>$policy->id,'result_policy_id'=>$policy->id,'insurance_quote_id'=>$quote->id,'kind'=>'addition','effective_on'=>today(),'expires_on'=>today()->addYear(),'reference'=>'APP-501','description'=>'Aggiunta cristalli','premium_cents'=>9000,'snapshot'=>[],'request_key'=>(string)\Illuminate\Support\Str::uuid(),'created_by'=>$this->admin->id]);
+        try { app(InsuranceDemoReset::class)->apply($this->admin); $this->fail('Lo storico delle variazioni deve impedire il reset.'); }
+        catch (\RuntimeException $exception) { $this->assertStringContainsString('variazioni contrattuali',$exception->getMessage()); }
+        $this->assertDatabaseHas('insurance_policy_changes',['id'=>$change->id]);
+        $this->assertDatabaseHas('insurance_policies',['id'=>$policy->id,'number'=>'SA-2026-501']);
+        $this->assertDatabaseHas('clients',['id'=>$client->id]);
+        $this->assertSame([],Storage::disk('local')->allFiles());
+    }
+
     public function test_merit_classes_are_validated_saved_and_displayed(): void
     {
         $client=Client::factory()->create();

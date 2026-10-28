@@ -117,11 +117,26 @@ class DeadlineReminders
 
     public function details(Collection $notifications, User $user): array
     {
-        $ids = $notifications->where('type', self::TYPE)->filter(fn ($item) => ($item->data['kind'] ?? null) === 'title')->map(fn ($item) => $item->data['source_id']);
-        $titles = InsuranceTitle::visibleTo($user)->whereIn('id', $ids)->with('policy.client')->get()->keyBy('id');
+        $deadlines = $notifications->where('type', self::TYPE);
+        $ids = $deadlines->filter(fn ($item) => ($item->data['kind'] ?? null) === 'title')->map(fn ($item) => $item->data['source_id']);
+        $titles = $ids->isEmpty() ? collect() : InsuranceTitle::visibleTo($user)->whereIn('id', $ids)->with('policy.client')->get()->keyBy('id');
+        $documentIds = $deadlines->filter(fn ($item) => ($item->data['kind'] ?? null) === 'document')->map(fn ($item) => $item->data['source_id']);
+        /** Enrich only the displayed files, including older alerts, without resetting their read history. */
+        $documents = $documentIds->isEmpty() ? collect() : Attachment::whereIn('id', $documentIds)
+            ->where('attachable_type', (new Client)->getMorphClass())
+            ->whereIn('attachable_id', Client::current()->visibleTo($user)->select('id'))
+            ->whereNotNull('document_category')->whereNotNull('expires_on')->whereDoesntHave('newerVersion')
+            ->with('attachable:id,name')->get(['id','attachable_type','attachable_id','original_name','document_category','expires_on'])->keyBy('id');
         $details = [];
-        foreach ($notifications as $notification) {
-            if ($notification->type !== self::TYPE || ($notification->data['kind'] ?? null) !== 'title') continue;
+        foreach ($deadlines as $notification) {
+            if (($notification->data['kind'] ?? null) === 'document') {
+                if ($document = $documents->get($notification->data['source_id'])) {
+                    $details[$notification->id] = ['title'=>$document->expires_on->lt(today()) ? 'Documento scaduto' : 'Documento in scadenza',
+                        'message'=>(Attachment::DOCUMENT_CATEGORIES[$document->document_category] ?? 'Documento').' · '.$document->original_name.' · '.$document->attachable->name.' · '.$document->expires_on->format('d/m/Y')];
+                }
+                continue;
+            }
+            if (($notification->data['kind'] ?? null) !== 'title') continue;
             if (!$title = $titles->get($notification->data['source_id'])) continue;
             $details[$notification->id] = ['title'=>$title->due_on->lt(today()) ? 'Rata scaduta da incassare' : 'Rata da incassare',
                 'message'=>$title->policy->number.' · '.$title->policy->client->name.' · '.$title->payment_frequency.' · '.$title->due_on->format('d/m/Y').' · Residuo '.Money::format($title->balance_cents)];

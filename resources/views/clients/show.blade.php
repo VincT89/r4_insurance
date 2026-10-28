@@ -6,7 +6,8 @@
         <x-slot:title>{{ $client->name }}</x-slot:title>
         <x-slot:actions>
             @can('updateRegistry', $client)
-                <a href="{{ route('clients.policies.create', [$client, 'category' => request('category'), 'subcategory' => request('subcategory')]) }}" class="btn btn-p">Nuova polizza</a>
+                <a href="{{ route('quotes.create', ['client_id' => $client->id]) }}" class="btn btn-p">Nuovo preventivo</a>
+                <a href="{{ route('clients.policies.create', [$client, 'category' => request('category'), 'subcategory' => request('subcategory')]) }}" class="btn btn-g">Nuova polizza</a>
                 <a href="{{ route('clients.edit', $client) }}" class="btn btn-g">Modifica anagrafica</a>
             @endcan
         </x-slot:actions>
@@ -16,6 +17,7 @@
         @if($client->vat_number) / Partita IVA: {{ $client->vat_number }}@endif
     </p>
     <nav class="client-section-nav client-main-nav" aria-label="Sezioni della scheda cliente">
+        <a href="{{ route('quotes.index',['client'=>$client->id]) }}">Preventivi</a>
         @foreach(['policies' => 'Polizze', 'registry' => 'Anagrafica', 'documents' => 'Documenti', 'deadlines' => 'Scadenze'] as $key => $label)
             <a href="{{ route('clients.show', [$client, 'tab' => $key]) }}" @if($tab === $key) aria-current="page" @endif>{{ $label }}</a>
         @endforeach
@@ -30,7 +32,6 @@
                 @foreach($secondaryTabs as $key => $label)
                     <a href="{{ route('clients.show', [$client, 'tab' => $key]) }}" @if($tab === $key) aria-current="page" @endif>{{ $label }}</a>
                 @endforeach
-                <a href="{{ route('quotes.index',['client'=>$client->id]) }}">Preventivi</a>
                 <a href="{{ route('titles.index',['client'=>$client->id]) }}">Rate e quietanze</a>
                 <a href="{{ route('collections.index',['client'=>$client->id,'month'=>'']) }}">Incassi</a>
             </div>

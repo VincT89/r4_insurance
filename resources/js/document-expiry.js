@@ -42,7 +42,7 @@ function initDocumentExpiry() {
                         const dates=await readDocumentExpiry(file,form.dataset.ocrBase,message=>{if(current===generation)result.textContent=message;});
                         if(current!==generation)return;
                         result.replaceChildren();
-                        if(dates.length!==1){result.textContent=dates.length?'Rilevate più scadenze: verifica il documento e inserisci la data corretta.':unknownExpiry;return;}
+                        if(dates.length!==1){result.textContent=dates.length?'Rilevate più scadenze: verifica il documento e inserisci la data corretta.':'Nessuna scadenza rilevata. Puoi inserirla manualmente.';return;}
                         const description=element('p','',`Scadenza rilevata: ${dates[0].split('-').reverse().join('/')}. Controlla che corrisponda al documento.`), confirm=element('button','btn btn-g','Conferma la data rilevata');confirm.type='button';
                         confirm.addEventListener('click',()=>{if(current!==generation)return;expiry.value=dates[0];refresh();result.replaceChildren();});
                         if(expiry.value!==dateBefore)description.textContent+=' La data inserita manualmente resta conservata fino alla conferma.';

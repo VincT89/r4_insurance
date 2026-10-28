@@ -15,7 +15,7 @@ class InsuranceLedgerController extends Controller
     {
         return $request->validate(['search'=>['nullable','string','max:255'],'month'=>['nullable','date_format:Y-m'],'from'=>['nullable','date_format:Y-m-d'],'to'=>['nullable','date_format:Y-m-d',...($request->filled('from')?['after_or_equal:from']:[])],
             'agency'=>['nullable','integer'],'company'=>['nullable','integer'],'client'=>['nullable','integer'],'policy'=>['nullable','integer'],'category'=>['nullable','string','max:100'],'subcategory'=>['nullable','string','max:100'],
-            'consultant'=>['nullable','integer'],'payment_method'=>['nullable',Rule::in(InsurancePolicy::PAYMENT_METHODS)],'payment_frequency'=>['nullable',Rule::in(InsurancePolicy::PAYMENT_FREQUENCIES)],'state'=>['nullable','in:open,partial,overdue,paid,cancelled,recorded,voided'],'kind'=>['nullable',Rule::in(array_keys(InsuranceTitle::KINDS))],'document_type'=>['nullable',Rule::in(array_keys(InsuranceCollection::DOCUMENT_TYPES))],'recipient'=>['nullable',Rule::in(array_keys(InsuranceCollection::RECIPIENTS))]]);
+            'consultant'=>['nullable','integer'],'payment_method'=>['nullable',Rule::in(InsurancePolicy::PAYMENT_METHODS)],'payment_frequency'=>['nullable',Rule::in(InsurancePolicy::PAYMENT_FREQUENCIES)],'state'=>['nullable',Rule::in([...array_keys(InsuranceTitle::STATES),'recorded','voided'])],'kind'=>['nullable',Rule::in(array_keys(InsuranceTitle::KINDS))],'document_type'=>['nullable',Rule::in(array_keys(InsuranceCollection::DOCUMENT_TYPES))],'recipient'=>['nullable',Rule::in(array_keys(InsuranceCollection::RECIPIENTS))]]);
     }
     private function titleQuery(array $filters)
     {
@@ -33,13 +33,19 @@ class InsuranceLedgerController extends Controller
     {
         $this->authorize('viewAny',Client::class);$filters=$this->filters($request);$query=$this->titleQuery($filters);$this->dates($query,'due_on',$filters);
         foreach(['kind','payment_method','payment_frequency'] as $key)if($filters[$key]??null)$query->where($key,$filters[$key]);
-        match($filters['state']??null){
-            'cancelled'=>$query->whereNotNull('cancelled_at'), 'paid'=>$query->whereNull('cancelled_at')->whereColumn('collected_cents','amount_cents'),
-            'overdue'=>$query->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents')->where('due_on','<',today()->toDateString()),
-            'partial'=>$query->whereNull('cancelled_at')->where('collected_cents','>',0)->whereColumn('collected_cents','<','amount_cents'),
-            'open'=>$query->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents'), default=>null};
+        $query->inPaymentState($filters['state']??null);
+        $paymentSummary = app(\App\Services\InsurancePaymentSummary::class)->forQuery($query);
         $titles=$query->with(['policy.client','policy.supplierAgency'])->orderBy('due_on')->orderBy('id')->paginate(TableListing::perPage(25))->withQueryString();
-        return view('ledger.titles',compact('titles','filters')+$this->options());
+        return view('ledger.titles',compact('titles','filters','paymentSummary')+$this->options()+$this->context($filters));
+    }
+    private function context(array $filters): array
+    {
+        $contextParameters=array_filter(\Illuminate\Support\Arr::only($filters,['client','policy']));
+        $contextClient=($filters['client']??null) ? Client::current()->visibleTo(auth()->user())->findOrFail($filters['client']) : null;
+        $contextPolicy=($filters['policy']??null) ? InsurancePolicy::whereIn('client_id',Client::current()->visibleTo(auth()->user())->select('id'))->with('client')->findOrFail($filters['policy']) : null;
+        abort_if($contextClient && $contextPolicy && (int)$contextClient->id !== (int)$contextPolicy->client_id,404);
+        $contextClient ??= $contextPolicy?->client;
+        return compact('contextParameters','contextClient','contextPolicy');
     }
     private function options(): array
     {
@@ -76,7 +82,15 @@ class InsuranceLedgerController extends Controller
     {
         $this->access($title,true);$data=$request->validate(['received_on'=>['required','date_format:Y-m-d','before_or_equal:today'],'amount'=>['required','regex:/\A\d{1,10}([.,]\d{1,2})?\z/'],'payment_method'=>['required',Rule::in(InsurancePolicy::PAYMENT_METHODS)],'recipient'=>['required',Rule::in(array_keys(InsuranceCollection::RECIPIENTS))],'document_type'=>['required',Rule::in(array_keys(InsuranceCollection::DOCUMENT_TYPES))],'reference'=>['nullable','string','max:150'],'notes'=>['nullable','string','max:5000'],'consultant_id'=>['nullable','integer',Rule::exists('users','id')->where('status','active')],'idempotency_key'=>['required','uuid'],'files'=>['nullable','array','max:10'],'files.*'=>['file','max:10240','mimes:pdf','extensions:pdf']]);
         if(!auth()->user()->canManageSystem())$data['consultant_id']=auth()->id();$data['consultant_id']??=auth()->id();$data['amount_cents']=Money::cents($data['amount']);unset($data['amount'],$data['files']);
-        $payment=DB::transaction(function()use($ledger,$title,$data,$request){$payment=$ledger->collect($title,$data);if($payment->wasRecentlyCreated && $request->hasFile('files'))app(ClientDocumentRegistry::class)->uploadMany($title->policy->client,$request->file('files'),['document_category'=>'collection','insurance_policy_id'=>$title->insurance_policy_id,'insurance_title_id'=>$title->id,'insurance_collection_id'=>$payment->id]);return $payment;});
+        $payment=DB::transaction(function()use($ledger,$title,$data,$request){
+            /** Match the registry's client-then-policy lock order before storing payment attachments. */
+            $client=Client::whereKey($title->policy->client_id)->lockForUpdate()->firstOrFail();
+            abort_if($client->merged_into_id,409,'Anagrafica già unificata. Riapri la polizza prima di registrare l’incasso.');
+            $this->authorize('updateRegistry',$client);
+            $payment=$ledger->collect($title,$data);
+            if($payment->wasRecentlyCreated && $request->hasFile('files'))app(ClientDocumentRegistry::class)->uploadMany($client,$request->file('files'),['document_category'=>'collection','insurance_policy_id'=>$title->insurance_policy_id,'insurance_title_id'=>$title->id,'insurance_collection_id'=>$payment->id]);
+            return $payment;
+        });
         return to_route('titles.show',$title)->with('success','Incasso registrato.');
     }
     public function void(Request $request,InsuranceCollection $collection,InsuranceLedger $ledger){$this->authorize('ledger.manage');$data=$request->validate(['reason'=>['required','string','min:5','max:1000']]);$ledger->void($collection,$data['reason']);return to_route('titles.show',$collection->insurance_title_id)->with('success','Incasso stornato. Lo storico è conservato.');}
@@ -92,7 +106,7 @@ class InsuranceLedgerController extends Controller
         foreach(['payment_method','document_type','recipient'] as $key)if($filters[$key]??null)$query->where($key,$filters[$key]);if($filters['consultant']??null)$query->where('consultant_id',$filters['consultant']);
         if(($filters['state']??null)==='voided')$query->whereNotNull('voided_at');elseif(($filters['state']??null)==='recorded')$query->whereNull('voided_at');
         $totals=(clone $query)->whereNull('voided_at')->selectRaw("COALESCE(SUM(amount_cents),0) as total, COALESCE(SUM(CASE WHEN recipient='our_agency' THEN amount_cents ELSE 0 END),0) as ours")->first();
-        $collections=$query->with(['title.policy.client','title.policy.supplierAgency','consultant','documents'])->orderByDesc('received_on')->orderByDesc('id')->paginate(TableListing::perPage(25))->withQueryString();return view('ledger.collections',compact('collections','filters','totals')+$this->options());
+        $collections=$query->with(['title.policy.client','title.policy.supplierAgency','consultant','documents'])->orderByDesc('received_on')->orderByDesc('id')->paginate(TableListing::perPage(25))->withQueryString();return view('ledger.collections',compact('collections','filters','totals')+$this->options()+$this->context($filters));
     }
     public function renewal(InsurancePolicy $policy){$this->authorize('ledger.manage');abort_unless($policy->editableBy(auth()->user()),403);return view('ledger.renewal',compact('policy'));}
     private function renewalData(Request $request): array

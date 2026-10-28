@@ -68,7 +68,7 @@
       <div class="topbar-right">
         <span class="tb-date">{{ strtoupper(now()->locale('it')->isoFormat('ddd D MMM YYYY')) }}</span>
         @unless(\App\Support\TableListing::exporting())
-          @livewire('notifications.notification-dropdown')
+          @livewire('notifications.notification-dropdown', ['lazy' => 'on-load'])
         @endunless
 
         <div class="dropdown" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="if(open){ open = false; $nextTick(() => $refs.profileTrigger.focus()) }">

@@ -39,8 +39,7 @@ class DeadlineController extends Controller
         foreach ([$policies,$documents,$requests] as $source) $source->selectRaw('NULL as balance_cents');
         $titles->selectRaw('t.amount_cents - t.collected_cents as balance_cents');
         $sources = ['policy'=>$policies, 'document'=>$documents, 'request'=>$requests, 'title'=>$titles];
-        $categories = $this->options($sources, 'category');
-        $companies = $this->options($sources, 'company');
+        [$categories, $companies] = $this->options($visible);
         $responsibles = User::whereIn('id', Client::current()->visibleTo($request->user())->select('commercial_user_id')->whereNotNull('commercial_user_id'))->orderBy('name')->get(['id', 'name']);
         $period = $filters['period'] ?? '15';
         $combined = null;
@@ -74,15 +73,33 @@ class DeadlineController extends Controller
         return view('deadlines.index', compact('deadlines', 'categories', 'companies', 'responsibles', 'period', 'agencies', 'lastCheck'));
     }
 
-    private function options(array $sources, string $field)
+    private function options($visible): array
     {
-        $values = null;
-        /** Dropdown choices need distinct names, not a materialized copy of every deadline and its document metadata. */
-        foreach ($sources as $kind=>$source) {
-            $column = $field === 'category' && $kind === 'request' ? 'COALESCE(p.category, b.name)' : 'p.'.$field;
-            $part = (clone $source)->select([])->selectRaw($column.' as value')->whereNotNull(DB::raw($column))->distinct();
-            $values = $values ? $values->union($part) : $part;
-        }
-        return DB::query()->fromSub($values, 'choices')->orderBy('value')->pluck('value');
+        /** A policy supplies each option once, even when many receipts or document versions refer to it. */
+        $outstandingRequests = fn () => DB::table('client_document_requests as r')->whereNotNull('r.due_on')
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('attachments as received')->whereColumn('received.document_request_id', 'r.id'))
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('client_document_request_files as linked')->whereColumn('linked.client_document_request_id', 'r.id'));
+        $eligible = DB::table('insurance_policies as p')->whereIn('p.client_id', clone $visible)->where(function ($q) use ($outstandingRequests) {
+            $q->whereNotIn('p.status', \App\Models\InsurancePolicy::CLOSED_STATUSES)
+                ->orWhereExists(fn ($q) => $q->selectRaw('1')->from('insurance_titles as t')->whereColumn('t.insurance_policy_id', 'p.id')
+                    ->whereNull('t.cancelled_at')->whereColumn('t.collected_cents', '<', 't.amount_cents'))
+                ->orWhereExists(fn ($q) => $q->selectRaw('1')->from('attachments as a')->whereColumn('a.insurance_policy_id', 'p.id')->whereColumn('a.attachable_id', 'p.client_id')
+                    ->where('a.attachable_type', (new Client)->getMorphClass())->whereNotNull('a.document_category')->whereNotNull('a.expires_on')
+                    ->whereNotExists(fn ($newer) => $newer->selectRaw('1')->from('attachments as newer')->whereColumn('newer.previous_version_id', 'a.id')))
+                ->orWhereExists($outstandingRequests()->selectRaw('1')->whereColumn('r.insurance_policy_id', 'p.id')->whereColumn('r.client_id', 'p.client_id'));
+        });
+        /** Materialize the eligible category/company pairs once, then deduplicate each dropdown in the database's collation. */
+        $fields = DB::query()->selectRaw("'category' as kind")->unionAll(DB::query()->selectRaw("'company' as kind"));
+        $names = DB::query()->fromSub($eligible->select('p.category', 'p.company')->distinct(), 'eligible')
+            ->crossJoinSub($fields, 'fields')->selectRaw("fields.kind, CASE WHEN fields.kind='category' THEN eligible.category ELSE eligible.company END as value")->distinct();
+        /** Requests without a matching policy still contribute their branch, with the same client ownership checks as the table. */
+        $requestBranches = $outstandingRequests()->whereIn('r.client_id', clone $visible)
+            ->leftJoin('insurance_policies as p', fn ($join) => $join->on('p.id', '=', 'r.insurance_policy_id')->on('p.client_id', '=', 'r.client_id'))
+            ->join('insurance_branches as b', 'b.id', '=', 'r.insurance_branch_id')->whereNull('p.id')->selectRaw("'category' as kind, b.name as value")->distinct();
+        $choices = DB::query()->fromSub($names->union($requestBranches), 'choices')->whereNotNull('value')->orderBy('value')->get();
+        return [
+            $choices->where('kind', 'category')->pluck('value'),
+            $choices->where('kind', 'company')->pluck('value'),
+        ];
     }
 }

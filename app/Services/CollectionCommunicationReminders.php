@@ -29,6 +29,16 @@ class CollectionCommunicationReminders
     public function forUser(User $user): int
     {
         if ($user->status !== 'active' || !$user->can('system.admin')) return 0;
+        return DB::transaction(function () use ($user) {
+            /** Serialize the scan and its publication, so a slower tab cannot overwrite a more recent notification. */
+            $current = User::whereKey($user->id)->lockForUpdate()->first();
+            if (!$current || $current->status !== 'active' || !$current->can('system.admin')) return 0;
+            return $this->refreshPending($current);
+        }, 3);
+    }
+
+    private function refreshPending(User $user): int
+    {
         $status = app(CollectionCommunicationStatus::class);
         $query = $status->withDeliveryState($status->pending($status->payments($user))->select([
             'insurance_collections.id','insurance_collections.amount_cents','communication_policy.supplier_agency_id',

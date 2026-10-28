@@ -14,12 +14,13 @@ class InsuranceQuoteController extends Controller
     {
         $this->authorize('viewAny',Client::class);
         $filters=$request->validate(['search'=>['nullable','string','max:255'],'status'=>['nullable','in:open,approved,closed'],'company'=>['nullable','integer'],'from'=>['nullable','date_format:Y-m-d'],'to'=>['nullable','date_format:Y-m-d'],'client'=>['nullable','integer']]);
+        $selectedClient=($filters['client']??null) ? Client::current()->visibleTo($request->user())->findOrFail($filters['client']) : null;
         $query=InsuranceQuoteCase::visibleTo($request->user())->with(['client','branch','subbranch','quotes.company']);
         if($filters['search']??null)$query->where(fn($q)=>$q->where('subject','like','%'.$filters['search'].'%')->orWhereHas('client',fn($q)=>$q->where('name','like','%'.$filters['search'].'%')));
         foreach(['status','client'=>'client_id'] as $key=>$column){if(is_int($key))$key=$column;if($filters[$key]??null)$query->where($column,$filters[$key]);}
         if($filters['company']??null)$query->whereHas('quotes',fn($q)=>$q->where('supplier_company_id',$filters['company']));
         if($filters['from']??null)$query->whereDate('created_at','>=',$filters['from']);if($filters['to']??null)$query->whereDate('created_at','<=',$filters['to']);
-        return view('quotes.index',['cases'=>$query->latest('id')->paginate(TableListing::perPage(25))->withQueryString(),'filters'=>$filters,'companies'=>SupplierCompany::orderBy('name')->get()]);
+        return view('quotes.index',['cases'=>$query->latest('id')->paginate(TableListing::perPage(25))->withQueryString(),'filters'=>$filters,'selectedClient'=>$selectedClient,'companies'=>SupplierCompany::orderBy('name')->get()]);
     }
     public function create(Request $request)
     {
@@ -104,7 +105,7 @@ class InsuranceQuoteController extends Controller
     public function request(Request $request,InsuranceQuoteCase $quoteCase,InsuranceQuoteWorkflow $workflow)
     {
         $this->authorize('updateRegistry',$quoteCase->client);$data=$request->validate(['supplier_company_id'=>['required','integer'],'requested_on'=>['required','date_format:Y-m-d','before_or_equal:today'],'confirmed'=>['accepted']]);
-        $workflow->request($quoteCase,$data['supplier_company_id'],$data['requested_on']);return back()->with('success','Richiesta registrata.');
+        $quote=$workflow->request($quoteCase,$data['supplier_company_id'],$data['requested_on']);return redirect()->to(route('quotes.show',$quoteCase).'#proposal-'.$quote->id)->with('success','Richiesta registrata.');
     }
     public function change(Request $request,InsuranceQuote $quote,string $action,InsuranceQuoteWorkflow $workflow)
     {
@@ -115,6 +116,6 @@ class InsuranceQuoteController extends Controller
             'submit'=>['confirmed'=>['accepted']],
             'approve'=>['approved_on'=>['required','date_format:Y-m-d','before_or_equal:today'],'approval_note'=>['nullable','string','max:5000'],'confirmed'=>['accepted']]+$files,
             'reject'=>['approval_note'=>['required','string','min:5','max:5000']],default=>abort(404)};
-        $data=$request->validate($rules);unset($data['files'],$data['confirmed']);$workflow->change($quote,$action,$data,$request->file('files',[]));return back()->with('success','Preventivo aggiornato.');
+        $data=$request->validate($rules);unset($data['files'],$data['confirmed']);$workflow->change($quote,$action,$data,$request->file('files',[]));return redirect()->to(route('quotes.show',$quote->insurance_quote_case_id).'#proposal-'.$quote->id)->with('success','Preventivo aggiornato.');
     }
 }

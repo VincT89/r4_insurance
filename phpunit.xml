@@ -39,6 +39,7 @@
             <file>tests/Feature/AgencyPolicyChangeCommunicationTest.php</file>
             <file>tests/Feature/CommunicationPaginationTest.php</file>
             <file>tests/Feature/InsuranceOperationsTest.php</file>
+            <file>tests/Feature/InsurancePaymentSummaryTest.php</file>
             <file>tests/Feature/OperationalReminderFlowTest.php</file>
             <file>tests/Feature/InsuranceReadPerformanceTest.php</file>
             <file>tests/Feature/InsurancePolicyWorkflowTest.php</file>

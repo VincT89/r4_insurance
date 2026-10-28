@@ -46,6 +46,8 @@ class InsurancePolicyController extends Controller
     {
         $this->authorize('view', $client);
         abort_unless((int) $policy->client_id === (int) $client->id, 404);
+        /** Keep display aggregates outside the persisted attributes checked by the work fingerprint. */
+        $hasTitles = $policy->titles()->exists();
         $commissionSummary = auth()->user()->can('system.admin')
             ? app(\App\Domain\Core\Queries\InsuranceCommissionQuery::class)->summary($client, $policy)
             : null;
@@ -56,7 +58,7 @@ class InsurancePolicyController extends Controller
             ? $policy->titles()->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents')
                 ->selectRaw('COUNT(*) as open_titles, COALESCE(SUM(amount_cents-collected_cents),0) as balance_cents')->toBase()->first()
             : null;
-        return view('clients.policies.show', compact('client', 'policy', 'corrections', 'accountingReview', 'commissionSummary', 'changes'));
+        return view('clients.policies.show', compact('client', 'policy', 'corrections', 'accountingReview', 'commissionSummary', 'changes', 'hasTitles'));
     }
 
     public function edit(Client $client, InsurancePolicy $policy): View
