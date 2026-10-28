@@ -17,7 +17,7 @@ class QuoteRequestEmailWorkflow
 
     public function remainingPriorities(InsuranceQuoteCase $case)
     {
-        if ($case->purpose === 'addition') return collect();
+        if ($case->purpose === 'addition' || $case->recipient_group_snapshot !== null) return collect();
         /** A documented reply also proves prior contact without forcing a duplicate request outside this system. */
         $contacted = $case->emails()->where('status', 'sent')->pluck('supplier_company_id')
             ->merge($case->quotes()->whereNotNull('received_at')->whereHas('documents', fn ($q) => $q->where('document_category', 'quote'))->pluck('supplier_company_id'));
@@ -30,6 +30,7 @@ class QuoteRequestEmailWorkflow
         abort_unless($user->status === 'active' && $user->can('updateRegistry', $case->client), 403);
         if ($case->status !== 'open') $this->fail('La pratica ha già una proposta approvata o una polizza.');
         if ($case->purpose==='addition' && !$case->availableCompanies()->whereKey($company->id)->exists()) $this->fail('L’aggiunta di coperture va richiesta alla compagnia della polizza attuale.');
+        if ($case->recipient_group_snapshot !== null && !$case->availableCompanies()->whereKey($company->id)->exists()) $this->fail('La compagnia non appartiene al gruppo scelto per questa richiesta.');
         if ($company->status !== 'active' || !filter_var($company->email, FILTER_VALIDATE_EMAIL)) $this->fail('Completa l’indirizzo email della compagnia attiva nella sua anagrafica.');
         if (!$company->quote_priority && $this->remainingPriorities($case)->isNotEmpty()) $this->fail('Contatta prima le compagnie prioritarie: occorre un invio confermato o il preventivo ricevuto con documento allegato.');
         if ($case->quotes()->where('supplier_company_id', $company->id)->where('status', '!=', 'requested')->exists()) $this->fail('Questa compagnia ha già risposto alla richiesta. Conserva la proposta nella pratica.');
@@ -66,7 +67,7 @@ class QuoteRequestEmailWorkflow
                 $registry->check($files,$selected);
                 if (InsuranceQuoteEmail::where('delivery_key', $this->key($case, $company))->exists()) $this->fail('La richiesta è già inviata o ha un invio da verificare. Controlla lo storico.');
                 $message = $case->emails()->create(['supplier_company_id'=>$company->id, 'user_id'=>$user->id, 'status'=>'review', 'payload'=>[], 'fingerprint'=>str_repeat('0',64), 'review_expires_at'=>now()->addMinutes(30)]);
-                $registry->store($case->client,$files,['insurance_quote_email_id'=>$message->id],$stored);
+                $registry->store($case->client,$files,['insurance_quote_email_id'=>$message->id,'vehicle_id'=>$case->vehicle_id],$stored);
                 foreach ($selected as $document) $stored[]=$registry->copyForEmail($document,$message->id);
                 $attachments = [];
                 foreach ($stored as $document) {
@@ -99,7 +100,7 @@ class QuoteRequestEmailWorkflow
             if ($total > self::MAX_BYTES) $this->fail('Allegati oltre il limite consentito.');
             $bytes = Storage::disk($document->disk)->get($document->path);
             if (!hash_equals($file['sha256'], hash('sha256',$bytes))) $this->fail('Un allegato è cambiato dopo il controllo.');
-            $files[] = ['name'=>$file['name'], 'bytes'=>$bytes];
+            $files[] = ['name'=>$file['name'], 'bytes'=>$bytes, 'mime'=>$document->mime_type];
         }
         return $files;
     }

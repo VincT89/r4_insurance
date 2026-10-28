@@ -14,6 +14,7 @@ function initPolicyClientPicker() {
                 const select = form.elements.namedItem(name);
                 if (select) { select.replaceChildren(new Option(label, '')); if (name==='current_policy_id') select.dispatchEvent(new Event('change',{bubbles:true})); }
             }
+            form.dispatchEvent(new CustomEvent('client-context-cleared'));
         }
         async function choose(client) {
             const current = ++generation;
@@ -29,15 +30,25 @@ function initPolicyClientPicker() {
                 const data = await response.json();
                 if (current !== generation) return;
                 selected.value = String(client.id);
-                for (const vehicle of data.vehicles) form.elements.vehicle_id?.add(new Option([vehicle.plate, vehicle.make, vehicle.model].filter(Boolean).join(' / '), vehicle.id));
+                for (const vehicle of data.vehicles) {
+                    const option = new Option([vehicle.plate, vehicle.make, vehicle.model].filter(Boolean).join(' / '), vehicle.id);
+                    option.dataset.cu = vehicle.merit_class_cu || '';
+                    option.dataset.internal = vehicle.merit_class_internal || '';
+                    option.dataset.plate = vehicle.plate;
+                    form.elements.vehicle_id?.add(option);
+                }
                 for (const asset of data.assets) form.elements.client_asset_id?.add(new Option(`${asset.name} / ${asset.category}`, asset.id));
                 for (const policy of data.policies || []) {
                     const option = new Option(`${policy.number} / ${policy.company} / ${policy.category}`, policy.id);
                     option.dataset.branch = policy.insurance_branch_id || '';
                     option.dataset.subbranch = policy.insurance_subbranch_id || '';
+                    option.dataset.vehicle = policy.vehicle_id || '';
+                    option.dataset.cu = policy.merit_class_cu || '';
+                    option.dataset.internal = policy.merit_class_internal || '';
                     form.elements.current_policy_id?.add(option);
                 }
                 status.textContent = `Cliente selezionato: ${client.name}`;
+                form.dispatchEvent(new CustomEvent('client-context-loaded'));
                 if (quick) quick.hidden = true;
                 root.querySelector('[data-new-client]')?.setAttribute('aria-expanded', 'false');
             } catch {

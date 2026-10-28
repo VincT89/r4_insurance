@@ -41,9 +41,9 @@ class PolicyPortfolioController extends Controller
         $this->authorize('updateRegistry', $client);
         abort_if($client->merged_into_id, 404);
         return response()->json([
-            'vehicles' => $client->vehicles()->orderBy('plate')->get(['id', 'plate', 'make', 'model']),
+            'vehicles' => $client->vehicles()->orderBy('plate')->get(['id', 'plate', 'make', 'model', 'merit_class_cu', 'merit_class_internal', 'merit_class_company_id']),
             'assets' => $client->assets()->orderBy('name')->get(['id', 'name', 'category']),
-            'policies' => $client->policies()->orderBy('number')->get(['id', 'number', 'company', 'category', 'insurance_branch_id', 'insurance_subbranch_id']),
+            'policies' => $client->policies()->orderBy('number')->get(['id', 'number', 'company', 'category', 'insurance_branch_id', 'insurance_subbranch_id', 'vehicle_id', 'merit_class_cu', 'merit_class_internal']),
         ])->header('Cache-Control', 'no-store, private');
     }
 }

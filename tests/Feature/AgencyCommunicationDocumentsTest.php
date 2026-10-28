@@ -55,6 +55,44 @@ class AgencyCommunicationDocumentsTest extends TestCase
         return $this->post(route('agency-communications.documents',$message),$data + ['attachment_revision'=>$message->fresh()->attachment_revision]);
     }
 
+    public function test_policy_review_and_multiple_attachments_work_without_recipient_but_delivery_remains_blocked(): void
+    {
+        $this->agency->update(['email'=>null]);
+        $this->mock(AgencyEmailTransport::class)->shouldNotReceive('send');
+        $list=$this->get(route('agency-communications.index'))->assertOk();
+        $this->assertMatchesRegularExpression('/aria-label="Includi polizza SA-2026-0028"\s*>/', $list->getContent());
+        $source=$this->document('contratto.pdf',['insurance_policy_id'=>$this->policy->id]);
+        $message=$this->review();
+        $this->assertNull($message->payload['recipient']['address']);
+        $this->update($message,['document_ids'=>[$source->id],'files'=>[$this->pdf('appendice.pdf')]])->assertSessionHasNoErrors();
+        $page=$this->get(route('agency-communications.show',$message))->assertOk()->assertSee('Email da indicare prima dell’invio')->assertSee('Allegati inclusi: 2');
+        $this->assertMatchesRegularExpression('/<button[^>]*disabled[^>]*>Conferma e invia email<\/button>/', $page->getContent());
+        $this->post(route('agency-communications.send',$message),['reviewed'=>1,'attachment_revision'=>1])->assertSessionHasErrors('agency');
+        $this->assertSame('review',$message->fresh()->status);
+        $this->assertNull(DB::table('agency_communication_policies')->where('agency_communication_id',$message->id)->value('delivery_key'));
+        $this->agency->update(['email'=>'destinatario@example.test']);
+        $this->post(route('agency-communications.send',$message),['reviewed'=>1,'attachment_revision'=>1])->assertSessionHasErrors('email');
+        $this->assertSame('review',$message->fresh()->status);
+    }
+
+    public function test_collection_review_without_recipient_cannot_claim_delivery_even_after_contact_is_completed(): void
+    {
+        $this->agency->update(['email'=>null]);
+        $this->mock(AgencyEmailTransport::class)->shouldNotReceive('send');
+        $title=InsuranceTitle::create(['insurance_policy_id'=>$this->policy->id,'kind'=>'emission','due_on'=>today(),'coverage_from'=>'2026-10-01','coverage_to'=>'2027-04-01','amount_cents'=>10000,'created_by'=>$this->admin->id,'payment_frequency'=>'Semestrale','payment_method'=>'Bonifico a Intermediario']);
+        $payment=app(InsuranceLedger::class)->collect($title,['received_on'=>today()->toDateString(),'amount_cents'=>5000,'payment_method'=>'Bonifico a Intermediario','recipient'=>'our_agency','document_type'=>'transfer','consultant_id'=>$this->admin->id,'idempotency_key'=>(string)Str::uuid()]);
+        $list=$this->get(route('agency-communications.collections'))->assertOk();
+        $this->assertMatchesRegularExpression('/aria-label="Includi incasso '.$payment->id.'"\s*>/', $list->getContent());
+        $this->post(route('agency-communications.collections-review',$this->agency),['scope'=>'pending','collections'=>[$payment->id]])->assertSessionHasNoErrors();
+        $message=AgencyCommunication::latest('id')->firstOrFail();
+        $this->get(route('agency-communications.show',$message))->assertOk()->assertSee('Email da indicare prima dell’invio');
+        $this->post(route('agency-communications.send',$message),['reviewed'=>1])->assertSessionHasErrors('email');
+        $this->assertSame('review',$message->fresh()->status);
+        $this->assertNull(DB::table('agency_communication_collections')->where('agency_communication_id',$message->id)->value('delivery_key'));
+        $this->agency->update(['email'=>'destinatario@example.test']);
+        $this->post(route('agency-communications.send',$message),['reviewed'=>1])->assertSessionHasErrors('email');
+    }
+
     public function test_automatic_list_is_scoped_to_selected_policies_and_their_client_and_has_no_automatic_selection(): void
     {
         $identity = $this->document('identita.pdf',['document_category'=>'identity','expires_on'=>'2026-10-01']);

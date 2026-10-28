@@ -4,6 +4,7 @@
 @csrf
 <x-form-section title="Cliente e destinatario">
 <p class="u-mb-md">{{ $case->client->name }} · {{ $case->branch->name }}{{ $case->subbranch ? ' / '.$case->subbranch->name : '' }}</p>
+@if($case->recipient_group_snapshot)<p class="u-mb-md">Gruppo {{ $case->recipient_group_snapshot['name'] }}@if($case->merit_class_cu) · CU {{ $case->merit_class_cu }}@endif: seleziona una delle compagnie configurate per questa richiesta.</p>@endif
 @if($remaining->isNotEmpty())<p class="u-mb-md">Prima invia le richieste a {{ $remaining->pluck('name')->join(' e ') }}. Le altre compagnie saranno disponibili dopo la conferma degli invii. Se hai già ricevuto un preventivo fuori dal gestionale, registralo nella pratica con il PDF ricevuto.</p>@endif
 <div class="form-row">
 <x-form-group label="Compagnia" name="supplier_company_id" required><select id="field-supplier-company-id" class="form-sel" name="supplier_company_id" x-model="company" required><option value="">Seleziona la compagnia</option>@foreach($companies as $company)<option value="{{ $company->id }}" @disabled($unavailable->contains($company->id) || (!$company->quote_priority && $remaining->isNotEmpty()))>{{ $company->name }}{{ $company->quote_priority ? ' — prioritaria' : '' }}{{ $unavailable->contains($company->id) ? ' — già richiesta' : '' }}</option>@endforeach</select></x-form-group>

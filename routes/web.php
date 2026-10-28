@@ -32,6 +32,17 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'force.password.change'])->group(function () {
+    Route::prefix('settings/registry-imports')->name('registry-imports.')->middleware('can:system.admin')->group(function () {
+        Route::get('/', [\App\Http\Controllers\RegistryImportController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\RegistryImportController::class, 'upload'])->middleware('throttle:10,1')->name('upload');
+        Route::get('/templates/{kind}', [\App\Http\Controllers\RegistryImportController::class, 'template'])->where('kind', 'company|agency|branch|subbranch')->name('template');
+        Route::get('/{id}/mapping', [\App\Http\Controllers\RegistryImportController::class, 'mapping'])->whereUuid('id')->name('mapping');
+        Route::post('/{id}/preview', [\App\Http\Controllers\RegistryImportController::class, 'prepare'])->whereUuid('id')->middleware('throttle:30,1')->name('prepare');
+        Route::get('/{id}', [\App\Http\Controllers\RegistryImportController::class, 'preview'])->whereUuid('id')->name('preview');
+        Route::post('/{id}/confirm', [\App\Http\Controllers\RegistryImportController::class, 'confirm'])->whereUuid('id')->middleware('throttle:10,1')->name('confirm');
+        Route::get('/{id}/report', [\App\Http\Controllers\RegistryImportController::class, 'report'])->whereUuid('id')->name('report');
+        Route::delete('/{id}', [\App\Http\Controllers\RegistryImportController::class, 'discard'])->whereUuid('id')->name('discard');
+    });
     Route::prefix('claims')->name('claims.')->group(function () {
         Route::get('/',[\App\Http\Controllers\InsuranceClaimController::class,'index'])->name('index');
         Route::get('/create',[\App\Http\Controllers\InsuranceClaimController::class,'create'])->name('create');
@@ -115,6 +126,7 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('/agency-communications/messages/{communication}/documents/{document}', [\App\Http\Controllers\AgencyCommunicationController::class, 'download'])->middleware('can:system.admin')->name('agency-communications.documents.download');
     Route::post('/agency-communications/messages/{communication}/send', [\App\Http\Controllers\AgencyCommunicationController::class, 'send'])->middleware(['can:system.admin','throttle:10,1'])->name('agency-communications.send');
     Route::post('/agency-communications/messages/{communication}/resolve', [\App\Http\Controllers\AgencyCommunicationController::class, 'resolve'])->middleware(['can:system.admin','throttle:10,1'])->name('agency-communications.resolve');
+    Route::resource('/settings/quote-groups', \App\Http\Controllers\QuoteRecipientGroupController::class)->except(['show','destroy'])->parameters(['quote-groups'=>'quoteGroup'])->middleware('can:system.admin');
     Route::get('/settings/email', [\App\Http\Controllers\EmailSettingsController::class, 'edit'])->middleware('can:system.admin')->name('email-settings.edit');
     Route::patch('/settings/email', [\App\Http\Controllers\EmailSettingsController::class, 'update'])->middleware(['can:system.admin','throttle:10,1'])->name('email-settings.update');
     Route::get('/deadlines', [\App\Http\Controllers\DeadlineController::class, 'index'])->name('deadlines.index');

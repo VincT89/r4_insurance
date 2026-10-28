@@ -69,7 +69,7 @@ class ClientController extends Controller
         }
         $policySubcategories = filled($filters['category'] ?? null) ? $policies->pluck('subcategory')->filter()->unique()->values() : collect();
         if (filled($filters['subcategory'] ?? null)) $policies = $policies->where('subcategory', $filters['subcategory']);
-        $vehicles = $tab === 'vehicles' ? $client->vehicles()->withCount('policies')->orderBy('plate')->get() : collect();
+        $vehicles = $tab === 'vehicles' ? $client->vehicles()->withCount('policies')->with(['meritClassCompany','policies'=>fn($q)=>$q->orderByDesc('starts_on')->orderByDesc('id')])->orderBy('plate')->get() : collect();
         $documents = $tab === 'documents' ? $client->attachments()->whereNull('client_material_category')
             ->when(($filters['document_view'] ?? 'current') === 'current', fn ($q) => $q->whereDoesntHave('newerVersion'))
             ->with(['uploader', 'insurancePolicy.vehicle', 'vehicle', 'newerVersion', 'validator'])->withExists('checklistRequests')->latest()->get() : collect();

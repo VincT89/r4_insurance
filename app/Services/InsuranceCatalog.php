@@ -39,6 +39,7 @@ class InsuranceCatalog
 
     public function used(InsuranceBranch|InsuranceSubbranch $record): bool
     {
+        if (\App\Models\QuoteRecipientGroup::where($record instanceof InsuranceBranch ? 'insurance_branch_id' : 'insurance_subbranch_id',$record->id)->exists()) return true;
         if (\App\Models\InsuranceFormTemplate::where($record instanceof InsuranceBranch ? 'insurance_branch_id' : 'insurance_subbranch_id',$record->id)->exists()) return true;
         if (\App\Models\AgencyCommissionRate::where($record instanceof InsuranceBranch ? 'insurance_branch_id' : 'insurance_subbranch_id',$record->id)->exists()) return true;
         if (\App\Models\InsuranceQuoteCase::where($record instanceof InsuranceBranch ? 'insurance_branch_id' : 'insurance_subbranch_id',$record->id)->exists()) return true;

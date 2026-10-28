@@ -17,6 +17,7 @@
             <file>tests/Feature/RolePermissionsTest.php</file>
             <file>tests/Feature/RoleMigrationTest.php</file>
             <file>tests/Feature/QuoteRequestContextTest.php</file>
+            <file>tests/Feature/QuoteVehicleGroupsTest.php</file>
             <file>tests/Feature/AuditSafetyRegressionTest.php</file>
             <file>tests/Feature/Security/SecurityHeadersTest.php</file>
             <file>tests/Feature/ClientMaterialsTest.php</file>
@@ -26,6 +27,7 @@
             <file>tests/Feature/SupplierAgencyTest.php</file>
             <file>tests/Feature/InsuranceImportPreparationTest.php</file>
             <file>tests/Feature/RegistryExcelImporterTest.php</file>
+            <file>tests/Feature/RegistryImportTest.php</file>
             <file>tests/Feature/HeldRegistryResolutionTest.php</file>
             <file>tests/Feature/InsuranceCatalogTest.php</file>
             <file>tests/Feature/ApprovedInsuranceCatalogMergesTest.php</file>

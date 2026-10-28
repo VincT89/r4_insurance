@@ -66,6 +66,8 @@ class SupplierCompanyController extends Controller
         $this->authorize('delete', $company);
         DB::transaction(function () use ($company) {
             $company = SupplierCompany::whereKey($company->id)->lockForUpdate()->firstOrFail();
+            if (\App\Models\InsuranceQuoteCase::whereJsonContains('recipient_group_snapshot->company_ids',$company->id)->exists()) throw ValidationException::withMessages(['company'=>'La compagnia è conservata in un gruppo di una richiesta di preventivo. Impostala come inattiva per mantenere lo storico.']);
+            if (\App\Models\QuoteRecipientGroup::whereHas('companies',fn($q)=>$q->where('supplier_companies.id',$company->id))->exists() || \App\Models\ClientVehicle::where('merit_class_company_id',$company->id)->exists()) throw ValidationException::withMessages(['company'=>'La compagnia è collegata a gruppi preventivi o classi di merito. Impostala come inattiva per conservare i riferimenti.']);
             if (\App\Models\AgencyCommissionSchedule::where('supplier_company_id',$company->id)->exists()) throw ValidationException::withMessages(['company'=>'La compagnia ha condizioni provvigionali da conservare. Puoi impostarla come inattiva.']);
             if (\App\Models\InsuranceQuoteEmail::where('supplier_company_id',$company->id)->exists()) throw ValidationException::withMessages(['company'=>'La compagnia è collegata allo storico delle richieste di preventivo. Impostala come inattiva per conservarlo.']);
             if ($company->agencies()->exists() || $company->policies()->exists() || \App\Models\InsuranceQuote::where('supplier_company_id',$company->id)->exists()) {

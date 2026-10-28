@@ -2,4 +2,5 @@
     <a href="{{ route('suppliers.index') }}" @if(request()->routeIs('suppliers.*')) aria-current="page" @endif>Agenzie e subagenzie</a>
     <a href="{{ route('supplier-companies.index') }}" @if(request()->routeIs('supplier-companies.*')) aria-current="page" @endif>Compagnie</a>
     <a href="{{ route('insurance-catalog.index') }}" @if(request()->routeIs('insurance-catalog.*')) aria-current="page" @endif>Rami e sottorami</a>
+    @can('system.admin')<a href="{{ route('registry-imports.index', ['kind'=>request()->routeIs('supplier-companies.*') ? 'company' : (request()->routeIs('insurance-catalog.*') ? request('kind', 'branch') : 'agency')]) }}">Importa CSV/Excel</a>@endcan
 </nav>

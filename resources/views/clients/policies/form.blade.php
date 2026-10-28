@@ -28,8 +28,9 @@
             @if($selectedQuote)
                 <p>Contraente: {{ $client->name }}. Ramo, prodotto, compagnia, date, frazionamento e premio provengono dalla proposta approvata.</p>
                 @if($globalCreate)<input type="hidden" name="client_id" value="{{ $client->id }}">@endif
-                @foreach(app(\App\Services\InsuranceQuoteWorkflow::class)->policyValues($selectedQuote) as $key=>$value)<input type="hidden" name="{{ $key }}" value="{{ $value }}">@endforeach
-                <div x-init="$nextTick(() => { for (const name of @js(array_keys(app(\App\Services\InsuranceQuoteWorkflow::class)->policyValues($selectedQuote)))) { for (const el of $el.closest('form').querySelectorAll('[name=&quot;'+name+'&quot;]:not([type=hidden])')) el.disabled = true; } })"></div>
+                @php($quoteFixedValues = \Illuminate\Support\Arr::except(app(\App\Services\InsuranceQuoteWorkflow::class)->policyValues($selectedQuote), ['merit_class_cu','merit_class_internal']))
+                @foreach($quoteFixedValues as $key=>$value)<input type="hidden" name="{{ $key }}" value="{{ $value }}">@endforeach
+                <div x-init="$nextTick(() => { for (const name of @js(array_keys($quoteFixedValues))) { for (const el of $el.closest('form').querySelectorAll('[name=&quot;'+name+'&quot;]:not([type=hidden])')) el.disabled = true; } })"></div>
             @elseif($globalCreate) @include('policies.client-picker') @endif
             <x-form-section title="Polizza e intermediari">
             <div class="form-row">
@@ -66,7 +67,7 @@
                 <x-form-group label="Bene o soggetto assicurato" name="insured_subject"><input id="field-insured-subject" name="insured_subject" class="form-in" value="{{ old('insured_subject', $policy->insured_subject) }}" maxlength="255"></x-form-group>
                 <x-form-group label="Immobile o altro bene collegato" name="client_asset_id"><select id="field-client-asset-id" name="client_asset_id" class="form-sel"><option value="">Nessun bene collegato</option>@foreach($assets as $asset)<option value="{{ $asset->id }}" @selected((string)old('client_asset_id', $policy->client_asset_id) === (string)$asset->id)>{{ $asset->name }} / {{ $asset->category }}</option>@endforeach</select><p class="u-text-meta">Scegli un bene oppure un veicolo. Registra i beni nella sezione Immobili e beni del cliente.</p></x-form-group>
             </div></x-form-section>
-            <x-form-section title="Classi di merito RC Auto"><div class="form-row">
+            <x-form-section title="Classi di merito RC Auto">@if($selectedQuote)<p class="u-text-meta u-mb-md">Controlla le classi riportate nel contratto. La classe interna è specifica della compagnia scelta.</p>@endif<div class="form-row">
                 <x-form-group label="Classe universale CU" name="merit_class_cu"><select id="field-merit-class-cu" name="merit_class_cu" class="form-sel"><option value="">Non indicata / non applicabile</option>@foreach(range(1,18) as $class)<option value="{{ $class }}" @selected((string) old('merit_class_cu', $policy->merit_class_cu) === (string) $class)>{{ $class }}</option>@endforeach</select></x-form-group>
                 <x-form-group label="Classe interna della compagnia" name="merit_class_internal"><input id="field-merit-class-internal" name="merit_class_internal" class="form-in" value="{{ old('merit_class_internal', $policy->merit_class_internal) }}" maxlength="30"></x-form-group>
             </div></x-form-section>

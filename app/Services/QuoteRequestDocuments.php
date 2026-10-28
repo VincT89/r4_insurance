@@ -18,7 +18,8 @@ class QuoteRequestDocuments
         $rules = [];
         foreach (self::GROUPS as $field=>$category) {
             $rules[$field] = ['nullable', 'array', 'list', 'max:10'];
-            $rules[$field.'.*'] = ['file', 'max:10240', 'mimes:pdf', 'extensions:pdf'];
+            $formats = $category === 'quote_request' ? 'pdf' : 'pdf,jpg,jpeg,png,webp';
+            $rules[$field.'.*'] = ['file', 'max:10240', 'mimes:'.$formats, 'extensions:'.$formats];
         }
         return $rules + [
             'identity_file_details'=>['nullable','array','list','max:10'],
@@ -63,17 +64,19 @@ class QuoteRequestDocuments
         }
         foreach ($documents as $document) {
             $disk = Storage::disk($document->disk);
-            if ($document->mime_type !== 'application/pdf' || !$disk->exists($document->path)) throw ValidationException::withMessages(['document_ids'=>'Un documento selezionato non è un PDF disponibile.']);
+            if (!in_array($document->mime_type, ['application/pdf','image/jpeg','image/png','image/webp'], true) || !$disk->exists($document->path)) throw ValidationException::withMessages(['document_ids'=>'Un documento selezionato non è disponibile o non ha un formato consentito.']);
             $size += $disk->size($document->path); $count++;
         }
-        if ($count > 10 || $size > self::MAX_BYTES) throw ValidationException::withMessages(['email'=>'Seleziona al massimo 10 PDF e 20 MB complessivi, contando tutti i gruppi e i documenti già caricati.']);
+        if ($count > 10 || $size > self::MAX_BYTES) throw ValidationException::withMessages(['email'=>'Seleziona al massimo 10 documenti e 20 MB complessivi, contando tutti i gruppi e i documenti già caricati.']);
     }
 
     public function store(Client $client, array $uploads, array $links, array &$stored): void
     {
         foreach ($uploads as $entry) {
             $metadata = $entry['details'] ?? [];
-            $stored[] = app(ClientDocumentRegistry::class)->upload($client, $entry['file'], $links + [
+            $documentLinks = $links;
+            if ($entry['category'] !== 'vehicle') unset($documentLinks['vehicle_id']);
+            $stored[] = app(ClientDocumentRegistry::class)->upload($client, $entry['file'], $documentLinks + [
                 'document_category'=>$entry['category'],
                 'identity_type'=>$entry['category']==='identity' ? ($metadata['identity_type']??null) : null,
                 'expires_on'=>$entry['category']==='identity' ? ($metadata['expires_on']??null) : null,
@@ -85,7 +88,8 @@ class QuoteRequestDocuments
     {
         /** Every reviewed email owns an immutable copy, so later requests cannot replace its evidence. */
         $disk = Storage::disk($document->disk);
-        $path = $document->directory.'/'.Str::uuid().'.pdf';
+        $extension = match($document->mime_type) { 'application/pdf'=>'pdf', 'image/jpeg'=>'jpg', 'image/png'=>'png', 'image/webp'=>'webp', default=>throw ValidationException::withMessages(['document_ids'=>'Formato non consentito.']) };
+        $path = $document->directory.'/'.Str::uuid().'.'.$extension;
         try {
             if (!$disk->copy($document->path, $path)) throw ValidationException::withMessages(['document_ids'=>'Impossibile preparare una copia dell’allegato. Riprova.']);
             $copy = $document->replicate(['insurance_quote_case_id','insurance_quote_id','insurance_policy_id','insurance_quote_email_id','document_request_id','previous_version_id','validated_by','validated_at','validation_note']);

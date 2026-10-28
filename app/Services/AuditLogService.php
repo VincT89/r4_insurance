@@ -17,6 +17,7 @@ class AuditLogService
         if ($auditable instanceof SupplierAgency || $auditable instanceof SupplierCompany) $fields = $auditable->getFillable();
         if ($auditable instanceof \App\Models\InsurancePolicy) $fields = $auditable->getFillable();
         if ($auditable instanceof SupplierAgency) $fields[] = 'supplier_company_ids';
+        if ($auditable instanceof \App\Models\QuoteRecipientGroup) $fields = ['name','insurance_branch_id','insurance_subbranch_id','cu_from','cu_to','status','company_ids'];
         if ($auditable instanceof \App\Models\Attachment) $fields = ['review_status', 'validated_by', 'validated_at', 'validation_note', 'previous_version_id', 'version_number', 'document_request_id'];
         if ($auditable instanceof \App\Models\InsuranceBranch || $auditable instanceof \App\Models\InsuranceSubbranch) $fields = ['name', 'status', 'needs_review', 'notes', 'insurance_branch_id', 'document_categories'];
         if ($auditable instanceof \App\Models\InsurancePolicyImport) $fields = ['insurance_policy_id', 'status', 'issues', 'source_key', 'payload_hash', 'source_rows', 'resolution_rule', 'compared_fields', 'source_statuses'];

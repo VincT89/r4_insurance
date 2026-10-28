@@ -2,7 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\{Client,InsuranceQuoteCase,InsuranceQuote,InsuranceBranch,InsurancePolicy,SupplierCompany};
-use App\Services\{InsuranceQuoteWorkflow, QuoteRequestDocuments};
+use App\Services\{InsuranceQuoteWorkflow, QuoteRequestDocuments, QuoteVehicleContext};
 use App\Support\TableListing;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,12 +13,14 @@ class InsuranceQuoteController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny',Client::class);
-        $filters=$request->validate(['search'=>['nullable','string','max:255'],'status'=>['nullable','in:open,approved,closed'],'company'=>['nullable','integer'],'from'=>['nullable','date_format:Y-m-d'],'to'=>['nullable','date_format:Y-m-d'],'client'=>['nullable','integer']]);
+        $filters=$request->validate(['search'=>['nullable','string','max:255'],'status'=>['nullable','in:open,approved,closed'],'company'=>['nullable','integer'],'from'=>['nullable','date_format:Y-m-d'],'to'=>['nullable','date_format:Y-m-d'],'client'=>['nullable','integer'],'plate'=>['nullable','string','max:20'],'cu'=>['nullable','integer','between:1,18']]);
         $selectedClient=($filters['client']??null) ? Client::current()->visibleTo($request->user())->findOrFail($filters['client']) : null;
         $query=InsuranceQuoteCase::visibleTo($request->user())->with(['client','branch','subbranch','quotes.company']);
         if($filters['search']??null)$query->where(fn($q)=>$q->where('subject','like','%'.$filters['search'].'%')->orWhereHas('client',fn($q)=>$q->where('name','like','%'.$filters['search'].'%')));
         foreach(['status','client'=>'client_id'] as $key=>$column){if(is_int($key))$key=$column;if($filters[$key]??null)$query->where($column,$filters[$key]);}
         if($filters['company']??null)$query->whereHas('quotes',fn($q)=>$q->where('supplier_company_id',$filters['company']));
+        if($filters['plate']??null)$query->where('vehicle_plate','like','%'.strtoupper(trim($filters['plate'])).'%');
+        if($filters['cu']??null)$query->where('merit_class_cu',$filters['cu']);
         if($filters['from']??null)$query->whereDate('created_at','>=',$filters['from']);if($filters['to']??null)$query->whereDate('created_at','<=',$filters['to']);
         return view('quotes.index',['cases'=>$query->latest('id')->paginate(TableListing::perPage(25))->withQueryString(),'filters'=>$filters,'selectedClient'=>$selectedClient,'companies'=>SupplierCompany::orderBy('name')->get()]);
     }
@@ -31,7 +33,7 @@ class InsuranceQuoteController extends Controller
         $currentPolicies=$client->exists ? $client->policies()->orderBy('number')->get() : collect();
         $source=$request->filled('current_policy_id') ? $currentPolicies->firstWhere('id',$request->integer('current_policy_id')) : null;
         abort_if($request->filled('current_policy_id') && !$source,404);
-        return view('quotes.create',['client'=>$client,'currentPolicies'=>$currentPolicies,'source'=>$source,'purpose'=>$request->input('purpose','new'),'branches'=>InsuranceBranch::where('status','active')->with(['subbranches'=>fn($q)=>$q->where('status','active')])->orderBy('name')->get()]);
+        return view('quotes.create',['client'=>$client,'currentPolicies'=>$currentPolicies,'source'=>$source,'purpose'=>$request->input('purpose','new'),'vehicles'=>$client->exists ? $client->vehicles()->orderBy('plate')->get() : collect(),'recipientGroups'=>\App\Models\QuoteRecipientGroup::where('status','active')->with(['companies'=>fn($q)=>$q->where('supplier_companies.status','active')])->orderBy('cu_from')->orderBy('name')->get(),'branches'=>InsuranceBranch::where('status','active')->with(['subbranches'=>fn($q)=>$q->where('status','active')])->orderBy('name')->get()]);
     }
     public function store(Request $request)
     {
@@ -46,7 +48,7 @@ class InsuranceQuoteController extends Controller
             'current_policy_reference'=>['nullable','string','max:500',Rule::prohibitedIf($request->filled('current_policy_id'))],
             'current_coverages'=>['nullable','string','max:5000'],
             'additional_coverages'=>['required_if:purpose,addition','nullable','string','max:5000'],
-        ] + QuoteRequestDocuments::rules());
+        ] + QuoteRequestDocuments::rules() + QuoteVehicleContext::rules());
         $client=Client::current()->findOrFail($data['client_id']);$this->authorize('updateRegistry',$client);
         $documents=app(QuoteRequestDocuments::class); $uploads=QuoteRequestDocuments::uploads($request); $documents->check($uploads); $stored=[];
         $values=\Illuminate\Support\Arr::except($data,['files','identity_files','vehicle_files','identity_file_details']);
@@ -60,8 +62,9 @@ class InsuranceQuoteController extends Controller
                 }
                 /** Keep the references used for the request without changing the existing contract or its coverage. */
                 $snapshot=$policy ? ['number'=>$policy->number,'company'=>$policy->company,'category'=>$policy->category,'plate'=>$policy->vehicle?->plate,'expires_on'=>$policy->expires_on->toDateString()] : null;
-                $case=$client->quoteCases()->create($values+['created_by'=>$request->user()->id,'current_policy_snapshot'=>$snapshot]);
-                $documents->store($client,$uploads,['insurance_quote_case_id'=>$case->id],$stored);
+                $context = app(QuoteVehicleContext::class)->values($client, $values, $policy, $values['purpose'] ?? 'new');
+                $case=$client->quoteCases()->create(array_replace($values,$context,['created_by'=>$request->user()->id,'current_policy_snapshot'=>$snapshot]));
+                $documents->store($client,$uploads,['insurance_quote_case_id'=>$case->id,'vehicle_id'=>$case->vehicle_id],$stored);
                 $client->auditLogs()->create(['user_id'=>$request->user()->id,'action'=>'quote_updated','description'=>'Aperta pratica preventivi #'.$case->id.': '.$case->subject,'new_values'=>['case_id'=>$case->id,'current_policy_id'=>$policy?->id,'attachments'=>count($stored)],'created_at'=>now()]);
                 return $case;
             });
@@ -80,7 +83,7 @@ class InsuranceQuoteController extends Controller
             DB::transaction(function () use ($quoteCase,$request,$registry,$uploads,&$stored) {
                 $case=InsuranceQuoteCase::whereKey($quoteCase->id)->lockForUpdate()->firstOrFail();
                 abort_unless($case->status==='open',409);
-                $registry->store($case->client,$uploads,['insurance_quote_case_id'=>$case->id],$stored);
+                $registry->store($case->client,$uploads,['insurance_quote_case_id'=>$case->id,'vehicle_id'=>$case->vehicle_id],$stored);
                 $case->client->auditLogs()->create(['user_id'=>$request->user()->id,'action'=>'quote_updated','description'=>'Aggiunti '.count($stored).' documenti alla pratica preventivi #'.$case->id.'.','created_at'=>now()]);
             });
         } catch (\Throwable $exception) { foreach ($stored as $document) Storage::disk($document->disk)->delete($document->path); throw $exception; }

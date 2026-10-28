@@ -1,4 +1,5 @@
 <x-app-layout title="Riepilogo email">
+    @php($recipientReady = (bool) filter_var($payload['recipient']['address'] ?? null, FILTER_VALIDATE_EMAIL))
     <div x-data="{attachmentsDirty:false}">
     @if(in_array($communication->status,['sending','sent','uncertain']))
         <span hidden data-communication-claimed data-selection-user="{{ auth()->id() }}" data-selection-path="{{ route(($payload['kind']??null)==='collections' ? 'agency-communications.collections' : 'agency-communications.index',[],false) }}" data-claimed-ids="{{ json_encode($payload['selection_keys'] ?? array_column($payload[($payload['kind']??null)==='collections' ? 'collections' : 'policies'],'id')) }}"></span>
@@ -11,7 +12,7 @@
         </x-panel>
     @endif
     <x-panel padded>
-        <dl class="email-envelope"><div><dt>Mittente</dt><dd>{{ $payload['from']['name'] }}<br>{{ $payload['from']['address'] ?: 'Da configurare' }}</dd></div><div><dt>Destinatario</dt><dd>{{ $payload['recipient']['name'] }}<br>{{ $payload['recipient']['address'] }}</dd></div><div><dt>Oggetto</dt><dd>{{ $payload['subject'] }}</dd></div><div><dt>Esito</dt><dd>{{ $communication->status_label }}@if($communication->sent_at)<br>{{ $communication->sent_at->format('d/m/Y H:i') }}@endif</dd></div></dl>
+        <dl class="email-envelope"><div><dt>Mittente</dt><dd>{{ $payload['from']['name'] }}<br>{{ $payload['from']['address'] ?: 'Da configurare' }}</dd></div><div><dt>Destinatario</dt><dd>{{ $payload['recipient']['name'] }}<br>{{ $payload['recipient']['address'] ?: 'Email da indicare prima dell’invio' }}</dd></div><div><dt>Oggetto</dt><dd>{{ $payload['subject'] }}</dd></div><div><dt>Esito</dt><dd>{{ $communication->status_label }}@if($communication->sent_at)<br>{{ $communication->sent_at->format('d/m/Y H:i') }}@endif</dd></div></dl>
         @if($communication->status==='sent')<p class="u-mt-md">Il messaggio è stato accettato dal server di posta. La consegna finale alla casella dell’agenzia dipende dal servizio destinatario.</p>@endif
     </x-panel>
     @php($baseRows = array_filter($payload['policies'], fn ($row) => !isset($payload['policy_ids']) || in_array($row['id'], $payload['policy_ids'], true)))
@@ -69,6 +70,7 @@
     <x-panel title="Testo dell’email" padded><pre class="email-message-body">{{ $payload['body'] }}</pre></x-panel>
     @if($communication->status==='review')
         <x-panel padded>
+            @if(!$recipientReady)<p class="u-mb-md">Puoi controllare polizze e allegati. Per inviare, completa l’email nella <a href="{{ route('suppliers.edit',$communication->supplier_agency_id) }}">scheda dell’agenzia</a>, poi prepara un nuovo riepilogo.</p>@endif
             @if(!$mailReady)<p class="u-mb-md">Completa la casella in <a href="{{ route('email-settings.edit') }}">Impostazioni email</a>, poi prepara un nuovo riepilogo con il mittente configurato.</p>@endif
             @if($voidedCollections->isNotEmpty())<p>Prepara una nuova selezione con gli incassi aggiornati.</p>
             @elseif($communication->review_expires_at->isPast())<p>Il riepilogo è scaduto. Torna alla selezione per controllare i dati aggiornati.</p>
@@ -77,7 +79,7 @@
                 <input type="hidden" name="attachment_revision" value="{{ $communication->attachment_revision }}">
                 <p x-cloak x-show="attachmentsDirty" class="u-mb-md">Hai modificato la selezione dei file: premi «Aggiorna allegati», poi controlla il riepilogo aggiornato.</p>
                 <label class="email-review-confirm"><input type="checkbox" name="reviewed" value="1" x-model="reviewed" :disabled="attachmentsDirty" required> Ho controllato il destinatario, {{ ($payload['kind']??null)==='collections' ? 'gli incassi, gli importi e i metodi di pagamento' : 'le operazioni elencate e i relativi premi' }} e gli allegati inclusi</label>
-                <div class="insurance-form-actions"><span class="form-help">Verrà inviata una sola email a questa agenzia. Allegati inclusi: {{ $includedDocuments->count() }}.</span><button type="submit" class="btn btn-p" @disabled(!$mailReady) :disabled="!reviewed || busy || attachmentsDirty || {{ $mailReady ? 'false' : 'true' }}" x-text="busy ? 'Invio in corso…' : 'Conferma e invia email'">Conferma e invia email</button></div>
+                <div class="insurance-form-actions"><span class="form-help">Verrà inviata una sola email a questa agenzia. Allegati inclusi: {{ $includedDocuments->count() }}.</span><button type="submit" class="btn btn-p" @disabled(!$mailReady || !$recipientReady) :disabled="!reviewed || busy || attachmentsDirty || {{ $mailReady && $recipientReady ? 'false' : 'true' }}" x-text="busy ? 'Invio in corso…' : 'Conferma e invia email'">Conferma e invia email</button></div>
             </form>@endif
         </x-panel>
     @elseif($communication->canResolve())

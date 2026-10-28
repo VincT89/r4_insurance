@@ -8,6 +8,8 @@ import './table-tools.js';
 import './communication-selection.js';
 import './policy-client-picker.js';
 import './document-expiry.js';
+import './quote-vehicle.js';
+import './registration-reader.js';
 import { initShell } from './app-shell.js';
 import { createIcons, icons } from 'lucide';
 

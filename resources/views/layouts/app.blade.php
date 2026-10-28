@@ -181,7 +181,7 @@
       <div class="nav-spacer"></div>
       <div class="nav-divider"></div>
       <div class="nav-group">
-        <x-nav-item href="{{ route('profile.edit') }}" icon="settings" label="Impostazioni" :active="request()->routeIs('profile.*', 'appearance.*', 'insurance-import.*')" />
+        <x-nav-item href="{{ route('profile.edit') }}" icon="settings" label="Impostazioni" :active="request()->routeIs('profile.*', 'appearance.*', 'insurance-import.*', 'quote-groups.*')" />
       </div>
 
       <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form">

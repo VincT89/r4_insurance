@@ -74,7 +74,7 @@ class AgencyEmailWorkflow
     {
         $changes ??= collect();
         $allPolicies = $this->referencedPolicies($policies, $changes);
-        $this->validateSelection($agency, $allPolicies);
+        $this->validateSelection($agency, $allPolicies, false);
         $this->validateChanges($changes);
         if ($policies->count() + $changes->count() > 500) throw ValidationException::withMessages(['policies'=>'Seleziona al massimo 500 operazioni per agenzia.']);
         [$payload, $fingerprint] = $this->snapshot($agency, $policies, $range, $changes);
@@ -89,9 +89,11 @@ class AgencyEmailWorkflow
         });
     }
 
-    private function validateSelection(SupplierAgency $agency, Collection $policies): void
+    private function validateSelection(SupplierAgency $agency, Collection $policies, bool $requireRecipient = true): void
     {
-        if ($agency->status !== 'active' || !filter_var($agency->email, FILTER_VALIDATE_EMAIL)) throw ValidationException::withMessages(['agency'=>'Completa l’indirizzo email di un’agenzia attiva prima di continuare.']);
+        if ($agency->status !== 'active') throw ValidationException::withMessages(['agency'=>'Seleziona un’agenzia attiva.']);
+        /** Review can precede contact configuration; the send path always requires a valid recipient and a fresh fingerprint. */
+        if ($requireRecipient && !filter_var($agency->email, FILTER_VALIDATE_EMAIL)) throw ValidationException::withMessages(['agency'=>'Completa l’indirizzo email dell’agenzia e prepara un nuovo riepilogo prima di inviare.']);
         if ($policies->isEmpty() || $policies->contains(fn ($p) => (int)$p->supplier_agency_id !== $agency->id || !$p->client || !in_array($p->status,['active','renewed'],true) || $p->expires_on->lt(today()))) {
             throw ValidationException::withMessages(['policies'=>'Seleziona soltanto polizze attive o rinnovate, non scadute, della stessa agenzia.']);
         }

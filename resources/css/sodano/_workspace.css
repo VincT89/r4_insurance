@@ -111,6 +111,18 @@
 .app-body .client-more-links a:hover, .app-body .client-more-links a[aria-current] { background: var(--ap-secondary-hover); color: var(--ap-secondary-hover-text); }
 .app-body .client-policy-nav { flex-wrap: nowrap; overflow-x: auto; gap: 4px 18px; margin: 0 0 18px; padding-bottom: 2px; }
 .client-policy-nav > a { flex: 0 0 auto; white-space: nowrap; }
+.registry-import-mapping { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; }
+.registry-import-table { min-width: 760px; }
+.registry-import-table td { white-space: normal; overflow-wrap: anywhere; max-width: 390px; vertical-align: top; }
+.registry-import-table td p + p { margin-top: 7px; }
+.registry-import-details { margin-top: 10px; }
+.registry-import-details summary { cursor: pointer; color: var(--ap-primary); }
+.registry-import-details dl { margin-top: 10px; }
+.registry-import-details dt { font-weight: 600; margin-top: 8px; }
+.registry-import-details dd { margin: 3px 0 0; }
+.registry-import-confirm { display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+.registry-import-confirm input { flex: 0 0 auto; margin-top: 4px; }
+@media (max-width: 700px) { .registry-import-mapping { grid-template-columns: minmax(0, 1fr); gap: 16px; } }
 .source-reference { margin: 18px 0; color: var(--text2); font-size: 12px; }
 .source-reference > summary { cursor: pointer; padding: 8px 0; }
 .source-reference .panel { margin-top: 12px; }
@@ -323,6 +335,15 @@
 .notification-links a { display: inline-flex; align-items: center; min-height: 36px; color: var(--ap-primary); font-size: 12px; font-weight: 600; }
 @media (max-width: 640px) { .notification-links a { min-height: 44px; } .communication-followup-actions > .btn, .deadline-quick-actions > .btn { flex: 1 1 auto; } }
 .policy-start-intro { margin: 0 0 24px; line-height: 1.6; }
+.quote-company-options { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 10px 18px; }
+.quote-company-options > label { padding: 9px 12px; border: 1px solid var(--ap-form-border); border-radius: var(--r2); background: var(--ap-panel); }
+.registration-review { margin-top: 14px; padding: 14px; border: 1px solid var(--ap-form-border); border-radius: var(--r2); background: var(--ap-panel-soft); }
+.registration-review-title { margin-bottom: 12px; font-weight: 600; color: var(--ap-section-heading); }
+.registration-review .form-row > div { min-width: 0; }
+.registration-review label { display: block; margin-bottom: 5px; }
+.registration-review .email-review-confirm { display: flex; }
+.vehicle-policy-reference + .vehicle-policy-reference { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--ap-section-line); }
+.vehicle-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .policy-start-empty { padding: 18px; background: var(--ap-section-end); border: 1px solid var(--ap-section-line); border-radius: 6px; color: var(--ap-section-end-text); }
 .policy-start-empty p + p { margin-top: 10px; }
 .policy-start .insurance-form-actions { margin-top: 16px; }

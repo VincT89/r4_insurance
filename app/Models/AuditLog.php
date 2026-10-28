@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class AuditLog extends Model
 {
     public const ACTIONS = [
+        'registry_import_completed',
+        'quote_group_updated',
         'agency_email_attachments',
         'roles_migrated',
         'claim_created','claim_updated','claim_status','claim_note','claim_activity_added','claim_activity_completed','claim_activity_rescheduled','claim_activity_cancelled',
@@ -71,6 +73,8 @@ class AuditLog extends Model
         $status = $this->displayStatusLabel($this->new_values['status'] ?? null);
 
         return match ($this->action) {
+            'registry_import_completed' => 'ha importato nuove anagrafiche da CSV o Excel dopo il controllo dell’anteprima.',
+            'quote_group_updated' => 'ha configurato un gruppo di compagnie per le richieste di preventivo.',
             'roles_migrated' => 'ha convertito il ruolo precedente in Operatore.',
             'claim_created' => 'ha aperto un sinistro.',
             'claim_updated' => 'ha modificato i dati di un sinistro conservandone lo storico.',
@@ -144,6 +148,8 @@ class AuditLog extends Model
     public function getDisplayActionLabelAttribute(): string
     {
         return match ($this->action) {
+            'registry_import_completed' => 'Importazione anagrafiche',
+            'quote_group_updated' => 'Gruppi preventivi',
             'agency_email_attachments' => 'Allegati comunicazione',
             'roles_migrated' => 'Ruoli e permessi',
             'claim_created','claim_updated','claim_status','claim_note','claim_activity_added','claim_activity_completed','claim_activity_rescheduled','claim_activity_cancelled' => 'Sinistri',

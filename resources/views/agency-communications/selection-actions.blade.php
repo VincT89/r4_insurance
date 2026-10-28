@@ -1,6 +1,6 @@
-<x-panel title="Selezione per l’invio" padded>
+<x-panel title="Selezione per il riepilogo" padded>
     <div class="communication-selection-actions">
-        <button type="button" class="btn btn-g" data-select-page>Seleziona gli inviabili di questa pagina</button>
+        <button type="button" class="btn btn-g" data-select-page>Seleziona le voci di questa pagina</button>
         <button type="button" class="btn btn-g" data-clear-selection>Svuota selezione</button>
         <strong data-selection-count role="status" aria-live="polite">Nessun elemento selezionato</strong>
     </div>
@@ -11,9 +11,9 @@
             <form method="POST" action="{{ route($reviewRoute, $reviewAgency) }}" data-review-agency="{{ $reviewAgency->id }}" hidden>
                 @csrf
                 @foreach($filters as $key=>$value)<input type="hidden" name="{{ $key }}" value="{{ $value }}">@endforeach
-                <div><strong>{{ $reviewAgency->name }}</strong><p class="form-help">{{ $reviewAgency->email ?: 'Email non indicata: completa i recapiti dell’agenzia.' }}</p></div>
+                <div><strong>{{ $reviewAgency->name }}</strong><p class="form-help">{{ $reviewAgency->email ?: 'Email non indicata: puoi controllare il riepilogo, ma non inviarlo.' }}</p></div>
                 <span data-agency-count></span><div data-selection-inputs></div>
-                <button type="submit" class="btn btn-p" @disabled($reviewAgency->status !== 'active' || !filter_var($reviewAgency->email, FILTER_VALIDATE_EMAIL))>Controlla invio a {{ $reviewAgency->name }}</button>
+                <button type="submit" class="btn btn-p" @disabled($reviewAgency->status !== 'active')>Controlla riepilogo per {{ $reviewAgency->name }}</button>
             </form>
         @endforeach
     </div>

@@ -15,9 +15,11 @@ class AgencyCollectionEmailWorkflow
     {
         return app(CollectionCommunicationStatus::class)->deliveries($payments);
     }
-    private function snapshot(SupplierAgency $agency,Collection $payments,string $range): array
+    private function snapshot(SupplierAgency $agency,Collection $payments,string $range,bool $requireRecipient=true): array
     {
-        if($agency->status!=='active' || !filter_var($agency->email,FILTER_VALIDATE_EMAIL))$this->fail('Completa l’email di un’agenzia attiva.');
+        if($agency->status!=='active')$this->fail('Seleziona un’agenzia attiva.');
+        /** Preparing a review does not authorize delivery without a verified recipient. */
+        if($requireRecipient && !filter_var($agency->email,FILTER_VALIDATE_EMAIL))$this->fail('Completa l’email dell’agenzia e prepara un nuovo riepilogo prima di inviare.');
         if($payments->isEmpty() || $payments->contains(fn($p)=>$p->voided_at || $p->title->cancelled_at || (int)$p->title->policy->supplier_agency_id!==(int)$agency->id))$this->fail('Seleziona incassi non stornati, relativi a titoli della stessa agenzia.');
         $rows=$payments->sortBy('id')->map(fn($p)=>[
             'id'=>$p->id,'title_id'=>$p->insurance_title_id,'policy_id'=>$p->title->insurance_policy_id,'number'=>$p->title->policy->number,'client'=>$p->title->policy->client->name,'company'=>$p->title->policy->company,
@@ -42,7 +44,7 @@ class AgencyCollectionEmailWorkflow
     }
     public function prepare(User $user,SupplierAgency $agency,Collection $payments,array $filters,string $range): AgencyCommunication
     {
-        [$payload,$fingerprint]=$this->snapshot($agency,$payments,$range);
+        [$payload,$fingerprint]=$this->snapshot($agency,$payments,$range,false);
         return DB::transaction(function()use($user,$agency,$payments,$filters,$payload,$fingerprint){
             $message=AgencyCommunication::create(['supplier_agency_id'=>$agency->id,'user_id'=>$user->id,'status'=>'review','payload'=>$payload+['filters'=>$filters],'fingerprint'=>$fingerprint,'review_expires_at'=>now()->addMinutes(30)]);
             foreach($payments as $payment)DB::table('agency_communication_collections')->insert(['agency_communication_id'=>$message->id,'insurance_collection_id'=>$payment->id]);

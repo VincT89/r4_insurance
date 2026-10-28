@@ -20,8 +20,9 @@ class InsuranceQuoteWorkflow
             if($case->status!=='open') $this->fail('La pratica ha già una proposta approvata o una polizza.');
             $company=SupplierCompany::whereKey($companyId)->where('status','active')->firstOrFail();
             if ($case->purpose==='addition' && !$case->availableCompanies()->whereKey($companyId)->exists()) $this->fail('Le coperture aggiuntive vanno richieste alla compagnia della polizza attuale.');
+            if ($case->recipient_group_snapshot !== null && !$case->availableCompanies()->whereKey($companyId)->exists()) $this->fail('La compagnia non appartiene al gruppo scelto per questa richiesta.');
             $priorities=SupplierCompany::where('quote_priority',true)->where('status','active')->pluck('id');
-            if($case->purpose!=='addition' && !$company->quote_priority && $priorities->diff($case->quotes()->pluck('supplier_company_id'))->isNotEmpty()) $this->fail('Registra prima le richieste alle compagnie prioritarie dell’agenzia.');
+            if($case->purpose!=='addition' && $case->recipient_group_snapshot === null && !$company->quote_priority && $priorities->diff($case->quotes()->pluck('supplier_company_id'))->isNotEmpty()) $this->fail('Registra prima le richieste alle compagnie prioritarie dell’agenzia.');
             if($case->quotes()->where('supplier_company_id',$company->id)->exists()) $this->fail('La richiesta a questa compagnia è già presente.');
             $quote=$case->quotes()->create(['supplier_company_id'=>$company->id,'priority'=>$company->quote_priority,'requested_at'=>$requestedOn,'status'=>'requested']);
             $this->log($case,'registrata richiesta a '.$company->name.'.',['requested_on'=>$requestedOn]); return $quote;
@@ -65,7 +66,14 @@ class InsuranceQuoteWorkflow
     }
     public function policyValues(InsuranceQuote $quote): array
     {
-        return ['category'=>$quote->quoteCase->branch->name,'subcategory'=>$quote->quoteCase->subbranch?->name,'company'=>$quote->company->name,'supplier_agency_id'=>$quote->supplier_agency_id,'product'=>$quote->product,'starts_on'=>$quote->starts_on->toDateString(),'expires_on'=>$quote->expires_on->toDateString(),'premium'=>Money::decimal($quote->premium_cents),'payment_frequency'=>$quote->payment_frequency,'installment_premium'=>null];
+        $values = ['category'=>$quote->quoteCase->branch->name,'subcategory'=>$quote->quoteCase->subbranch?->name,'company'=>$quote->company->name,'supplier_agency_id'=>$quote->supplier_agency_id,'product'=>$quote->product,'starts_on'=>$quote->starts_on->toDateString(),'expires_on'=>$quote->expires_on->toDateString(),'premium'=>Money::decimal($quote->premium_cents),'payment_frequency'=>$quote->payment_frequency,'installment_premium'=>null];
+        if ($quote->quoteCase->vehicle_id) {
+            $values['vehicle_id'] = $quote->quoteCase->vehicle_id;
+            $values['merit_class_cu'] = $quote->quoteCase->merit_class_cu;
+            /** An internal class belongs to its company and must not be copied to a different insurer. */
+            $values['merit_class_internal'] = (int)($quote->quoteCase->vehicle_snapshot['class_company_id'] ?? 0) === (int)$quote->supplier_company_id ? $quote->quoteCase->merit_class_internal : null;
+        }
+        return $values;
     }
     public function approvedQuote(Client $client, int $quoteId): InsuranceQuote
     {
@@ -87,7 +95,8 @@ class InsuranceQuoteWorkflow
         $quote = $this->approvedQuote($client, $quoteId);
         $case = $quote->quoteCase;
         if ($case->purpose !== 'new') $this->fail('Questo preventivo richiede il percorso Sostituzione o Aggiunta di coperture dalla polizza attuale.');
-        $values=array_replace($values,$this->policyValues($quote));
+        $contractClasses = array_intersect_key($values, array_flip(['merit_class_cu','merit_class_internal']));
+        $values=array_replace($values,$this->policyValues($quote),$contractClasses);
         if($client->policies()->where('company',$values['company'])->where('number',$values['number'])->exists()) $this->fail('Questo numero di polizza è già presente per cliente e compagnia.');
         if(!in_array($values['status'],['active','renewed'],true)) $this->fail('Una nuova stipula deve essere attiva o rinnovata.');
         $policy=$client->policies()->create(app(PolicyProviders::class)->values(app(InsuranceCatalog::class)->policyValues($values)));
