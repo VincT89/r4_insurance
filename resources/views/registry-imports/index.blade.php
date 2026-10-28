@@ -30,7 +30,7 @@
     @if($recent)
         <x-panel title="I tuoi caricamenti delle ultime 24 ore" class="u-mt-md">
             <div class="client-table-scroll" role="region" aria-label="Caricamenti recenti" tabindex="0"><table class="t-table"><thead><tr><th>File</th><th>Anagrafiche</th><th>Esito</th><th>Azioni</th></tr></thead><tbody>
-            @foreach($recent as $item)<tr><td>{{ $item['filename'] }}</td><td>{{ $kinds[$item['kind']] }}</td><td>{{ isset($item['result']) ? $item['result']['created'].' voci create' : 'In preparazione' }}</td><td><div class="search-form-actions"><a class="btn btn-g btn-sm" href="{{ route('registry-imports.preview', $item['id']) }}">Apri</a><form method="POST" action="{{ route('registry-imports.discard', $item['id']) }}">@csrf @method('DELETE')<button type="submit" class="btn btn-g btn-sm">Rimuovi file</button></form></div></td></tr>@endforeach
+            @foreach($recent as $item)<tr><td>{{ $item['filename'] }}</td><td>{{ $kinds[$item['kind']] }}</td><td>{{ isset($item['result']) ? $item['result']['created'].($item['result']['created']===1 ? ' voce creata' : ' voci create') : 'In preparazione' }}</td><td><div class="search-form-actions"><a class="btn btn-g btn-sm" href="{{ route('registry-imports.preview', $item['id']) }}">Apri</a><form method="POST" action="{{ route('registry-imports.discard', $item['id']) }}">@csrf @method('DELETE')<button type="submit" class="btn btn-g btn-sm">Rimuovi file</button></form></div></td></tr>@endforeach
             </tbody></table></div>
         </x-panel>
     @endif

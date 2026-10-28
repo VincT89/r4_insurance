@@ -5,7 +5,7 @@
     @endphp
     <x-page-header><x-slot:title>{{ isset($batch['result']) ? 'Importazione completata' : 'Anteprima importazione' }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route('registry-imports.index') }}">Importazioni</a><a class="btn btn-g" href="{{ route('registry-imports.report', $batch['id']) }}">Scarica controllo CSV</a></x-slot:actions></x-page-header>
     <div class="deadline-notice"><p><strong>{{ \App\Services\RegistryImportSchema::KINDS[$batch['kind']] }}</strong> · {{ $batch['filename'] }} · {{ $batch['sheets'][$batch['preview']['sheet']]['name'] }}</p>
-        @if(isset($batch['result']))<p>Creazione completata: <strong>{{ $batch['result']['created'] }} voci</strong>. Escluse: {{ $batch['result']['excluded'] }}. Nessuna scheda esistente è stata modificata.</p>
+        @if(isset($batch['result']))<p>Creazione completata: <strong>{{ $batch['result']['created'] }} {{ $batch['result']['created']===1 ? 'voce' : 'voci' }}</strong>. Righe escluse: {{ $batch['result']['excluded'] }}. Nessuna scheda esistente è stata modificata.</p>
         @else<p>Non è ancora stato salvato nulla nelle anagrafiche. Confermando verranno create solo le voci nuove; duplicati e righe da correggere resteranno esclusi.</p>@endif
     </div>
     <div class="overview-totals">@foreach($states as $state=>$label)<a class="overview-total {{ $state==='review' ? 'is-alert' : '' }}" href="{{ route('registry-imports.preview', ['id'=>$batch['id'], 'state'=>$state]) }}"><span>{{ $label }}</span><strong>{{ $batch['preview']['counts'][$state] }}</strong></a>@endforeach</div>
@@ -27,7 +27,7 @@
     </x-panel>
     @unless(isset($batch['result']))
         <x-panel title="Conferma delle nuove voci" padded class="u-mt-md">
-            <p>Verranno create {{ $newLabel }}, comprese quelle nelle altre pagine dell’anteprima. I filtri servono solo al controllo. Per correggere le righe escluse, modifica il file e caricalo di nuovo.</p>
+            <p>Da creare: <strong>{{ $newLabel }}</strong>. La conferma comprende tutte le righe nuove dell’anteprima, anche nelle altre pagine. I filtri servono solo al controllo. Per correggere le righe escluse, modifica il file e caricalo di nuovo.</p>
             <form method="POST" action="{{ route('registry-imports.prepare', $batch['id']) }}" class="u-mt-md">@csrf<input type="hidden" name="sheet" value="{{ $batch['preview']['sheet'] }}">@foreach($batch['preview']['mapping'] as $field=>$column)<input type="hidden" name="mapping[{{ $field }}]" value="{{ $column }}">@endforeach<div class="search-form-actions"><a class="btn btn-g" href="{{ route('registry-imports.mapping', $batch['id']) }}">Modifica associazioni</a><button class="btn btn-g" type="submit">Ricalcola anteprima</button></div></form>
             @error('confirm')<p class="invalid-feedback u-mt-md" role="alert">{{ $message }}</p>@enderror
             @error('hash')<p class="invalid-feedback u-mt-md" role="alert">{{ $message }}</p>@enderror

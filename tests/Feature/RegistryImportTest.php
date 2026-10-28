@@ -154,6 +154,7 @@ class RegistryImportTest extends TestCase
         $this->post(route('registry-imports.prepare', $id), ['sheet' => 0, 'mapping' => ['name' => 0, 'email' => 0]])->assertSessionHasErrors('mapping');
         $batch = $this->preview($id, ['name' => 0]);
         $this->get(route('registry-imports.preview', ['id' => $id, 'page' => 2]))->assertOk()->assertSee('Compagnia 30')->assertDontSee('Compagnia 24');
+        $this->withHeader('X-Table-Export', '1')->get(route('registry-imports.preview', ['id' => $id, '_table_all' => 1]))->assertOk()->assertSee('Compagnia 1')->assertSee('Compagnia 30');
         $report = $this->get(route('registry-imports.report', $id))->streamedContent();
         $this->assertStringContainsString("'=HYPERLINK(1)", $report);
         $this->confirm($batch)->assertSessionHasNoErrors();
