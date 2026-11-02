@@ -3,7 +3,11 @@
 namespace App\Http\Requests\Concerns;
 
 use App\Models\Client;
+use App\Rules\ItalianFiscalIdentifier;
+use App\Services\ClientFiscalIdentity;
+use App\Support\FiscalIdentifier;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 trait ValidatesClientRegistry
 {
@@ -36,8 +40,8 @@ trait ValidatesClientRegistry
             'email' => ['nullable', 'email', 'max:255', ...($emailUnchanged ? [] : [Rule::unique('clients', 'email')->whereNull('merged_into_id')->ignore($client)])],
             'phone' => ['nullable', 'string', 'max:50'],
             'reference_person' => ['nullable', 'string', 'max:255'],
-            'vat_number' => ['nullable', 'string', 'max:20', Rule::unique('clients', 'vat_number')->whereNull('merged_into_id')->ignore($client)],
-            'tax_code' => ['nullable', 'string', 'max:20', Rule::unique('clients', 'tax_code')->whereNull('merged_into_id')->ignore($client)],
+            'vat_number' => ['bail', 'nullable', 'string', 'max:20', new ItalianFiscalIdentifier, Rule::unique('clients', 'vat_number')->whereNull('merged_into_id')->ignore($client)],
+            'tax_code' => ['bail', 'nullable', 'string', 'max:20', new ItalianFiscalIdentifier, Rule::unique('clients', 'tax_code')->whereNull('merged_into_id')->ignore($client)],
             'address' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:100'],
             'postal_code' => ['nullable', 'string', 'max:10'],
@@ -60,12 +64,27 @@ trait ValidatesClientRegistry
                 continue;
             }
 
-            $value = trim($value);
+            $value = in_array($field, ['vat_number', 'tax_code'], true) ? FiscalIdentifier::normalize($value, $field) : trim($value);
             $normalized[$field] = $value === '' ? null : (
                 in_array($field, ['email', 'reference_email', 'billing_email', 'pec'], true) ? strtolower($value) : strtoupper($value)
             );
         }
         $this->merge($normalized);
+    }
+
+    public function after(): array
+    {
+        return [function (Validator $validator) {
+            $values = $this->only(['vat_number', 'tax_code']);
+            if (collect($values)->contains(fn ($value) => $value !== null && !is_string($value))) return;
+            $identity = app(ClientFiscalIdentity::class);
+            $matches = $identity->matches($values);
+            if ($identity->conflicts($matches, $values)) {
+                $message = 'Partita IVA e codice fiscale rimandano a clienti diversi. Controlla entrambi i dati prima di salvare.';
+                $validator->errors()->add('vat_number', $message);
+                $validator->errors()->add('tax_code', $message);
+            }
+        }];
     }
 
     public function messages(): array

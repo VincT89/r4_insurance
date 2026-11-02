@@ -15,6 +15,7 @@ use Tests\TestCase;
 class OperationalReminderFlowTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Support\HistoricalCollections;
 
     private User $admin;
     private User $operator;
@@ -133,7 +134,7 @@ class OperationalReminderFlowTest extends TestCase
 
     public function test_pending_communications_remain_visible_among_many_new_deadline_notifications(): void
     {
-        $this->payment(4000);
+        $this->historicalCollection($this->title,4000);
         app(CollectionCommunicationReminders::class)->forUser($this->admin);
         $this->travel(1)->minutes();
         for ($i=0;$i<12;$i++) { $title=$this->title->replicate(); $title->save(); }
@@ -159,9 +160,9 @@ class OperationalReminderFlowTest extends TestCase
         Livewire::test(NotificationDropdown::class)->assertDontSee('Incassi da comunicare');
     }
 
-    public function test_delivery_set_keeps_latest_state_and_current_agency_without_multiplying_payments(): void
+    public function test_delivery_set_keeps_latest_state_and_title_agency_without_multiplying_payments(): void
     {
-        $one=$this->payment(100); $two=$this->payment(100); $three=$this->payment(100);
+        $one=$this->historicalCollection($this->title,100); $two=$this->historicalCollection($this->title,100); $three=$this->historicalCollection($this->title,100);
         $other=SupplierAgency::create(['name'=>'Agenzia Fontana','email'=>'fontana@example.test','status'=>'active']);
         $claim=function ($payment, $agency, $state, $date, $claimed=true) {
             $message=AgencyCommunication::create(['supplier_agency_id'=>$agency->id,'user_id'=>$this->admin->id,'status'=>$state,
@@ -182,7 +183,7 @@ class OperationalReminderFlowTest extends TestCase
         $claim($one,$this->agency,'sent',now()->subDay());
         $this->assertSame('uncertain',$status->withDeliveryState($status->payments($this->admin))->where('insurance_collections.id',$one->id)->sole()->communication_state);
         $this->policy->update(['supplier_agency_id'=>$other->id]);
-        $this->assertEqualsCanonicalizing([$one->id,$three->id],$status->pending($status->payments($this->admin))->pluck('insurance_collections.id')->all());
+        $this->assertEqualsCanonicalizing([$one->id,$two->id,$three->id],$status->pending($status->payments($this->admin))->pluck('insurance_collections.id')->all());
     }
 
     public function test_partial_payment_full_payment_review_send_and_reversal_keep_each_alert_consistent(): void
@@ -190,7 +191,7 @@ class OperationalReminderFlowTest extends TestCase
         app(DeadlineReminders::class)->forUser($this->admin);
         $original = $this->visible(DeadlineReminders::TYPE)->sole()->id;
         $this->actingAs($this->operator);
-        $a = $this->payment(4000);
+        $a = $this->historicalCollection($this->title,4000);
         $this->actingAs($this->admin);
         $followup = app(CollectionCommunicationReminders::class);
         $this->assertSame(1, $followup->forUser($this->admin));
@@ -245,7 +246,7 @@ class OperationalReminderFlowTest extends TestCase
     public function test_backdated_collections_remain_in_pending_pages_exports_and_selection(): void
     {
         $ids=[];
-        for($i=0;$i<28;$i++)$ids[]=$this->payment(100,['received_on'=>'2025-01-02'])->id;
+        for($i=0;$i<28;$i++)$ids[]=$this->historicalCollection($this->title,100,['received_on'=>'2025-01-02'])->id;
         $filters=['scope'=>'pending','agency'=>$this->agency->id,'search'=>$this->policy->number];
         $this->get(route('agency-communications.collections'))->assertViewHas('payments',fn($rows)=>$rows->total()===0);
         $this->get(route('agency-communications.collections',$filters))->assertOk()->assertViewHas('payments',fn($rows)=>$rows->total()===28 && $rows->count()===25);
@@ -259,8 +260,10 @@ class OperationalReminderFlowTest extends TestCase
 
     public function test_missing_agency_and_inactive_accounts_never_hide_an_uncommunicated_payment(): void
     {
-        $payment=$this->payment(100);
-        DB::table('insurance_policies')->where('id',$this->policy->id)->update(['supplier_agency_id'=>null]);
+        $payment=$this->historicalCollection($this->title,100);
+        DB::table('insurance_titles')->where('id',$this->title->id)->update(['supplier_agency_id'=>null]);
+        $snapshot=$this->title->fresh()->contract_snapshot; $snapshot['supplier_agency_id']=null;
+        $this->title->update(['contract_snapshot'=>$snapshot]);
         $reminders=app(CollectionCommunicationReminders::class);
         $this->assertSame(1,$reminders->forUser($this->admin));
         $notification=$this->visible(CollectionCommunicationReminders::TYPE)->sole();
@@ -286,7 +289,7 @@ class OperationalReminderFlowTest extends TestCase
     {
         $this->mock(AgencyEmailTransport::class)->shouldNotReceive('send');
         $this->title->update(['due_on'=>today()->subDays(20)]);
-        $this->payment(100);
+        $this->historicalCollection($this->title,100);
         $this->artisan('insurance:deadline-reminders')->assertSuccessful();
         $count=DB::table('notifications')->count();
         $this->artisan('insurance:deadline-reminders')->assertSuccessful();

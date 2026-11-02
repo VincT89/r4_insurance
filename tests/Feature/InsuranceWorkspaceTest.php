@@ -39,13 +39,26 @@ class InsuranceWorkspaceTest extends TestCase
         $this->actingAs($employee)->get(route('dashboard'))->assertOk()->assertViewHas('todayPolicies',fn($rows)=>$rows->pluck('id')->sort()->values()->all()===collect([$open->id,$midnight->id,$futureCoverage->id])->sort()->values()->all());
     }
 
+    public function test_dashboard_pages_today_policies_independently_from_the_other_lists(): void
+    {
+        $client=Client::factory()->create();
+        $ids=collect();
+        for ($i=0; $i<17; $i++) $ids->push($this->policy($client)->id);
+        $ordered=$ids->reverse()->values();
+        $this->get(route('dashboard'))->assertOk()->assertViewHas('todayPolicies',fn($rows)=>$rows->total()===17 && $rows->pluck('id')->all()===$ordered->take(8)->all());
+        $this->get(route('dashboard',['today_policies_page'=>2,'titles_page'=>2]))->assertOk()
+            ->assertViewHas('todayPolicies',fn($rows)=>$rows->pluck('id')->all()===$ordered->slice(8,8)->values()->all())
+            ->assertViewHas('duePolicies',fn($rows)=>$rows->currentPage()===1)
+            ->assertViewHas('dueTitles',fn($rows)=>$rows->currentPage()===2);
+    }
+
     public function test_direct_form_client_lookup_quick_creation_and_policy_attachments(): void
     {
         Storage::fake('attachments');
         $this->get(route('policies.create',['entry_mode'=>'existing']))->assertOk()->assertSee('Cerca cliente')->assertSee('Documenti allegati')->assertSee('Tacito rinnovo');
-        $created=$this->postJson(route('api.clients.quick-store'), ['name'=>'Contraente demo', 'client_type'=>'company', 'vat_number'=>'DEMO-101'])->assertCreated();
+        $created=$this->postJson(route('api.clients.quick-store'), ['name'=>'Contraente demo', 'client_type'=>'company', 'vat_number'=>'01234567897'])->assertCreated();
         $client=Client::findOrFail($created->json('id'));
-        $this->getJson(route('api.clients.search',['q'=>'DEMO-101']))->assertOk()->assertJsonFragment(['id'=>$client->id]);
+        $this->getJson(route('api.clients.search',['q'=>'01234567897']))->assertOk()->assertJsonFragment(['id'=>$client->id]);
         $this->post(route('policies.store'), (['client_id'=>$client->id, 'number'=>'NUOVA-DEMO', 'category'=>'RC auto', 'company'=>'Compagnia demo', 'starts_on'=>'2026-10-16', 'expires_on'=>'2027-10-16', 'status'=>'active', 'payment_frequency'=>'Semestrale', 'documents'=>[$this->pdf()]]) + ['entry_mode'=>'existing','existing_reason'=>'Registrazione da archivio di collaudo'])->assertSessionHasNoErrors()->assertRedirect();
         $policy=$client->policies()->sole();
         $this->assertTrue($policy->tacit_renewal);

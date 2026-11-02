@@ -67,7 +67,8 @@ class SupplierAgencyRegistry
             SupplierCompany::orderBy('id')->lockForUpdate()->get();
             $supplier = SupplierAgency::whereKey($supplier->id)->lockForUpdate()->firstOrFail();
             if ($supplier->commissionSchedules()->exists()) throw ValidationException::withMessages(['supplier'=>'L’agenzia ha condizioni provvigionali da conservare. Puoi impostarla come inattiva.']);
-            if ($supplier->subagencies()->exists() || $supplier->policies()->exists() || \App\Models\InsuranceQuote::where('supplier_agency_id',$supplier->id)->exists()) {
+            if (\App\Models\InsuranceQuoteEmail::where('supplier_agency_id',$supplier->id)->exists()) throw ValidationException::withMessages(['supplier'=>'L’agenzia ha richieste di preventivo nello storico. Puoi impostarla come inattiva.']);
+            if ($supplier->subagencies()->exists() || $supplier->policies()->exists() || \App\Models\InsuranceTitle::where('supplier_agency_id',$supplier->id)->exists() || \App\Models\InsuranceQuote::where('supplier_agency_id',$supplier->id)->exists()) {
                 throw ValidationException::withMessages(['supplier' => 'L’agenzia ha subagenzie o polizze collegate e non può essere eliminata. Puoi impostarla come inattiva.']);
             }
             $supplier->delete();

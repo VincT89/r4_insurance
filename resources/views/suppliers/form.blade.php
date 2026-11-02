@@ -59,6 +59,7 @@
                 </div>
                 </x-form-section>
             @endforeach
+            @include('suppliers.bank-fields',['entity'=>$supplier])
             <x-form-section title="Gestione">
             <div class="form-row">
                 <x-form-group label="Stato agenzia" name="status" required>

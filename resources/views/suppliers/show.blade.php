@@ -36,6 +36,7 @@
                 </dl>
             </section>
         @endforeach
+        @include('suppliers.bank-details',['entity'=>$supplier])
         @if($supplier->notes)<section class="client-detail-section"><h2 class="sec-lbl">Note</h2><p class="u-whitespace-pre-wrap">{{ $supplier->notes }}</p></section>@endif
     </x-panel>
     @if(! $supplier->parent_agency_id && $supplier->companies->isNotEmpty())

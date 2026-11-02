@@ -2,28 +2,64 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{InsuranceQuoteCase, InsuranceQuoteEmail, SupplierCompany};
-use App\Services\{AgencyMailConfiguration, QuoteRequestEmailWorkflow, QuoteRequestDocuments};
+use App\Models\{InsuranceQuoteCase, InsuranceQuoteEmail, QuoteRecipientGroup};
+use App\Services\{AgencyMailConfiguration, QuoteRecipients, QuoteRequestEmailWorkflow, QuoteRequestDocuments};
 use Illuminate\Http\Request;
 
 class QuoteRequestEmailController extends Controller
 {
-    public function create(InsuranceQuoteCase $quoteCase, QuoteRequestEmailWorkflow $workflow, AgencyMailConfiguration $configuration)
+    public function create(Request $request, InsuranceQuoteCase $quoteCase, QuoteRequestEmailWorkflow $workflow, AgencyMailConfiguration $configuration)
     {
         $this->authorize('updateRegistry',$quoteCase->client);
         abort_unless($quoteCase->status === 'open',409);
         $quoteCase->load('documents');
-        $companies = $quoteCase->availableCompanies()->get();
-        $claimed = $quoteCase->emails()->whereNotNull('delivery_key')->pluck('supplier_company_id');
-        $answered = $quoteCase->quotes()->where('status','!=','requested')->pluck('supplier_company_id');
-        return response()->view('quotes.email-compose',['case'=>$quoteCase,'companies'=>$companies,'unavailable'=>$claimed->merge($answered), 'remaining'=>$workflow->remainingPriorities($quoteCase), 'sender'=>$configuration->sender(), 'mailReady'=>$configuration->ready()])->header('Cache-Control','no-store, private');
+        $request->validate(['draft'=>['nullable','uuid']]);
+        $drafts = $request->filled('draft') ? $workflow->editableDraft($quoteCase, $request->user(), $request->input('draft')) : collect();
+        $draft = $drafts->first();
+        $draftValues = $draft ? ['subject'=>$draft->payload['subject'], 'body'=>$draft->payload['request_body'] ?? $draft->payload['body'], 'document_ids'=>$draft->documents->modelKeys()] : [];
+        $documents = $quoteCase->documents->merge($draft?->documents ?? collect());
+        $companies = app(QuoteRecipients::class)->catalog($quoteCase, activeOnly:true);
+        $groups = $quoteCase->purpose === 'addition' ? collect() : QuoteRecipientGroup::forRequest($quoteCase->insurance_branch_id, $quoteCase->insurance_subbranch_id, $quoteCase->merit_class_cu)->with('companies')->orderBy('name')->get();
+        return response()->view('quotes.email-compose',['case'=>$quoteCase,'companies'=>$companies,'unavailableKeys'=>$workflow->unavailableKeys($quoteCase), 'groups'=>$groups, 'selectedKeys'=>$draft ? $drafts->map(fn($message)=>QuoteRecipients::key($message->supplier_company_id,$message->supplier_agency_id))->all() : $quoteCase->suggestedRecipientKeys(), 'draft'=>$draft, 'draftValues'=>$draftValues, 'documents'=>$documents, 'sender'=>$configuration->sender(), 'mailReady'=>$configuration->ready()])->header('Cache-Control','no-store, private');
     }
 
     public function review(Request $request, InsuranceQuoteCase $quoteCase, QuoteRequestEmailWorkflow $workflow)
     {
         $this->authorize('updateRegistry',$quoteCase->client);
-        $data = $request->validate(['supplier_company_id'=>['required','integer'], 'subject'=>['required','string','max:180','not_regex:/[\r\n\x00]/'], 'body'=>['required','string','min:20','max:20000','not_regex:/\x00/'], 'document_ids'=>['nullable','array','list','max:10'],'document_ids.*'=>['integer','distinct']] + QuoteRequestDocuments::rules());
+        $batch = $request->has('recipient_selection_present') || $request->has('recipient_keys');
+        $recipients = $batch ? QuoteRecipients::rules() : ['supplier_company_id'=>['required','integer'], 'supplier_agency_id'=>['nullable','integer']];
+        $data = $request->validate($recipients + ['draft_id'=>['nullable','uuid',\Illuminate\Validation\Rule::prohibitedIf(!$batch)], 'subject'=>['required','string','max:180','not_regex:/[\r\n\x00]/'], 'body'=>['required','string','min:20','max:20000','not_regex:/\x00/'], 'document_ids'=>['nullable','array','list','max:10'],'document_ids.*'=>['integer','distinct']] + QuoteRequestDocuments::rules(), ['recipient_keys.required'=>'Seleziona almeno una compagnia o un’agenzia.']);
+        if ($batch) {
+            $messages = $workflow->prepareBatch($quoteCase,$request->user(),$data,QuoteRequestDocuments::uploads($request));
+            return to_route('quote-email-batches.show',$messages->first()->review_batch_id);
+        }
         return to_route('quote-emails.show',$workflow->prepare($quoteCase,$request->user(),$data,QuoteRequestDocuments::uploads($request)));
+    }
+
+    private function batchMessages(string $batch)
+    {
+        $messages = InsuranceQuoteEmail::with(['quoteCase.client','company','agency','user'])->where('review_batch_id',$batch)->orderBy('created_at')->orderBy('id')->get();
+        abort_if($messages->isEmpty(),404);
+        abort_unless($messages->count() <= QuoteRecipients::MAX_RECIPIENTS && $messages->pluck('insurance_quote_case_id')->unique()->count() === 1,409);
+        $this->authorize('view',$messages->first()->quoteCase->client);
+        return $messages;
+    }
+
+    public function batchShow(string $batch, AgencyMailConfiguration $configuration)
+    {
+        $messages = $this->batchMessages($batch);
+        return response()->view('quotes.email-batch',['batch'=>$batch,'messages'=>$messages,'case'=>$messages->first()->quoteCase,'payload'=>$messages->first()->payload,'mailReady'=>$configuration->ready()])->header('Cache-Control','no-store, private');
+    }
+
+    public function batchSend(Request $request, string $batch, QuoteRequestEmailWorkflow $workflow)
+    {
+        $messages = $this->batchMessages($batch);
+        $this->authorize('updateRegistry',$messages->first()->quoteCase->client);
+        $request->validate(['reviewed'=>['accepted']]);
+        $results = $workflow->sendBatch($messages,$request->user());
+        $sent = $results->where('status','sent')->count();
+        $pending = $results->count() - $sent;
+        return to_route('quote-email-batches.show',$batch)->with($pending ? 'warning' : 'success', $sent.' richieste accettate dal server di posta.'.($pending ? ' '.$pending.' invii da verificare con l’admin: controlla gli esiti qui sotto.' : ' Tutti gli invii sono registrati nella pratica.'));
     }
 
     public function show(InsuranceQuoteEmail $message, AgencyMailConfiguration $configuration)

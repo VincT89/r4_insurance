@@ -12,18 +12,17 @@ function initQuoteVehicles() {
         function refreshGroups() {
             const previous = group.value, addition = purpose.value === 'addition';
             const matching = choices.filter(option => branch.value && option.dataset.branch === branch.value && (!option.dataset.subbranch || option.dataset.subbranch === subbranch.value) && (!option.dataset.from || (cu.value && +cu.value >= +option.dataset.from && +cu.value <= +option.dataset.to)));
-            group.replaceChildren(new Option('Nessun gruppo selezionato',''));
+            group.replaceChildren(new Option('Scelgo i destinatari senza usare un gruppo',''));
             for (const option of matching) group.add(option.cloneNode(true));
             if (matching.some(option => option.value === previous)) group.value = previous;
-            else if (matching.length === 1) group.value = matching[0].value;
             group.disabled = addition;
-            group.required = !addition && matching.length > 0;
+            group.required = false;
             vehicle.disabled = addition;
             quick.hidden = addition;
             if (addition) { group.value = ''; description.textContent = 'Le coperture aggiuntive si richiedono alla compagnia della polizza attuale.'; }
-            else if (group.value) description.textContent = `Compagnie ammesse: ${group.selectedOptions[0].dataset.companies || 'nessuna compagnia attiva'}. Controlla la selezione prima di aprire la pratica.`;
-            else if (matching.length > 1) description.textContent = 'Più gruppi corrispondono a ramo, sottoramo e classe: scegli quello da usare.';
-            else description.textContent = branch.value ? 'Nessun gruppo configurato per ramo, sottoramo e classe indicati. Verranno usate le normali priorità dell’agenzia.' : 'Scegli prima il ramo assicurativo. La classe CU serve soltanto per i gruppi che la richiedono.';
+            else if (group.value) description.textContent = 'Il gruppo suggerisce compagnie e agenzie. Prima dell’invio potrai modificare liberamente i destinatari.';
+            else if (matching.length > 0) description.textContent = 'Puoi usare uno dei gruppi compatibili oppure scegliere direttamente i destinatari prima dell’invio.';
+            else description.textContent = branch.value ? 'Sceglierai compagnie e agenzie prima dell’invio. Il gruppo è facoltativo.' : 'Scegli prima il ramo assicurativo. La classe CU serve soltanto per i gruppi che la richiedono.';
         }
         function selectVehicle() {
             const option = vehicle.selectedOptions[0];
@@ -56,6 +55,7 @@ function initQuoteVehicles() {
         });
         save.addEventListener('click', async () => {
             const clientId = form.elements.client_id.value, error = root.querySelector('[data-quick-vehicle-error]');
+            if (form.dataset.clientPending === 'true') { error.textContent = 'Conferma prima il cliente oppure mantieni quello attuale.'; return; }
             if (!clientId) { error.textContent = 'Seleziona o crea prima il cliente.'; return; }
             const data = Object.fromEntries([...root.querySelectorAll('[data-quick-vehicle-field]')].map(field => [field.dataset.quickVehicleField, field.value.trim() || null]));
             data.merit_class_cu = cu.value || null;

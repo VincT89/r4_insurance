@@ -12,6 +12,7 @@ use Tests\TestCase;
 
 class QuoteVehicleGroupsTest extends TestCase
 {
+    use \Tests\Support\ContractPolicyInput;
     use RefreshDatabase;
     private Client $client;
     private InsuranceBranch $branch;
@@ -66,34 +67,35 @@ class QuoteVehicleGroupsTest extends TestCase
     public function test_vehicle_and_group_are_checked_server_side_and_snapshot_is_preserved(): void
     {
         $vehicle=$this->vehicle();
-        $this->post(route('quotes.store'),$this->input(['vehicle_id'=>$vehicle->id]))->assertSessionHasErrors('quote_recipient_group_id');
+        $this->post(route('quotes.store'),$this->input(['vehicle_id'=>$vehicle->id]))->assertSessionHasNoErrors();
         $other=Client::factory()->create()->vehicles()->create(['plate'=>'GB456DE']);
         $this->post(route('quotes.store'),$this->input(['vehicle_id'=>$other->id,'quote_recipient_group_id'=>$this->group->id]))->assertSessionHasErrors('vehicle_id');
         $this->post(route('quotes.store'),$this->input(['vehicle_id'=>$vehicle->id,'merit_class_cu'=>1,'quote_recipient_group_id'=>$this->group->id]))->assertSessionHasErrors('quote_recipient_group_id');
         $case=$this->createCase(['vehicle_id'=>$vehicle->id,'quote_recipient_group_id'=>$this->group->id,'recipient_group_snapshot'=>['companies'=>[['id'=>$this->nobis->id]]]]);
         $this->assertSame(14,$case->merit_class_cu);
-        $this->assertSame([$this->allianz->id,$this->tua->id],$case->availableCompanies()->pluck('id')->all());
+        $this->assertSame([$this->allianz->id,$this->nobis->id,$this->tua->id],$case->availableCompanies()->pluck('id')->all());
+        $this->assertSame(['company:'.$this->allianz->id,'company:'.$this->tua->id],$case->suggestedRecipientKeys());
         $vehicle->update(['plate'=>'GC789FG','merit_class_cu'=>1]);
         $this->group->companies()->sync([$this->nobis->id]);
         $this->delete(route('supplier-companies.destroy',$this->tua))->assertSessionHasErrors('company');
         $this->assertSame('GA123BC',$case->fresh()->vehicle_snapshot['plate']);
-        $this->assertSame([$this->allianz->id,$this->tua->id],$case->fresh()->availableCompanies()->pluck('id')->all());
+        $this->assertSame([$this->allianz->id,$this->nobis->id,$this->tua->id],$case->fresh()->availableCompanies()->pluck('id')->all());
         $this->get(route('quotes.index',['plate'=>'GA123','cu'=>14]))->assertOk()->assertSee('Copertura autovettura');
         $this->get(route('quotes.index',['plate'=>'GC789']))->assertOk()->assertDontSee('Copertura autovettura');
         $this->delete(route('clients.vehicles.destroy',[$this->client,$vehicle]))->assertSessionHasErrors('vehicle');
     }
 
-    public function test_requests_and_email_reviews_cannot_escape_the_chosen_group(): void
+    public function test_group_suggests_recipients_without_restricting_manual_or_email_requests(): void
     {
         $vehicle=$this->vehicle(); $case=$this->createCase(['vehicle_id'=>$vehicle->id,'quote_recipient_group_id'=>$this->group->id]);
         $manual=['requested_on'=>today()->toDateString(),'confirmed'=>1];
-        $this->post(route('quotes.request',$case),$manual+['supplier_company_id'=>$this->nobis->id])->assertSessionHasErrors('quote');
+        $this->post(route('quotes.request',$case),$manual+['supplier_company_id'=>$this->nobis->id])->assertSessionHasNoErrors();
         $this->post(route('quotes.request',$case),$manual+['supplier_company_id'=>$this->allianz->id])->assertSessionHasNoErrors();
         $email=['subject'=>'Richiesta copertura','body'=>'Buongiorno, richiediamo il preventivo per il veicolo indicato.'];
-        $this->post(route('quotes.emails.review',$case),$email+['supplier_company_id'=>$this->nobis->id])->assertSessionHasErrors('email');
+        $this->post(route('quotes.emails.review',$case),$email+['supplier_company_id'=>$this->nobis->id])->assertSessionHasNoErrors();
         $this->post(route('quotes.emails.review',$case),$email+['supplier_company_id'=>$this->tua->id])->assertSessionHasNoErrors();
-        $this->assertSame('review',InsuranceQuoteEmail::sole()->status);
-        $this->get(route('quotes.emails.create',$case))->assertOk()->assertSee('Classe 14')->assertDontSee('>Nobis',false);
+        $this->assertSame(2,InsuranceQuoteEmail::where('status','review')->count());
+        $this->get(route('quotes.emails.create',$case))->assertOk()->assertSee('Classe 14')->assertSee('Nobis');
     }
 
     public function test_multiple_identity_images_and_registration_files_remain_linked_correctly(): void
@@ -150,12 +152,12 @@ class QuoteVehicleGroupsTest extends TestCase
         $workflow->change($quote,'approve',['approved_on'=>'2026-10-28'],[$this->pdf('approvazione.pdf')]);
         $this->get(route('policies.create',['quote_id'=>$quote->id]))->assertOk()->assertDontSee('type="hidden" name="merit_class_internal"',false);
         $input=array_replace($workflow->policyValues($quote->fresh()),['client_id'=>$this->client->id,'entry_mode'=>'new','insurance_quote_id'=>$quote->id,'number'=>'SA-2026-619','status'=>'active','merit_class_cu'=>13,'merit_class_internal'=>'T13']);
-        $this->post(route('policies.store'),$input)->assertSessionHasNoErrors()->assertRedirect();
+        $this->post(route('policies.store'),$this->contractInput($input))->assertSessionHasNoErrors()->assertRedirect();
         $policy=$quote->policy()->sole();
         $this->assertSame($vehicle->id,$policy->vehicle_id);
         $this->assertSame(13,$policy->merit_class_cu);
         $this->assertSame('T13',$policy->merit_class_internal);
-        $this->assertSame(3,$policy->documents()->count());
+        $this->assertSame(4,$policy->documents()->count());
         $this->assertSame(14,$case->fresh()->merit_class_cu);
         $this->assertSame('A2',$case->fresh()->merit_class_internal);
     }
@@ -169,7 +171,7 @@ class QuoteVehicleGroupsTest extends TestCase
         $group=QuoteRecipientGroup::where('name','Casa e incendio')->sole();
         $this->assertNull($group->cu_from);
         $this->get(route('quote-groups.index',['branch'=>$home->id]))->assertOk()->assertSee('Casa e incendio')->assertDontSee('Classe 14');
-        $this->post(route('quotes.store'),$this->input(['insurance_branch_id'=>$home->id]))->assertSessionHasErrors('quote_recipient_group_id');
+        $this->post(route('quotes.store'),$this->input(['insurance_branch_id'=>$home->id]))->assertSessionHasNoErrors();
         $this->post(route('quotes.store'),$this->input(['insurance_branch_id'=>$home->id,'quote_recipient_group_id'=>$this->group->id]))->assertSessionHasErrors('quote_recipient_group_id');
         $case=$this->createCase(['insurance_branch_id'=>$home->id,'insurance_subbranch_id'=>$fire->id,'quote_recipient_group_id'=>$group->id]);
         $this->assertNull($case->vehicle_id);
@@ -189,8 +191,9 @@ class QuoteVehicleGroupsTest extends TestCase
         $group->companies()->attach($this->tua->id);
         $this->post(route('quotes.store'),$this->input(['insurance_branch_id'=>$branch->id,'insurance_subbranch_id'=>$second->id,'quote_recipient_group_id'=>$group->id]))->assertSessionHasErrors('quote_recipient_group_id');
         $case=$this->createCase(['insurance_branch_id'=>$branch->id,'insurance_subbranch_id'=>$first->id,'quote_recipient_group_id'=>$group->id]);
-        $this->assertSame([$this->tua->id],$case->availableCompanies()->pluck('id')->all());
+        $this->assertSame([$this->allianz->id,$this->nobis->id,$this->tua->id],$case->availableCompanies()->pluck('id')->all());
         $this->delete(route('insurance-catalog.destroy',['subbranch',$first->id]))->assertSessionHasErrors('catalog');
-        $this->patch(route('quote-groups.update',$group),['name'=>'Lavoro','insurance_branch_id'=>$branch->id,'insurance_subbranch_id'=>$first->id,'cu_from'=>1,'cu_to'=>null,'status'=>'active','company_ids'=>[$this->tua->id]])->assertSessionHasErrors('cu_to');
+        $this->patch(route('quote-groups.update',$group),['name'=>'Lavoro','insurance_branch_id'=>$branch->id,'insurance_subbranch_id'=>$first->id,'cu_from'=>1,'cu_to'=>null,'status'=>'active','company_ids'=>[$this->tua->id]])->assertSessionHasNoErrors();
+        $this->assertSame(1,$group->fresh()->cu_to);
     }
 }

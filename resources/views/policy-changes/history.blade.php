@@ -1,10 +1,10 @@
-<x-panel title="Sostituzioni e coperture aggiuntive">
+<x-panel title="Rinnovi, sostituzioni e coperture aggiuntive">
     <x-slot:headerActions>
         <div class="dashboard-section-actions">
-        @if($policy->editableBy(auth()->user()))
+        @can('updateRegistry',$client)
             @if(in_array($policy->status,['active','renewed','expired','suspended','ceased'],true))<a class="btn btn-g btn-sm" href="{{ route('clients.policies.changes.create',[$client,$policy,'kind'=>'replacement']) }}">Sostituisci polizza</a>@endif
-            @if(in_array($policy->status,['active','renewed'],true))<a class="btn btn-p btn-sm" href="{{ route('clients.policies.changes.create',[$client,$policy,'kind'=>'addition']) }}">Aggiungi coperture</a>@endif
-        @endif
+            @if($policy->editableBy(auth()->user()) && in_array($policy->status,['active','renewed'],true))<a class="btn btn-p btn-sm" href="{{ route('clients.policies.changes.create',[$client,$policy,'kind'=>'addition']) }}">Aggiungi coperture</a>@endif
+        @endcan
         </div>
     </x-slot:headerActions>
     <div class="client-table-scroll"><table class="t-table"><thead><tr><th>Operazione</th><th>Riferimento</th><th>Polizza precedente</th><th>Polizza risultante</th><th>Decorrenza</th><th>Scadenza</th><th>Premio concordato</th><th>Operatore</th><th>Azioni</th></tr></thead><tbody>

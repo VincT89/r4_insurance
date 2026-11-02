@@ -13,6 +13,7 @@ use Tests\TestCase;
 class InsuranceCommissionLedgerTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Support\HistoricalCollections;
     private User $admin;
     private SupplierAgency $agency;
     private SupplierCompany $company;
@@ -75,7 +76,7 @@ class InsuranceCommissionLedgerTest extends TestCase
     public function test_partial_direct_collections_accrue_proportionally_and_reverse_without_erasing_a_settlement(): void
     {
         $this->conditions(); $title = $this->title();
-        $first = $this->collect($title,40000,'2026-10-10',['payment_method'=>'Bonifico a Compagnia','recipient'=>'company']);
+        $first = $this->historicalCollection($title,40000,['received_on'=>'2026-10-10']+['payment_method'=>'Bonifico a Compagnia','recipient'=>'company']);
         $this->assertSame(4000,$title->commission()->sole()->accrued_cents);
         $data = $this->movementData($title,'30.00');
         $this->post(route('commissions.record',[$title,'settlement']),$data)->assertSessionHasNoErrors()->assertRedirect();
@@ -93,7 +94,7 @@ class InsuranceCommissionLedgerTest extends TestCase
     public function test_full_balance_rule_uses_last_actual_payment_date_even_with_a_backdated_last_entry(): void
     {
         $this->conditions(['collection_mode'=>'full']); $title=$this->title();
-        $this->collect($title,60000,'2026-10-18');
+        $this->historicalCollection($title,60000,['received_on'=>'2026-10-18']);
         $this->assertSame(0,$title->commission()->sole()->accrued_cents);
         $this->collect($title,40000,'2026-10-02');
         $movement=$title->commission->movements()->where('kind','accrual')->sole();
@@ -178,7 +179,7 @@ class InsuranceCommissionLedgerTest extends TestCase
 
     public function test_initial_calculation_reconstructs_collection_and_reversal_dates_and_is_repeatable(): void
     {
-        $title=$this->title(); $payment=$this->collect($title,40000,'2026-09-30');
+        $title=$this->title(); $payment=$this->historicalCollection($title,40000,['received_on'=>'2026-09-30']);
         app(InsuranceLedger::class)->void($payment,'Incasso registrato per errore');
         $this->conditions();
         $this->post(route('commissions.calculate'),['month'=>'2026-10','confirmed'=>1])->assertSessionHasNoErrors();
@@ -198,8 +199,8 @@ class InsuranceCommissionLedgerTest extends TestCase
         $this->post(route('commissions.calculate'),['confirmed'=>1])->assertForbidden();
         $this->post(route('commissions.prepare',$title),['version'=>1])->assertForbidden();
         foreach(['accrual','settlement'] as $kind) $this->post(route('commissions.record',[$title,$kind]),$data)->assertForbidden();
-        $this->collect($title,50000);
-        $this->assertSame(5000,$title->commission()->sole()->accrued_cents);
+        $this->collect($title,100000);
+        $this->assertSame(10000,$title->commission()->sole()->accrued_cents);
         $this->assertDatabaseHas('audit_logs',['action'=>'commission_accrued','user_id'=>$operator->id]);
         $this->get(route('titles.show',$title))->assertOk()->assertDontSee('href="'.route('commissions.show',$title).'"',false);
     }
@@ -227,7 +228,7 @@ class InsuranceCommissionLedgerTest extends TestCase
     {
         $this->conditions();
         $first = $this->title(['amount_cents'=>50000], ['number'=>'RCA-101']);
-        $this->collect($first, 20000);
+        $this->historicalCollection($first, 20000);
         $this->post(route('commissions.record', [$first, 'settlement']), $this->movementData($first, '10.00'))->assertSessionHasNoErrors();
         $second = $this->title(['kind'=>'quietance', 'amount_cents'=>50000], ['number'=>'RCA-102']);
         $otherClient = Client::factory()->create(['name'=>'Altro contraente']);
@@ -236,7 +237,7 @@ class InsuranceCommissionLedgerTest extends TestCase
         $before = InsuranceCommission::orderBy('id')->get()->toArray();
         $movements = InsuranceCommissionMovement::count();
 
-        foreach (['registry', 'policies'] as $tab) {
+        foreach (['commissions'] as $tab) {
             $this->get(route('clients.show', [$this->client, 'tab'=>$tab]))->assertOk()
                 ->assertSee('Riepilogo provvigioni')->assertSee('75,00 €')->assertSee('20,00 €')->assertSee('10,00 €')
                 ->assertSee(route('commissions.index', ['client'=>$this->client->id, 'period'=>'all']))
@@ -253,7 +254,7 @@ class InsuranceCommissionLedgerTest extends TestCase
 
     public function test_summary_distinguishes_no_rates_missing_conditions_partial_totals_and_a_real_zero_rate(): void
     {
-        $this->get(route('clients.show', $this->client))->assertOk()->assertSee('Nessuna rata registrata.');
+        $this->get(route('clients.show', [$this->client,'tab'=>'commissions']))->assertOk()->assertSee('Nessuna rata registrata.');
         $unknown = $this->title([], ['supplier_agency_id'=>null]);
         $this->get(route('clients.policies.show', [$this->client, $unknown->policy]))->assertOk()
             ->assertSee('Da configurare')->assertSee('1 rata da completare')
@@ -263,7 +264,7 @@ class InsuranceCommissionLedgerTest extends TestCase
         $this->get(route('clients.policies.show', [$this->client, $zero->policy]))->assertOk()
             ->assertSee('0,00 €')->assertDontSee('Da configurare')
             ->assertViewHas('commissionSummary', fn ($s) => (int)$s->incomplete===0 && (int)$s->expected===0);
-        $this->get(route('clients.show', [$this->client, 'category'=>$this->branch->name]))->assertOk()
+        $this->get(route('clients.show', [$this->client, 'tab'=>'commissions', 'category'=>$this->branch->name]))->assertOk()
             ->assertSee('Totali parziali.')->assertSee('Tutte le polizze del cliente')
             ->assertViewHas('commissionSummary', fn ($s) => (int)$s->rows_count===2 && (int)$s->incomplete===1);
     }

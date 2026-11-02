@@ -7,6 +7,7 @@ use App\Models\{Client, InsuranceBranch, InsuranceCommission, InsuranceCommissio
 use App\Services\InsuranceCommissionLedger;
 use App\Support\{Money, TableListing};
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\{Rule, ValidationException};
 
 class InsuranceCommissionController extends Controller
@@ -34,10 +35,10 @@ class InsuranceCommissionController extends Controller
     {
         $query = app(InsuranceCommissionQuery::class)->positions();
         if ($filters['mode'] === 'movements') $query->join('insurance_commission_movements as m', 'm.insurance_commission_id', '=', 'v.id');
-        foreach (['client'=>'p.client_id', 'policy'=>'p.id', 'agency'=>'p.supplier_agency_id', 'company'=>'p.supplier_company_id', 'branch'=>'p.insurance_branch_id', 'subbranch'=>'p.insurance_subbranch_id'] as $key=>$column) {
-            if (filled($filters[$key] ?? null)) $query->where($column, $filters[$key]);
+        foreach (['client'=>'p.client_id', 'policy'=>'p.id', 'agency'=>'t.supplier_agency_id', 'company'=>'t.supplier_company_id', 'branch'=>'t.contract_snapshot->insurance_branch_id', 'subbranch'=>'t.contract_snapshot->insurance_subbranch_id'] as $key=>$column) {
+            if (filled($filters[$key] ?? null)) $query->where($column, (int)$filters[$key]);
         }
-        if ($search = $filters['search'] ?? null) $query->where(fn ($q) => $q->where('p.number', 'like', '%'.$search.'%')->orWhere('c.name', 'like', '%'.$search.'%'));
+        if ($search = $filters['search'] ?? null) $query->where(fn ($q) => $q->where('t.contract_snapshot->number', 'like', '%'.$search.'%')->orWhere('c.name', 'like', '%'.$search.'%'));
         if ($filters['state'] ?? null) $query->whereRaw('('.self::STATE_SQL.') = ?', [$filters['state']]);
         if ($filters['mode'] === 'movements' && ($filters['kind'] ?? null)) $query->where('m.kind', $filters['kind']);
         $column = $filters['mode'] === 'positions' ? 't.coverage_from' : 'm.effective_on';
@@ -62,13 +63,13 @@ class InsuranceCommissionController extends Controller
         $totals = (clone $base)->selectRaw($this->totalsSql($filters['mode']))->first();
         if ($filters['group'] !== 'detail') {
             [$label, $id] = match ($filters['group']) {
-                'agency'=>["COALESCE(a.name,'Agenzia non assegnata')", 'p.supplier_agency_id'],
-                'company'=>['p.company', 'p.supplier_company_id'],
-                'branch'=>['p.category', 'p.insurance_branch_id'],
+                'agency'=>["COALESCE(a.name,'Agenzia non assegnata')", 't.supplier_agency_id'],
+                'company'=>[DB::connection()->getQueryGrammar()->wrap('t.contract_snapshot->company'), 't.supplier_company_id'],
+                'branch'=>[DB::connection()->getQueryGrammar()->wrap('t.contract_snapshot->category'), DB::connection()->getQueryGrammar()->wrap('t.contract_snapshot->insurance_branch_id')],
             };
             $rows = $base->selectRaw($label.' as label, '.$id.' as group_id, '.$this->totalsSql($filters['mode']))->groupByRaw($label.', '.$id)->orderBy('label')->orderBy('group_id');
         } else {
-            $rows = $base->select(['t.id as title_id', 'p.number', 'p.company', 'p.category', 'p.subcategory', 'p.client_id', 'p.id as policy_id', 'c.name as client_name', 'a.name as agency_name', 't.coverage_from', 't.kind as title_kind', 'v.expected_cents', 'v.accrued_cents', 'v.settled_cents', 'v.incomplete_reason'])
+            $rows = $base->select(['t.id as title_id', 't.contract_snapshot->number as number', 't.contract_snapshot->company as company', 't.contract_snapshot->category as category', 't.contract_snapshot->subcategory as subcategory', 'p.client_id', 'p.id as policy_id', 'c.name as client_name', 'a.name as agency_name', 't.coverage_from', 't.kind as title_kind', 'v.expected_cents', 'v.accrued_cents', 'v.settled_cents', 'v.incomplete_reason'])
                 ->selectRaw(self::STATE_SQL.' as state');
             if ($filters['mode'] === 'movements') $rows->addSelect(['m.id as movement_id', 'm.effective_on', 'm.kind', 'm.amount_cents', 'm.reference', 'm.reason', 'm.reversal_of_id'])->orderByDesc('m.effective_on')->orderByDesc('m.id');
             else $rows->orderBy('t.coverage_from')->orderBy('t.id');

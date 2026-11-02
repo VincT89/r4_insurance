@@ -8,7 +8,7 @@
         <p class="u-mb-md"><a href="{{ route('suppliers.index', ['unassigned' => 1]) }}">Anagrafiche con compagnia da assegnare: {{ $unassignedCount }}</a></p>
     @endif
     <form method="GET" action="{{ route('supplier-companies.index') }}" class="client-search-form">
-        <x-form-group label="Cerca compagnia" name="search"><input id="field-search" type="search" name="search" value="{{ request('search') }}" class="form-in" maxlength="255" placeholder="Nome, email o referente"></x-form-group>
+        <x-form-group label="Cerca compagnia" name="search"><input id="field-search" type="search" name="search" value="{{ request('search') }}" class="form-in" maxlength="255" placeholder="Nome, ragione sociale, P. IVA o contatto"></x-form-group>
         <x-form-group label="Stato" name="status"><select class="form-sel" id="field-status" name="status"><option value="">Tutti</option><option value="active" @selected(request('status')==='active')>Attive</option><option value="inactive" @selected(request('status')==='inactive')>Inattive</option></select></x-form-group>
         <button type="submit" class="btn btn-p btn-sm">Cerca</button>
         @if(request('search') || request('status'))<a href="{{ route('supplier-companies.index') }}" class="btn btn-g btn-sm">Azzera filtri</a>@endif

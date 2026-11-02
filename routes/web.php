@@ -83,12 +83,18 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('/quotes/{quoteCase}/emails/create',[\App\Http\Controllers\QuoteRequestEmailController::class,'create'])->name('quotes.emails.create');
     Route::post('/quotes/{quoteCase}/emails/review',[\App\Http\Controllers\QuoteRequestEmailController::class,'review'])->middleware('throttle:10,1')->name('quotes.emails.review');
     Route::get('/quote-emails/{message}',[\App\Http\Controllers\QuoteRequestEmailController::class,'show'])->name('quote-emails.show');
+    Route::get('/quote-email-batches/{batch}',[\App\Http\Controllers\QuoteRequestEmailController::class,'batchShow'])->whereUuid('batch')->name('quote-email-batches.show');
+    Route::post('/quote-email-batches/{batch}/send',[\App\Http\Controllers\QuoteRequestEmailController::class,'batchSend'])->whereUuid('batch')->middleware('throttle:10,1')->name('quote-email-batches.send');
     Route::post('/quote-emails/{message}/send',[\App\Http\Controllers\QuoteRequestEmailController::class,'send'])->middleware('throttle:10,1')->name('quote-emails.send');
     Route::post('/quote-emails/{message}/resolve',[\App\Http\Controllers\QuoteRequestEmailController::class,'resolve'])->name('quote-emails.resolve');
     Route::post('/quote-proposals/{quote}/{action}',[\App\Http\Controllers\InsuranceQuoteController::class,'change'])->where('action','receive|submit|approve|reject')->name('quotes.change');
     Route::get('/titles',[\App\Http\Controllers\InsuranceLedgerController::class,'index'])->name('titles.index');
+    Route::get('/policies/{policy}/transition/{kind}',[\App\Http\Controllers\PolicyTransitionController::class,'create'])->where('kind','renewal|replacement')->name('policy-transitions.create');
+    Route::post('/policies/{policy}/transition/{kind}/preview',[\App\Http\Controllers\PolicyTransitionController::class,'preview'])->where('kind','renewal|replacement')->middleware('throttle:60,1')->name('policy-transitions.preview');
+    Route::post('/policies/{policy}/transition/{kind}',[\App\Http\Controllers\PolicyTransitionController::class,'store'])->where('kind','renewal|replacement')->name('policy-transitions.store');
     Route::get('/titles/{title}',[\App\Http\Controllers\InsuranceLedgerController::class,'show'])->name('titles.show');
     Route::post('/titles/{title}/collections',[\App\Http\Controllers\InsuranceLedgerController::class,'collect'])->name('titles.collect');
+    Route::post('/policies/{policy}/collections',[\App\Http\Controllers\InsuranceLedgerController::class,'collectForPolicy'])->middleware('can:ledger.manage')->name('policies.collect');
     Route::post('/titles/{title}/documents',[\App\Http\Controllers\InsuranceLedgerController::class,'document'])->name('titles.documents');
     Route::post('/titles/{title}/cancel',[\App\Http\Controllers\InsuranceLedgerController::class,'cancel'])->middleware('can:ledger.manage')->name('titles.cancel');
     Route::get('/collections',[\App\Http\Controllers\InsuranceLedgerController::class,'collections'])->name('collections.index');
@@ -103,8 +109,10 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
         Route::post('/renewal',[\App\Http\Controllers\InsuranceLedgerController::class,'renew'])->name('titles.renew');
     });
     Route::get('/policies', [\App\Http\Controllers\PolicyPortfolioController::class, 'index'])->name('policies.index');
+    Route::get('/vehicles', [\App\Http\Controllers\ClientVehicleController::class, 'index'])->name('vehicles.index');
     Route::get('/policies/create', [\App\Http\Controllers\PolicyPortfolioController::class, 'create'])->name('policies.create');
     Route::post('/policies', [\App\Http\Controllers\PolicyPortfolioController::class, 'store'])->name('policies.store');
+    Route::post('/policies/contract-schedule', [\App\Http\Controllers\PolicyPortfolioController::class, 'contractSchedule'])->middleware('throttle:60,1')->name('policies.contract-schedule');
     Route::get('/clients/{client}/policy-context', [\App\Http\Controllers\PolicyPortfolioController::class, 'clientContext'])->name('clients.policy-context');
     Route::get('/reports', \App\Http\Controllers\InsuranceReportController::class)->middleware('can:system.admin')->name('reports.index');
     Route::middleware('can:system.admin')->group(function () {
@@ -202,6 +210,7 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::delete('clients/{client}/households/{household}', [\App\Http\Controllers\ClientNetworkController::class, 'deleteHousehold'])->name('clients.households.destroy');
     });
     Route::get('/api/clients/search', [ClientController::class, 'search'])->name('api.clients.search');
+    Route::post('/api/clients/check-fiscal-identifiers', \App\Http\Controllers\ClientFiscalIdentityController::class)->middleware('throttle:60,1')->name('api.clients.check-fiscal-identifiers');
     Route::post('/api/clients/quick-store', [ClientController::class, 'quickStore'])->name('api.clients.quick-store');
 
     Route::resource('users', UserController::class)->except(['show']);
@@ -210,6 +219,7 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
 
     Route::post('/attachments', [AttachmentController::class, 'store'])->name('attachments.store');
     Route::get('/attachments/{attachment}/download', [AttachmentController::class, 'download'])->name('attachments.download');
+    Route::get('/attachments/{attachment}/preview', [AttachmentController::class, 'preview'])->name('attachments.preview');
     Route::delete('/attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
 
     Route::get('/audit-logs', [AuditLogController::class, 'index'])->middleware('can:system.admin')->name('audit-logs.index');

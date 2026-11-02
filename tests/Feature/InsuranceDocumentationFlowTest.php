@@ -13,6 +13,7 @@ use Tests\TestCase;
 
 class InsuranceDocumentationFlowTest extends TestCase
 {
+    use \Tests\Support\ContractPolicyInput;
     use RefreshDatabase;
 
     private User $admin;
@@ -116,9 +117,9 @@ class InsuranceDocumentationFlowTest extends TestCase
         $this->post(route('quotes.change', [$quote, 'submit']), ['confirmed'=>1])->assertSessionHasNoErrors();
         $this->post(route('quotes.change', [$quote, 'approve']), ['approved_on'=>'2026-10-20', 'confirmed'=>1, 'files'=>[$this->pdf('approvazione.pdf')]])->assertSessionHasNoErrors();
         $this->get(route('policies.create', ['quote_id'=>$quote->id]))->assertOk();
-        $this->post(route('policies.store'), ['client_id'=>$client->id, 'entry_mode'=>'new', 'insurance_quote_id'=>$quote->id,
+        $this->post(route('policies.store'), $this->contractInput(['client_id'=>$client->id, 'entry_mode'=>'new', 'insurance_quote_id'=>$quote->id,
             'category'=>$this->branch->name, 'subcategory'=>$this->sub->name, 'company'=>$this->company->name, 'number'=>'SA-2026-481',
-            'starts_on'=>'2026-10-20', 'expires_on'=>'2027-10-20', 'status'=>'active', 'payment_method'=>'Bonifico a Intermediario'])->assertSessionHasNoErrors();
+            'starts_on'=>'2026-10-20', 'expires_on'=>'2027-10-20', 'status'=>'active', 'payment_method'=>'Bonifico a Intermediario']))->assertSessionHasNoErrors();
         $policy = $client->policies()->sole();
         $this->assertSame('800.00', $policy->premium);
         $this->assertSame($policy->id, $quote->fresh()->policy->id);

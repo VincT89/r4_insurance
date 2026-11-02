@@ -24,6 +24,7 @@ class SaveClientDocumentRequest extends ClientInsuranceRequest
             'identity_type' => ['nullable', Rule::in(array_keys(Attachment::IDENTITY_TYPES))],
             'document_category' => ['required', Rule::in(array_keys(Attachment::DOCUMENT_CATEGORIES))],
             'insurance_policy_id' => ['nullable', 'integer', Rule::exists('insurance_policies', 'id')->where('client_id', $clientId)],
+            'return_policy' => ['nullable', 'integer', Rule::exists('insurance_policies', 'id')->where('client_id', $clientId)],
             'vehicle_id' => ['nullable', 'integer', Rule::exists('client_vehicles', 'id')->where('client_id', $clientId)],
             'expires_on' => ['nullable', 'date_format:Y-m-d'],
             'description' => ['nullable', 'string', 'max:500'],

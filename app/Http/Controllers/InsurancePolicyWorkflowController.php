@@ -32,7 +32,7 @@ class InsurancePolicyWorkflowController extends Controller
             $locked->forceFill(['work_closed_at' => now(), 'work_closed_by' => auth()->id()])->save();
             app(InsuranceLedger::class)->log($locked, 'policy_work_closed', 'lavorazione completata; modifiche riservate all’admin dal giorno successivo.', ['work_closed_at' => $locked->work_closed_at->toIso8601String()]);
         });
-        return redirect()->route('clients.policies.show', [$client, $policy])->with('success', 'Lavorazione chiusa. Dal giorno successivo solo l’admin potrà modificare la polizza.');
+        return redirect()->route('clients.policies.show', [$client, $policy, 'tab'=>'history'])->with('success', 'Lavorazione chiusa. Dal giorno successivo solo l’admin potrà modificare la polizza.');
     }
 
     public function report(Request $request, Client $client, InsurancePolicy $policy): RedirectResponse
@@ -53,7 +53,7 @@ class InsurancePolicyWorkflowController extends Controller
                 $this->notify($admin, $locked, $correction, 'Errore segnalato su una polizza', 'Da esaminare: polizza '.$locked->number.'.');
             }
         });
-        return redirect()->to(route('clients.policies.show', [$client, $policy]).'#policy-corrections')->with('success', 'Segnalazione registrata e notificata all’admin.');
+        return redirect()->to(route('clients.policies.show', [$client, $policy, 'tab'=>'history']).'#policy-corrections')->with('success', 'Segnalazione registrata e notificata all’admin.');
     }
 
     public function resolve(Request $request, Client $client, InsurancePolicy $policy, InsurancePolicyCorrection $correction): RedirectResponse
@@ -76,7 +76,7 @@ class InsurancePolicyWorkflowController extends Controller
                 $this->notify($requester, $locked, $entry, 'Esito della segnalazione', 'Polizza '.$locked->number.': '.InsurancePolicyCorrection::STATUSES[$entry->status].'.');
             }
         });
-        return redirect()->to(route('clients.policies.show', [$client, $policy]).'#policy-corrections')->with('success', 'Esito registrato nello storico della polizza.');
+        return redirect()->to(route('clients.policies.show', [$client, $policy, 'tab'=>'history']).'#policy-corrections')->with('success', 'Esito registrato nello storico della polizza.');
     }
 
     private function notify(User $recipient, InsurancePolicy $policy, InsurancePolicyCorrection $correction, string $title, string $message): void

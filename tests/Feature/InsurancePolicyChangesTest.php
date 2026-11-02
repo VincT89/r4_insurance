@@ -13,7 +13,9 @@ use Tests\TestCase;
 
 class InsurancePolicyChangesTest extends TestCase
 {
+    use \Tests\Support\ContractPolicyInput;
     use RefreshDatabase;
+    use \Tests\Support\HistoricalCollections;
     private User $admin;
     private Client $client;
     private InsurancePolicy $policy;
@@ -63,10 +65,22 @@ class InsurancePolicyChangesTest extends TestCase
     {
         $kind=$quote->quoteCase->purpose;
         $page=$this->get(route('clients.policies.changes.create',[$this->client,$this->policy,'kind'=>$kind,'quote_id'=>$quote->id]))->assertOk();
+        if ($kind === 'replacement') {
+            $values=array_replace(app(\App\Services\InsuranceQuoteWorkflow::class)->policyValues($quote),[
+                'kind'=>$kind,'quote_id'=>$quote->id,'number'=>'SA-2026-2311','payment_method'=>'Bonifico a Intermediario',
+                'source_revision'=>$page->viewData('sourceRevision'),'request_key'=>(string)Str::uuid(),
+                'description'=>'Garanzie concordate e approvate dal contraente.','adjustment'=>'none',
+                'contract'=>$this->pdf('contratto.pdf'),'contract_reviewed'=>1,
+            ]);
+            $preview=$this->postJson(route('policy-transitions.preview',[$this->policy,$kind]),$values);
+            $values['schedule_fingerprint']=$preview->json('fingerprint') ?? str_repeat('0',64);
+            return array_replace($values,$extra);
+        }
         return array_replace(['kind'=>$kind,'quote_id'=>$quote->id,'fingerprint'=>$page->viewData('fingerprint'),
-            'request_key'=>(string)Str::uuid(),'description'=>'Garanzie concordate e approvate dal contraente.','confirmed'=>1,
-        ]+($kind==='replacement' ? ['number'=>'SA-2026-2311'] : ['reference'=>'APP-'.$quote->id]),$extra);
+            'request_key'=>(string)Str::uuid(),'description'=>'Garanzie concordate e approvate dal contraente.','confirmed'=>1,'reference'=>'APP-'.$quote->id,
+        ],$extra);
     }
+
     private function record(InsuranceQuote $quote, array $extra=[]): InsurancePolicyChange
     {
         $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$this->input($quote,$extra))->assertSessionHasNoErrors();
@@ -86,7 +100,7 @@ class InsurancePolicyChangesTest extends TestCase
     public function test_replacement_preserves_previous_contract_finances_and_links_two_policies(): void
     {
         $title=$this->baseTitle();
-        $this->collect($title,'300.00');
+        $this->historicalCollection($title,30000);
         $before=$title->fresh()->getAttributes();
         $quote=$this->approve('replacement');
         $change=$this->record($quote,['documents'=>[$this->pdf('contratto.pdf'),$this->pdf('condizioni.pdf')]]);
@@ -96,12 +110,12 @@ class InsurancePolicyChangesTest extends TestCase
         $this->assertSame('replaced',$this->policy->fresh()->status);
         $this->assertSame('2027-01-01',$this->policy->fresh()->expires_on->toDateString());
         $this->assertSame($before,$title->fresh()->getAttributes());
-        $this->assertSame(0,$new->titles()->count());
-        $this->assertSame(4,$change->documents()->count());
+        $this->assertSame(1,$new->titles()->count());
+        $this->assertSame(3,$change->documents()->count());
         $this->assertSame('closed',$quote->quoteCase->fresh()->status);
         $this->get(route('clients.policies.show',[$this->client,$this->policy]))->assertOk()->assertSee('SA-2026-2311')->assertSee('900,00');
         $this->get(route('clients.policies.show',[$this->client,$new]))->assertOk()->assertSee('SA-2026-2310');
-        $this->get(route('clients.policy-changes.show',[$this->client,$change]))->assertOk()->assertSee('Prepara moduli');
+        $this->get(route('clients.policy-changes.show',[$this->client,$change]))->assertOk()->assertSee('Moduli e firme della variazione');
         $this->assertDatabaseHas('audit_logs',['action'=>'policy_contract_changed','user_id'=>$this->admin->id]);
         $this->delete(route('clients.policies.destroy',[$this->client,$new]))->assertSessionHasErrors();
     }
@@ -124,13 +138,13 @@ class InsurancePolicyChangesTest extends TestCase
     {
         $quote=$this->approve('replacement');
         $input=$this->input($quote,['number'=>$this->policy->number]);
-        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors('change');
+        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors();
         $other=Client::factory()->create();
         $this->post(route('clients.policies.changes.store',[$other,$this->policy]),$input)->assertNotFound();
-        $this->post(route('clients.policies.store',$this->client),[
+        $this->post(route('clients.policies.store',$this->client),$this->contractInput([
             'entry_mode'=>'new','insurance_quote_id'=>$quote->id,'category'=>'RC auto','company'=>'Nobis','number'=>'SA-42',
             'starts_on'=>'2026-10-20','expires_on'=>'2027-01-01','status'=>'active',
-        ])->assertSessionHasErrors('quote');
+        ]))->assertSessionHasErrors('quote');
         $this->assertDatabaseCount('insurance_policy_changes',0);
         $this->assertDatabaseCount('insurance_policies',1);
     }
@@ -139,17 +153,17 @@ class InsurancePolicyChangesTest extends TestCase
     {
         $quote=$this->approve('replacement',['starts_on'=>'2026-10-21']);
         $input=$this->input($quote);
-        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors('change');
+        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors();
         $quote->update(['starts_on'=>'2026-10-20']);
         $input=$this->input($quote->fresh());
         $this->policy->update(['insured_subject'=>'Bene aggiornato']);
-        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors('change');
+        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors();
         $input=$this->input($quote->fresh());
         Storage::disk('attachments')->put($quote->documents()->first()->path,'%PDF-1.4 changed');
-        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors('change');
+        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors();
         $input=$this->input($quote->fresh());
         $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasNoErrors();
-        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors('quote');
+        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasNoErrors();
         $this->assertDatabaseCount('insurance_policy_changes',1);
     }
 

@@ -17,12 +17,14 @@
         @if($client->vat_number) / Partita IVA: {{ $client->vat_number }}@endif
     </p>
     <nav class="client-section-nav client-main-nav" aria-label="Sezioni della scheda cliente">
-        <a href="{{ route('quotes.index',['client'=>$client->id]) }}">Preventivi</a>
-        @foreach(['policies' => 'Polizze', 'registry' => 'Anagrafica', 'documents' => 'Documenti', 'deadlines' => 'Scadenze'] as $key => $label)
+        @foreach(['policies' => 'Polizze', 'registry' => 'Anagrafica', 'vehicles' => 'Veicoli', 'documents' => 'Documenti', 'deadlines' => 'Scadenze'] as $key => $label)
             <a href="{{ route('clients.show', [$client, 'tab' => $key]) }}" @if($tab === $key) aria-current="page" @endif>{{ $label }}</a>
         @endforeach
+        <a href="{{ route('quotes.index',['client'=>$client->id]) }}">Preventivi</a>
+        @can('ledger.manage')<a href="{{ route('titles.index',['client'=>$client->id]) }}">Titoli</a><a href="{{ route('collections.index',['client'=>$client->id,'month'=>'']) }}">Contabilità</a>@endcan
         @php
-            $secondaryTabs = ['network' => 'Referenti e relazioni', 'vehicles' => 'Veicoli e targhe', 'assets' => 'Immobili e beni', 'history' => 'Contatti e note', 'consents' => 'Consensi'];
+            $secondaryTabs = ['network' => 'Referenti e relazioni', 'assets' => 'Immobili e beni', 'history' => 'Contatti e note', 'consents' => 'Consensi'];
+            if (auth()->user()->can('system.admin')) $secondaryTabs['commissions'] = 'Provvigioni';
         @endphp
         <details class="client-nav-more" x-data @click.outside="$el.open = false" @keydown.escape.stop="$el.open = false; $el.querySelector('summary').focus()">
             <summary @class(['is-current' => isset($secondaryTabs[$tab])])>{{ $secondaryTabs[$tab] ?? 'Altre sezioni' }}</summary>
@@ -32,13 +34,12 @@
                 @foreach($secondaryTabs as $key => $label)
                     <a href="{{ route('clients.show', [$client, 'tab' => $key]) }}" @if($tab === $key) aria-current="page" @endif>{{ $label }}</a>
                 @endforeach
-                <a href="{{ route('titles.index',['client'=>$client->id]) }}">Rate e quietanze</a>
-                <a href="{{ route('collections.index',['client'=>$client->id,'month'=>'']) }}">Incassi</a>
             </div>
         </details>
     </nav>
-    @include('commissions.summary', ['commissionPolicy'=>null])
-    @if($tab === 'registry')
+    @if($tab === 'commissions')
+        @include('commissions.summary', ['commissionPolicy'=>null])
+    @elseif($tab === 'registry')
         <x-panel padded>
             @include('clients.partials.registry-details')
             @if(auth()->user()->can('view', $client))

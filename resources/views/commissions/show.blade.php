@@ -1,8 +1,8 @@
 <x-app-layout title="Provvigione della rata">
-    <x-page-header><x-slot:title>Provvigione · {{ $title->policy->number }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route('commissions.index', ['month'=>$title->coverage_from->format('Y-m')]) }}">Report provvigioni</a><a class="btn btn-g" href="{{ route('titles.show',$title) }}">Rata e incassi</a></x-slot:actions></x-page-header>
+    <x-page-header><x-slot:title>Provvigione · {{ $title->contract->number }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route('commissions.index', ['month'=>$title->coverage_from->format('Y-m')]) }}">Report provvigioni</a><a class="btn btn-g" href="{{ route('titles.show',$title) }}">Rata e incassi</a></x-slot:actions></x-page-header>
     <x-panel title="Rata e mandato" padded>
         <dl class="client-registry-details">
-            <div><dt>Contraente</dt><dd>{{ $title->policy->client->name }}</dd></div><div><dt>Agenzia</dt><dd>{{ $title->policy->supplierAgency?->name ?: 'Non assegnata' }}</dd></div><div><dt>Compagnia</dt><dd>{{ $title->policy->company }}</dd></div>
+            <div><dt>Contraente</dt><dd>{{ $title->policy->client->name }}</dd></div><div><dt>Agenzia</dt><dd>{{ $title->contract->supplierAgency?->name ?: 'Non assegnata' }}</dd></div><div><dt>Compagnia</dt><dd>{{ $title->contract->company }}</dd></div>
             <div><dt>Ramo / sottoramo</dt><dd>{{ $title->policy->category }}{{ $title->policy->subcategory ? ' / '.$title->policy->subcategory : '' }}</dd></div><div><dt>Titolo</dt><dd>{{ \App\Models\InsuranceTitle::KINDS[$title->kind] }} #{{ $title->id }}</dd></div><div><dt>Copertura</dt><dd>{{ $title->coverage_from->format('d/m/Y') }} – {{ $title->coverage_to->format('d/m/Y') }}</dd></div>
             <div><dt>Premio della rata</dt><dd>{{ \App\Support\Money::format($title->amount_cents) }}</dd></div><div><dt>Premio incassato</dt><dd>{{ \App\Support\Money::format($title->collected_cents) }}</dd></div><div><dt>Stato provvigione</dt><dd>{{ $commission ? \App\Models\InsuranceCommission::STATES[$commission->state] : 'Da completare' }}</dd></div>
         </dl>
@@ -16,7 +16,7 @@
     @if(!$commission?->locked_at && !$title->cancelled_at)
         <x-panel title="Completa il calcolo" padded>
             <p class="u-mb-md">@if($commission?->incomplete_reason)Ultimo tentativo di calcolo: {{ $commission->incomplete_reason }} Se hai aggiornato le condizioni, ripeti il calcolo.@else Calcola la provvigione usando le condizioni del mandato valide all’inizio della copertura di questa rata.@endif</p>
-            @if($title->policy->supplier_agency_id)<p class="u-mb-md"><a class="btn btn-g" href="{{ route('suppliers.show',[$title->policy->supplier_agency_id,'tab'=>'commissions']) }}">Configura condizioni del mandato</a></p>@endif
+            @if($title->contract->supplier_agency_id)<p class="u-mb-md"><a class="btn btn-g" href="{{ route('suppliers.show',[$title->contract->supplier_agency_id,'tab'=>'commissions']) }}">Configura condizioni del mandato</a></p>@endif
             <form method="POST" action="{{ route('commissions.prepare',$title) }}">
                 @csrf<input type="hidden" name="version" value="{{ $commission?->version ?? -1 }}">
                 <x-form-section title="Base provvigionale della singola rata">
@@ -33,7 +33,7 @@
         <x-panel title="Condizioni applicate" padded>
             <dl class="client-registry-details"><div><dt>Mandato</dt><dd>{{ $rule['mandate_reference'] ?: 'Riferimento non indicato' }}</dd></div><div><dt>Base</dt><dd>{{ \App\Models\AgencyCommissionRate::BASES[$rule['basis']] }} · {{ \App\Support\Money::format($commission->base_cents) }}</dd></div><div><dt>Aliquota</dt><dd>{{ \App\Models\AgencyCommissionRate::percent($rule['rate_units'],',') }} %</dd></div><div><dt>Maturazione</dt><dd>{{ \App\Models\AgencyCommissionSchedule::ACCRUAL_EVENTS[$rule['accrual_event']] }}</dd></div>@if($rule['accrual_event']==='collection')<div><dt>Pagamenti parziali</dt><dd>{{ \App\Models\AgencyCommissionSchedule::COLLECTION_MODES[$rule['collection_mode']] }}</dd></div>@endif<div><dt>Base documentata da</dt><dd>{{ $commission->base_reference ?: 'Premio totale della rata' }}</dd></div></dl>
             <p class="u-text-meta u-mt-md">Le condizioni sono conservate con la rata: modificare le aliquote del mandato non riscrive questi movimenti. Gli storni restano nello storico.</p>
-            <div class="insurance-form-actions"><a class="btn btn-g" href="{{ route('suppliers.commissions.show',[$title->policy->supplier_agency_id,$rule['schedule_id']]) }}">Apri versione applicata</a></div>
+            <div class="insurance-form-actions"><a class="btn btn-g" href="{{ route('suppliers.commissions.show',[$title->contract->supplier_agency_id,$rule['schedule_id']]) }}">Apri versione applicata</a></div>
         </x-panel>
         @if(!$title->cancelled_at)
             @if($rule['accrual_event']==='confirmation' && $commission->accrued_cents < $commission->expected_cents)

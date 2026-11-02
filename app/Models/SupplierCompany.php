@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Relations\{BelongsToMany, MorphMany};
 
 class SupplierCompany extends Model
 {
-    protected $fillable = ['name', 'email', 'phone', 'reference_person', 'status', 'notes','quote_priority'];
-    protected function casts(): array {return ['quote_priority'=>'boolean'];}
+    protected $fillable = ['name','company_name','vat_number','tax_code','email','pec','phone','mobile','reference_person','reference_role','reference_email','reference_phone','address','city','province','postal_code','country','status','notes','quote_priority','iban','account_holder','bank_name','bic','billing_email','sdi_code'];
+    protected $hidden = ['iban'];
+    protected function casts(): array {return ['quote_priority'=>'boolean','iban'=>'encrypted'];}
 
     public function agencies(): BelongsToMany
     {

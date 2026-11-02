@@ -18,8 +18,9 @@ class SupplierCompanyController extends Controller
         $query = SupplierCompany::query()->orderBy('name')->orderBy('id');
         if (filled($filters['search'] ?? null)) {
             $search = '%'.mb_strtolower(trim($filters['search'])).'%';
-            $query->where(fn ($q) => $q->whereRaw('LOWER(name) LIKE ?', [$search])
-                ->orWhereRaw('LOWER(reference_person) LIKE ?', [$search])->orWhereRaw('LOWER(email) LIKE ?', [$search]));
+            $query->where(function ($q) use ($search) {
+                foreach (['name','company_name','vat_number','tax_code','email','pec','reference_person','city'] as $field) $q->orWhereRaw("LOWER({$field}) LIKE ?",[$search]);
+            });
         }
         if (filled($filters['status'] ?? null)) $query->where('status', $filters['status']);
         return view('supplier-companies.index', [
@@ -70,7 +71,7 @@ class SupplierCompanyController extends Controller
             if (\App\Models\QuoteRecipientGroup::whereHas('companies',fn($q)=>$q->where('supplier_companies.id',$company->id))->exists() || \App\Models\ClientVehicle::where('merit_class_company_id',$company->id)->exists()) throw ValidationException::withMessages(['company'=>'La compagnia è collegata a gruppi preventivi o classi di merito. Impostala come inattiva per conservare i riferimenti.']);
             if (\App\Models\AgencyCommissionSchedule::where('supplier_company_id',$company->id)->exists()) throw ValidationException::withMessages(['company'=>'La compagnia ha condizioni provvigionali da conservare. Puoi impostarla come inattiva.']);
             if (\App\Models\InsuranceQuoteEmail::where('supplier_company_id',$company->id)->exists()) throw ValidationException::withMessages(['company'=>'La compagnia è collegata allo storico delle richieste di preventivo. Impostala come inattiva per conservarlo.']);
-            if ($company->agencies()->exists() || $company->policies()->exists() || \App\Models\InsuranceQuote::where('supplier_company_id',$company->id)->exists()) {
+            if ($company->agencies()->exists() || $company->policies()->exists() || \App\Models\InsuranceTitle::where('supplier_company_id',$company->id)->exists() || \App\Models\InsuranceQuote::where('supplier_company_id',$company->id)->exists()) {
                 throw ValidationException::withMessages(['company' => 'La compagnia ha agenzie o polizze collegate e non può essere eliminata. Puoi impostarla come inattiva.']);
             }
             $company->delete();

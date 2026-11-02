@@ -13,19 +13,16 @@ class InsuranceQuoteWorkflow
     {
         $case->client->auditLogs()->create(['user_id'=>auth()->id(),'action'=>'quote_updated','description'=>'Preventivo #'.$case->id.': '.$description,'new_values'=>$values,'created_at'=>now()]);
     }
-    public function request(InsuranceQuoteCase $case,int $companyId,string $requestedOn): InsuranceQuote
+    public function request(InsuranceQuoteCase $case,int $companyId,string $requestedOn,?int $agencyId=null): InsuranceQuote
     {
-        return DB::transaction(function()use($case,$companyId,$requestedOn){
+        return DB::transaction(function()use($case,$companyId,$requestedOn,$agencyId){
             $case=InsuranceQuoteCase::whereKey($case->id)->lockForUpdate()->firstOrFail();
             if($case->status!=='open') $this->fail('La pratica ha già una proposta approvata o una polizza.');
-            $company=SupplierCompany::whereKey($companyId)->where('status','active')->firstOrFail();
-            if ($case->purpose==='addition' && !$case->availableCompanies()->whereKey($companyId)->exists()) $this->fail('Le coperture aggiuntive vanno richieste alla compagnia della polizza attuale.');
-            if ($case->recipient_group_snapshot !== null && !$case->availableCompanies()->whereKey($companyId)->exists()) $this->fail('La compagnia non appartiene al gruppo scelto per questa richiesta.');
-            $priorities=SupplierCompany::where('quote_priority',true)->where('status','active')->pluck('id');
-            if($case->purpose!=='addition' && $case->recipient_group_snapshot === null && !$company->quote_priority && $priorities->diff($case->quotes()->pluck('supplier_company_id'))->isNotEmpty()) $this->fail('Registra prima le richieste alle compagnie prioritarie dell’agenzia.');
-            if($case->quotes()->where('supplier_company_id',$company->id)->exists()) $this->fail('La richiesta a questa compagnia è già presente.');
-            $quote=$case->quotes()->create(['supplier_company_id'=>$company->id,'priority'=>$company->quote_priority,'requested_at'=>$requestedOn,'status'=>'requested']);
-            $this->log($case,'registrata richiesta a '.$company->name.'.',['requested_on'=>$requestedOn]); return $quote;
+            $target=app(QuoteRecipients::class)->resolve([QuoteRecipients::key($companyId,$agencyId)],case:$case)->first();
+            $company=$target['company'];
+            if($case->quotes()->where('supplier_company_id',$company->id)->where('recipient_key',QuoteRecipients::quoteKey($agencyId))->exists()) $this->fail('La richiesta a questo destinatario è già presente.');
+            $quote=$case->quotes()->create(['supplier_company_id'=>$company->id,'supplier_agency_id'=>$agencyId,'recipient_key'=>QuoteRecipients::quoteKey($agencyId),'request_recipient'=>app(QuoteRecipients::class)->snapshot($target),'priority'=>$company->quote_priority,'requested_at'=>$requestedOn,'status'=>'requested']);
+            $this->log($case,'registrata richiesta a '.$target['name'].' per '.$company->name.'.',['requested_on'=>$requestedOn,'supplier_agency_id'=>$agencyId]); return $quote;
         });
     }
     public function change(InsuranceQuote $quote,string $action,array $data,array $files=[]): void
@@ -90,17 +87,29 @@ class InsuranceQuoteWorkflow
         }
         return $quote->setRelation('quoteCase', $case);
     }
-    public function createPolicy(Client $client,array $values,int $quoteId): InsurancePolicy
+    public function createPolicy(Client $client,array $values,int $quoteId,?bool $contractChangesConfirmed=null): InsurancePolicy
     {
         $quote = $this->approvedQuote($client, $quoteId);
         $case = $quote->quoteCase;
         if ($case->purpose !== 'new') $this->fail('Questo preventivo richiede il percorso Sostituzione o Aggiunta di coperture dalla polizza attuale.');
-        $contractClasses = array_intersect_key($values, array_flip(['merit_class_cu','merit_class_internal']));
-        $values=array_replace($values,$this->policyValues($quote),$contractClasses);
+        $approved = $this->policyValues($quote);
+        $differences = [];
+        if ($contractChangesConfirmed !== null) {
+            foreach (array_diff(array_keys($approved), ['merit_class_cu','merit_class_internal','installment_premium']) as $field) {
+                $before = $approved[$field]; $after = $values[$field] ?? null;
+                $same = $field === 'premium' ? Money::cents($before) === Money::cents($after ?? 0) : (string) $before === (string) $after;
+                if (!$same) $differences[$field] = ['preventivo'=>$before, 'contratto'=>$after];
+            }
+            if ($differences && !$contractChangesConfirmed) throw \Illuminate\Validation\ValidationException::withMessages(['quote_changes_confirmed'=>'Alcuni dati differiscono dal preventivo approvato. Controlla il contratto e conferma le differenze indicate.']);
+        } else {
+            $contractClasses = array_intersect_key($values, array_flip(['merit_class_cu','merit_class_internal']));
+            $values = array_replace($values, $approved, $contractClasses);
+        }
         if($client->policies()->where('company',$values['company'])->where('number',$values['number'])->exists()) $this->fail('Questo numero di polizza è già presente per cliente e compagnia.');
         if(!in_array($values['status'],['active','renewed'],true)) $this->fail('Una nuova stipula deve essere attiva o rinnovata.');
         $policy=$client->policies()->create(app(PolicyProviders::class)->values(app(InsuranceCatalog::class)->policyValues($values)));
         $policy->forceFill(['insurance_quote_id'=>$quote->id])->save();
+        if ($differences) app(InsuranceLedger::class)->log($policy, 'contract_quote_differences', 'Differenze tra contratto e proposta approvata controllate e confermate dall’operatore.', $differences);
         $quote->documents()->update(['insurance_policy_id'=>$policy->id]);
         $case->documents()->update(['insurance_policy_id'=>$policy->id]);
         $quote->update(['status'=>'converted']); $case->update(['status'=>'closed']);

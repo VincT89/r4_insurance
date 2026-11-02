@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{Attachment, Client, InsuranceQuoteCase};
+use App\Models\{Attachment, Client, InsuranceQuoteCase, InsuranceQuoteEmail};
 use Illuminate\Http\{Request, UploadedFile};
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -45,9 +45,12 @@ class QuoteRequestDocuments
         return array_map(fn ($entry) => $entry instanceof UploadedFile ? ['file'=>$entry,'category'=>'quote_request','details'=>[]] : $entry, $uploads);
     }
 
-    public function selected(InsuranceQuoteCase $case, array $ids)
+    public function selected(InsuranceQuoteCase $case, array $ids, ?InsuranceQuoteEmail $draft = null)
     {
-        $documents = $case->documents()->whereKey($ids)->orderBy('id')->get();
+        /** Il chiamante autorizza la bozza; gli allegati possono provenire solo da questa pratica o dalla sua anteprima. */
+        abort_if($draft && (int) $draft->insurance_quote_case_id !== (int) $case->id, 403);
+        $documents = Attachment::where(fn($query) => $query->where('insurance_quote_case_id', $case->id)
+            ->when($draft, fn($query) => $query->orWhere('insurance_quote_email_id', $draft->id)))->whereKey($ids)->orderBy('id')->get();
         if ($documents->count() !== count($ids) || $documents->contains(fn ($document) => $document->attachable_type !== $case->client->getMorphClass() || (int)$document->attachable_id !== (int)$case->client_id)) {
             throw ValidationException::withMessages(['document_ids'=>'Seleziona soltanto documenti di questa pratica e di questo cliente.']);
         }

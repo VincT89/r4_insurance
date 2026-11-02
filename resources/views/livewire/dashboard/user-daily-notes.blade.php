@@ -1,90 +1,55 @@
-<div x-data @note-added.window="setTimeout(() => { let id = $event.detail.id || ($event.detail[0] && $event.detail[0].id) || $event.detail; document.getElementById('note-ta-' + id)?.focus() }, 100)">
-    <x-page-header 
-        meta="Appunti e cose da fare, organizzati per giornata.">
-        <x-slot:title>Blocco note</x-slot:title>
-        <x-slot:actions><button type="button" wire:click="addEntry" class="btn btn-p">Nuova nota</button></x-slot:actions>
-    </x-page-header>
-
+<div x-data @note-created.window="$nextTick(() => document.getElementById('new-note')?.focus())" @note-editing.window="$nextTick(() => document.getElementById('edit-note-' + $event.detail.id)?.focus())" @note-edit-ended.window="$nextTick(() => document.getElementById('edit-note-button-' + $event.detail.id)?.focus())">
+    <x-page-header><x-slot:title>Blocco note</x-slot:title></x-page-header>
     <div class="notes-container">
         <div class="notes-header">
-            <button type="button" wire:click="previousDay" class="btn btn-g notes-nav-btn" aria-label="Giorno precedente">
-                <i data-lucide="chevron-left" class="u-icon-md"></i>
-            </button>
-            
+            <button type="button" wire:click="previousDay" @disabled($editingEntryId !== null) class="btn btn-g notes-nav-btn" aria-label="Giorno precedente"><i data-lucide="chevron-left" class="u-icon-md"></i></button>
             <div class="notes-date-display">
-                <div class="notes-date-title">
-                    {{ \Carbon\Carbon::parse($currentDate)->isToday() ? 'Oggi' : \Carbon\Carbon::parse($currentDate)->locale('it')->isoFormat('D MMMM YYYY') }}
-                </div>
-                <div class="notes-date-subtitle">
-                    {{ \Carbon\Carbon::parse($currentDate)->locale('it')->isoFormat('dddd') }}
-                </div>
+                <div class="notes-date-title">{{ \Carbon\Carbon::parse($currentDate)->isToday() ? 'Oggi' : \Carbon\Carbon::parse($currentDate)->locale('it')->isoFormat('D MMMM YYYY') }}</div>
+                <div class="notes-date-subtitle">{{ \Carbon\Carbon::parse($currentDate)->locale('it')->isoFormat('dddd') }}</div>
             </div>
-
-            <button type="button" wire:click="nextDay" class="btn btn-g notes-nav-btn" aria-label="Giorno successivo">
-                <i data-lucide="chevron-right" class="u-icon-md"></i>
-            </button>
+            <button type="button" wire:click="nextDay" @disabled($editingEntryId !== null) class="btn btn-g notes-nav-btn" aria-label="Giorno successivo"><i data-lucide="chevron-right" class="u-icon-md"></i></button>
         </div>
 
-        <div class="notes-grid">
-            @if($note && $note->entries->count() > 0)
-                @foreach($note->entries as $entry)
-                    <div class="note-card">
-                        <div class="note-header-actions">
-                            <h2 class="note-heading">Nota {{ $loop->iteration }}</h2>
-                            @can('system.admin')
-                            <x-confirm-modal
-                                title="Elimina Nota"
-                                message="Sei sicuro di voler eliminare questa nota?"
-                                confirmText="Elimina"
-                                confirmMethod="deleteEntry({{ $entry->id }})"
-                                confirmClass="btn btn-p btn-danger"
-                                icon="trash-2"
-                                variant="danger"
-                            >
-                                <button type="button" class="btn btn-g btn-sm btn-danger-outline" aria-label="Elimina nota {{ $loop->iteration }}">
-                                    <i data-lucide="trash-2" class="u-icon-sm"></i>
-                                </button>
+        <form wire:submit="addEntry" class="notes-compose">
+            <label class="form-lbl" for="new-note">Scrivi una nota</label>
+            <textarea id="new-note" wire:model="newContent" class="form-ta note-textarea" rows="3" maxlength="10000" required @error('newContent') aria-invalid="true" aria-describedby="new-note-error" @enderror></textarea>
+            @error('newContent')<p id="new-note-error" class="invalid-feedback">{{ $message }}</p>@enderror
+            <div class="note-actions"><button type="submit" class="btn btn-p" wire:loading.attr="disabled" wire:target="addEntry">OK</button></div>
+        </form>
+        <p class="notes-status" role="status" aria-live="polite">{{ $statusMessage }}</p>
+
+        <div class="notes-list">
+            @forelse($note?->entries ?? [] as $entry)
+                <article class="note-card" wire:key="note-{{ $entry->id }}">
+                    @if($editingEntryId === $entry->id)
+                        <form wire:submit="saveEntry" class="note-edit-form">
+                            <label class="form-lbl" for="edit-note-{{ $entry->id }}">Modifica nota</label>
+                            <textarea id="edit-note-{{ $entry->id }}" wire:model="editingContent" class="form-ta note-textarea" rows="4" maxlength="10000" required @error('editingContent') aria-invalid="true" aria-describedby="edit-note-error" @enderror></textarea>
+                            @error('editingContent')<p id="edit-note-error" class="invalid-feedback">{{ $message }}</p>@enderror
+                            <div class="note-actions"><button type="button" wire:click="cancelEdit" class="btn btn-g">Annulla</button><button type="submit" class="btn btn-p" wire:loading.attr="disabled" wire:target="saveEntry">OK</button></div>
+                        </form>
+                    @else
+                        <p class="note-content">{{ $entry->content ?: 'Nota senza testo' }}</p>
+                    @endif
+                    @if(filled($entry->post_script) || $entry->checklistItems->isNotEmpty())
+                        <details class="note-existing-details"><summary>Altre annotazioni salvate</summary>
+                            @if(filled($entry->post_script))<p class="note-content">{{ $entry->post_script }}</p>@endif
+                            @if($entry->checklistItems->isNotEmpty())<ul>@foreach($entry->checklistItems as $item)<li>{{ $item->label }}@if($item->is_completed) — completata @endif</li>@endforeach</ul>@endif
+                        </details>
+                    @endif
+                    <div class="note-footer">
+                        <time class="u-text-meta" datetime="{{ $entry->created_at->toIso8601String() }}">{{ $entry->created_at->format('H:i') }}</time>
+                        <div class="note-actions">
+                            @if($editingEntryId !== $entry->id)<button type="button" id="edit-note-button-{{ $entry->id }}" wire:click="editEntry({{ $entry->id }})" @disabled($editingEntryId !== null) class="btn btn-g btn-sm">Modifica</button>@endif
+                            <x-confirm-modal title="Elimina nota" message="Vuoi eliminare questa nota?" confirmText="Elimina" :confirmMethod="'deleteEntry('.$entry->id.')'" confirmClass="btn btn-p btn-danger" icon="trash-2" variant="danger">
+                                <button type="button" class="btn btn-g btn-sm btn-danger-outline">Elimina</button>
                             </x-confirm-modal>
-                            @endcan
-                        </div>
-                        <textarea id="note-ta-{{ $entry->id }}" wire:model.live.debounce.1000ms="entryContents.{{ $entry->id }}" class="form-ta note-textarea" aria-label="Testo della nota {{ $loop->iteration }}" placeholder="Scrivi i tuoi appunti qui..."></textarea>
-                        <div class="note-checklist">
-                            @if($entry->checklistItems->count() > 0)
-                                @foreach($entry->checklistItems as $item)
-                                    <div class="note-checklist-item">
-                                        <input type="checkbox" wire:click="toggleChecklistItem({{ $item->id }})" {{ $item->is_completed ? 'checked' : '' }} class="note-check-box" aria-label="{{ $item->label }}">
-                                        <div class="note-check-label {{ $item->is_completed ? 'completed' : '' }}">
-                                            {{ $item->label }}
-                                        </div>
-                                        @can('system.admin')
-                                        <button type="button" wire:click="deleteChecklistItem({{ $item->id }})" class="btn btn-g btn-sm btn-danger-outline" aria-label="Elimina voce {{ $item->label }}">
-                                            <i data-lucide="x" class="u-icon-sm"></i>
-                                        </button>
-                                        @endcan
-                                    </div>
-                                @endforeach
-                            @endif
-                            
-                            <div class="note-check-input-wrap">
-                                <input type="text" wire:model="newChecklistLabels.{{ $entry->id }}" wire:keydown.enter="addChecklistItem({{ $entry->id }})" class="form-in note-check-input" aria-label="Nuova voce della nota {{ $loop->iteration }}" placeholder="Aggiungi una voce...">
-                                <button type="button" class="btn btn-g btn-sm" wire:click="addChecklistItem({{ $entry->id }})">Aggiungi</button>
-                            </div>
-                        </div>
-                        <div class="note-ps-wrap">
-                            <label class="form-lbl" for="note-ps-{{ $entry->id }}">Annotazione aggiuntiva</label>
-                            <input type="text" wire:model.live.debounce.1000ms="entryPostScripts.{{ $entry->id }}" id="note-ps-{{ $entry->id }}" class="form-in note-ps-input" placeholder="Facoltativa">
                         </div>
                     </div>
-                @endforeach
-            @endif
-            @if(!$note || $note->entries->count() === 0)
-                <div class="notes-empty-state">
-                    <h2>Nessuna nota</h2>
-                    <p>Nessuna nota per {{ \Carbon\Carbon::parse($currentDate)->isToday() ? 'oggi' : 'questa giornata' }}. Usa «Nuova nota» per aggiungere appunti e cose da fare.</p>
-                </div>
-            @endif
-
-
+                </article>
+            @empty
+                <p class="notes-empty-state">Nessuna nota per questa giornata.</p>
+            @endforelse
         </div>
     </div>
 </div>

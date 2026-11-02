@@ -36,7 +36,7 @@ class InsuranceClientRegistryTest extends TestCase
     {
         $this->post(route('clients.store'), [
             'client_type' => 'person', 'name' => 'Persona dimostrativa', 'title' => 'Sig.',
-            'tax_code' => 'demo-persona', 'birth_date' => '1980-01-02', 'birth_place' => 'Luogo dimostrativo',
+            'tax_code' => 'rssmra80a02h501z', 'birth_date' => '1980-01-02', 'birth_place' => 'Luogo dimostrativo',
             'phone' => '0100000000', 'mobile' => '3200000000', 'fax' => '0100000001', 'email' => 'test@example.test',
             'target' => 'Target dimostrativo', 'province' => 'rm', 'city' => 'Roma', 'address' => 'Indirizzo dimostrativo', 'postal_code' => '00100',
             'reference_person' => 'Referente dimostrativo', 'reference_email' => 'referente@example.test',
@@ -45,12 +45,12 @@ class InsuranceClientRegistryTest extends TestCase
             'operator' => 'Operatore dimostrativo', 'salient_notes' => 'Notizie dimostrative',
         ])->assertSessionHasNoErrors()->assertRedirect();
         $person = Client::where('name', 'Persona dimostrativa')->sole();
-        $this->assertSame('DEMO-PERSONA', $person->tax_code);
+        $this->assertSame('RSSMRA80A02H501Z', $person->tax_code);
         $this->assertSame('1980-01-02', $person->birth_date->toDateString());
         $this->assertSame('3200000000', $person->mobile);
         $this->assertSame('Operatore dimostrativo', $person->operator);
         $this->get(route('clients.show', [$person, 'tab' => 'registry']))->assertOk()->assertSee('Notizie dimostrative')->assertSee('Referente dimostrativo');
-        $this->post(route('clients.store'), ['client_type' => 'company', 'name' => 'Azienda dimostrativa', 'vat_number' => 'DEMO-IVA'])
+        $this->post(route('clients.store'), ['client_type' => 'company', 'name' => 'Azienda dimostrativa', 'vat_number' => '01234567897'])
             ->assertSessionHasNoErrors()->assertRedirect();
         $company = Client::where('name', 'Azienda dimostrativa')->sole();
         $this->assertSame('company', $company->client_type);

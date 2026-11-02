@@ -26,12 +26,15 @@
             <input id="field-name" name="name" class="form-in" value="{{ $registryValue('name') }}" maxlength="255" required>
         </x-form-group>
     </div>
+    <div data-fiscal-check data-check-url="{{ route('api.clients.check-fiscal-identifiers') }}" data-current-client="{{ $client?->id }}">
     <div class="form-row">
         @foreach(['tax_code' => 'Codice fiscale', 'vat_number' => 'Partita IVA'] as $field => $label)
             <x-form-group :label="$label" :name="$field">
-                <input id="field-{{ Str::slug($field) }}" name="{{ $field }}" class="form-in" value="{{ $registryValue($field) }}" maxlength="20">
+                <input id="field-{{ Str::slug($field) }}" name="{{ $field }}" class="form-in" value="{{ $registryValue($field) }}" maxlength="20" data-fiscal-field="{{ $field }}" autocomplete="off" spellcheck="false">
             </x-form-group>
         @endforeach
+    </div>
+    @include('clients.partials.fiscal-feedback')
     </div>
     <fieldset class="permission-fieldset" x-show="clientType !== 'company'" :disabled="clientType === 'company'">
         <div class="form-row">

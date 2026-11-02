@@ -1,4 +1,4 @@
-@props(['label' => '', 'name' => '', 'required' => false, 'for' => null])
+@props(['label' => '', 'name' => '', 'required' => false, 'for' => null, 'errorBag' => 'default'])
 @php
     $fieldId = $for ?: ($name ? 'field-'.\Illuminate\Support\Str::slug(str_replace(['[', ']', '.'], '-', $name)) : null);
 @endphp
@@ -10,7 +10,7 @@
         @endif
     </label>
     {{ $slot }}
-    @error($name)
+    @error($name, $errorBag)
         <div class="invalid-feedback" @if($fieldId) id="{{ $fieldId }}-error" @endif>{{ $message }}</div>
     @enderror
 </div>

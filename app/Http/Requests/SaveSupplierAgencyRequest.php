@@ -7,6 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class SaveSupplierAgencyRequest extends FormRequest
 {
+    use Concerns\ValidatesBankDetails;
     public function authorize(): bool
     {
         $supplier = $this->route('supplier');
@@ -42,11 +43,12 @@ class SaveSupplierAgencyRequest extends FormRequest
             'country' => ['nullable', 'string', 'max:100'],
             'status' => ['required', 'in:active,inactive'],
             'notes' => ['nullable', 'string', 'max:10000'],
-        ];
+        ] + $this->bankRules();
     }
 
     protected function prepareForValidation(): void
     {
+        $this->normalizeBankDetails();
         $values = [];
         foreach (['email', 'pec', 'reference_email', 'vat_number', 'tax_code', 'province'] as $field) {
             if (is_string($this->input($field))) {
@@ -74,7 +76,7 @@ class SaveSupplierAgencyRequest extends FormRequest
             '*.max' => 'Il campo :attribute può contenere al massimo :max caratteri.',
             'status.required' => 'Seleziona lo stato dell’agenzia.',
             'status.in' => 'Lo stato deve essere attiva o inattiva.',
-        ];
+        ] + $this->bankMessages();
     }
 
     public function attributes(): array
@@ -86,6 +88,6 @@ class SaveSupplierAgencyRequest extends FormRequest
             'reference_role' => 'ruolo referente', 'reference_email' => 'email referente',
             'reference_phone' => 'telefono referente', 'address' => 'indirizzo', 'city' => 'città',
             'province' => 'provincia', 'postal_code' => 'CAP', 'country' => 'paese', 'notes' => 'note',
-        ];
+        ] + $this->bankAttributes();
     }
 }

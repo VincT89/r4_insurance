@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class AuditLog extends Model
 {
     public const ACTIONS = [
+        'title_residual_cancelled','refund_recorded','policy_contract_changed','policy_change_documents',
         'registry_import_completed',
         'quote_group_updated',
         'agency_email_attachments',

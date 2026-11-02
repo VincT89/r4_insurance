@@ -1,0 +1,19 @@
+[data-policy-contract] [hidden] { display: none !important; }
+.contract-source { max-height: 260px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: var(--bg); color: var(--text); font: 13px/1.5 var(--sans); }
+.contract-warnings, [data-contract-difference-list] { padding-left: 20px; margin: 12px 0; line-height: 1.6; overflow-wrap: anywhere; }
+.contract-confirm { display: flex; align-items: flex-start; gap: 10px; margin: 18px 0; line-height: 1.5; }
+.contract-confirm input { flex-shrink: 0; width: 18px; height: 18px; margin-top: 3px; }
+.contract-quote-differences { padding: 16px; margin: 16px 0; border: 1px solid var(--border); border-radius: var(--r); }
+.contract-extra { margin: 20px 0; }
+.contract-extra[open] summary { margin-bottom: 16px; }
+.contract-schedule table { width: 100%; border-collapse: collapse; }
+.contract-schedule th, .contract-schedule td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--line); }
+.contract-schedule caption { text-align: left; padding: 12px 0; font-weight: 600; }
+.contract-schedule td:last-child, .contract-schedule th:last-child { text-align: right; }
+[data-policy-contract] .contract-field-note { font-size: 12px; line-height: 1.4; color: var(--text2); margin-top: 4px; }
+[data-policy-contract] [data-contract-errors] { margin: 12px 0; }
+@media (max-width: 640px) {
+    [data-policy-contract] .form-row { grid-template-columns: minmax(0,1fr); }
+    .contract-schedule th, .contract-schedule td { padding: 10px 4px; font-size: 12px; }
+    .contract-schedule .contract-coverage { display: none; }
+}

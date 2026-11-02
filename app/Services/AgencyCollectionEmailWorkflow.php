@@ -20,25 +20,25 @@ class AgencyCollectionEmailWorkflow
         if($agency->status!=='active')$this->fail('Seleziona un’agenzia attiva.');
         /** Preparing a review does not authorize delivery without a verified recipient. */
         if($requireRecipient && !filter_var($agency->email,FILTER_VALIDATE_EMAIL))$this->fail('Completa l’email dell’agenzia e prepara un nuovo riepilogo prima di inviare.');
-        if($payments->isEmpty() || $payments->contains(fn($p)=>$p->voided_at || $p->title->cancelled_at || (int)$p->title->policy->supplier_agency_id!==(int)$agency->id))$this->fail('Seleziona incassi non stornati, relativi a titoli della stessa agenzia.');
+        if($payments->isEmpty() || $payments->contains(fn($p)=>$p->voided_at || ($p->title->cancelled_at && !$p->title->cancelled_residual_cents) || (int)$p->title->supplier_agency_id!==(int)$agency->id))$this->fail('Seleziona movimenti non stornati, relativi a titoli della stessa agenzia.');
         $rows=$payments->sortBy('id')->map(fn($p)=>[
-            'id'=>$p->id,'title_id'=>$p->insurance_title_id,'policy_id'=>$p->title->insurance_policy_id,'number'=>$p->title->policy->number,'client'=>$p->title->policy->client->name,'company'=>$p->title->policy->company,
-            'kind'=>InsuranceTitle::KINDS[$p->title->kind],'date'=>$p->received_on->format('d/m/Y'),'amount'=>Money::format($p->amount_cents),'payment_method'=>$p->payment_method,'recipient'=>InsuranceCollection::RECIPIENTS[$p->recipient],
+            'id'=>$p->id,'title_id'=>$p->insurance_title_id,'policy_id'=>$p->title->insurance_policy_id,'number'=>$p->title->contract->number,'client'=>$p->title->policy->client->name,'company'=>$p->title->contract->company,
+            'kind'=>InsuranceTitle::KINDS[$p->title->kind],'direction'=>$p->direction === 'refund' ? 'Rimborso' : 'Incasso','date'=>$p->received_on->format('d/m/Y'),'amount'=>Money::format($p->direction === 'refund' ? -$p->amount_cents : $p->amount_cents),'payment_method'=>$p->payment_method,'recipient'=>InsuranceCollection::RECIPIENTS[$p->recipient],
             'policy_status'=>$p->title->policy->status_label,
-            'policy_premium'=>$p->title->policy->premium === null ? 'Non indicato' : Money::format(Money::cents((string)$p->title->policy->premium)),
-            'document_type'=>InsuranceCollection::DOCUMENT_TYPES[$p->document_type],'reference'=>$p->reference,'frequency'=>$p->title->payment_frequency,'coverage_from'=>$p->title->coverage_from->format('d/m/Y'),'coverage_to'=>$p->title->coverage_to->format('d/m/Y'),'balance'=>Money::format($p->title->balance_cents),'ad_horas'=>(bool)$p->title->policy->ad_horas,
+            'policy_premium'=>$p->title->contract->premium === null ? 'Non indicato' : Money::format(Money::cents((string)$p->title->contract->premium)),
+            'document_type'=>InsuranceCollection::DOCUMENT_TYPES[$p->document_type],'reference'=>$p->reference,'frequency'=>$p->title->payment_frequency,'coverage_from'=>$p->title->coverage_from->format('d/m/Y'),'coverage_to'=>$p->title->coverage_to->format('d/m/Y'),'balance'=>Money::format($p->title->balance_cents),'ad_horas'=>(bool)$p->title->contract->ad_horas,
         ])->values()->all();
         $lines=['Buongiorno,','','riepilogo degli incassi registrati nel periodo '.$range.':',''];
         $clean=fn($v)=>trim(preg_replace('/[\r\n\t]+/u',' ',(string)$v));
         foreach($rows as $raw){$r=array_map($clean,$raw);$lines[]=($raw['ad_horas']?'AD HORAS - ':'').$r['number'].' | '.$r['client'].' | '.$r['company'];
             $lines[]=$r['kind'].' #'.$r['title_id'].'; periodo '.$r['coverage_from'].' – '.$r['coverage_to'].'; frazionamento '.$r['frequency'].'.';
             $lines[]='Premio della polizza: '.$r['policy_premium'].'.';
-            $lines[]='Incasso del '.$r['date'].': '.$r['amount'].'; metodo: '.$r['payment_method'].'; destinatario: '.$r['recipient'].'.';
+            $lines[]=$r['direction'].' del '.$r['date'].': '.$r['amount'].'; metodo: '.$r['payment_method'].'; '.($r['direction']==='Rimborso'?'erogato da: ':'destinatario: ').$r['recipient'].'.';
             $lines[]='Documento: '.$r['document_type'].($r['reference']?' / '.$r['reference']:'').'; residuo del titolo: '.$r['balance'].'.';
             $lines[]='Stato attuale della polizza: '.$r['policy_status'].'.';$lines[]='';}
         $lines[]='Il riepilogo riporta i movimenti registrati; gli allegati riservati del cliente non sono inclusi.';$lines[]='';$lines[]=config('branding.wordmark');
-        $policies=$payments->map(fn($p)=>$p->title->policy)->unique('id')->map(fn($p)=>['id'=>$p->id,'client_id'=>$p->client_id,'number'=>$p->number,'client'=>$p->client->name,'company'=>$p->company,'starts_on'=>$p->starts_on->format('d/m/Y'),'expires_on'=>$p->expires_on->format('d/m/Y'),'premium'=>$p->premium === null ? 'Non indicato' : Money::format(Money::cents((string)$p->premium)),'frequency'=>$p->payment_frequency,'ad_horas'=>(bool)$p->ad_horas])->values()->all();
-        $payload=['kind'=>'collections','from'=>app(AgencyMailConfiguration::class)->sender(),'recipient'=>['address'=>$agency->email,'name'=>$agency->name],'range'=>$range,'policies'=>$policies,'collections'=>$rows,'subject'=>($payments->contains(fn($p)=>$p->title->policy->ad_horas)?'Ad horas - ':'').'Riepilogo incassi '.$range.' - '.config('branding.wordmark'),'body'=>implode("\n",$lines)];
+        $policies=$payments->map(fn($p)=>$p->title->contract)->unique('id')->map(fn($p)=>['id'=>$p->id,'client_id'=>$p->client_id,'number'=>$p->number,'client'=>$p->client->name,'company'=>$p->company,'starts_on'=>$p->starts_on->format('d/m/Y'),'expires_on'=>$p->expires_on->format('d/m/Y'),'premium'=>$p->premium === null ? 'Non indicato' : Money::format(Money::cents((string)$p->premium)),'frequency'=>$p->payment_frequency,'ad_horas'=>(bool)$p->ad_horas])->values()->all();
+        $payload=['kind'=>'collections','from'=>app(AgencyMailConfiguration::class)->sender(),'recipient'=>['address'=>$agency->email,'name'=>$agency->name],'range'=>$range,'policies'=>$policies,'collections'=>$rows,'subject'=>($payments->contains(fn($p)=>$p->title->contract->ad_horas)?'Ad horas - ':'').'Riepilogo incassi '.$range.' - '.config('branding.wordmark'),'body'=>implode("\n",$lines)];
         $versions=$payments->sortBy('id')->map(fn($p)=>[$p->getAttributes(),$p->title->getAttributes(),app(AgencyEmailWorkflow::class)->policyFingerprint($p->title->policy)])->values()->all();
         return [$payload,hash('sha256',json_encode([$payload,$versions],JSON_THROW_ON_ERROR))];
     }

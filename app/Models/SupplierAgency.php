@@ -12,7 +12,11 @@ class SupplierAgency extends Model
         'email', 'pec', 'phone', 'mobile', 'reference_person', 'reference_role',
         'reference_email', 'reference_phone', 'address', 'city', 'province',
         'postal_code', 'country', 'status', 'notes', 'supplier_company_id', 'parent_agency_id',
+        'iban', 'account_holder', 'bank_name', 'bic', 'billing_email', 'sdi_code',
     ];
+
+    protected $hidden = ['iban'];
+    protected function casts(): array { return ['iban'=>'encrypted']; }
 
     public function getStatusLabelAttribute(): string
     {

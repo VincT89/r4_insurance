@@ -2,197 +2,113 @@
 
 namespace App\Livewire\Dashboard;
 
-use Livewire\Component;
 use App\Models\UserDailyNote;
 use App\Models\UserDailyNoteEntry;
-use App\Models\UserDailyNoteChecklistItem;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Locked;
+use Livewire\Component;
 
 class UserDailyNotes extends Component
 {
-    public $currentDate;
-    
-    public $entryContents = [];
-    public $entryPostScripts = [];
-    public $newChecklistLabels = [];
+    #[Locked]
+    public string $currentDate;
 
-    public function mount()
+    #[Locked]
+    public ?int $editingEntryId = null;
+
+    public string $newContent = '';
+    public string $editingContent = '';
+    public string $statusMessage = '';
+
+    public function mount(): void
     {
         $this->currentDate = Carbon::today()->format('Y-m-d');
-        $this->loadState();
     }
 
-    public function previousDay()
+    public function previousDay(): void
     {
         $this->currentDate = Carbon::parse($this->currentDate)->subDay()->format('Y-m-d');
-        $this->loadState();
+        $this->cancelEdit();
+        $this->statusMessage = '';
     }
 
-    public function nextDay()
+    public function nextDay(): void
     {
         $this->currentDate = Carbon::parse($this->currentDate)->addDay()->format('Y-m-d');
-        $this->loadState();
+        $this->cancelEdit();
+        $this->statusMessage = '';
     }
 
-    public function loadState()
+    public function addEntry(): void
     {
-        if (auth()->user()->can('system.admin')) $this->cleanupEmptyEntries();
-
-        $note = UserDailyNote::with(['entries' => function($q) {
-            $q->orderBy('sort_order');
-        }])->where('user_id', Auth::id())
-          ->whereDate('date', $this->currentDate)
-          ->first();
-
-        $this->entryContents = [];
-        $this->entryPostScripts = [];
-        $this->newChecklistLabels = [];
-
-        if ($note) {
-            foreach ($note->entries as $entry) {
-                $this->entryContents[$entry->id] = $entry->content;
-                $this->entryPostScripts[$entry->id] = $entry->post_script;
-                $this->newChecklistLabels[$entry->id] = '';
-            }
-        }
-    }
-
-    protected function cleanupEmptyEntries()
-    {
-        $note = UserDailyNote::where('user_id', Auth::id())
-            ->whereDate('date', $this->currentDate)
-            ->first();
-
-        if ($note) {
-            foreach ($note->entries as $entry) {
-                if (empty(trim($entry->content)) && empty(trim($entry->post_script)) && $entry->checklistItems()->count() === 0) {
-                    $entry->delete();
-                }
-            }
-        }
-    }
-
-    protected function getOrCreateDailyNote()
-    {
-        return UserDailyNote::whereDate('date', $this->currentDate)->firstOrCreate([
-            'user_id' => Auth::id(),
-        ], [
-            'date' => $this->currentDate,
-        ]);
-    }
-
-    public function addEntry()
-    {
-        $note = $this->getOrCreateDailyNote();
-        
-        $maxSort = $note->entries()->max('sort_order') ?? 0;
-        
-        $entry = $note->entries()->create([
-            'content' => '',
-            'post_script' => null,
-            'sort_order' => $maxSort + 1,
+        $this->newContent = trim($this->newContent);
+        $this->validate(['newContent' => ['required', 'string', 'max:10000']], [
+            'newContent.required' => 'Scrivi la nota prima di premere OK.',
+            'newContent.max' => 'La nota può contenere al massimo 10.000 caratteri.',
         ]);
 
-        $this->entryContents[$entry->id] = '';
-        $this->entryPostScripts[$entry->id] = '';
-        $this->newChecklistLabels[$entry->id] = '';
-        
-        $this->dispatch('note-added', id: $entry->id);
+        $note = UserDailyNote::whereDate('date', $this->currentDate)->firstOrCreate(['user_id'=>Auth::id()], ['date'=>$this->currentDate]);
+        $note->entries()->create([
+            'content'=>$this->newContent,
+            'sort_order'=>($note->entries()->max('sort_order') ?? 0) + 1,
+        ]);
+
+        $this->newContent = '';
+        $this->statusMessage = 'Nota creata.';
+        $this->dispatch('note-created');
     }
 
-    public function updatedEntryContents($value, $key)
+    public function editEntry(int $entryId): void
     {
-        $entry = UserDailyNoteEntry::whereHas('userDailyNote', function($q) {
-            $q->where('user_id', Auth::id());
-        })->find($key);
-
-        if ($entry) {
-            $entry->update(['content' => $value]);
-        }
+        $entry = $this->ownedEntry($entryId);
+        $this->resetValidation();
+        $this->editingEntryId = $entry->id;
+        $this->editingContent = $entry->content ?? '';
+        $this->statusMessage = '';
+        $this->dispatch('note-editing', id: $entry->id);
     }
 
-    public function updatedEntryPostScripts($value, $key)
+    public function saveEntry(): void
     {
-        $entry = UserDailyNoteEntry::whereHas('userDailyNote', function($q) {
-            $q->where('user_id', Auth::id());
-        })->find($key);
-
-        if ($entry) {
-            $entry->update(['post_script' => $value]);
-        }
+        abort_unless($this->editingEntryId, 404);
+        $entry = $this->ownedEntry($this->editingEntryId);
+        $this->editingContent = trim($this->editingContent);
+        $this->validate(['editingContent'=>['required', 'string', 'max:10000']], [
+            'editingContent.required'=>'La nota non può essere vuota. Per rimuoverla usa Elimina.',
+            'editingContent.max'=>'La nota può contenere al massimo 10.000 caratteri.',
+        ]);
+        $entry->update(['content'=>$this->editingContent]);
+        $this->cancelEdit();
+        $this->statusMessage = 'Nota modificata.';
     }
 
-    public function deleteEntry($entryId)
+    public function cancelEdit(): void
     {
-        \Illuminate\Support\Facades\Gate::authorize('system.admin');
-        $entry = UserDailyNoteEntry::whereHas('userDailyNote', function($q) {
-            $q->where('user_id', Auth::id());
-        })->find($entryId);
-
-        if ($entry) {
-            $entry->delete();
-            unset($this->entryContents[$entryId]);
-            unset($this->entryPostScripts[$entryId]);
-            unset($this->newChecklistLabels[$entryId]);
-        }
+        $id = $this->editingEntryId;
+        $this->editingEntryId = null;
+        $this->editingContent = '';
+        $this->resetValidation();
+        if ($id) $this->dispatch('note-edit-ended', id: $id);
     }
 
-    public function addChecklistItem($entryId)
+    public function deleteEntry(int $entryId): void
     {
-        $label = trim($this->newChecklistLabels[$entryId] ?? '');
-        if (empty($label)) return;
-
-        $entry = UserDailyNoteEntry::whereHas('userDailyNote', function($q) {
-            $q->where('user_id', Auth::id());
-        })->find($entryId);
-
-        if ($entry) {
-            $maxSort = $entry->checklistItems()->max('sort_order') ?? 0;
-            $entry->checklistItems()->create([
-                'label' => $label,
-                'is_completed' => false,
-                'sort_order' => $maxSort + 1,
-            ]);
-            $this->newChecklistLabels[$entryId] = '';
-        }
+        $entry = $this->ownedEntry($entryId);
+        $entry->delete();
+        if ($this->editingEntryId === $entryId) $this->cancelEdit();
+        $this->statusMessage = 'Nota eliminata.';
     }
 
-    public function toggleChecklistItem($itemId)
+    private function ownedEntry(int $entryId): UserDailyNoteEntry
     {
-        $item = UserDailyNoteChecklistItem::whereHas('userDailyNoteEntry.userDailyNote', function($q) {
-            $q->where('user_id', Auth::id());
-        })->find($itemId);
-
-        if ($item) {
-            $item->update(['is_completed' => !$item->is_completed]);
-        }
-    }
-
-    public function deleteChecklistItem($itemId)
-    {
-        \Illuminate\Support\Facades\Gate::authorize('system.admin');
-        $item = UserDailyNoteChecklistItem::whereHas('userDailyNoteEntry.userDailyNote', function($q) {
-            $q->where('user_id', Auth::id());
-        })->find($itemId);
-
-        if ($item) {
-            $item->delete();
-        }
+        /** Personal notes stay private: every mutation checks ownership again on the server. */
+        return UserDailyNoteEntry::whereHas('userDailyNote', fn($query) => $query->where('user_id', Auth::id()))->findOrFail($entryId);
     }
 
     public function render()
     {
-        $note = UserDailyNote::with(['entries' => function($q) {
-            $q->orderBy('sort_order');
-        }, 'entries.checklistItems' => function($q) {
-            $q->orderBy('sort_order');
-        }])->where('user_id', Auth::id())
-          ->whereDate('date', $this->currentDate)
-          ->first();
-
-        return view('livewire.dashboard.user-daily-notes', [
-            'note' => $note
-        ])->layout('layouts.app', ['title' => 'Blocco Note']);
+        $note = UserDailyNote::with(['entries.checklistItems'])->where('user_id', Auth::id())->whereDate('date', $this->currentDate)->first();
+        return view('livewire.dashboard.user-daily-notes', ['note'=>$note])->layout('layouts.app', ['title'=>'Blocco note']);
     }
 }

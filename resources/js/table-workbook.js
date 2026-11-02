@@ -1,18 +1,23 @@
 import ExcelJS from 'exceljs';
 import { excelCell, exportColumnType } from './table-export-values.js';
 
-export function tableWorkbook({ title, headers, rows, filters, searchFilters, stamp, columnTypes = [] }) {
+export function tableWorkbook({ title, headers, rows, footers = [], filters, searchFilters, stamp, columnTypes = [], summary = null }) {
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'R4 Insurance';
-    const sheet = workbook.addWorksheet('Dati');
+    const addTableSheet = (name, headers, rows, footers, columnTypes) => {
+    const sheet = workbook.addWorksheet(name);
     sheet.columns = headers.map((header, i) => ({ width: Math.min(55, Math.max(18, header.length + 3, ...rows.slice(0, 100).map(row => Math.min(55, String(row[i] ?? '').length + 2)))) }));
     sheet.addRow([title]);
     sheet.addRow([`Esportato il ${stamp} · ${rows.length} ${rows.length === 1 ? 'riga' : 'righe'}`]);
-    sheet.addRow([filters ? `Filtri avanzati: ${filters}` : 'Tutti i risultati della ricerca corrente']);
+    sheet.addRow([summary ? [searchFilters,filters ? `Altri filtri: ${filters}` : ''].filter(Boolean).join('; ') || 'Tutti i movimenti' : filters ? `Filtri avanzati: ${filters}` : 'Tutti i risultati della ricerca corrente']);
     sheet.addRow([]); sheet.addRow(headers);
-    for (const values of rows) {
+    for (const [index, values] of [...rows, ...footers].entries()) {
         const row = sheet.addRow([]);
         row.alignment = { vertical: 'top', wrapText: true };
+        if (index >= rows.length) {
+            row.font = { bold: true };
+            row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6ECF3' } };
+        }
         headers.forEach((header, index) => {
             const cell = excelCell(values[index], columnTypes[index] || exportColumnType(header));
             row.getCell(index + 1).value = cell.value;
@@ -30,6 +35,10 @@ export function tableWorkbook({ title, headers, rows, filters, searchFilters, st
     sheet.getRow(5).height = 28;
     sheet.autoFilter = { from: { row: 5, column: 1 }, to: { row: 5 + rows.length, column: Math.max(1, headers.length) } };
     sheet.views = [{ state: 'frozen', ySplit: 5 }];
+    sheet.pageSetup = { orientation:'landscape', paperSize:9, fitToPage:true, fitToWidth:1, fitToHeight:0, printTitlesRow:'1:5' };
+    };
+    if (summary) addTableSheet('Riepilogo',summary.headers,summary.rows,summary.footers || [],summary.columnTypes || []);
+    addTableSheet(summary ? 'Movimenti' : 'Dati',headers,rows,footers,columnTypes);
     const meta = workbook.addWorksheet('Filtri');
     meta.columns = [{ width: 24 }, { width: 110 }];
     meta.addRows([['Elenco', title], ['Data', stamp], ['Righe', rows.length], ['Filtri avanzati', filters || 'Nessuno'], ['Ricerca corrente', searchFilters || 'Nessuna']]);

@@ -58,10 +58,29 @@ class InsuranceLedger
     private function insert(InsurancePolicy $policy,array $data): InsuranceTitle
     {
         if (!$policy->coverage_origin_on) $policy->forceFill(['coverage_origin_on'=>$policy->starts_on])->save();
-        if($policy->titles()->where('insurance_policy_change_id',$data['insurance_policy_change_id']??null)->whereNull('cancelled_at')->whereDate('coverage_from','<',$data['coverage_to'])->whereDate('coverage_to','>',$data['coverage_from'])->exists()) $this->fail('Esiste già un titolo per questo periodo. Controlla i titoli presenti prima di procedere.');
+        $affectsCoverage = $data['affects_coverage'] ?? empty($data['insurance_policy_change_id']);
+        $overlap = $policy->titles()->where('kind','!=','adjustment')->whereNull('cancelled_at')->whereDate('coverage_from','<',$data['coverage_to'])->whereDate('coverage_to','>',$data['coverage_from']);
+        if ($affectsCoverage) $overlap->where('affects_coverage',true);
+        else $overlap->where('insurance_policy_change_id',$data['insurance_policy_change_id'] ?? null);
+        if (($data['kind'] ?? '') !== 'adjustment' && $overlap->exists()) $this->fail('Esiste già un titolo per questo periodo. Controlla i titoli presenti prima di procedere.');
         $title = $policy->titles()->create($data+['created_by'=>auth()->id()]);
         app(InsuranceCommissionLedger::class)->sync($title);
         return $title;
+    }
+    public function transitionTitle(InsurancePolicy $policy, array $data): InsuranceTitle
+    {
+        \Illuminate\Support\Facades\Gate::authorize('ledger.manage');
+        return $this->insert($policy, $data);
+    }
+    public function cancelResidual(InsuranceTitle $title, string $reason): void
+    {
+        \Illuminate\Support\Facades\Gate::authorize('ledger.manage');
+        $before = $title->only(['amount_cents','collected_cents']);
+        if ($title->cancelled_at || $title->balance_cents < 1) $this->fail('Il residuo selezionato non è più annullabile. Riapri il riepilogo.');
+        $title->update(['cancelled_residual_cents'=>$title->balance_cents,'cancelled_at'=>now(),'cancellation_reason'=>$reason]);
+        /** Cancelling a debt does not reverse money already collected or invent a commission adjustment. */
+        app(InsuranceCommissionLedger::class)->sync($title);
+        $this->log($title->policy,'title_residual_cancelled','Annullato solo il residuo del titolo #'.$title->id.': '.$reason,['insurance_title_id'=>$title->id,'cancelled_residual_cents'=>$title->cancelled_residual_cents],$before);
     }
     public function manual(InsurancePolicy $policy,array $data): InsuranceTitle
     {
@@ -102,13 +121,16 @@ class InsuranceLedger
                 return $existing;
             }
             if($title->cancelled_at || $data['amount_cents']<1 || $data['amount_cents']>$title->balance_cents) $this->fail('Importo non valido: il titolo è annullato, già incassato o l’importo supera il residuo.');
+            /** New collections settle the balance; existing partial collections remain in the ledger. */
+            if($data['amount_cents']!==$title->balance_cents) $this->fail('Registra l’intero importo da incassare del titolo. I nuovi pagamenti parziali non sono previsti. Se il residuo è cambiato, riapri la polizza prima di riprovare.');
             if ((str_contains($data['payment_method'],'a Compagnia') && $data['recipient']!=='company') || (str_contains($data['payment_method'],'a Intermediario') && $data['recipient']==='company')) $this->fail('Metodo e destinatario del pagamento non coincidono.');
-            if ($data['recipient']==='agency' && !$policy->supplier_agency_id) $this->fail('Collega l’agenzia intermediaria alla polizza prima di registrare questo pagamento.');
+            if ($data['recipient']==='agency' && !$title->supplier_agency_id) $this->fail('Il titolo non ha un’agenzia intermediaria collegata.');
             $before=['collected_cents'=>$title->collected_cents];
+            $data['direction'] = $title->direction;
             $payment=$title->collections()->create($data+['created_by'=>auth()->id(),'request_fingerprint'=>$fingerprint]);
             $title->update(['collected_cents'=>$title->collected_cents+$data['amount_cents']]);
             app(InsuranceCommissionLedger::class)->sync($title, $payment->received_on->toDateString(), 'Maturazione sull’incasso #'.$payment->id.'.');
-            $this->refresh($policy);$this->log($policy,'collection_recorded','registrato incasso #'.$payment->id.' di '.Money::format($payment->amount_cents).' sul titolo #'.$title->id.'.',['insurance_collection_id'=>$payment->id,'insurance_title_id'=>$title->id,'collected_cents'=>$title->collected_cents]+$data,$before);return $payment;
+            $this->refresh($policy);$this->log($policy,$title->direction === 'refund' ? 'refund_recorded' : 'collection_recorded','registrato '.($title->direction === 'refund' ? 'rimborso' : 'incasso').' #'.$payment->id.' di '.Money::format($payment->amount_cents).' sul titolo #'.$title->id.'.',['insurance_collection_id'=>$payment->id,'insurance_title_id'=>$title->id,'collected_cents'=>$title->collected_cents]+$data,$before);return $payment;
         });
     }
     public function void(InsuranceCollection $payment,string $reason): void
@@ -155,7 +177,8 @@ class InsuranceLedger
         $titles=$policy->titles()->whereNull('cancelled_at')->orderBy('coverage_from')->orderBy('id')->get();
         $covered=null; $cursor=$policy->coverage_origin_on ?? $policy->starts_on;
         /** A later paid instalment never bridges a gap left by an unpaid earlier title. */
-        foreach($titles->whereNull('insurance_policy_change_id') as $title){if($title->balance_cents>0 || !$title->coverage_from->equalTo($cursor))break; $covered=$title->coverage_to; $cursor=$covered;}
-        $policy->forceFill(['coverage_until'=>$covered,'payment_status'=>$titles->isEmpty() ? null : ($titles->every(fn($t)=>$t->balance_cents===0) ? 'paid' : 'unpaid')])->save();
+        foreach($titles->where('affects_coverage',true) as $title){if($title->balance_cents>0 || !$title->coverage_from->equalTo($cursor))break; $covered=$title->coverage_to; $cursor=$covered;}
+        $receipts=$titles->where('direction','!=','refund');
+        $policy->forceFill(['coverage_until'=>$covered,'payment_status'=>$receipts->isEmpty() ? null : ($receipts->every(fn($t)=>$t->balance_cents===0) ? 'paid' : 'unpaid')])->save();
     }
 }

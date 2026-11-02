@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\{Attachment, Client, ClientDocumentRequest};
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\{DB, Storage};
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class ClientDocumentRegistry
@@ -55,7 +56,9 @@ class ClientDocumentRegistry
                     if ($request->document_category !== $values['document_category'] || $request->insurance_policy_id != ($values['insurance_policy_id'] ?? null)) throw ValidationException::withMessages(['document_request_id' => 'Categoria e polizza devono corrispondere alla richiesta.']);
                 }
                 $directory = 'client/'.$client->id.'/insurance';
-                $path = $file->store($directory, 'attachments');
+                /** Ogni registrazione ha una copia indipendente, anche se lo stesso upload serve a più destinatari. */
+                $extension = $file->extension();
+                $path = $file->storeAs($directory, Str::uuid().($extension ? '.'.$extension : ''), 'attachments');
                 if (!$path) throw ValidationException::withMessages(['file' => 'Caricamento non riuscito. Riprova.']);
                 return $client->attachments()->create(array_merge($values, [
                     'type' => 'document', 'uploaded_by' => auth()->id(), 'disk' => 'attachments', 'directory' => $directory, 'path' => $path,

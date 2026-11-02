@@ -13,7 +13,7 @@ class InsuranceCommissionQuery
         return DB::table('insurance_titles as t')
             ->join('insurance_policies as p', 'p.id', '=', 't.insurance_policy_id')
             ->join('clients as c', 'c.id', '=', 'p.client_id')
-            ->leftJoin('supplier_agencies as a', 'a.id', '=', 'p.supplier_agency_id')
+            ->leftJoin('supplier_agencies as a', 'a.id', '=', 't.supplier_agency_id')
             ->leftJoin('insurance_commissions as v', 'v.insurance_title_id', '=', 't.id');
     }
 

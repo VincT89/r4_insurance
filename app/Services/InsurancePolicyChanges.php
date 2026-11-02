@@ -13,7 +13,7 @@ class InsurancePolicyChanges
     public function check(InsurancePolicy $policy, string $kind): void
     {
         Gate::authorize('updateRegistry', $policy->client);
-        abort_unless($policy->editableBy(auth()->user()), 403);
+        if ($kind === 'addition') abort_unless($policy->editableBy(auth()->user()), 403);
         $allowed = $kind === 'addition' ? ['active','renewed'] : ['active','renewed','expired','suspended','ceased'];
         if (!in_array($policy->status, $allowed, true)) $this->fail('Lo stato di questa polizza non consente la variazione selezionata.');
         if ($kind === 'replacement' && $policy->changes()->where('kind','replacement')->exists()) $this->fail('Questa polizza ha già una sostitutiva collegata.');

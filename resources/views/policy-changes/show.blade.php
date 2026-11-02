@@ -7,16 +7,31 @@
             <div><dt>Compagnia</dt><dd>{{ $change->snapshot['after']['policy']['company'] }}</dd></div><div><dt>Periodo della variazione</dt><dd>{{ $change->effective_on->format('d/m/Y') }} – {{ $change->expires_on->format('d/m/Y') }}</dd></div>
             <div><dt>{{ $change->kind==='addition' ? 'Premio aggiuntivo del periodo' : 'Premio del nuovo contratto' }}</dt><dd>{{ \App\Support\Money::format($change->premium_cents) }}</dd></div><div><dt>Registrata da</dt><dd>{{ $change->author?->name ?: 'Utente non disponibile' }} / {{ $change->created_at->format('d/m/Y H:i') }}</dd></div>
         </dl><p class="u-whitespace-pre-wrap u-mt-md">{{ $change->description }}</p>
-        <div class="insurance-form-actions"><a class="btn btn-g" href="{{ route('quotes.show',$change->quote->quoteCase) }}">Preventivo e approvazione</a></div>
+        <div class="insurance-form-actions">@if($change->quote)<a class="btn btn-g" href="{{ route('quotes.show',$change->quote->quoteCase) }}">Preventivo e approvazione</a>@endif @foreach($change->documents->where('document_category','policy') as $contract)<a class="btn btn-p" href="{{ route('attachments.preview',$contract) }}">Apri contratto</a>@endforeach<a class="btn btn-g" href="{{ route('clients.policies.show',[$client,$change->resultPolicy,'tab'=>'payments']) }}">Titoli e pagamenti</a></div>
     </x-panel>
+    @if($change->kind !== 'addition')
+    <x-panel title="Titoli e conguagli registrati" padded>
+        @if(($change->snapshot['titles_mode'] ?? 'automatic') === 'manual')<p>Completa i titoli ordinari dalla scheda della polizza: hai scelto l’inserimento manuale.</p>@endif
+        @if($change->snapshot['cancelled_cents'] ?? 0)<p>Residui annullati: {{ \App\Support\Money::format($change->snapshot['cancelled_cents']) }}. Gli incassi già ricevuti sono conservati.</p><p>Motivo: {{ $change->snapshot['cancellation_reason'] }}</p>@endif
+        @foreach($change->titles as $title)<p class="u-mb-sm"><a href="{{ route('titles.show',$title) }}">{{ $title->direction === 'refund' ? 'Rimborso' : \App\Models\InsuranceTitle::KINDS[$title->kind] }} del {{ $title->due_on->format('d/m/Y') }}</a>: {{ \App\Support\Money::format($title->amount_cents) }} / {{ $title->state_label }}.</p>@endforeach
+    </x-panel>
+    @endif
     <x-panel title="Moduli e firme della variazione" padded>
         @forelse($change->formPackages as $package)<p><a href="{{ route('clients.forms.show',[$client,$package]) }}">Fascicolo #{{ $package->id }}</a> / {{ $package->created_at->format('d/m/Y') }} / {{ $package->state_label }}</p>@empty<p>I moduli per questa variazione sono ancora da preparare e far firmare.</p>@endforelse
-        @if($change->resultPolicy->editableBy(auth()->user()) && $change->id===(int)$change->resultPolicy->incomingChanges()->max('id'))<div class="insurance-form-actions"><a class="btn btn-p" href="{{ route('clients.forms.create',[$client,'policy'=>$change->result_policy_id,'change'=>$change->id]) }}">Prepara moduli della variazione</a></div>@else<p class="u-text-meta">I fascicoli di questa variazione restano consultabili. Le nuove preparazioni seguono i permessi e l’ultima versione della polizza.</p>@endif
+        @if($change->resultPolicy->editableBy(auth()->user()) && $change->id===(int)$change->resultPolicy->incomingChanges()->max('id'))
+            @php($policy=$change->resultPolicy)
+            @php($templates=app(\App\Services\InsuranceForms::class)->available($policy,$client))
+            @php($contextHash=app(\App\Services\InsuranceForms::class)->contextHash($client,$policy))
+            @php($safeOld=fn($key,$default='')=>is_scalar(old($key,$default))?old($key,$default):'')
+            @if($templates->isNotEmpty())
+                <details @if($change->formPackages->isEmpty()) open @endif><summary>Scegli i moduli da generare</summary>@include('insurance-forms.package-form')</details>
+            @else<p class="u-text-meta">Nessun modello attivo disponibile per questa polizza. L’admin può abilitarli nelle impostazioni dei modelli.</p>@endif
+        @else<p class="u-text-meta">I moduli di questa variazione restano consultabili nello storico.</p>@endif
     </x-panel>
     <x-panel title="Allegati della variazione">@include('clients.documents.table',['documents'=>$change->documents])</x-panel>
     @can('updateRegistry',$client)<x-panel title="Aggiungi documenti allo storico" padded><form method="POST" enctype="multipart/form-data" action="{{ route('clients.policy-changes.documents',[$client,$change]) }}">@csrf<x-form-group label="Contratto, appendice e altri allegati" name="documents" required><input class="form-in" type="file" name="documents[]" accept=".pdf,.jpg,.jpeg,.png" multiple required><p class="u-text-meta">Fino a 10 file da 10 MB ciascuno, 50 MB complessivi. I documenti precedenti restano conservati.</p></x-form-group><div class="insurance-form-actions"><button class="btn btn-p">Aggiungi allegati</button></div></form></x-panel>@endcan
     <x-panel title="Controllo contabile" padded>
-        <p>Le rate e gli incassi precedenti restano collegati alla loro polizza. Verifica manualmente importi residui, eventuali rimborsi e {{ $change->kind==='addition' ? 'il titolo del premio aggiuntivo' : 'le rate del nuovo contratto' }} prima di registrarli.</p>
+<p>I movimenti precedenti restano nello storico con la loro compagnia e agenzia. I titoli aperti si possono saldare dalla scheda della polizza, indicando data effettiva e modalità.</p>
         <div class="insurance-form-actions"><a class="btn btn-g" href="{{ route('titles.index',['policy'=>$change->source_policy_id]) }}">Rate della polizza {{ $change->sourcePolicy->number }}</a>@if($change->kind==='replacement')<a class="btn btn-g" href="{{ route('titles.index',['policy'=>$change->result_policy_id]) }}">Rate della sostitutiva</a>@endif</div>
         @if($change->kind==='addition')
             @foreach($change->titles as $title)<p><a href="{{ route('titles.show',$title) }}">Titolo {{ $title->reference ?: '#'.$title->id }}</a> / {{ \App\Support\Money::format($title->amount_cents) }} / <x-status-text :alert="in_array($title->state,['due_today','partial','overdue'],true)">{{ $title->state_label }}</x-status-text></p>@endforeach

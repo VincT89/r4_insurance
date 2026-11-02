@@ -153,7 +153,7 @@
           <div class="nav-group-label">Anagrafica</div>
           <x-nav-item href="{{ route('clients.index') }}" icon="users" label="Clienti" :active="request()->routeIs('clients.*') && !request()->routeIs('clients.policies.*')" />
           @can('viewAny', \App\Models\SupplierAgency::class)
-            <x-nav-item href="{{ route('suppliers.index') }}" icon="building-2" label="Agenzie" :active="request()->routeIs('suppliers.*', 'supplier-companies.*', 'insurance-catalog.*')" />
+            <x-nav-item href="{{ route('suppliers.index') }}" icon="building-2" label="Compagnie e agenzie" :active="request()->routeIs('suppliers.*', 'supplier-companies.*', 'insurance-catalog.*')" />
           @endcan
         </div>
       @endcan
@@ -163,8 +163,8 @@
           <div class="nav-group-label">Gestione</div>
           <x-nav-item href="{{ route('claims.index') }}" icon="folder-open" label="Sinistri" :active="request()->routeIs('claims.*')" />
           <x-nav-item href="{{ route('quotes.index') }}" icon="file-text" label="Preventivi" :active="request()->routeIs('quotes.*')" />
-          <x-nav-item href="{{ route('titles.index') }}" icon="files" label="Rate e quietanze" :active="request()->routeIs('titles.*')" />
-          <x-nav-item href="{{ route('collections.index') }}" icon="wallet" label="Incassi" :active="request()->routeIs('collections.*')" />
+          <x-nav-item href="{{ route('titles.index') }}" icon="files" label="Titoli" :active="request()->routeIs('titles.*')" />
+          <x-nav-item href="{{ route('collections.index') }}" icon="wallet" label="Contabilità" :active="request()->routeIs('collections.*')" />
           <x-nav-item href="{{ route('policies.index') }}" icon="files" label="Polizze" :active="request()->routeIs('policies.index', 'clients.policies.show', 'clients.policies.edit')" />
           <x-nav-item href="{{ route('deadlines.index') }}" icon="clock" label="Scadenze" :active="request()->routeIs('deadlines.*')" />
           @can('system.admin')<x-nav-item href="{{ route('agency-communications.index') }}" icon="mail" label="Comunicazioni" :active="request()->routeIs('agency-communications.*')" /><x-nav-item href="{{ route('reports.index') }}" icon="chart-no-axes-combined" label="Report" :active="request()->routeIs('reports.*','commissions.*')" />@endcan

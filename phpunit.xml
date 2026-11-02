@@ -15,16 +15,21 @@
             <file>tests/Feature/FirstLoginPasswordChangeTest.php</file>
             <file>tests/Feature/Core/UserAdministrationSafetyTest.php</file>
             <file>tests/Feature/RolePermissionsTest.php</file>
+            <file>tests/Feature/UserDailyNotesTest.php</file>
             <file>tests/Feature/RoleMigrationTest.php</file>
             <file>tests/Feature/QuoteRequestContextTest.php</file>
             <file>tests/Feature/QuoteVehicleGroupsTest.php</file>
+            <file>tests/Feature/QuoteRecipientSelectionTest.php</file>
             <file>tests/Feature/AuditSafetyRegressionTest.php</file>
             <file>tests/Feature/Security/SecurityHeadersTest.php</file>
             <file>tests/Feature/ClientMaterialsTest.php</file>
             <file>tests/Feature/RetiredModulesCleanupTest.php</file>
             <file>tests/Feature/InsuranceClientRegistryTest.php</file>
             <file>tests/Feature/ClientRegistryCompletionTest.php</file>
+            <file>tests/Feature/ClientVehicleWorkspaceTest.php</file>
+            <file>tests/Feature/ClientFiscalIdentityTest.php</file>
             <file>tests/Feature/SupplierAgencyTest.php</file>
+            <file>tests/Feature/SupplierRegistryDetailsTest.php</file>
             <file>tests/Feature/InsuranceImportPreparationTest.php</file>
             <file>tests/Feature/RegistryExcelImporterTest.php</file>
             <file>tests/Feature/RegistryImportTest.php</file>
@@ -41,7 +46,10 @@
             <file>tests/Feature/AgencyPolicyChangeCommunicationTest.php</file>
             <file>tests/Feature/CommunicationPaginationTest.php</file>
             <file>tests/Feature/InsuranceOperationsTest.php</file>
+            <file>tests/Feature/PolicyContractCreationTest.php</file>
+            <file>tests/Feature/PolicyContractTransitionsTest.php</file>
             <file>tests/Feature/InsurancePaymentSummaryTest.php</file>
+            <file>tests/Feature/InsuranceAccountingWorkspaceTest.php</file>
             <file>tests/Feature/OperationalReminderFlowTest.php</file>
             <file>tests/Feature/InsuranceReadPerformanceTest.php</file>
             <file>tests/Feature/InsurancePolicyWorkflowTest.php</file>

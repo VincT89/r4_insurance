@@ -13,7 +13,7 @@ class PolicyPortfolioController extends Controller
     {
         $this->authorize('viewAny', Client::class);
         $filters = $query->filters($request);
-        $policies = $query->forUser($request->user(), $filters)->with(['client', 'supplierAgency', 'vehicle', 'asset'])
+        $policies = $query->forUser($request->user(), $filters)->with(['client', 'supplierAgency', 'vehicle', 'asset', 'contracts'])
             ->orderBy('expires_on')->orderBy('id')->paginate(TableListing::perPage(25))->withQueryString();
         return view('policies.index', compact('policies', 'filters') + $query->options($request->user()));
     }
@@ -34,6 +34,16 @@ class PolicyPortfolioController extends Controller
     public function store(\App\Http\Requests\SaveInsurancePolicyRequest $request)
     {
         return app(InsurancePolicyController::class)->store($request, $request->policyClient());
+    }
+
+    public function contractSchedule(Request $request)
+    {
+        $this->authorize('create', Client::class);
+        $this->authorize('ledger.manage');
+        $schedule = app(\App\Services\PolicyContractSchedule::class);
+        $values = $request->validate($schedule->rules());
+        $rows = app(\App\Services\InsuranceLedger::class)->plan(new \App\Models\InsurancePolicy($values));
+        return response()->json(['rows' => $rows, 'fingerprint' => $schedule->fingerprint($rows)])->header('Cache-Control', 'no-store, private');
     }
 
     public function clientContext(Client $client)

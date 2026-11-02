@@ -5,6 +5,7 @@
     >
     <x-slot:title><strong>Anagrafica clienti</strong></x-slot:title>
         <x-slot:actions>
+            <a href="{{ route('vehicles.index') }}" class="btn btn-g">Parco veicoli</a>
             @can('create', App\Models\Client::class)
                 <a href="{{ route('clients.create') }}" class="btn btn-p">Nuovo cliente</a>
             @endcan

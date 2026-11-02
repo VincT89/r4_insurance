@@ -15,9 +15,9 @@ class CollectionCommunicationStatus
         return InsuranceCollection::query()
             ->join('insurance_titles as communication_title', 'communication_title.id', '=', 'insurance_collections.insurance_title_id')
             ->join('insurance_policies as communication_policy', 'communication_policy.id', '=', 'communication_title.insurance_policy_id')
-            ->leftJoin('supplier_agencies as communication_agency', 'communication_agency.id', '=', 'communication_policy.supplier_agency_id')
+            ->leftJoin('supplier_agencies as communication_agency', 'communication_agency.id', '=', 'communication_title.supplier_agency_id')
             ->whereIn('communication_policy.client_id', Client::current()->visibleTo($user)->select('id'))
-            ->whereNull('insurance_collections.voided_at')->whereNull('communication_title.cancelled_at')
+            ->whereNull('insurance_collections.voided_at')->where(fn($q)=>$q->whereNull('communication_title.cancelled_at')->orWhere('communication_title.cancelled_residual_cents','>',0))
             ->select('insurance_collections.*');
     }
 
@@ -31,12 +31,12 @@ class CollectionCommunicationStatus
 
     private function claimedPayments(): QueryBuilder
     {
-        /** Materialize claimed payments once; preserve the agency of the current contract, even after reassignment. */
+        /** Materialize claimed payments once and match the agency recorded with each title. */
         return $this->claims()
             ->join('insurance_collections as claimed_payment', 'claimed_payment.id', '=', 'delivery.insurance_collection_id')
             ->join('insurance_titles as claimed_title', 'claimed_title.id', '=', 'claimed_payment.insurance_title_id')
             ->join('insurance_policies as claimed_policy', 'claimed_policy.id', '=', 'claimed_title.insurance_policy_id')
-            ->whereColumn('communication.supplier_agency_id', 'claimed_policy.supplier_agency_id')
+            ->whereColumn('communication.supplier_agency_id', 'claimed_title.supplier_agency_id')
             ->select('delivery.insurance_collection_id');
     }
 
@@ -61,14 +61,14 @@ class CollectionCommunicationStatus
 
         return $query->leftJoinSub($latest, 'latest_delivery', fn ($join) => $join
             ->on('latest_delivery.insurance_collection_id', '=', 'insurance_collections.id')
-            ->on('latest_delivery.supplier_agency_id', '=', 'communication_policy.supplier_agency_id'))
+            ->on('latest_delivery.supplier_agency_id', '=', 'communication_title.supplier_agency_id'))
             ->addSelect('latest_delivery.status as communication_state');
     }
 
     public function deliveries(Collection $payments): Collection
     {
         if ($payments->isEmpty()) return collect();
-        $agencies = $payments->mapWithKeys(fn ($payment) => [$payment->id => $payment->title->policy->supplier_agency_id]);
+        $agencies = $payments->mapWithKeys(fn ($payment) => [$payment->id => $payment->title->supplier_agency_id]);
         return DB::table('agency_communication_collections as delivery')
             ->join('agency_communications as communication', 'communication.id', '=', 'delivery.agency_communication_id')
             ->whereIn('delivery.insurance_collection_id', $payments->pluck('id'))->whereNotNull('delivery.delivery_key')

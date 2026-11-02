@@ -99,16 +99,21 @@ class InsuranceQuoteController extends Controller
     public function show(Request $request, InsuranceQuoteCase $quoteCase)
     {
         $this->authorize('view',$quoteCase->client);$quoteCase->load(['branch','subbranch','currentPolicy','documents.uploader','quotes.company.agencies','quotes.agency','quotes.documents','quotes.policy','quotes.policyChange']);
-        $companies=$quoteCase->availableCompanies()->get();
+        $companies=$quoteCase->availableCompanies()->with('agencies')->get();
         $emailFilters = $request->validate(['email_company'=>['nullable','integer'],'email_state'=>['nullable','in:'.implode(',',array_keys(\App\Models\InsuranceQuoteEmail::STATUSES))],'email_month'=>['nullable','date_format:Y-m']]);
-        $emails = $quoteCase->emails()->with(['company','user'])->when($emailFilters['email_company']??null,fn($q,$id)=>$q->where('supplier_company_id',$id))->when($emailFilters['email_state']??null,fn($q,$state)=>$q->where('status',$state));
+        $emails = $quoteCase->emails()->with(['company','agency','user'])->when($emailFilters['email_company']??null,fn($q,$id)=>$q->where('supplier_company_id',$id))->when($emailFilters['email_state']??null,fn($q,$state)=>$q->where('status',$state));
         if($month=$emailFilters['email_month']??null){$start=\Illuminate\Support\Carbon::createFromFormat('!Y-m',$month);$emails->where('created_at','>=',$start)->where('created_at','<',$start->copy()->addMonth());}
         return view('quotes.show',['case'=>$quoteCase,'companies'=>$companies,'emailFilters'=>$emailFilters,'emails'=>$emails->latest()->paginate(TableListing::perPage(15),['*'],'requests_page')->withQueryString()]);
     }
     public function request(Request $request,InsuranceQuoteCase $quoteCase,InsuranceQuoteWorkflow $workflow)
     {
-        $this->authorize('updateRegistry',$quoteCase->client);$data=$request->validate(['supplier_company_id'=>['required','integer'],'requested_on'=>['required','date_format:Y-m-d','before_or_equal:today'],'confirmed'=>['accepted']]);
-        $quote=$workflow->request($quoteCase,$data['supplier_company_id'],$data['requested_on']);return redirect()->to(route('quotes.show',$quoteCase).'#proposal-'.$quote->id)->with('success','Richiesta registrata.');
+        $this->authorize('updateRegistry',$quoteCase->client);
+        $data=$request->validate(['supplier_company_id'=>['required_without:recipient_key','nullable','integer'],'recipient_key'=>['nullable','string','max:60'],'supplier_agency_id'=>['nullable','integer'],'requested_on'=>['required','date_format:Y-m-d','before_or_equal:today'],'confirmed'=>['accepted']]);
+        if (!empty($data['recipient_key'])) {
+            $target=app(\App\Services\QuoteRecipients::class)->resolve([$data['recipient_key']],case:$quoteCase)->first();
+            $data['supplier_company_id']=$target['company_id']; $data['supplier_agency_id']=$target['agency_id'];
+        }
+        $quote=$workflow->request($quoteCase,$data['supplier_company_id'],$data['requested_on'],$data['supplier_agency_id']??null);return redirect()->to(route('quotes.show',$quoteCase).'#proposal-'.$quote->id)->with('success','Richiesta registrata.');
     }
     public function change(Request $request,InsuranceQuote $quote,string $action,InsuranceQuoteWorkflow $workflow)
     {
@@ -119,6 +124,17 @@ class InsuranceQuoteController extends Controller
             'submit'=>['confirmed'=>['accepted']],
             'approve'=>['approved_on'=>['required','date_format:Y-m-d','before_or_equal:today'],'approval_note'=>['nullable','string','max:5000'],'confirmed'=>['accepted']]+$files,
             'reject'=>['approval_note'=>['required','string','min:5','max:5000']],default=>abort(404)};
-        $data=$request->validate($rules);unset($data['files'],$data['confirmed']);$workflow->change($quote,$action,$data,$request->file('files',[]));return redirect()->to(route('quotes.show',$quote->insurance_quote_case_id).'#proposal-'.$quote->id)->with('success','Preventivo aggiornato.');
+        try {
+            $data=$request->validate($rules);
+            unset($data['files'],$data['confirmed']);
+            $workflow->change($quote,$action,$data,$request->file('files',[]));
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            if ($request->expectsJson()) throw $exception;
+            /** La proposta di ritorno viene scelta dal server, per non mescolare dati ed errori di agenzie diverse. */
+            return redirect()->to(route('quotes.show',$quote->insurance_quote_case_id).'#proposal-'.$quote->id)
+                ->withErrors($exception->errors(), 'proposal_'.$quote->id.'_'.$action)
+                ->withInput(array_replace($request->except(['files','_token']), ['_proposal_id'=>$quote->id, '_proposal_action'=>$action]));
+        }
+        return redirect()->to(route('quotes.show',$quote->insurance_quote_case_id).'#proposal-'.$quote->id)->with('success','Preventivo aggiornato.');
     }
 }

@@ -41,6 +41,26 @@ class AttachmentController extends Controller
         return $disk->download($attachment->path, $attachment->original_name, $headers);
     }
 
+    public function preview(Attachment $attachment): \Illuminate\Http\Response|StreamedResponse
+    {
+        $this->authorize('download', $attachment);
+        $disk = Storage::disk($attachment->disk);
+        abort_unless($disk->exists($attachment->path), 404);
+        /** Read the stored file type; an uploaded filename or database label cannot authorize active content. */
+        $mime = $disk->mimeType($attachment->path);
+        abort_unless(in_array($mime, ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'], true), 415, 'Anteprima non disponibile per questo formato. Usa Scarica.');
+        if ($mime === 'application/pdf') {
+            /** Il PDF viene disegnato dal lettore: il file originale conserva le protezioni del download. */
+            return response()->view('attachments.preview', compact('attachment'))->withHeaders([
+                'X-Content-Type-Options'=>'nosniff', 'Cache-Control'=>'private, no-store',
+            ]);
+        }
+        return $disk->response($attachment->path, $attachment->original_name, [
+            'Content-Type'=>$mime, 'X-Content-Type-Options'=>'nosniff',
+            'Content-Security-Policy'=>"default-src 'none'; sandbox", 'Cache-Control'=>'private, no-store',
+        ], 'inline');
+    }
+
     public function destroy(Attachment $attachment): RedirectResponse
     {
         $this->authorize('delete', $attachment);

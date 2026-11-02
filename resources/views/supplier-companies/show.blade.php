@@ -5,12 +5,18 @@
         <x-slot:actions>@can('update', $company)<a href="{{ route('supplier-companies.edit', $company) }}" class="btn btn-g">Modifica compagnia</a>@endcan</x-slot:actions>
     </x-page-header>
     <p class="client-identity-line">Compagnia {{ strtolower($company->status_label) }}</p>
-    <x-panel title="Compagnia e contatti" padded>
-        <dl class="client-registry-details">
-            @foreach(['email' => 'Email', 'phone' => 'Telefono', 'reference_person' => 'Referente'] as $field => $label)
-                <div><dt>{{ $label }}</dt><dd>{{ $company->$field ?: 'Non indicato' }}</dd></div>
-            @endforeach
-        </dl>
+    <x-panel title="Anagrafica compagnia" padded>
+        @foreach([
+            'Dati della compagnia'=>['company_name'=>'Ragione sociale','vat_number'=>'Partita IVA','tax_code'=>'Codice fiscale'],
+            'Contatti'=>['email'=>'Email per i preventivi','pec'=>'PEC','phone'=>'Telefono','mobile'=>'Cellulare'],
+            'Referente principale'=>['reference_person'=>'Nome referente','reference_role'=>'Ruolo referente','reference_email'=>'Email referente','reference_phone'=>'Telefono referente'],
+            'Sede'=>['address'=>'Indirizzo','city'=>'Città','province'=>'Provincia','postal_code'=>'CAP','country'=>'Paese'],
+        ] as $section=>$fields)
+            <section class="client-detail-section"><h2 class="sec-lbl">{{ $section }}</h2><dl class="client-registry-details">
+            @foreach($fields as $field=>$label)<div><dt>{{ $label }}</dt><dd>{{ $company->$field ?: 'Non indicato' }}</dd></div>@endforeach
+            </dl></section>
+        @endforeach
+        @include('suppliers.bank-details',['entity'=>$company])
         @if($company->notes)<section class="client-detail-section"><h2 class="sec-lbl">Note</h2><p class="u-whitespace-pre-wrap">{{ $company->notes }}</p></section>@endif
     </x-panel>
     <x-panel title="Agenzie e subagenzie">
@@ -26,7 +32,7 @@
                                 <td>{{ $entry->type_label }}</td>
                                 <td><div>{{ $entry->email ?: 'Email non indicata' }}</div><div class="u-text-meta">{{ $entry->phone ?: $entry->mobile ?: 'Telefono non indicato' }}</div></td>
                                 <td>{{ $entry->status_label }}</td>
-                                <td>@can('create', \App\Models\SupplierAgency::class)@if(! $entry->parent_agency_id)<a href="{{ route('suppliers.create', ['parent_agency_id' => $entry->id]) }}" class="btn btn-g btn-sm" aria-label="Aggiungi subagenzia a {{ $entry->name }}">Nuova subagenzia</a>@endif@endcan</td>
+                                <td><a href="{{ route('suppliers.show',[$entry,'tab'=>'commissions','company'=>$company->id]) }}" class="btn btn-g btn-sm">Aliquote</a>@can('create', \App\Models\SupplierAgency::class)@if(! $entry->parent_agency_id)<a href="{{ route('suppliers.create', ['parent_agency_id' => $entry->id]) }}" class="btn btn-g btn-sm" aria-label="Aggiungi subagenzia a {{ $entry->name }}">Nuova subagenzia</a>@endif@endcan</td>
                             </tr>
                         @endforeach
                     @empty

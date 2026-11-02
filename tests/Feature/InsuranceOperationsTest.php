@@ -13,6 +13,9 @@ use Tests\TestCase;
 class InsuranceOperationsTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Support\ContractTransitionInput;
+    use \Tests\Support\HistoricalCollections;
+    use \Tests\Support\ContractPolicyInput;
     private User $admin; private Client $client; private InsurancePolicy $policy; private InsuranceBranch $branch; private SupplierCompany $company;
     protected function setUp(): void
     {
@@ -44,16 +47,16 @@ class InsuranceOperationsTest extends TestCase
     {
         [$first,$second] = $this->generate();
         $summary = $this->get(route('dashboard'))->assertOk()->viewData('paymentSummary');
-        $this->assertSame(['future'=>1,'partial'=>0,'due_today'=>1,'overdue'=>0],array_map(fn($group)=>$group['count'],$summary));
-        $this->post(route('titles.collect',$first),$this->payment(20000))->assertSessionHasNoErrors();
+        $this->assertSame(['overdue'=>0,'due_soon'=>1,'future'=>1],array_map(fn($group)=>$group['count'],$summary));
+        $this->historicalCollection($first,20000);
         $summary = $this->get(route('dashboard'))->assertOk()->viewData('paymentSummary');
-        $this->assertSame(['count'=>1,'balance_cents'=>$first->amount_cents-20000],$summary['partial']);
-        $this->assertSame(0,$summary['due_today']['count']);
+        $this->assertSame(['count'=>1,'balance_cents'=>$first->amount_cents-20000],$summary['due_soon']);
+        $this->assertSame(0,$summary['overdue']['count']);
         $this->post(route('titles.collect',$first),$this->payment($first->amount_cents-20000))->assertSessionHasNoErrors();
         $last = $first->collections()->latest('id')->first();
-        $this->get(route('dashboard'))->assertViewHas('paymentSummary',fn($rows)=>$rows['partial']['count']===0 && $rows['future']['count']===1);
+        $this->get(route('dashboard'))->assertViewHas('paymentSummary',fn($rows)=>$rows['due_soon']['count']===0 && $rows['future']['count']===1);
         $this->post(route('collections.void',$last),['reason'=>'Incasso registrato per errore'])->assertSessionHasNoErrors();
-        $this->get(route('dashboard'))->assertViewHas('paymentSummary',fn($rows)=>$rows['partial']['count']===1);
+        $this->get(route('dashboard'))->assertViewHas('paymentSummary',fn($rows)=>$rows['due_soon']['count']===1);
         $this->post(route('titles.cancel',$second),['reason'=>'Rata inserita per errore'])->assertSessionHasNoErrors();
         $this->get(route('dashboard'))->assertViewHas('paymentSummary',fn($rows)=>$rows['future']['count']===0);
     }
@@ -69,7 +72,7 @@ class InsuranceOperationsTest extends TestCase
             $this->assertSame(1, $user->visibleNotifications()->where('data->kind', 'title')->count());
             $user->notifications()->update(['read_at'=>now()]);
         }
-        $this->post(route('titles.collect', $title), $this->payment(20000))->assertSessionHasNoErrors();
+        $this->historicalCollection($title,20000);
         $this->assertSame(1, $this->admin->visibleNotifications()->where('data->kind', 'title')->count());
         $this->post(route('titles.collect', $title), $this->payment(30000))->assertSessionHasNoErrors();
         $lastPayment = $title->collections()->latest('id')->first();
@@ -119,9 +122,9 @@ class InsuranceOperationsTest extends TestCase
         $this->assertSame(3, $this->admin->notifications()->count());
     }
 
-    public function test_new_policy_entry_point_requires_a_proposal_before_showing_the_form(): void
+    public function test_new_policy_entry_point_starts_from_contract_and_retains_admin_archive_entry(): void
     {
-        $this->get(route('policies.create'))->assertOk()->assertViewIs('policies.start')->assertSee('Richiedi preventivo')->assertDontSee('name="number"',false);
+        $this->get(route('policies.create'))->assertOk()->assertViewIs('clients.policies.form')->assertSee('Carica il contratto')->assertSee('data-contract-fields hidden',false);
         $this->get(route('policies.create',['entry_mode'=>'existing']))->assertOk()->assertViewIs('clients.policies.form')->assertSee('Cerca cliente')->assertSee('name="existing_reason"',false);
         $operator=User::factory()->create(['role'=>UserRole::Operator]);
         $this->actingAs($operator)->get(route('policies.create'))->assertOk()->assertDontSee('Registra polizza già stipulata');
@@ -131,7 +134,7 @@ class InsuranceOperationsTest extends TestCase
     public function test_policy_quote_choice_filters_invalid_proposals_and_survives_validation_errors(): void
     {
         $quote=$this->approve();
-        $this->get(route('policies.create'))->assertOk()->assertViewIs('policies.start')->assertSee($quote->reference)->assertSee('800,00 €');
+        $this->get(route('policies.create'))->assertOk()->assertViewIs('clients.policies.form')->assertSee($quote->reference)->assertSee('800,00 €');
         $url=route('policies.create',['quote_id'=>$quote->id]);
         $this->get($url)->assertOk()->assertViewIs('clients.policies.form')->assertSee('name="insurance_quote_id"',false)->assertDontSee('name="existing_reason"',false)->assertSee('value="active"',false)->assertSee('value="renewed"',false)->assertDontSee('value="cancelled"',false)->assertDontSee('value="expired"',false);
         $this->from($url)->post(route('policies.store'),$this->policyInput()+['client_id'=>$this->client->id,'entry_mode'=>'new','insurance_quote_id'=>$quote->id,'number'=>''])->assertSessionHasErrors('number');
@@ -144,18 +147,18 @@ class InsuranceOperationsTest extends TestCase
     public function test_rate_filters_and_collections_keep_the_selected_contract_including_empty_results(): void
     {
         [$title]=$this->generate();
-        $this->post(route('titles.collect',$title),$this->payment(100))->assertSessionHasNoErrors();
+        $this->post(route('titles.collect',$title),$this->payment($title->balance_cents))->assertSessionHasNoErrors();
         $other=Client::factory()->create();
         $rateUrl=route('titles.index',['policy'=>$this->policy->id]);
         $collectionUrl=route('collections.index',['policy'=>$this->policy->id,'month'=>'']);
-        $this->get($rateUrl)->assertOk()->assertSee('Rate e quietanze / '.$this->policy->number)
+        $this->get($rateUrl)->assertOk()->assertSee('Titoli / '.$this->policy->number)
             ->assertSee(e($collectionUrl),false)->assertSee('href="'.$rateUrl.'">Azzera filtri',false)
             ->assertSee(e(route('titles.index',['policy'=>$this->policy->id,'state'=>'overdue'])),false)
             ->assertViewHas('titles',fn($titles)=>$titles->every(fn($row)=>$row->insurance_policy_id===$this->policy->id));
-        $this->get($collectionUrl)->assertOk()->assertSee('Incassi / '.$this->policy->number)->assertSee($rateUrl,false)
+        $this->get($collectionUrl)->assertOk()->assertSee('Contabilità / '.$this->policy->number)->assertSee($rateUrl,false)
             ->assertViewHas('collections',fn($rows)=>$rows->count()===1 && $rows->first()->insurance_title_id===$title->id);
         $this->get(route('collections.index',['policy'=>$this->policy->id,'month'=>'2027-12']))->assertOk()
-            ->assertSee('Incassi / '.$this->policy->number)->assertViewHas('collections',fn($rows)=>$rows->isEmpty());
+            ->assertSee('Contabilità / '.$this->policy->number)->assertViewHas('collections',fn($rows)=>$rows->isEmpty());
         $this->get(route('titles.index',['policy'=>$this->policy->id,'client'=>$other->id]))->assertNotFound();
         $this->get(route('collections.index',['policy'=>999999]))->assertNotFound();
     }
@@ -177,15 +180,22 @@ class InsuranceOperationsTest extends TestCase
         $this->policy->update(['starts_on'=>'2028-01-31','expires_on'=>'2028-04-30','payment_frequency'=>'Mensile','premium'=>'100.00']);
         $rows=app(InsuranceLedger::class)->plan($this->policy);$this->assertSame(['2028-02-29','2028-03-31','2028-04-30'],array_column($rows,'coverage_to'));$this->assertSame(10000,array_sum(array_column($rows,'amount_cents')));
     }
-    public function test_partial_full_and_direct_payments_are_idempotent_and_never_overpay(): void
+    public function test_full_and_direct_payments_are_idempotent_and_never_overpay(): void
     {
-        [$title]=$this->generate();$data=$this->payment(20000,['files'=>[$this->pdf('contabile.pdf')]]);
-        $this->post(route('titles.collect',$title),$data)->assertSessionHasNoErrors();$this->post(route('titles.collect',$title),$data)->assertSessionHasNoErrors();
-        $this->assertDatabaseCount('insurance_collections',1);$this->assertSame(30000,$title->fresh()->balance_cents);$this->assertSame(1,$title->documents()->count());
-        $this->post(route('titles.collect',$title),$this->payment(30001))->assertSessionHasErrors('ledger');
-        $this->post(route('titles.collect',$title),$this->payment(30000,['payment_method'=>'Bonifico a Compagnia','recipient'=>'company']))->assertSessionHasNoErrors();
-        $this->assertSame('paid',$title->fresh()->state);$this->assertSame('2027-04-16',$this->policy->fresh()->coverage_until->toDateString());
-        $this->get(route('collections.index',['month'=>'2026-10']))->assertOk()->assertViewHas('totals',fn($v)=>(int)$v->total===50000&&(int)$v->ours===20000);
+        [$title,$next]=$this->generate();
+        $this->post(route('titles.collect',$title),$this->payment(20000))->assertSessionHasErrors('ledger');
+        $this->assertDatabaseCount('insurance_collections',0);
+        $data=$this->payment(50000,['files'=>[$this->pdf('contabile.pdf')]]);
+        $this->post(route('titles.collect',$title),$data)->assertSessionHasNoErrors();
+        $this->post(route('titles.collect',$title),$data)->assertSessionHasNoErrors();
+        $this->assertDatabaseCount('insurance_collections',1);
+        $this->assertSame(0,$title->fresh()->balance_cents);
+        $this->assertSame(1,$title->documents()->count());
+        $this->assertSame('paid',$title->fresh()->state);
+        $this->assertSame('2027-04-16',$this->policy->fresh()->coverage_until->toDateString());
+        $this->post(route('titles.collect',$next),$this->payment(50002))->assertSessionHasErrors('ledger');
+        $this->post(route('titles.collect',$next),$this->payment(50001,['payment_method'=>'Bonifico a Compagnia','recipient'=>'company']))->assertSessionHasNoErrors();
+        $this->get(route('collections.index',['month'=>'2026-10']))->assertOk()->assertViewHas('totals',fn($v)=>(int)$v->total===100001&&(int)$v->ours===50000);
         $this->post(route('titles.collect',$title),$this->payment(1))->assertSessionHasErrors('ledger');
     }
     public function test_later_paid_title_does_not_bridge_unpaid_or_cancelled_coverage_and_storno_rewinds(): void
@@ -210,13 +220,13 @@ class InsuranceOperationsTest extends TestCase
     public function test_renewal_creates_new_titles_but_retains_original_payments_and_periods(): void
     {
         [$a,$b]=$this->generate();$this->post(route('titles.collect',$a),$this->payment(50000));$this->post(route('titles.collect',$b),$this->payment(50001));
-        $data=['starts_on'=>'2027-10-16','expires_on'=>'2028-10-16','premium'=>'1200.00','payment_frequency'=>'Semestrale','payment_method'=>'Bonifico a Intermediario'];
-        $preview=$this->post(route('titles.renewal-preview',$this->policy),$data)->assertOk();$data+=['confirmed'=>1,'fingerprint'=>$preview->viewData('fingerprint')];
+        $data=$this->transitionInput($this->policy,['starts_on'=>'2027-10-16','expires_on'=>'2028-10-16','premium'=>'1200.00','payment_frequency'=>'Semestrale','payment_method'=>'Bonifico a Intermediario']);
+        $preview=$this->postJson(route('titles.renewal-preview',$this->policy),$data)->assertOk();$data+=['schedule_fingerprint'=>$preview->json('fingerprint')];
         $this->post(route('titles.renew',$this->policy),$data)->assertSessionHasNoErrors();$this->assertDatabaseCount('insurance_titles',4);$this->assertDatabaseCount('insurance_collections',2);
         $this->assertSame('2027-10-16',$this->policy->fresh()->coverage_until->toDateString());$this->assertSame('2026-10-16',$this->policy->fresh()->coverage_origin_on->toDateString());
         $this->assertSame('Rinnovata',$this->policy->fresh()->status_label);
         $this->assertTrue(app(\App\Domain\Core\Queries\PolicyPortfolioQuery::class)->forUser($this->admin,['status'=>'active'])->whereKey($this->policy->id)->exists());
-        $this->post(route('titles.renew',$this->policy),$data)->assertSessionHasErrors('ledger');$this->assertDatabaseCount('insurance_titles',4);
+        $this->post(route('titles.renew',$this->policy),$data)->assertSessionHasNoErrors();$this->assertDatabaseCount('insurance_titles',4);
     }
     public function test_title_payments_documents_and_catalogue_links_cannot_be_deleted_or_reassigned(): void
     {
@@ -232,12 +242,12 @@ class InsuranceOperationsTest extends TestCase
         [$title]=$this->generate();$employee=User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']);$this->actingAs($employee);
         $this->get(route('titles.show',$title))->assertOk();
         $this->client->update(['commercial_user_id'=>$employee->id]);$this->get(route('titles.show',$title))->assertOk();
-        $this->post(route('titles.collect',$title),$this->payment(100,['consultant_id'=>$this->admin->id]))->assertSessionHasNoErrors();$payment=$title->collections()->sole();$this->assertSame($employee->id,$payment->consultant_id);
+        $this->post(route('titles.collect',$title),$this->payment($title->balance_cents,['consultant_id'=>$this->admin->id]))->assertSessionHasNoErrors();$payment=$title->collections()->sole();$this->assertSame($employee->id,$payment->consultant_id);
         $this->post(route('collections.void',$payment),['reason'=>'Correzione operatore tracciata'])->assertSessionHasNoErrors();$this->post(route('titles.cancel',$title),['reason'=>'Correzione operatore tracciata'])->assertSessionHasNoErrors();$this->get(route('titles.create',$this->policy))->assertOk();
     }
     public function test_payment_recipient_date_file_and_idempotency_cannot_be_forged(): void
     {
-        [$title]=$this->generate();$data=$this->payment(100);$this->post(route('titles.collect',$title),$data)->assertSessionHasNoErrors();
+        [$title]=$this->generate();$data=$this->payment($title->balance_cents);$this->post(route('titles.collect',$title),$data)->assertSessionHasNoErrors();
         $this->post(route('titles.collect',$title),array_replace($data,['amount'=>'2.00']))->assertSessionHasErrors('ledger');
         $this->post(route('titles.collect',$title),$this->payment(100,['recipient'=>'company']))->assertSessionHasErrors('ledger');
         $this->post(route('titles.collect',$title),$this->payment(100,['recipient'=>'agency']))->assertSessionHasErrors('ledger');
@@ -253,44 +263,57 @@ class InsuranceOperationsTest extends TestCase
         app(DeadlineReminders::class)->forUser($this->admin);app(DeadlineReminders::class)->forUser($this->admin);
         $this->assertEqualsCanonicalizing([$rows[0]->id,$rows[1]->id],$this->admin->notifications()->where('data->kind','title')->get()->map(fn($notification)=>(int)$notification->data['source_id'])->all());
         $this->get(route('deadlines.index',['kind'=>'title','period'=>'15']))->assertOk()->assertViewHas('deadlines',fn($r)=>$r->total()===1);
-        $this->get(route('dashboard'))->assertOk()->assertSee('Rate scadute e in scadenza');$this->get(route('clients.show',[$this->client,'tab'=>'deadlines']))->assertOk()->assertSee('Residuo');
+        $this->get(route('dashboard'))->assertOk()->assertSee('Titoli da incassare');$this->get(route('clients.show',[$this->client,'tab'=>'deadlines']))->assertOk()->assertSee('Residuo');
     }
-    public function test_priority_companies_must_be_contacted_before_other_companies(): void
+    public function test_manual_requests_follow_operator_choice_and_reject_duplicate_recipients(): void
     {
         $europe=SupplierCompany::create(['name'=>'Europ Assistance','quote_priority'=>true,'status'=>'active']);$other=SupplierCompany::create(['name'=>'Altra compagnia','status'=>'active']);$case=$this->case();
-        $data=['requested_on'=>'2026-10-16','confirmed'=>1];$this->post(route('quotes.request',$case),$data+['supplier_company_id'=>$other->id])->assertSessionHasErrors('quote');
-        foreach([$this->company,$europe,$other] as $company)$this->post(route('quotes.request',$case),$data+['supplier_company_id'=>$company->id])->assertSessionHasNoErrors();
+        $data=['requested_on'=>'2026-10-16','confirmed'=>1];
+        foreach([$other,$europe,$this->company] as $company)$this->post(route('quotes.request',$case),$data+['supplier_company_id'=>$company->id])->assertSessionHasNoErrors();
         $this->assertSame(3,$case->quotes()->count());$this->post(route('quotes.request',$case),$data+['supplier_company_id'=>$other->id])->assertSessionHasErrors('quote');
     }
     public function test_quote_requires_document_then_customer_approval_with_evidence_and_cannot_skip_states(): void
     {
         $case=$this->case();$quote=app(InsuranceQuoteWorkflow::class)->request($case,$this->company->id,'2026-10-15');
-        $this->post(route('quotes.change',[$quote,'submit']),['confirmed'=>1])->assertSessionHasErrors('quote');
-        $this->post(route('quotes.change',[$quote,'approve']),['confirmed'=>1,'approved_on'=>'2026-10-16'])->assertSessionHasErrors('files');
+        $this->post(route('quotes.change',[$quote,'submit']),['confirmed'=>1])->assertSessionHasErrorsIn('proposal_'.$quote->id.'_submit', 'quote');
+        $this->post(route('quotes.change',[$quote,'approve']),['confirmed'=>1,'approved_on'=>'2026-10-16'])->assertSessionHasErrorsIn('proposal_'.$quote->id.'_approve', 'files');
         $this->assertSame('requested',$quote->fresh()->status);$this->assertSame(0,$quote->documents()->count());
     }
     public function test_conversion_uses_approved_premium_links_all_documents_and_cannot_be_duplicated(): void
     {
-        $quote=$this->approve();$data=$this->policyInput();$data+=['client_id'=>$this->client->id,'entry_mode'=>'new','insurance_quote_id'=>$quote->id,'premium'=>'1.00','number'=>'SA-2026-502'];
+        $quote=$this->approve();$data=$this->contractInput($this->policyInput()+['client_id'=>$this->client->id,'entry_mode'=>'new','insurance_quote_id'=>$quote->id,'number'=>'SA-2026-502']);
         $this->get(route('policies.create',['quote_id'=>$quote->id]))->assertOk()->assertSee('800,00 €');
+        $this->post(route('policies.store'),array_replace($data,['premium'=>'1.00']))->assertSessionHasErrors('quote_changes_confirmed');
         $this->post(route('policies.store'),$data)->assertSessionHasNoErrors();$policy=$this->client->policies()->where('number',$data['number'])->sole();
-        $this->assertSame('800.00',$policy->premium);$this->assertSame('Auto completa',$policy->product);$this->assertSame(2,$policy->documents()->count());$this->assertSame('converted',$quote->fresh()->status);
+        $this->assertSame('800.00',$policy->premium);$this->assertSame('Auto completa',$policy->product);$this->assertSame(3,$policy->documents()->count());$this->assertSame('converted',$quote->fresh()->status);
         $this->post(route('policies.store'),array_replace($data,['number'=>'SA-2026-503']))->assertSessionHasErrors('quote');$this->assertSame(1,InsurancePolicy::where('insurance_quote_id',$quote->id)->count());
         $this->get(route('quotes.show',$quote->insurance_quote_case_id))->assertOk()->assertSee('SA-2026-502');
     }
     public function test_quote_cannot_be_used_for_another_client_or_after_expiry_and_history_is_private(): void
     {
-        $quote=$this->approve();$other=Client::factory()->create();$data=$this->policyInput()+['client_id'=>$other->id,'entry_mode'=>'new','insurance_quote_id'=>$quote->id,'number'=>'SA-2026-503'];
+        $quote=$this->approve();$other=Client::factory()->create();$data=$this->contractInput($this->policyInput()+['client_id'=>$other->id,'entry_mode'=>'new','insurance_quote_id'=>$quote->id,'number'=>'SA-2026-503']);
         $this->post(route('policies.store'),$data)->assertSessionHasErrors('quote');$data['client_id']=$this->client->id;
         $quote->update(['valid_until'=>'2026-10-15']);$this->post(route('policies.store'),$data)->assertSessionHasErrors('quote');
         $employee=User::factory()->create(['role'=>UserRole::Operator]);$this->actingAs($employee);$this->get(route('quotes.show',$quote->insurance_quote_case_id))->assertOk();$this->get(route('attachments.download',$quote->documents()->first()))->assertOk();
+    }
+    public function test_confirmed_contract_differences_are_logged_without_rewriting_the_approved_quote(): void
+    {
+        $quote = $this->approve();
+        $input = $this->contractInput($this->policyInput()+['client_id'=>$this->client->id,'entry_mode'=>'new','insurance_quote_id'=>$quote->id,'number'=>'CONTRATTO-DIVERSO','premium'=>'900.00','payment_frequency'=>'Trimestrale','payment_method'=>'Bonifico a Intermediario','titles_mode'=>'automatic','quote_changes_confirmed'=>1]);
+        $input['schedule_fingerprint'] = $this->postJson(route('policies.contract-schedule'),$input)->assertOk()->json('fingerprint');
+        $this->post(route('policies.store'),$input)->assertSessionHasNoErrors();
+        $policy = $quote->policy()->sole();
+        $this->assertSame('900.00',$policy->premium);
+        $this->assertSame(4,$policy->titles()->count());
+        $this->assertSame(80000,$quote->fresh()->premium_cents);
+        $this->assertTrue($this->client->auditLogs()->where('action','contract_quote_differences')->exists());
     }
     public function test_employee_can_convert_own_approved_proposal_but_cannot_bypass_approval_as_historical_entry(): void
     {
         $employee=User::factory()->create(['role'=>UserRole::Operator]);$this->client->update(['commercial_user_id'=>$employee->id]);$this->actingAs($employee);$quote=$this->approve();
         $data=$this->policyInput()+['client_id'=>$this->client->id,'entry_mode'=>'existing','existing_reason'=>'Archivio pregresso','number'=>'SA-2026-504'];
         $this->post(route('policies.store'),$data)->assertSessionHasErrors('entry_mode');
-        $this->post(route('policies.store'),array_replace($data,['entry_mode'=>'new','insurance_quote_id'=>$quote->id]))->assertSessionHasNoErrors();
+        $this->post(route('policies.store'),$this->contractInput(array_replace($data,['entry_mode'=>'new','insurance_quote_id'=>$quote->id])))->assertSessionHasNoErrors();
     }
     public function test_closed_policy_is_locked_from_next_day_except_for_admin(): void
     {
@@ -301,7 +324,7 @@ class InsuranceOperationsTest extends TestCase
     }
     public function test_new_pages_filters_and_exports_render_with_real_relations(): void
     {
-        [$title]=$this->generate();$this->post(route('titles.collect',$title),$this->payment(100));$quote=$this->approve();
+        [$title]=$this->generate();$this->post(route('titles.collect',$title),$this->payment($title->balance_cents))->assertSessionHasNoErrors();$quote=$this->approve();
         foreach(['quotes.index'=>[],'quotes.create'=>[],'quotes.show'=>[$quote->insurance_quote_case_id],'titles.index'=>[],'titles.show'=>[$title],'titles.create'=>[$this->policy],'titles.renewal'=>[$this->policy],'collections.index'=>['month'=>'2026-10','company'=>$this->company->id,'category'=>$this->branch->name,'state'=>'recorded']] as $route=>$params)$this->get(route($route,$params))->assertOk();
         $this->get(route('collections.index',['month'=>'2026-11']))->assertOk()->assertViewHas('collections',fn($r)=>$r->isEmpty());
         $this->get(route('titles.index',['_table_all'=>1]))->assertOk()->assertViewHas('titles',fn($r)=>$r->total()===2);
@@ -310,7 +333,7 @@ class InsuranceOperationsTest extends TestCase
     {
         $agency=SupplierAgency::create(['name'=>'Agenzia Valserena','email'=>'agenzia@example.test','status'=>'active','supplier_company_id'=>$this->company->id]);$this->policy->update(['supplier_agency_id'=>$agency->id]);
         \App\Models\OutboundMailSetting::create(['credentials'=>['enabled'=>true,'host'=>'smtp.example.test','port'=>587,'encryption'=>'starttls','username'=>'sender@example.test','password'=>Str::random(32),'from_address'=>'sender@example.test','from_name'=>'Soluzioni Assicurative SAS'],'updated_by'=>$this->admin->id]);
-        [$title]=$this->generate();$this->post(route('titles.collect',$title),$this->payment(10000))->assertSessionHasNoErrors();$this->post(route('titles.collect',$title),$this->payment(5000,['payment_method'=>'Bonifico a Compagnia','recipient'=>'company']))->assertSessionHasNoErrors();
+        [$title]=$this->generate();$this->historicalCollection($title,10000);$this->historicalCollection($title,5000,['payment_method'=>'Bonifico a Compagnia','recipient'=>'company']);
         return [$agency,$title,$title->collections()->get()];
     }
     private function reviewCollections(SupplierAgency $agency,array $ids): \App\Models\AgencyCommunication

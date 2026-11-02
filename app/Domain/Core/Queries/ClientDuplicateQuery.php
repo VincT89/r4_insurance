@@ -25,7 +25,7 @@ class ClientDuplicateQuery
             }
         })->orderBy('name')->get()->map(function ($candidate) use ($keys, $phones) {
             $reasons = [];
-            foreach (['registry_name_key' => 'stesso nome', 'tax_code' => 'stesso codice fiscale', 'vat_number' => 'stessa partita IVA', 'email' => 'stessa email'] as $field => $label) {
+            foreach (['vat_number' => 'stessa partita IVA', 'tax_code' => 'stesso codice fiscale', 'registry_name_key' => 'stesso nome', 'email' => 'stessa email'] as $field => $label) {
                 if (isset($keys[$field]) && mb_strtolower($candidate->$field ?? '') === mb_strtolower($keys[$field])) {
                     $reasons[] = $label;
                 }
@@ -35,6 +35,6 @@ class ClientDuplicateQuery
             }
 
             return ['client' => $candidate, 'reasons' => $reasons];
-        });
+        })->sortBy(fn ($match) => in_array('stessa partita IVA', $match['reasons'], true) ? 0 : (in_array('stesso codice fiscale', $match['reasons'], true) ? 1 : 2))->values();
     }
 }

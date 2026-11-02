@@ -1,9 +1,10 @@
-<x-app-layout :title="$document->exists ? 'Modifica dati documento' : 'Carica documento'">
+<x-app-layout :title="$document->exists ? 'Modifica dati documento' : 'Carica documenti'">
     @php($linksLocked = $document->document_request_id || $document->previous_version_id || ($document->exists && $document->checklistRequests()->exists()))
-    <x-page-header><x-slot:title>{{ $document->exists ? 'Modifica dati documento' : 'Carica documento' }}</x-slot:title><x-slot:actions><a href="{{ route('clients.show', [$client, 'tab' => 'documents']) }}" class="btn btn-g">{{ $client->name }}</a></x-slot:actions></x-page-header>
+    <x-page-header><x-slot:title>{{ $document->exists ? 'Modifica dati documento' : 'Carica documenti' }}</x-slot:title><x-slot:actions><a href="{{ $returnUrl }}" class="btn btn-g">{{ $returnPolicy ? 'Torna alla polizza '.$returnPolicy->number : $client->name }}</a></x-slot:actions></x-page-header>
     <x-panel padded>
         <form method="POST" enctype="multipart/form-data" data-document-expiry data-today="{{ today()->toDateString() }}" data-ocr-base="{{ asset('vendor/ocr').'/' }}" action="{{ $document->exists ? route('clients.documents.update', [$client, $document]) : route('clients.documents.store', $client) }}">
             @csrf
+            @if($returnPolicy)<input type="hidden" name="return_policy" value="{{ $returnPolicy->id }}">@endif
             @if(!$document->exists && $document->previous_version_id)<input type="hidden" name="previous_version_id" value="{{ $document->previous_version_id }}"><p class="u-mb-md">Nuova versione {{ $document->version_number }}. Il file precedente sarà conservato nello storico; il nuovo file dovrà essere validato.</p>@endif
             @if(!$document->exists && $document->document_request_id)<input type="hidden" name="document_request_id" value="{{ $document->document_request_id }}"><p class="u-text-meta u-mb-md">Questo caricamento risponde a un documento presente nella lista da ricevere.</p>@endif
             @error('previous_version_id')<p class="invalid-feedback">{{ $message }}</p>@enderror @error('document_request_id')<p class="invalid-feedback">{{ $message }}</p>@enderror
@@ -24,7 +25,7 @@
                 @if($document->exists)<x-form-group label="Tipo di documento d’identità" name="identity_type"><select id="field-identity-type" name="identity_type" class="form-sel" data-identity-type><option value="">Non specificato</option>@foreach(\App\Models\Attachment::IDENTITY_TYPES as $value => $label)<option value="{{ $value }}" @selected(old('identity_type', $document->identity_type) === $value)>{{ $label }}</option>@endforeach</select></x-form-group>
                 <x-form-group label="Scadenza del documento" name="expires_on"><input id="field-expires-on" type="date" name="expires_on" class="form-in" value="{{ old('expires_on', $document->expires_on?->toDateString()) }}"></x-form-group>@endif
             </div>
-            @unless($document->exists)<p class="u-text-meta u-mt-sm">Per ogni file puoi leggere la scadenza da foto o PDF e confermarla, oppure inserirla manualmente. La lettura avviene localmente, sulle prime due pagine.</p><div data-file-details></div>@endunless
+            @unless($document->exists)<p class="u-text-meta u-mt-sm">Scegli la categoria e controlla la scadenza di ogni documento. Per i documenti d’identità puoi leggere la scadenza da foto o PDF e confermarla. I libretti vengono soltanto conservati.</p><div data-file-details></div>@endunless
             @if($document->exists)<p data-expiry-status role="status" class="document-expiry-status" hidden></p>@endif
             </x-form-section><x-form-section title="Collegamenti e descrizione"><div class="form-row">
                 <x-form-group label="Polizza collegata" name="insurance_policy_id"><select id="field-insurance-policy-id" name="insurance_policy_id" class="form-sel" @disabled($linksLocked)><option value="">Documento dell'anagrafica cliente</option>@foreach($policies as $policy)<option value="{{ $policy->id }}" @selected((string) ($linksLocked ? $document->insurance_policy_id : old('insurance_policy_id', $document->insurance_policy_id)) === (string) $policy->id)>{{ $policy->category }} / {{ $policy->company }} / {{ $policy->number }}</option>@endforeach</select></x-form-group>
@@ -32,7 +33,7 @@
             </div>
             <x-form-group label="Descrizione" name="description"><textarea id="field-description" name="description" class="form-ta" rows="3" maxlength="500">{{ old('description', $document->description) }}</textarea></x-form-group>
             </x-form-section>
-            <div class="insurance-form-actions"><a href="{{ route('clients.show', [$client, 'tab' => 'documents']) }}" class="btn btn-g">Annulla</a><button type="submit" class="btn btn-p">{{ $document->exists ? 'Salva dati' : 'Carica documento' }}</button></div>
+            <div class="insurance-form-actions"><a href="{{ $returnUrl }}" class="btn btn-g">Annulla</a><button type="submit" class="btn btn-p">{{ $document->exists ? 'Salva dati' : 'Carica documenti' }}</button></div>
         </form>
     </x-panel>
     @if($document->exists && !$document->newerVersion && $document->review_status !== 'validated')

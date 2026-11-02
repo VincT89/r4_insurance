@@ -3,12 +3,12 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "prebuild": "node scripts/prepare-ocr.mjs && node scripts/prepare-excel.mjs",
-        "predev": "node scripts/prepare-excel.mjs",
+        "prebuild": "node scripts/prepare-ocr.mjs && node scripts/prepare-excel.mjs && node scripts/prepare-pdf.mjs",
+        "predev": "node scripts/prepare-excel.mjs && node scripts/prepare-pdf.mjs",
         "build": "vite build",
         "dev": "vite",
         "pretest:tables": "node scripts/prepare-excel.mjs",
-        "test:tables": "node --test tests/Frontend/table-pagination.test.mjs tests/Frontend/table-workbook.test.mjs tests/Frontend/communication-selection.test.mjs"
+        "test:tables": "node --test tests/Frontend/table-pagination.test.mjs tests/Frontend/table-workbook.test.mjs tests/Frontend/collection-report.test.mjs tests/Frontend/communication-selection.test.mjs"
     },
     "devDependencies": {
         "alpinejs": "^3.4.2",

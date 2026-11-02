@@ -7,6 +7,6 @@
     <div data-file-details></div>
 </div>
 <div class="form-row u-mt-md">
-    @if($readRegistration ?? false)@include('clients.vehicles.registration-reader',['registrationField'=>'vehicle_files'])@else<x-form-group label="Libretto del veicolo" name="vehicle_files"><input id="field-vehicle-files" class="form-in" type="file" name="vehicle_files[]" multiple accept=".pdf,.jpg,.jpeg,.png,.webp"></x-form-group>@endif
+    @include('clients.vehicles.registration-upload', ['registrationField' => 'vehicle_files'])
     <x-form-group label="Altri documenti per la richiesta" name="files"><input id="field-files" class="form-in" type="file" name="files[]" multiple accept="application/pdf,.pdf"><p class="u-text-meta">Documenti aziendali, dell’immobile, polizza attuale o altre informazioni utili alla compagnia.</p></x-form-group>
 </div>

@@ -56,8 +56,8 @@ class RetiredModulesCleanupTest extends TestCase
         $this->get(route('clients.show', $own))->assertOk()->assertSee('DEMO-CF')->assertDontSee('Nota interna riservata');
         $this->get(route('clients.show', $other))->assertOk();
         $this->getJson(route('api.clients.search', ['q' => 'dimostrativo']))->assertOk()->assertJsonCount(2);
-        $this->post(route('clients.store'), ['name' => 'Nuovo cliente dimostrativo', 'company_name' => 'Società dimostrativa', 'tax_code' => 'demo-nuovo'])->assertSessionHasNoErrors()->assertRedirect();
-        $this->assertDatabaseHas('clients', ['name' => 'Nuovo cliente dimostrativo', 'commercial_user_id' => $commercial->id, 'tax_code' => 'DEMO-NUOVO']);
+        $this->post(route('clients.store'), ['name' => 'Nuovo cliente dimostrativo', 'company_name' => 'Società dimostrativa', 'tax_code' => 'rssmra80a01h501u'])->assertSessionHasNoErrors()->assertRedirect();
+        $this->assertDatabaseHas('clients', ['name' => 'Nuovo cliente dimostrativo', 'commercial_user_id' => $commercial->id, 'tax_code' => 'RSSMRA80A01H501U']);
     }
 
     public function test_operator_access_is_independent_of_legacy_direct_assignments(): void

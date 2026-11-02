@@ -89,26 +89,23 @@ class QuoteRequestEmailTest extends TestCase
         $this->assertDatabaseHas('audit_logs',['action'=>'quote_email_sent','user_id'=>$this->admin->id,'auditable_id'=>$this->client->id]);
     }
 
-    public function test_other_companies_unlock_only_after_both_priority_emails_are_sent(): void
+    public function test_operator_can_contact_any_company_without_priority_constraints(): void
     {
         $this->mock(QuoteRequestEmailTransport::class)->shouldReceive('send')->times(3)->andReturn('accepted@example.test');
-        $this->post(route('quotes.emails.review',$this->case),$this->input($this->other))->assertSessionHasErrors('email');
-        $nobis = $this->review(); $europe = $this->review($this->europe);
-        $this->post(route('quotes.emails.review',$this->case),$this->input($this->other))->assertSessionHasErrors('email');
-        $this->send($europe);
-        $this->post(route('quotes.emails.review',$this->case),$this->input($this->other))->assertSessionHasErrors('email');
-        $this->send($nobis); $this->send($this->review($this->other));
+        $this->send($this->review($this->other));
+        $this->send($this->review($this->europe));
+        $this->send($this->review($this->nobis));
         $this->assertSame(3,$this->case->quotes()->count());
         $this->assertTrue(app(QuoteRequestEmailWorkflow::class)->remainingPriorities($this->case)->isEmpty());
     }
 
-    public function test_manual_contacts_alone_do_not_unlock_emails_but_documented_replies_do(): void
+    public function test_manual_contacts_do_not_restrict_other_recipients_and_answered_targets_are_blocked(): void
     {
         $this->mock(QuoteRequestEmailTransport::class)->shouldNotReceive('send');
         foreach ([$this->nobis,$this->europe] as $company) {
             $this->post(route('quotes.request',$this->case),['supplier_company_id'=>$company->id,'requested_on'=>'2026-10-15','confirmed'=>1])->assertSessionHasNoErrors();
         }
-        $this->post(route('quotes.emails.review',$this->case),$this->input($this->other))->assertSessionHasErrors('email');
+        $this->post(route('quotes.emails.review',$this->case),$this->input($this->other))->assertSessionHasNoErrors();
         foreach ($this->case->quotes()->get() as $quote) {
             $this->post(route('quotes.change',[$quote,'receive']),['reference'=>'N-42','product'=>'Auto completa','starts_on'=>'2026-10-16','expires_on'=>'2027-10-16','valid_until'=>'2026-10-31','received_on'=>'2026-10-16','premium'=>'800.00','payment_frequency'=>'Semestrale','files'=>[$this->pdf()]])->assertSessionHasNoErrors();
         }
@@ -226,7 +223,7 @@ class QuoteRequestEmailTest extends TestCase
         $this->post(route('quote-emails.resolve',$email),['checked'=>1,'outcome'=>'sent','note'=>'Verificato con il servizio di posta'])->assertSessionHasNoErrors();
         $this->assertSame('sent',$email->fresh()->status);
         $this->assertSame(1,$this->case->quotes()->count());
-        $this->assertSame([$this->europe->id],app(QuoteRequestEmailWorkflow::class)->remainingPriorities($this->case)->pluck('id')->all());
+        $this->assertTrue(app(QuoteRequestEmailWorkflow::class)->remainingPriorities($this->case)->isEmpty());
         $this->assertStringNotContainsString($this->smtp['password'],DB::table('audit_logs')->get()->toJson());
         $this->get(route('quote-emails.show',$email))->assertOk()->assertDontSee('Private SMTP');
     }

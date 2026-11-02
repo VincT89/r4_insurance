@@ -80,7 +80,7 @@ class AgencyCommunicationDocumentsTest extends TestCase
         $this->agency->update(['email'=>null]);
         $this->mock(AgencyEmailTransport::class)->shouldNotReceive('send');
         $title=InsuranceTitle::create(['insurance_policy_id'=>$this->policy->id,'kind'=>'emission','due_on'=>today(),'coverage_from'=>'2026-10-01','coverage_to'=>'2027-04-01','amount_cents'=>10000,'created_by'=>$this->admin->id,'payment_frequency'=>'Semestrale','payment_method'=>'Bonifico a Intermediario']);
-        $payment=app(InsuranceLedger::class)->collect($title,['received_on'=>today()->toDateString(),'amount_cents'=>5000,'payment_method'=>'Bonifico a Intermediario','recipient'=>'our_agency','document_type'=>'transfer','consultant_id'=>$this->admin->id,'idempotency_key'=>(string)Str::uuid()]);
+        $payment=app(InsuranceLedger::class)->collect($title,['received_on'=>today()->toDateString(),'amount_cents'=>10000,'payment_method'=>'Bonifico a Intermediario','recipient'=>'our_agency','document_type'=>'transfer','consultant_id'=>$this->admin->id,'idempotency_key'=>(string)Str::uuid()]);
         $list=$this->get(route('agency-communications.collections'))->assertOk();
         $this->assertMatchesRegularExpression('/aria-label="Includi incasso '.$payment->id.'"\s*>/', $list->getContent());
         $this->post(route('agency-communications.collections-review',$this->agency),['scope'=>'pending','collections'=>[$payment->id]])->assertSessionHasNoErrors();
@@ -208,7 +208,7 @@ class AgencyCommunicationDocumentsTest extends TestCase
     public function test_collection_communication_can_include_title_documents_and_client_documents(): void
     {
         $title=InsuranceTitle::create(['insurance_policy_id'=>$this->policy->id,'kind'=>'emission','due_on'=>today(),'coverage_from'=>'2026-10-01','coverage_to'=>'2027-04-01','amount_cents'=>10000,'created_by'=>$this->admin->id,'payment_frequency'=>'Semestrale','payment_method'=>'Bonifico a Intermediario']);
-        $payment=app(InsuranceLedger::class)->collect($title,['received_on'=>today()->toDateString(),'amount_cents'=>5000,'payment_method'=>'Bonifico a Intermediario','recipient'=>'our_agency','document_type'=>'transfer','consultant_id'=>$this->admin->id,'idempotency_key'=>(string)Str::uuid()]);
+        $payment=app(InsuranceLedger::class)->collect($title,['received_on'=>today()->toDateString(),'amount_cents'=>10000,'payment_method'=>'Bonifico a Intermediario','recipient'=>'our_agency','document_type'=>'transfer','consultant_id'=>$this->admin->id,'idempotency_key'=>(string)Str::uuid()]);
         $quietance=$this->document('quietanza.pdf',['insurance_policy_id'=>$this->policy->id,'insurance_title_id'=>$title->id,'document_category'=>'quietance']);
         $receipt=$this->document('bonifico.pdf',['insurance_policy_id'=>$this->policy->id,'insurance_collection_id'=>$payment->id,'document_category'=>'collection']);
         $this->post(route('agency-communications.collections-review',$this->agency),['scope'=>'pending','collections'=>[$payment->id]])->assertSessionHasNoErrors();

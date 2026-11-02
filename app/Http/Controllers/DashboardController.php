@@ -11,7 +11,9 @@ class DashboardController extends Controller
     public function __invoke(Request $request, PolicyPortfolioQuery $query): View
     {
         if (!$request->user()->can('viewAny', Client::class)) return view('dashboard', ['overview' => null]);
-        $period = $request->validate(['period' => ['nullable', 'in:7,15,30,60']])['period'] ?? '15';
+        $filters = $request->validate(['period' => ['nullable', 'in:7,15,30,60'], 'titles_from'=>['nullable','date_format:Y-m-d'], 'titles_to'=>['nullable','date_format:Y-m-d',...($request->filled('titles_from')?['after_or_equal:titles_from']:[])]]);
+        $period = $filters['period'] ?? '15';
+        $titlesDates = \Illuminate\Support\Arr::only($filters,['titles_from','titles_to']);
         $all = $query->forUser($request->user());
         $upcoming = $query->forUser($request->user(), ['period' => $period])->whereIn('status', ['active', 'renewed']);
         $documentRequests = ClientDocumentRequest::whereIn('client_id', Client::current()->visibleTo($request->user())->select('id'))->whereDoesntHave('documents')->whereDoesntHave('linkedDocuments');
@@ -36,10 +38,19 @@ class DashboardController extends Controller
         /** L'apertura è la data di inserimento, distinta dalla decorrenza della copertura. */
         $todayPolicies = $query->forUser($request->user())->whereDoesntHave('importEntry')->where('created_at', '>=', today())->where('created_at', '<', today()->addDay())
             ->whereIn('status', ['active', 'renewed'])->where('expires_on', '>=', today()->toDateString())
-            ->with(['client', 'supplierAgency'])->orderByDesc('created_at')->orderByDesc('id')->get();
-        $dueTitles=\App\Models\InsuranceTitle::visibleTo($request->user())->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents')->where('due_on','<',today()->addDays((int)$period+1)->toDateString())->with('policy.client')->orderBy('due_on')->orderBy('id')->paginate(\App\Support\TableListing::perPage(8),['*'],'titles_page')->withQueryString();
+            ->with(['client', 'supplierAgency'])->orderByDesc('created_at')->orderByDesc('id')->paginate(\App\Support\TableListing::perPage(8), ['*'], 'today_policies_page')->withQueryString()->fragment('today-policies');
+        $titleQuery=\App\Models\InsuranceTitle::visibleTo($request->user())->where('direction','receipt')->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents');
+        if(array_filter($titlesDates)) {
+            if($titlesDates['titles_from']??null)$titleQuery->where('due_on','>=',$titlesDates['titles_from']);
+            if($titlesDates['titles_to']??null)$titleQuery->where('due_on','<',\Illuminate\Support\Carbon::parse($titlesDates['titles_to'])->addDay()->toDateString());
+        } else $titleQuery->where('due_on','<',today()->addDays((int)$period+1)->toDateString());
+        $dueTitles=$titleQuery->with('policy.client')->orderBy('due_on')->orderBy('id')->paginate(\App\Support\TableListing::perPage(8),['*'],'titles_page')->withQueryString();
+        /** Use the effective payment date, including entries recorded on a later day. */
+        $todayCollections=\App\Models\InsuranceCollection::whereIn('insurance_title_id',\App\Models\InsuranceTitle::visibleTo($request->user())->select('id'))
+            ->whereNull('voided_at')->where('received_on','>=',today()->toDateString())->where('received_on','<',today()->addDay()->toDateString())
+            ->selectRaw('COUNT(*) as count, '.\App\Models\InsuranceCollection::totalsSql())->first();
         $claimActivities=\App\Models\InsuranceClaimActivity::pending()->visibleTo($request->user())->where('due_on','<',today()->addDays(4)->toDateString())->with(['claim.client','claim.assignee'])->orderBy('due_on')->orderBy('id')->paginate(\App\Support\TableListing::perPage(8),['*'],'claims_page')->withQueryString();
         $paymentSummary = app(\App\Services\InsurancePaymentSummary::class)->forQuery(\App\Models\InsuranceTitle::visibleTo($request->user()));
-        return view('dashboard', compact('overview', 'period', 'duePolicies', 'missingDocuments', 'todayPolicies','dueTitles','claimActivities','paymentSummary'));
+        return view('dashboard', compact('overview', 'period', 'duePolicies', 'missingDocuments', 'todayPolicies','dueTitles','claimActivities','paymentSummary','titlesDates','todayCollections'));
     }
 }

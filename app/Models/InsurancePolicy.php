@@ -70,6 +70,11 @@ class InsurancePolicy extends Model
         return $this->hasMany(Attachment::class);
     }
 
+    public function contracts(): HasMany
+    {
+        return $this->documents()->where('document_category', 'policy')->whereDoesntHave('newerVersion')->orderByDesc('id');
+    }
+
     public function getIsExpiredAttribute(): bool
     {
         return $this->status === 'expired' || (in_array($this->status, ['active', 'renewed'], true) && $this->expires_on->lt(today()));

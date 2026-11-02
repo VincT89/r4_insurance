@@ -134,7 +134,7 @@ class ApprovedInsuranceCatalogMergesTest extends TestCase
         $this->assertSame('RC auto', $policy->category);
         $this->assertSame('AUTO', $policy->subcategory);
         $this->assertSame('Prodotto dimostrativo', $policy->product);
-        $this->get(route('clients.show', [$client, 'tab' => 'policies', 'category' => 'RC auto', 'subcategory' => 'AUTO']))->assertOk()->assertSee('<th>Ramo</th>', false)->assertSee('<th>Sottoramo</th>', false)->assertSee('<th>Nome del prodotto</th>', false)->assertSee('Prodotto dimostrativo');
+        $this->get(route('clients.show', [$client, 'tab' => 'policies', 'category' => 'RC auto', 'subcategory' => 'AUTO']))->assertOk()->assertSee('<th>Polizza e bene assicurato</th>', false)->assertSee('RC auto / AUTO')->assertSee('Prodotto dimostrativo');
         $this->get(route('clients.policies.show', [$client, $policy]))->assertOk()->assertSee('Nome del prodotto')->assertSee('Prodotto dimostrativo');
         $this->patch(route('clients.policies.update', [$client, $policy]), array_replace($values, ['policy_revision' => $policy->fresh()->editFingerprint(), 'product' => 'Altro nome commerciale']))->assertSessionHasNoErrors();
         $this->assertSame('AUTO', $policy->fresh()->subcategory);

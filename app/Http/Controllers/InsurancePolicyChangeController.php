@@ -14,6 +14,8 @@ class InsurancePolicyChangeController extends Controller
         abort_unless($policy->client_id === $client->id, 404);
         $data = $request->validate(['kind'=>['required',Rule::in(array_keys(InsurancePolicyChange::KINDS))], 'quote_id'=>['nullable','integer']]);
         $kind = $data['kind'];
+        if ($kind !== 'addition') return app(PolicyTransitionController::class)->create($request,$policy,$kind,app(\App\Services\PolicyContractTransitions::class));
+        if ($kind !== 'addition') return app(PolicyTransitionController::class)->create($request,$policy,$kind,app(\App\Services\PolicyContractTransitions::class));
         $workflow->check($policy,$kind);
         $quotes = InsuranceQuote::where('status','approved')->whereDate('valid_until','>=',today())->whereDoesntHave('policyChange')->whereDoesntHave('policy')
             ->whereHas('quoteCase',fn($q)=>$q->where('client_id',$client->id)->where('current_policy_id',$policy->id)->where('purpose',$kind)->where('status','approved'))
@@ -28,6 +30,7 @@ class InsurancePolicyChangeController extends Controller
     {
         abort_unless($policy->client_id === $client->id, 404);
         $this->authorize('updateRegistry',$client);
+        if (in_array($request->input('kind'),['renewal','replacement'],true)) return app(PolicyTransitionController::class)->store($request,$policy,$request->input('kind'),app(\App\Services\PolicyContractTransitions::class));
         $data = $request->validate([
             'kind'=>['required',Rule::in(array_keys(InsurancePolicyChange::KINDS))], 'quote_id'=>['required','integer'],
             'number'=>[Rule::requiredIf($request->input('kind')==='replacement'),Rule::prohibitedIf($request->input('kind')!=='replacement'),'string','max:100'],

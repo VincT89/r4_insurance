@@ -56,7 +56,7 @@ class InsurancePolicyWorkflowTest extends TestCase
 
     public function test_completion_uses_the_revision_rendered_in_the_actual_policy_page(): void
     {
-        $page=$this->get($this->path('show'))->assertOk()->assertSee('Prepara rate e quietanze');
+        $page=$this->get($this->path('show'))->assertOk()->assertSee('Prepara titoli');
         $this->assertSame(1,preg_match('/name="fingerprint" value="([a-f0-9]{64})"/',$page->getContent(),$match));
         $this->post($this->path('close-work'),['confirmed'=>1,'fingerprint'=>$match[1]])->assertSessionHasNoErrors()->assertRedirect();
         $this->assertNotNull($this->policy->fresh()->work_closed_at);

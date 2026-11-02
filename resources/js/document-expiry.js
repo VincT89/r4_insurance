@@ -33,21 +33,24 @@ function initDocumentExpiry() {
                 const read=element('button','btn btn-g','Leggi scadenza dal documento'); read.type='button'; read.dataset.readExpiry='';
                 const result=element('div','u-mt-md'), status=element('p','document-expiry-status'); result.setAttribute('role','status'); status.setAttribute('role','status'); status.dataset.expiryStatus='';
                 row.append(heading,grid,read,result,status);list.append(row);const refresh=bind(expiry,status,subtype);
+                const refreshReader=()=>{read.hidden=!category.value || category.value==='vehicle';if(read.hidden)result.replaceChildren();};
+                refreshers.push(refreshReader);refreshReader();
                 read.addEventListener('click',async()=>{
+                    if(!category.value || category.value==='vehicle')return;
                     if(busy){result.textContent='Attendi il termine della lettura in corso.';return;}
                     if(file.size>10*1024*1024 || !['application/pdf','image/jpeg','image/png','image/webp'].includes(file.type)){result.textContent='Per la lettura usa PDF, JPG, PNG o WEBP, massimo 10 MB.';return;}
-                    busy=true;read.disabled=true;result.textContent='Lettura locale in corso…'; const dateBefore=expiry.value;
+                    busy=true;read.disabled=true;result.textContent='Lettura locale in corso…'; const dateBefore=expiry.value,categoryBefore=category.value;
                     try{
                         const {readDocumentExpiry}=await import('./document-ocr.js');
-                        const dates=await readDocumentExpiry(file,form.dataset.ocrBase,message=>{if(current===generation)result.textContent=message;});
-                        if(current!==generation)return;
+                        const dates=await readDocumentExpiry(file,form.dataset.ocrBase,message=>{if(current===generation && category.value===categoryBefore)result.textContent=message;});
+                        if(current!==generation || category.value!==categoryBefore)return;
                         result.replaceChildren();
                         if(dates.length!==1){result.textContent=dates.length?'Rilevate più scadenze: verifica il documento e inserisci la data corretta.':'Nessuna scadenza rilevata. Puoi inserirla manualmente.';return;}
                         const description=element('p','',`Scadenza rilevata: ${dates[0].split('-').reverse().join('/')}. Controlla che corrisponda al documento.`), confirm=element('button','btn btn-g','Conferma la data rilevata');confirm.type='button';
-                        confirm.addEventListener('click',()=>{if(current!==generation)return;expiry.value=dates[0];refresh();result.replaceChildren();});
+                        confirm.addEventListener('click',()=>{if(current!==generation || category.value!==categoryBefore)return;expiry.value=dates[0];refresh();result.replaceChildren();});
                         if(expiry.value!==dateBefore)description.textContent+=' La data inserita manualmente resta conservata fino alla conferma.';
                         result.append(description,confirm);
-                    }catch{if(current===generation)result.textContent=unknownExpiry+'. Inserisci la data manualmente oppure riprova.';}
+                    }catch{if(current===generation && category.value===categoryBefore)result.textContent=unknownExpiry+'. Inserisci la data manualmente oppure riprova.';}
                     finally{busy=false;read.disabled=false;}
                 });
             });

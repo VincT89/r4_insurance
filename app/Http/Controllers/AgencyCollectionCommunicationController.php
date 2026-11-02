@@ -26,11 +26,10 @@ class AgencyCollectionCommunicationController extends Controller
             $filters['scope'] === 'attention' ? $status->attention($query) : $status->pending($query);
             $range = $filters['scope'] === 'attention' ? 'Invii con esito da controllare, tutte le date' : 'Incassi da completare, tutte le date';
         }
-        if ($filters['unassigned'] ?? false) $query->whereNull('communication_policy.supplier_agency_id');
-        $query->whereHas('title.policy',function($q)use($filters){
-            if($filters['agency']??null)$q->where('supplier_agency_id',$filters['agency']);if($filters['company']??null)$q->where('supplier_company_id',$filters['company']);
-            if($filters['search']??null)$q->where(fn($q)=>$q->where('number','like','%'.$filters['search'].'%')->orWhereHas('client',fn($q)=>$q->where('name','like','%'.$filters['search'].'%')));
-        })->with(['title.policy.client','title.policy.supplierAgency'])->orderBy('insurance_collections.id');
+        if ($filters['unassigned'] ?? false) $query->whereNull('communication_title.supplier_agency_id');
+        foreach (['agency'=>'supplier_agency_id','company'=>'supplier_company_id'] as $key=>$column) if ($filters[$key] ?? null) $query->where('communication_title.'.$column,$filters[$key]);
+        if ($filters['search'] ?? null) $query->where(fn($q)=>$q->where('communication_title.contract_snapshot->number','like','%'.$filters['search'].'%')->orWhereHas('title.policy.client',fn($client)=>$client->where('name','like','%'.$filters['search'].'%')));
+        $query->with(['title.policy.client'])->orderBy('insurance_collections.id');
         return [$filters,$query,$range];
     }
     public function index(Request $request,AgencyCollectionEmailWorkflow $workflow,AgencyMailConfiguration $configuration)
@@ -44,7 +43,7 @@ class AgencyCollectionCommunicationController extends Controller
     public function review(Request $request,SupplierAgency $agency,AgencyCollectionEmailWorkflow $workflow)
     {
         $this->authorize('system.admin');$data=$request->validate(['collections'=>['required','array','min:1','max:500'],'collections.*'=>['required','integer','distinct']]);[$filters,$query,$range]=$this->selection($request);
-        $payments=$query->whereIn('insurance_collections.id',$data['collections'])->whereHas('title.policy',fn($q)=>$q->where('supplier_agency_id',$agency->id))->get();
+        $payments=$query->whereIn('insurance_collections.id',$data['collections'])->where('communication_title.supplier_agency_id',$agency->id)->get();
         if($payments->count()!==count($data['collections']))throw ValidationException::withMessages(['collections'=>'La selezione include incassi di un’altra agenzia o fuori dal periodo.']);
         if ($workflow->existingDeliveries($payments)->isNotEmpty()) throw ValidationException::withMessages(['collections'=>'La selezione contiene incassi già comunicati o con un invio da controllare. Aggiorna la selezione.']);
         if ($filters['scope'] !== 'period') $range = $payments->min('received_on')->format('d/m/Y').' – '.$payments->max('received_on')->format('d/m/Y');

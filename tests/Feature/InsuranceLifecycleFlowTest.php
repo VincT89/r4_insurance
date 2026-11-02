@@ -13,6 +13,8 @@ use Tests\TestCase;
 class InsuranceLifecycleFlowTest extends TestCase
 {
     use RefreshDatabase;
+    use \Tests\Support\ContractTransitionInput;
+    use \Tests\Support\HistoricalCollections;
 
     private User $admin;
     private User $operator;
@@ -78,15 +80,15 @@ class InsuranceLifecycleFlowTest extends TestCase
 
     private function renewal(): array
     {
-        return ['starts_on'=>'2026-11-04', 'expires_on'=>'2027-11-04', 'premium'=>'1200.00',
-            'payment_frequency'=>'Semestrale', 'payment_method'=>'Bonifico a Intermediario'];
+        return $this->transitionInput($this->policy,['starts_on'=>'2026-11-04', 'expires_on'=>'2027-11-04', 'premium'=>'1200.00',
+            'payment_frequency'=>'Semestrale', 'payment_method'=>'Bonifico a Intermediario']);
     }
 
     private function renew(): void
     {
         $data = $this->renewal();
-        $preview = $this->post(route('titles.renewal-preview', $this->policy), $data)->assertOk();
-        $this->post(route('titles.renew', $this->policy), $data + ['confirmed'=>1, 'fingerprint'=>$preview->viewData('fingerprint')])->assertSessionHasNoErrors();
+        $preview = $this->postJson(route('titles.renewal-preview', $this->policy), $data)->assertOk();
+        $this->post(route('titles.renew', $this->policy), $data + ['confirmed'=>1, 'schedule_fingerprint'=>$preview->json('fingerprint')])->assertSessionHasNoErrors();
     }
 
     private function values(string $status): array
@@ -161,45 +163,40 @@ class InsuranceLifecycleFlowTest extends TestCase
             ->assertViewHas('policies', fn ($rows) => $rows->total() === 1);
     }
 
-    public function test_a_changed_policy_or_client_requires_a_new_renewal_preview_and_work_lock_remains(): void
+    public function test_changed_contract_requires_review_but_closed_work_allows_a_new_operator_cycle(): void
     {
         $this->generate();
-        $preview = $this->post(route('titles.renewal-preview', $this->policy), $this->renewal())->assertOk();
+        $data=$this->renewal();
+        $preview=$this->postJson(route('titles.renewal-preview',$this->policy),$data)->assertOk();
         $this->policy->update(['number'=>'SA-2025-0482']);
-        $this->post(route('titles.renew', $this->policy), $this->renewal() + ['confirmed'=>1, 'fingerprint'=>$preview->viewData('fingerprint')])->assertSessionHasErrors('ledger');
-        $this->assertDatabaseCount('insurance_titles', 2);
-        $preview = $this->post(route('titles.renewal-preview', $this->policy), $this->renewal())->assertOk();
+        $this->post(route('titles.renew',$this->policy),$data+['schedule_fingerprint'=>$preview->json('fingerprint')])->assertSessionHasErrors('source_revision');
+        $this->assertDatabaseCount('insurance_titles',2);
+        $data=$this->renewal();
+        $preview=$this->postJson(route('titles.renewal-preview',$this->policy),$data)->assertOk();
         $this->client->update(['name'=>'Elena Varesi Corretta']);
-        $this->post(route('titles.renew', $this->policy), $this->renewal() + ['confirmed'=>1, 'fingerprint'=>$preview->viewData('fingerprint')])->assertSessionHasErrors('ledger');
-        $this->policy->forceFill(['work_closed_at'=>today()->subDay(), 'work_closed_by'=>$this->operator->id])->save();
+        $this->post(route('titles.renew',$this->policy),$data+['schedule_fingerprint'=>$preview->json('fingerprint')])->assertSessionHasErrors('source_revision');
+        $this->policy->forceFill(['work_closed_at'=>today()->subDay(),'work_closed_by'=>$this->operator->id])->save();
         $this->actingAs($this->operator);
-        $this->get(route('titles.renewal', $this->policy))->assertForbidden();
-        $this->post(route('titles.renewal-preview', $this->policy), $this->renewal())->assertForbidden();
-        $this->post(route('titles.renew', $this->policy), $this->renewal() + ['confirmed'=>1, 'fingerprint'=>$preview->viewData('fingerprint')])->assertForbidden();
-        $this->actingAs($this->admin);
+        $this->get(route('clients.policies.edit',[$this->client,$this->policy]))->assertForbidden();
+        $this->get(route('titles.renewal',$this->policy))->assertOk();
         $this->renew();
-        $this->assertSame('2026-10-19', $this->policy->fresh()->work_closed_at->toDateString());
-        $this->assertFalse($this->policy->fresh()->editableBy($this->operator));
-        $this->assertDatabaseHas('audit_logs', ['action'=>'policy_renewed', 'user_id'=>$this->admin->id]);
+        $this->assertNull($this->policy->fresh()->work_closed_at);
+        $this->assertDatabaseHas('audit_logs',['action'=>'policy_renewed','user_id'=>$this->operator->id]);
     }
 
-    public function test_renewal_keeps_the_contract_number_and_rejects_a_different_number(): void
+    public function test_changed_contract_number_is_reviewed_and_old_titles_keep_original_number(): void
     {
-        $this->generate();
-        $originalNumber = $this->policy->number;
-        $changed = $this->renewal() + ['number'=>'SA-2026-0931'];
-        $this->post(route('titles.renewal-preview', $this->policy), $changed)->assertSessionHasErrors('number');
-        $preview = $this->post(route('titles.renewal-preview', $this->policy), $this->renewal())->assertOk();
-        $this->post(route('titles.renew', $this->policy), $changed + ['confirmed'=>1, 'fingerprint'=>$preview->viewData('fingerprint')])
-            ->assertSessionHasErrors('number');
-        $this->assertSame($originalNumber, $this->policy->fresh()->number);
-        $this->assertSame('2026-11-04', $this->policy->fresh()->expires_on->toDateString());
-        $this->assertDatabaseCount('insurance_titles', 2);
-        $this->renew();
-        $this->assertSame($originalNumber, $this->policy->fresh()->number);
-        $this->assertSame('2027-11-04', $this->policy->fresh()->expires_on->toDateString());
-        $this->assertDatabaseCount('insurance_policies', 1);
-        $this->assertDatabaseCount('insurance_titles', 4);
+        $old=$this->generate()->first();
+        $data=$this->renewal();
+        $preview=$this->postJson(route('titles.renewal-preview',$this->policy),$data)->assertOk();
+        $data['number']='SA-2026-0931';
+        $this->post(route('titles.renew',$this->policy),$data+['schedule_fingerprint'=>$preview->json('fingerprint')])->assertSessionHasErrors('schedule_fingerprint');
+        $preview=$this->postJson(route('titles.renewal-preview',$this->policy),$data)->assertOk();
+        $this->post(route('titles.renew',$this->policy),$data+['schedule_fingerprint'=>$preview->json('fingerprint')])->assertSessionHasNoErrors();
+        $this->assertSame('SA-2026-0931',$this->policy->fresh()->number);
+        $this->assertSame('SA-2025-0481',$old->fresh()->contract->number);
+        $this->assertDatabaseCount('insurance_policies',1);
+        $this->assertDatabaseCount('insurance_titles',4);
     }
 
     public function test_title_generation_preview_is_bound_to_the_policy_and_customer(): void
@@ -237,7 +234,7 @@ class InsuranceLifecycleFlowTest extends TestCase
         $this->assertSame(5000, $commission->fresh()->settled_cents);
         $this->assertSame(5000, $commission->fresh()->accrued_cents);
         $this->assertNull($payment->fresh()->voided_at);
-        $this->get(route('clients.policies.show', [$this->client, $this->policy]))->assertOk()->assertSee('Verifica contabile')->assertDontSee('Prepara rate e quietanze')
+        $this->get(route('clients.policies.show', [$this->client, $this->policy]))->assertOk()->assertSee('Verifica contabile')->assertDontSee('Prepara titoli')
             ->assertViewHas('accountingReview', fn ($review) => (int) $review->open_titles === 1 && (int) $review->balance_cents === 50000);
         $this->get(route('titles.show', $title))->assertOk()->assertSee('La polizza è annullata');
         $this->post(route('titles.cancel', $title), ['reason'=>'Titolo ancora incassato'])->assertSessionHasErrors('ledger');
@@ -269,15 +266,15 @@ class InsuranceLifecycleFlowTest extends TestCase
     {
         [$title] = $this->generate();
         $package = $this->package();
-        $this->collect($title, 10000);
+        $this->historicalCollection($title, 10000, ['payment_method'=>'Bonifico a Compagnia','recipient'=>'company']);
         app(DeadlineReminders::class)->forUser($this->admin);
         $this->patch(route('clients.policies.update', [$this->client, $this->policy]), $this->values('replaced'))->assertSessionHasNoErrors();
         $this->assertSame(40000, $title->fresh()->balance_cents);
         $this->assertSame(0, $this->admin->visibleNotifications()->where('data->kind', 'policy')->count());
         $this->assertSame(2, $this->admin->visibleNotifications()->where('data->kind', 'title')->count());
         $this->assertSame('Dati aggiornati: predisporre nuovi moduli', $package->fresh()->state_label);
-        $this->post(route('titles.renewal-preview', $this->policy), $this->renewal())->assertSessionHasErrors('ledger');
-        $this->get(route('clients.policies.show', [$this->client, $this->policy]))->assertOk()->assertSee('Verifica contabile')->assertDontSee('Prepara rate e quietanze')
+        $this->postJson(route('titles.renewal-preview', $this->policy), $this->renewal())->assertUnprocessable()->assertJsonValidationErrors('transition');
+        $this->get(route('clients.policies.show', [$this->client, $this->policy]))->assertOk()->assertSee('Verifica contabile')->assertDontSee('Prepara titoli')
             ->assertSee('900,00 €')->assertViewHas('accountingReview', fn ($review) => (int) $review->open_titles === 2 && (int) $review->balance_cents === 90000);
         $this->delete(route('clients.policies.destroy', [$this->client, $this->policy]))->assertSessionHasErrors('policy');
         $this->post(route('agency-communications.review', $this->agency), [
@@ -297,10 +294,10 @@ class InsuranceLifecycleFlowTest extends TestCase
         $message = AgencyCommunication::where('status','review')->sole();
         $this->mock(AgencyEmailTransport::class)->shouldNotReceive('send');
         $data = $this->renewal();
-        $preview = $this->post(route('titles.renewal-preview', $this->policy), $data)->assertOk();
-        $confirmation = $data + ['confirmed'=>1, 'fingerprint'=>$preview->viewData('fingerprint')];
+        $preview = $this->postJson(route('titles.renewal-preview', $this->policy), $data)->assertOk();
+        $confirmation = $data + ['confirmed'=>1, 'schedule_fingerprint'=>$preview->json('fingerprint')];
         $this->post(route('titles.renew', $this->policy), $confirmation)->assertSessionHasNoErrors();
-        $this->post(route('titles.renew', $this->policy), $confirmation)->assertSessionHasErrors('ledger');
+        $this->post(route('titles.renew', $this->policy), $confirmation)->assertSessionHasNoErrors();
         $this->assertDatabaseCount('insurance_titles', 4);
         $this->post(route('agency-communications.send', $message), ['reviewed'=>1])->assertSessionHasErrors('email');
         $this->assertSame('review', $message->fresh()->status);

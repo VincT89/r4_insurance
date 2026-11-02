@@ -138,8 +138,8 @@ class DeadlineReminders
             }
             if (($notification->data['kind'] ?? null) !== 'title') continue;
             if (!$title = $titles->get($notification->data['source_id'])) continue;
-            $details[$notification->id] = ['title'=>$title->due_on->lt(today()) ? 'Rata scaduta da incassare' : 'Rata da incassare',
-                'message'=>$title->policy->number.' · '.$title->policy->client->name.' · '.$title->payment_frequency.' · '.$title->due_on->format('d/m/Y').' · Residuo '.Money::format($title->balance_cents)];
+            $details[$notification->id] = ['title'=>$title->direction === 'refund' ? 'Rimborso da effettuare' : ($title->due_on->lt(today()) ? 'Rata scaduta da incassare' : 'Rata da incassare'),
+                'message'=>$title->contract->number.' · '.$title->policy->client->name.' · '.$title->payment_frequency.' · '.$title->due_on->format('d/m/Y').' · Residuo '.Money::format($title->balance_cents)];
         }
         return $details;
     }

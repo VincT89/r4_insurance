@@ -17,6 +17,11 @@ class AuditChanges
         'document_type'=>'Tipo documento', 'reference'=>'Riferimento', 'notes'=>'Note',
         'cancelled_at'=>'Annullata il', 'cancellation_reason'=>'Motivo annullamento',
         'voided_at'=>'Stornato il', 'void_reason'=>'Motivo storno',
+        'company_name'=>'Ragione sociale','vat_number'=>'Partita IVA','tax_code'=>'Codice fiscale','pec'=>'PEC',
+        'phone'=>'Telefono','mobile'=>'Cellulare','reference_person'=>'Referente','reference_role'=>'Ruolo referente',
+        'reference_email'=>'Email referente','reference_phone'=>'Telefono referente','address'=>'Indirizzo','city'=>'Città',
+        'province'=>'Provincia','postal_code'=>'CAP','country'=>'Paese','billing_email'=>'Email amministrativa',
+        'sdi_code'=>'Codice destinatario SDI','iban'=>'IBAN','account_holder'=>'Intestatario del conto','bank_name'=>'Banca','bic'=>'BIC/SWIFT',
     ];
 
     public static function rows(AuditLog $log): array

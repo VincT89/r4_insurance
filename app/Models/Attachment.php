@@ -110,6 +110,16 @@ class Attachment extends Model
         return route('attachments.download', $this);
     }
 
+    public function canPreview(): bool
+    {
+        return in_array($this->mime_type, ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'], true);
+    }
+
+    public function openUrl(): string
+    {
+        return $this->canPreview() ? route('attachments.preview', $this) : $this->downloadUrl();
+    }
+
     public function getValidityLabelAttribute(): string
     {
         if (!$this->expires_on) return 'Da verificare, data di scadenza non leggibile';

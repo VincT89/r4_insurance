@@ -9,8 +9,12 @@ class InsuranceQuoteCase extends Model
     {
         return SupplierCompany::where('status','active')
             ->when($this->purpose==='addition', fn($q)=>$q->whereKey($this->currentPolicy?->supplier_company_id ?? 0))
-            ->when($this->recipient_group_snapshot !== null, fn($q)=>$q->whereIn('id', array_column($this->recipient_group_snapshot['companies'] ?? [], 'id')))
-            ->orderByDesc('quote_priority')->orderBy('name');
+            ->orderBy('name');
+    }
+
+    public function suggestedRecipientKeys(): array
+    {
+        return $this->recipient_group_snapshot['recipient_keys'] ?? array_map(fn ($company) => \App\Services\QuoteRecipients::key((int) $company['id']), $this->recipient_group_snapshot['companies'] ?? []);
     }
     protected $guarded=['id'];
     protected function casts(): array { return ['current_policy_snapshot'=>'encrypted:array', 'vehicle_snapshot'=>'encrypted:array', 'recipient_group_snapshot'=>'array', 'merit_class_cu'=>'integer']; }
@@ -37,7 +41,7 @@ class InsuranceQuoteCase extends Model
             if ($vehicle['registered_on'] ?? null) $lines[] = 'Prima immatricolazione: '.\Illuminate\Support\Carbon::parse($vehicle['registered_on'])->format('d/m/Y');
         }
         if ($this->merit_class_cu) $lines[] = 'Classe CU dichiarata: '.$this->merit_class_cu;
-        if ($this->merit_class_internal) $lines[] = 'Classe interna dichiarata: '.$this->merit_class_internal.(!empty($vehicle['class_company']) ? ' ('.$vehicle['class_company'].')' : '');
+        if ($this->merit_class_internal) $lines[] = 'Classe dichiarata della compagnia: '.$this->merit_class_internal.(!empty($vehicle['class_company']) ? ' ('.$vehicle['class_company'].')' : '');
         if ($snapshot = $this->current_policy_snapshot) {
             $lines[] = 'Polizza attuale: '.$snapshot['number'].' / '.$snapshot['company'];
             if ($snapshot['plate'] ?? null) $lines[] = 'Targa: '.$snapshot['plate'];

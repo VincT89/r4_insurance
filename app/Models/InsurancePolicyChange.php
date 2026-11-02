@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class InsurancePolicyChange extends Model
 {
-    public const KINDS = ['replacement'=>'Sostituzione', 'addition'=>'Aggiunta di coperture'];
+    public const KINDS = ['replacement'=>'Sostituzione', 'addition'=>'Aggiunta di coperture', 'renewal'=>'Rinnovo'];
     protected $guarded = ['id'];
     protected function casts(): array
     {

@@ -97,21 +97,20 @@ class RolePermissionsTest extends TestCase
         Storage::disk('attachments')->assertExists($file->path);
     }
 
-    public function test_operator_cannot_delete_notes_or_notifications_but_can_mark_them_read(): void
+    public function test_operator_can_delete_personal_notes_but_can_only_mark_notifications_read(): void
     {
         $note=$this->operator->dailyNotes()->create(['date'=>today()]);
         $entry=$note->entries()->create(['content'=>'Annotazione da conservare','sort_order'=>1]);
         $item=$entry->checklistItems()->create(['label'=>'Controllo documenti','sort_order'=>1]);
         $notification=$this->operator->notifications()->create(['id'=>(string)Str::uuid(),'type'=>'test','data'=>['message'=>'Avviso di prova']]);
         $this->actingAs($this->operator);
-        Livewire::test(UserDailyNotes::class)->call('deleteEntry',$entry->id)->assertForbidden();
-        Livewire::test(UserDailyNotes::class)->call('deleteChecklistItem',$item->id)->assertForbidden();
+        Livewire::test(UserDailyNotes::class)->call('deleteEntry',$entry->id)->assertHasNoErrors();
         Livewire::test(NotificationDropdown::class)->call('deleteNotification',$notification->id)->assertForbidden();
         $this->delete(route('notifications.destroy',$notification->id))->assertForbidden();
         Livewire::test(NotificationDropdown::class)->call('markAsRead',$notification->id);
         $this->assertNotNull($notification->fresh()->read_at);
-        $this->assertNotNull($entry->fresh());
-        $this->assertNotNull($item->fresh());
+        $this->assertModelMissing($entry);
+        $this->assertModelMissing($item);
     }
 
     public function test_operator_generates_collects_reverses_and_cancels_with_attributed_immutable_history(): void
@@ -121,7 +120,7 @@ class RolePermissionsTest extends TestCase
         $this->post(route('titles.generate',$this->policy),['confirmed'=>1,'fingerprint'=>$preview->viewData('fingerprint')])->assertSessionHasNoErrors();
         $title=$this->policy->titles()->orderBy('id')->first();
         $this->get(route('titles.show',$title))->assertOk()->assertSee('Annulla titolo');
-        $data=['received_on'=>'2026-10-19','amount'=>'120.00','payment_method'=>'Bonifico a Intermediario','recipient'=>'our_agency','document_type'=>'transfer','idempotency_key'=>(string)Str::uuid(),'consultant_id'=>$this->admin->id,'created_by'=>$this->admin->id];
+        $data=['received_on'=>'2026-10-19','amount'=>\App\Support\Money::decimal($title->balance_cents),'payment_method'=>'Bonifico a Intermediario','recipient'=>'our_agency','document_type'=>'transfer','idempotency_key'=>(string)Str::uuid(),'consultant_id'=>$this->admin->id,'created_by'=>$this->admin->id];
         $this->post(route('titles.collect',$title),$data)->assertSessionHasNoErrors();
         $this->post(route('titles.collect',$title),$data)->assertSessionHasNoErrors();
         $collection=$title->collections()->sole();
@@ -137,20 +136,20 @@ class RolePermissionsTest extends TestCase
         $this->assertNotNull($title->fresh()->cancelled_at);
         foreach (['titles_generated','collection_recorded','collection_voided','title_cancelled'] as $action) $this->assertSame($this->operator->id,AuditLog::where('action',$action)->sole()->user_id);
         $log=AuditLog::where('action','collection_voided')->sole();
-        $this->assertSame(12000,$log->old_values['collected_cents']);
+        $this->assertSame($title->amount_cents,$log->old_values['collected_cents']);
         $this->assertSame(0,$log->new_values['collected_cents']);
         $this->assertSame($collection->id,$log->new_values['insurance_collection_id']);
-        $this->actingAs($this->admin)->get(route('audit-logs.index',['action'=>'reversals','user_id'=>$this->operator->id]))->assertOk()->assertSee('Importo attribuito al movimento errato')->assertSee('120,00')->assertSee('Prima:');
+        $this->actingAs($this->admin)->get(route('audit-logs.index',['action'=>'reversals','user_id'=>$this->operator->id]))->assertOk()->assertSee('Importo attribuito al movimento errato')->assertSee(\App\Support\Money::format($title->amount_cents))->assertSee('Prima:');
         $this->assertDatabaseCount('insurance_collections',1);
         $this->assertDatabaseCount('insurance_titles',2);
     }
 
-    public function test_operator_cannot_bypass_next_day_policy_lock_through_renewal(): void
+    public function test_operator_can_start_renewal_but_cannot_edit_closed_source_or_skip_contract(): void
     {
         $this->policy->forceFill(['work_closed_at'=>today()->subDay(),'work_closed_by'=>$this->operator->id])->save();
         $this->actingAs($this->operator);
-        $this->get(route('titles.renewal',$this->policy))->assertForbidden();
-        $this->post(route('titles.renew',$this->policy),[])->assertForbidden();
+        $this->get(route('titles.renewal',$this->policy))->assertOk();
+        $this->post(route('titles.renew',$this->policy),[])->assertSessionHasErrors(['contract','contract_reviewed']);
         $this->assertFalse($this->policy->editableBy($this->operator));
         $this->assertTrue($this->policy->editableBy($this->admin));
     }

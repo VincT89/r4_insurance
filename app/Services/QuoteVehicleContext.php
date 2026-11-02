@@ -43,12 +43,9 @@ class QuoteVehicleContext
         } elseif ($groupId) {
             $group = QuoteRecipientGroup::forRequest($branchId,$subbranchId,$cu ? (int)$cu : null)->whereKey($groupId)->lockForUpdate()->first();
             if (!$group) throw ValidationException::withMessages(['quote_recipient_group_id' => 'Seleziona un gruppo attivo compatibile con ramo, sottoramo e classe CU della richiesta.']);
-            $companies = $group->companies()->where('supplier_companies.status', 'active')->orderBy('supplier_companies.id')->get();
-            if ($companies->isEmpty()) throw ValidationException::withMessages(['quote_recipient_group_id' => 'Il gruppo non ha compagnie attive. Chiedi all’admin di aggiornarlo.']);
-            /** Freeze the operator's selection: future group edits must not change an existing request's recipients. */
-            $groupSnapshot = ['name' => $group->name, 'branch' => $group->branch?->name, 'subbranch' => $group->subbranch?->name, 'cu_from' => $group->cu_from, 'cu_to' => $group->cu_to, 'company_ids' => $companies->modelKeys(), 'companies' => $companies->map(fn ($company) => $company->only(['id', 'name']))->all()];
-        } elseif (QuoteRecipientGroup::forRequest($branchId,$subbranchId,$cu ? (int)$cu : null)->exists()) {
-            throw ValidationException::withMessages(['quote_recipient_group_id' => 'Per questa richiesta è configurato un gruppo: selezionalo prima di continuare.']);
+            $companies = $group->companies()->orderBy('supplier_companies.id')->get();
+            /** Il gruppo conserva un suggerimento storico; i destinatari effettivi si scelgono prima dell'invio. */
+            $groupSnapshot = ['name' => $group->name, 'branch' => $group->branch?->name, 'subbranch' => $group->subbranch?->name, 'cu_from' => $group->cu_from, 'cu_to' => $group->cu_to, 'company_ids' => $companies->modelKeys(), 'companies' => $companies->map(fn ($company) => $company->only(['id', 'name']))->all(), 'recipient_keys' => $group->recipientKeys()];
         }
         return ['vehicle_id' => $vehicle?->id, 'vehicle_plate' => $vehicle?->plate, 'merit_class_cu' => $cu, 'merit_class_internal' => $internal, 'vehicle_snapshot' => $snapshot, 'quote_recipient_group_id' => $groupId, 'recipient_group_snapshot' => $groupSnapshot];
     }

@@ -45,6 +45,15 @@ class InsuranceCommissionLedger
     private function synchronize(InsuranceTitle $title, ?InsuranceCommission $commission, string $eventOn, string $reason): InsuranceCommission
     {
         $commission ??= InsuranceCommission::create(['insurance_title_id'=>$title->id]);
+        if ($title->kind === 'adjustment') {
+            $this->incomplete($commission, 'Conguaglio: verifica la provvigione comunicata dal mandante prima di registrare rettifiche.');
+            return $commission;
+        }
+        if ($title->cancelled_at && $title->cancelled_residual_cents > 0 && $title->collected_cents > 0) {
+            $commission->incomplete_reason = 'Residuo annullato; incassi conservati. Verifica con il mandante l’eventuale rettifica della provvigione.';
+            $commission->save();
+            return $commission;
+        }
         if ($title->cancelled_at) {
             if ($commission->expected_cents > 0) $this->movement($commission, 'forecast', -$commission->expected_cents, $title->cancelled_at->toDateString(), 'Storno previsione: '.$title->cancellation_reason);
             if ($commission->accrued_cents > 0) $this->movement($commission, 'accrual', -$commission->accrued_cents, $title->cancelled_at->toDateString(), 'Storno maturazione: '.$title->cancellation_reason);
@@ -98,7 +107,7 @@ class InsuranceCommissionLedger
 
     private function freeze(InsuranceTitle $title, InsuranceCommission $commission): bool
     {
-        $policy = $title->policy;
+        $policy = $title->contract;
         if (!$policy->supplier_agency_id || !$policy->supplier_company_id || !$policy->insurance_branch_id) return $this->incomplete($commission, 'Completa agenzia, compagnia e ramo della polizza.');
         $rates = AgencyCommissionRate::with('schedule')->where('insurance_branch_id', $policy->insurance_branch_id)
             ->where('insurance_subbranch_id', $policy->insurance_subbranch_id)->whereHas('schedule', fn ($q) => $q->current()

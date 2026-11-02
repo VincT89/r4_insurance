@@ -3,8 +3,8 @@ const normalized = value => String(value ?? '').replace(/\s+/g, ' ').trim();
 export function exportColumnType(header) {
     const name = normalized(header).toLocaleLowerCase('it');
     if (/^(data(?:\s|$)|scadenza|decorrenza|dal$|al$|da ricevere entro$|caricato il$|creato il$|inserita il$|registrata il$|ultimo rinnovo$|preparata il$|inviata il$|ricevuta il$|validità$)/.test(name)) return 'date';
-    if (/^(polizze|appendici|clienti distinti|premio non indicato|non pagate|righe|gruppi interessati|quantità)$/.test(name)) return 'integer';
-    if (/^(premi?(?:o)?(?:\s|$)|importo|totale(?:\s|$)|residuo|incassato|costo|valore economico)/.test(name)) return 'currency';
+    if (/^(polizze|appendici|clienti distinti|premio non indicato|non pagate|righe|gruppi interessati|quantità|n\. incassi|n\. rimborsi)$/.test(name)) return 'integer';
+    if (/^(premi?(?:o)?(?:\s|$)|importo|totale(?:\s|$)|residuo|incassato|incassi?$|rimbors[oi]$|saldo(?:\s|$)|costo|valore economico)/.test(name)) return 'currency';
     if (/^(aliquota|percentuale)(?:\s|$)/.test(name)) return 'percent';
     return 'text';
 }

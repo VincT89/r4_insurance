@@ -1,4 +1,5 @@
 import { exportColumnType } from './table-export-values.js';
+import { collectionExportFooters } from './collection-totals.js';
 
 const states = new WeakMap();
 let serial = 0;
@@ -12,8 +13,10 @@ const element = (tag, attributes = {}, content) => {
     return node;
 };
 const button = (label, action) => { const b = element('button', { type: 'button', class: 'btn btn-g btn-sm' }, label); b.addEventListener('click', action); return b; };
-export function tableExportUrl(currentUrl, pageName = 'page') {
+export function tableExportUrl(currentUrl, pageName = 'page', appliedFilters = {}) {
     const url = new URL(currentUrl);
+    /** Freeze server defaults, such as today's payment dates, for every export page. */
+    for (const [key, value] of Object.entries(appliedFilters)) if (value !== null) url.searchParams.set(key, String(value));
     /** Named paginators must restart before the server increases the export batch size. */
     url.searchParams.set(pageName, '1');
     url.searchParams.set('_table_all', '1');
@@ -21,7 +24,9 @@ export function tableExportUrl(currentUrl, pageName = 'page') {
     return url;
 }
 export function columnType(name) {
-    if (exportColumnType(name) === 'date') return 'date';
+    const type = exportColumnType(name);
+    if (type === 'date') return 'date';
+    if (['currency', 'integer', 'percent', 'number'].includes(type)) return 'number';
     if (/^(premio|importo|totale|righe$|gruppi interessati$|quantità|costo|valore economico)/i.test(name)) return 'number';
     return 'text';
 }
@@ -34,7 +39,7 @@ const valueOf = (cell, type) => {
         return date.getUTCFullYear() === +m[1] && date.getUTCMonth() === +m[2]-1 && date.getUTCDate() === +m[3] ? +date : NaN;
     }
     if (type === 'number') {
-        let s = text(cell).replace(/\s|€/g, '');
+        let s = text(cell).replace(/\s|€|%/g, '');
         if (s.includes(',')) s = s.replaceAll('.', '').replace(',', '.');
         else if (/^-?\d{1,3}(?:\.\d{3})+$/.test(s)) s = s.replaceAll('.', '');
         return /^-?\d+(?:\.\d+)?$/.test(s) ? Number(s) : NaN;
@@ -63,6 +68,26 @@ export function matchesFilter(cells, rule) {
     }
 }
 
+export function restoreTableFilters(raw, columns) {
+    if (!raw) return { mode: 'all', rules: [] };
+    if (raw.length > 16000) throw new Error('Troppi filtri: azzera i filtri e riprova.');
+    let data;
+    try { data = JSON.parse(raw); } catch { throw new Error('Filtri non validi: azzera i filtri e riprova.'); }
+    if (!data || !['all','any'].includes(data.mode) || !Array.isArray(data.rules) || data.rules.length > 20) throw new Error('Filtri non validi.');
+    const rules = data.rules.map(rule => {
+        const column = columns.find(column => column.name === rule?.column);
+        const type = column && columnType(column.name);
+        const allowed = type === 'text' ? ['contains','eq','not_contains','starts','empty','filled'] : ['eq','gte','lte','between','empty'];
+        if (!column || !allowed.includes(rule.operator) || typeof rule.value !== 'string' || typeof rule.to !== 'string' || rule.value.length > 500 || rule.to.length > 500) throw new Error('Un filtro non è più disponibile: azzera i filtri e riprova.');
+        return { column: column.index, type, operator: rule.operator, value: rule.value, to: rule.to };
+    });
+    return { mode: data.mode, rules };
+}
+
+export function storeTableFilters(rules, mode, columns) {
+    return rules.length ? JSON.stringify({ mode, rules: rules.map(rule => ({ column: columns.find(column=>column.index===rule.column).name, operator: rule.operator, value: rule.value, to: rule.to })) }) : '';
+}
+
 function initialize(table, index) {
     if (states.has(table)) return;
     const headers = [...table.querySelectorAll('thead tr:first-child th')];
@@ -74,12 +99,16 @@ function initialize(table, index) {
     const pager = panel.querySelector('nav[role="navigation"]');
     const serverSummary = panel.querySelector('[data-table-page-summary]');
     const paginated = !!pager?.querySelector('a[href]');
-    const state = { rows: null, applied: [], page: 1, busy: false, original: [...body.children], index, mode: 'all' };
+    const state = { rows: null, applied: [], page: 1, busy: false, original: [...body.children], index, mode: 'all', invalidFilters:false };
     states.set(table, state);
+    const accounting = table.matches('[data-collection-table]');
+    const accountingWorkspace = accounting ? table.closest('[data-collection-workspace]') : null;
     const title = text(table.closest('[role="region"]')?.getAttribute('aria-label') || panel.querySelector('.panel-title')?.textContent || document.querySelector('h1, [role="heading"][aria-level="1"]')?.textContent || document.title);
     const toolbar = element('div', { class: 'table-tools', 'data-table-tools': id });
+    const filterForm = table.dataset.filterForm ? document.getElementById(table.dataset.filterForm) : null;
     const actions = element('div', { class: 'table-tools-actions' });
-    const filters = element('form', { id, class: 'table-filter-panel', hidden: '', 'aria-label': `Filtri: ${title}` });
+    const filters = element(filterForm ? 'div' : 'form', { id, class: 'table-filter-panel', 'aria-label': `Filtri: ${title}` });
+    filters.hidden = !filterForm;
     const rules = element('div', { class: 'table-filter-rules' });
     const mode = element('div', { class: 'table-filter-combine', role: 'group', 'aria-label': 'Come combinare i filtri' });
     let combination = 'all';
@@ -93,8 +122,9 @@ function initialize(table, index) {
     const toggle = button('Filtra tabella', () => { filters.hidden = !filters.hidden; toggle.setAttribute('aria-expanded', String(!filters.hidden)); if (!filters.hidden) picker.querySelector('button')?.focus(); });
     toggle.setAttribute('aria-controls', id); toggle.setAttribute('aria-expanded', 'false');
     const excel = button('Esporta Excel', () => download('xlsx'));
-    const pdf = button('Esporta PDF', () => download('pdf'));
-    actions.append(toggle, excel, pdf);
+    const pdf = button(accounting ? 'Stampa / PDF di tutti' : 'Esporta PDF', () => download('pdf'));
+    if (!filterForm) actions.append(toggle);
+    actions.append(excel, pdf);
     const instructions = element('p', { class: 'table-filter-help' }, 'Scegli cosa filtrare, inserisci il valore e premi Applica filtri. Puoi aggiungere più criteri.');
     const picker = element('div', { class: 'table-filter-picker', role: 'group', 'aria-label': 'Scegli cosa filtrare' });
     columns.forEach(column => picker.append(button(column.name, () => { addRule(column); rules.lastElementChild.querySelector('input')?.focus(); })));
@@ -104,18 +134,26 @@ function initialize(table, index) {
     const filterActions = element('div', { class: 'table-tools-actions' });
     const apply = element('button', { type: 'submit', class: 'btn btn-p btn-sm' }, 'Applica filtri');
     filterActions.append(apply, button('Azzera filtri', reset), button('Chiudi filtri', () => { filters.hidden = true; toggle.setAttribute('aria-expanded', 'false'); toggle.focus(); }));
-    filters.append(instructions, pickerTitle, picker, rules, mode, filterActions);
-    toolbar.append(actions, filters, info, navigation);
+    filters.append(instructions, pickerTitle, picker, rules, mode);
+    if (!filterForm) filters.append(filterActions);
+    toolbar.append(actions, info, navigation);
+    if (filterForm) (filterForm.querySelector('[data-column-filters]') || filterForm).append(filters);
+    else actions.after(filters);
     let anchor = table;
     if (table.parentElement?.classList.contains('client-table-scroll') || table.parentElement?.classList.contains('attachments-table-wrap')) anchor = table.parentElement;
-    anchor.before(toolbar);
+    const accountingActions = accountingWorkspace?.querySelector('[data-collection-actions]');
+    if (accountingActions) accountingActions.append(toolbar); else anchor.before(toolbar);
+    accountingWorkspace?.addEventListener('click',event=> {
+        const control = event.target.closest('[data-collection-export]');
+        if (control && accountingWorkspace.contains(control)) download(control.dataset.collectionExport,control.dataset.collectionGroup ?? null);
+    });
     const previous = button('Precedente', () => { state.page--; render(); });
     const next = button('Successiva', () => { state.page++; render(); });
     navigation.append(previous, pageLabel, next);
 
-    function addRule(column) {
+    function addRule(column, initial = null) {
         const type = columnType(column.name);
-        let operator = type === 'text' ? 'contains' : 'eq';
+        let operator = initial?.operator || (type === 'text' ? 'contains' : 'eq');
         const row = element('fieldset', { class: 'table-filter-rule' });
         const legend = element('legend', {}, column.name);
         const choices = type === 'text'
@@ -132,6 +170,7 @@ function initialize(table, index) {
         const valueTitle = element('span', { class: 'table-filter-label' }, 'Valore'); valueLabel.append(valueTitle, value);
         const to = element('input', { id: `${inputId}-to`, class: 'form-in', type: type === 'date' ? 'date' : 'text', 'aria-label': `Valore finale per ${column.name}`, maxlength: '500' });
         if (type === 'number') to.inputMode = 'decimal';
+        value.value = initial?.value || ''; to.value = initial?.to || '';
         const toLabel = element('label', { for: `${inputId}-to`, class: 'table-filter-value', hidden: '' });
         toLabel.append(element('span', { class: 'table-filter-label' }, 'A'), to);
         const update = () => {
@@ -165,7 +204,7 @@ function initialize(table, index) {
     }
     async function load() {
         if (!paginated) { state.rows = rowsFrom(table); return; }
-        const url = tableExportUrl(location.href, pager.dataset.pageName || 'page');
+        const url = tableExportUrl(location.href, pager.dataset.pageName || 'page', JSON.parse(table.dataset.tableQuery || '{}'));
         const rows = []; const seen = new Set();
         let pageUrl = url.href;
         while (pageUrl) {
@@ -203,6 +242,7 @@ function initialize(table, index) {
         }
         info.textContent = `${found.length} ${found.length === 1 ? 'risultato' : 'risultati'} su ${state.rows.length}. Excel e PDF includono tutti i risultati filtrati.`;
         table.dispatchEvent(new CustomEvent('table:rendered', { bubbles: true }));
+        table.dispatchEvent(new CustomEvent('table:filtered', { bubbles: true, detail: { rows: found.map(row => row.node.dataset) } }));
     }
     function reset() {
         state.applied = []; state.rows = null; state.page = 1;
@@ -213,40 +253,85 @@ function initialize(table, index) {
         toggle.textContent = 'Filtra tabella';
         combination = 'all'; [...mode.querySelectorAll('button')].forEach((b,i) => b.setAttribute('aria-pressed', String(i === 0)));
         table.dispatchEvent(new CustomEvent('table:rendered', { bubbles: true }));
+        table.dispatchEvent(new CustomEvent('table:filtered', { bubbles: true, detail: { rows: null } }));
     }
     async function busy(action) {
-        if (state.busy) return;
-        state.busy = true; [excel, pdf, ...filters.querySelectorAll('button')].forEach(b => b.disabled = true);
+        if (state.busy || state.invalidFilters) return;
+        const controls = () => [excel,pdf,...filters.querySelectorAll('button'),...(accountingWorkspace?.querySelectorAll('[data-collection-export]') || [])];
+        state.busy = true; controls().forEach(b => b.disabled = true);
         try { await action(); } catch (error) { info.textContent = error.message || 'Operazione non completata. Riprova.'; }
-        finally { state.busy = false; [excel, pdf, ...filters.querySelectorAll('button')].forEach(b => b.disabled = false); refreshEditor(); }
+        finally { state.busy = false; controls().forEach(b => b.disabled = false); refreshEditor(); }
     }
-    filters.addEventListener('submit', event => {
+    function readRules() {
+        const active = [...rules.children].map(row => row.read());
+        if (active.length > 20) throw new Error('Puoi combinare al massimo 20 criteri.');
+        for (const r of active) if (!['empty','filled'].includes(r.operator) && r.type !== 'text' && (!Number.isFinite(valueOf(r.value,r.type)) || (r.operator === 'between' && (!Number.isFinite(valueOf(r.to,r.type)) || valueOf(r.to,r.type)<valueOf(r.value,r.type))))) throw new Error('Controlla valori e intervalli dei filtri.');
+        return active;
+    }
+    if (filterForm) {
+        const saved = element('input', { type:'hidden', name:'_table_filters', disabled:'' });
+        filterForm.append(saved);
+        filterForm.addEventListener('submit', event => {
+            try { saved.value = storeTableFilters(readRules(), combination, columns); saved.disabled = !saved.value; }
+            catch (error) { event.preventDefault(); info.textContent = error.message; info.scrollIntoView({block:'nearest'}); }
+        });
+        (filterForm.closest('#content-area') || document).querySelectorAll('a[data-keep-table-filters]').forEach(link => link.addEventListener('click', () => {
+            const url = new URL(link.href), value = storeTableFilters(state.applied, state.mode, columns);
+            if (value) url.searchParams.set('_table_filters', value); else url.searchParams.delete('_table_filters');
+            link.href = url.href;
+        }));
+        try {
+            const restored = restoreTableFilters(new URL(location.href).searchParams.get('_table_filters'), columns);
+            combination = restored.mode; state.mode = restored.mode;
+            [...mode.querySelectorAll('button')].forEach((button,index) => button.setAttribute('aria-pressed', String(index === (combination==='all' ? 0 : 1))));
+            for (const rule of restored.rules) addRule(columns.find(column=>column.index===rule.column), rule);
+            state.applied = readRules();
+            if (state.applied.length) {
+                const details = filters.closest('details'); if (details) details.open = true;
+                info.textContent = 'Applicazione dei filtri a tutti i risultati…';
+                busy(async () => { await load(); render(); });
+            }
+        } catch (error) {
+            info.textContent = error.message;
+            /** An invalid saved accounting filter must never produce an apparently filtered financial report. */
+            if (accounting) {state.invalidFilters=true;[excel,pdf,...(accountingWorkspace?.querySelectorAll('[data-collection-export]') || [])].forEach(button=>button.disabled=true);}
+        }
+    } else filters.addEventListener('submit', event => {
         event.preventDefault();
         busy(async () => {
-            const active = [...rules.children].map(row => row.read());
+            const active = readRules();
             if (!active.length) { reset(); return; }
-            for (const r of active) if (!['empty','filled'].includes(r.operator) && r.type !== 'text' && (!Number.isFinite(valueOf(r.value,r.type)) || (r.operator === 'between' && (!Number.isFinite(valueOf(r.to,r.type)) || valueOf(r.to,r.type)<valueOf(r.value,r.type))))) throw new Error('Controlla valori e intervalli dei filtri.');
             await load(); state.applied = active; state.mode = combination; state.page = 1; render();
             toggle.textContent = `Filtri applicati (${active.length})`;
         });
     });
-    async function download(format) {
+    async function download(format, groupKey = null) {
         await busy(async () => {
-            await load(); const rows = matching().map(r => columns.map(c => r.cells[c.index]));
+            await load(); const matched = matching();
+            const rows = matched.map(r => columns.map(c => r.cells[c.index]));
+            const footers = table.matches('[data-collection-table]') ? collectionExportFooters(matched.map(row => row.node.dataset), columns.map(column=>column.name)) : [];
             info.textContent = `Preparazione ${format === 'xlsx' ? 'Excel' : 'PDF'}: ${rows.length} ${rows.length === 1 ? 'riga' : 'righe'}…`;
             const operators = { contains:'contiene', not_contains:'non contiene', starts:'inizia con', eq:'uguale a', ne:'diverso da', gt:'maggiore / dopo', gte:'maggiore o uguale', lt:'minore / prima', lte:'minore o uguale', between:'compreso tra', empty:'vuoto', filled:'compilato' };
             const filtersText = state.applied.map(r => `${columns.find(c=>c.index===r.column)?.name}: ${operators[r.operator]} ${r.value}${r.to ? ' e '+r.to : ''}`).join(state.mode === 'any' ? ' oppure ' : '; ');
-            const searchLabels = { search:'Ricerca', client:'Cliente', policy:'Polizza', client_type:'Tipo cliente', status:'Stato', category:'Ramo', subcategory:'Sottoramo', period:'Periodo', operation:'Operazione', date:'Giornata', month:'Mese', date_basis:'Data di riferimento', agency:'Agenzia', payment_frequency:'Frazionamento', from:'Dal', to:'Al', supplier_company_id:'Compagnia', company:'Compagnia', responsible:'Responsabile cliente', branch:'Ramo principale', subbranch:'Sottoramo', basis:'Base di calcolo', on:'Valide alla data', state:'Stato', review:'Solo da verificare', document_view:'Versioni documenti', unassigned:'Compagnia da assegnare', import_review:'Dati importati da verificare', kind:'Anagrafica', result:'Esito' };
-            const searchFilters = [...new URL(location.href).searchParams].filter(([key,value]) => searchLabels[key] && value).map(([key,value]) => {
+            const searchLabels = { search:'Ricerca', client:'Cliente', policy:'Polizza', client_type:'Tipo cliente', status:'Stato', category:'Ramo', subcategory:'Sottoramo', period:'Periodo', operation:'Operazione', date:'Giornata', month:'Mese', date_basis:'Data di riferimento', agency:'Agenzia', payment_frequency:'Frazionamento', from:'Dal', to:'Al', titles_from:'Scadenza titoli dal', titles_to:'Scadenza titoli al', payment_method:'Modalità di pagamento', supplier_company_id:'Compagnia', company:'Compagnia', responsible:'Responsabile cliente', branch:'Ramo principale', subbranch:'Sottoramo', basis:'Base di calcolo', on:'Valide alla data', state:'Stato', review:'Solo da verificare', document_view:'Versioni documenti', unassigned:'Compagnia da assegnare', import_review:'Dati importati da verificare', kind:'Anagrafica', result:'Esito',direction:'Movimento',recipient:'Gestito da',consultant:'Consulente',document_type:'Tipo documento' };
+            const appliedUrl = tableExportUrl(location.href, pager?.dataset.pageName || 'page', JSON.parse(table.dataset.tableQuery || '{}'));
+            const searchFilters = [...appliedUrl.searchParams].filter(([key,value]) => searchLabels[key] && value).map(([key,value]) => {
                 const field = [...document.querySelectorAll('form[method="GET"] [name]')].find(el => el.name === key);
-                if (field?.disabled) return null;
+                if (field?.disabled && !accounting) return null;
                 const label = field?.dataset.exportLabel || text(field?.labels?.[0]?.textContent) || searchLabels[key];
-                const display = field?.dataset.exportValue || field?.selectedOptions?.[0]?.textContent || (key === 'document_view' ? ({ current:'Documenti correnti', history:'Tutte le versioni' }[value] || value) : value);
+                const display = field?.dataset.exportValue || [...(field?.options || [])].find(option => option.value === value)?.textContent || (key === 'document_view' ? ({ current:'Documenti correnti', history:'Tutte le versioni' }[value] || value) : value);
                 return `${label}: ${display}`;
             }).filter(Boolean).join('; ');
-            const { exportTable } = await import('./table-export.js');
-            await exportTable({ format, title, headers: columns.map(c => c.name), columnTypes: columns.map(c => c.exportType), rows, filters: filtersText, searchFilters });
-            info.textContent = `Esportazione completata: ${rows.length} ${rows.length === 1 ? 'riga' : 'righe'}.`;
+            let exported = rows.length;
+            if (accounting) {
+                const [{collectionReport},{exportCollectionReport}] = await Promise.all([import('./collection-report.js'),import('./collection-export.js')]);
+                const report = collectionReport(matched.map(row=>({data:row.node.dataset,cells:columns.map(c=>row.cells[c.index])})),columns.map(c=>c.name),groupKey);
+                await exportCollectionReport({format,report,filters:filtersText,searchFilters}); exported=report.rows.length;
+            } else {
+                const { exportTable } = await import('./table-export.js');
+                await exportTable({ format, title, headers: columns.map(c => c.name), columnTypes: columns.map(c => c.exportType), rows, footers, filters: filtersText, searchFilters });
+            }
+            info.textContent = `Esportazione completata: ${exported} ${exported === 1 ? 'riga' : 'righe'}.`;
         });
     }
 }

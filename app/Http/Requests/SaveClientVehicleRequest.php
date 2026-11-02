@@ -35,6 +35,12 @@ class SaveClientVehicleRequest extends ClientInsuranceRequest
 
     public function messages(): array
     {
-        return ['plate.unique' => 'La targa è già presente nella scheda di questo cliente.'];
+        return [
+            'plate.required' => 'Inserisci la targa del veicolo.',
+            'plate.regex' => 'La targa può contenere lettere, numeri e trattini.',
+            'plate.unique' => 'La targa è già presente nella scheda di questo cliente.',
+            'merit_class_cu.between' => 'La classe di merito CU deve essere compresa tra 1 e 18.',
+            'merit_class_company_id.required_with' => 'Se inserisci la classe della compagnia, seleziona anche la compagnia di riferimento.',
+        ];
     }
 }

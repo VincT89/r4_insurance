@@ -16,14 +16,14 @@
 <p class="communication-pagination-summary" data-table-page-summary>{{ number_format($payments->total(),0,',','.') }} {{ $payments->total() === 1 ? 'incasso' : 'incassi' }} · Pagina {{ $payments->currentPage() }} di {{ $payments->lastPage() }}</p>
 <div class="client-table-scroll" role="region" aria-label="Incassi da comunicare alle agenzie" tabindex="0"><table class="t-table"><thead><tr><th>Seleziona</th><th>Data</th><th>Agenzia</th><th>Contraente</th><th>Polizza / titolo</th><th>Compagnia</th><th>Frazionamento</th><th>Importo</th><th>Metodo pagamento</th><th>Destinatario pagamento</th><th>Comunicazione</th></tr></thead><tbody>
 @forelse($payments as $payment)
-@php($agency=$payment->title->policy->supplierAgency)
+@php($agency=$payment->title->contract->supplierAgency)
 @php($delivery=$deliveries->get($payment->id))
-<tr><td>@if($agency)<input type="checkbox" value="{{ $payment->id }}" data-communication-item data-agency="{{ $agency->id }}" aria-label="Includi incasso {{ $payment->id }}" @disabled($delivery || $agency->status !== 'active')>@endif</td><td>{{ $payment->received_on->format('d/m/Y') }}</td><td>@if($agency)<a href="{{ route('suppliers.show',$agency) }}">{{ $agency->name }}</a>@else Agenzia da assegnare @endif</td><td>{{ $payment->title->policy->client->name }}</td><td><a href="{{ route('titles.show',$payment->insurance_title_id) }}">{{ $payment->title->policy->number }} / #{{ $payment->insurance_title_id }}</a></td><td>{{ $payment->title->policy->company }}</td><td>{{ $payment->title->payment_frequency }}</td><td>{{ \App\Support\Money::format($payment->amount_cents) }}</td><td>{{ $payment->payment_method }}</td><td>{{ \App\Models\InsuranceCollection::RECIPIENTS[$payment->recipient] }}</td><td>
+<tr><td>@if($agency)<input type="checkbox" value="{{ $payment->id }}" data-communication-item data-agency="{{ $agency->id }}" aria-label="Includi incasso {{ $payment->id }}" @disabled($delivery || $agency->status !== 'active')>@endif</td><td>{{ $payment->received_on->format('d/m/Y') }}</td><td>@if($agency)<a href="{{ route('suppliers.show',$agency) }}">{{ $agency->name }}</a>@else Agenzia da assegnare @endif</td><td>{{ $payment->title->policy->client->name }}</td><td><a href="{{ route('titles.show',$payment->insurance_title_id) }}">{{ $payment->title->contract->number }} / #{{ $payment->insurance_title_id }}</a></td><td>{{ $payment->title->contract->company }}</td><td>{{ $payment->title->payment_frequency }}</td><td>{{ \App\Support\Money::format($payment->direction === 'refund' ? -$payment->amount_cents : $payment->amount_cents) }}</td><td>{{ $payment->payment_method }}</td><td>{{ \App\Models\InsuranceCollection::RECIPIENTS[$payment->recipient] }}</td><td>
 @if($delivery)<a href="{{ route('agency-communications.show',$delivery->id) }}">{{ \App\Models\AgencyCommunication::STATUSES[$delivery->status] }}</a>
 @elseif(!$agency) Assegna l’agenzia
 @elseif($agency->status !== 'active') Agenzia non attiva
 @elseif(!filter_var($agency->email,FILTER_VALIDATE_EMAIL))<a href="{{ route('suppliers.edit',$agency) }}">Completa email agenzia</a>
-@else {{ $payment->title->policy->ad_horas ? 'Ad horas' : 'Da comunicare' }} @endif
+@else {{ $payment->title->contract->ad_horas ? 'Ad horas' : 'Da comunicare' }} @endif
 </td></tr>
 @empty<tr><td colspan="11">Nessun incasso da comunicare per questi filtri.</td></tr>@endforelse
 </tbody></table></div>{{ $payments->links() }}

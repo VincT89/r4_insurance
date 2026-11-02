@@ -49,7 +49,7 @@ class ClientController extends Controller
     {
         $this->authorize('view', $client);
         $filters = $request->validate([
-            'tab' => ['nullable', 'in:policies,registry,vehicles,documents,deadlines,network,assets,history,consents'],
+            'tab' => ['nullable', 'in:policies,registry,vehicles,documents,deadlines,network,assets,history,consents,commissions'],
             'category' => ['nullable', 'string', 'max:100'],
             'subcategory' => ['nullable', 'string', 'max:100'],
             'period' => ['nullable', 'in:all,overdue,7,15,30,45,60,custom'],
@@ -58,11 +58,14 @@ class ClientController extends Controller
             'to' => ['nullable', 'date_format:Y-m-d', ...($request->filled('from') ? ['after_or_equal:from'] : [])],
         ]);
         $tab = $filters['tab'] ?? 'policies';
-        $commissionSummary = $request->user()->can('system.admin') && in_array($tab, ['policies', 'registry'], true)
+        if ($tab === 'commissions') $this->authorize('system.admin');
+        $commissionSummary = $tab === 'commissions'
             ? app(\App\Domain\Core\Queries\InsuranceCommissionQuery::class)->summary($client)
             : null;
         $client->load('commercialUser:id,name');
-        $policies = $tab === 'policies' ? $client->policies()->with(['vehicle', 'asset', 'supplierAgency'])->orderBy('category')->orderBy('subcategory')->orderBy('expires_on')->get() : collect();
+        $policies = $tab === 'policies' ? $client->policies()->with(['vehicle', 'asset', 'supplierAgency', 'contracts'])
+            ->withExists(['titles as has_payable_titles' => fn ($q) => $q->whereNull('cancelled_at')->whereColumn('collected_cents', '<', 'amount_cents')])
+            ->orderBy('category')->orderBy('expires_on')->get() : collect();
         $policyCategories = (\App\Models\InsuranceBranch::exists() ? collect() : collect(\App\Models\InsurancePolicy::CATEGORY_SUGGESTIONS))->merge($policies->pluck('category'))->unique()->values();
         if (filled($filters['category'] ?? null)) {
             $policies = $policies->where('category', $filters['category']);
