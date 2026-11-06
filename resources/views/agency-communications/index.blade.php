@@ -1,35 +1,52 @@
+@php($otherFilters=filled($filters['company']??null) || filled($filters['status']??null) || $filters['operation']!=='all' || filled(request('_table_filters')))
 <x-app-layout title="Comunicazioni alle agenzie">
-    <x-page-header><x-slot:title>Comunicazioni alle agenzie</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route('agency-communications.history') }}">Storico invii</a><a class="btn btn-g" href="{{ route('email-settings.edit') }}">Impostazioni email</a></x-slot:actions></x-page-header>
+    <x-page-header><x-slot:title>Comunicazioni alle agenzie</x-slot:title></x-page-header>
+    <div class="communication-workspace">
     @include('agency-communications.navigation')
-    <form method="GET" x-data="{period:@js($filters['period'])}" class="client-search-form filter-grid">
-        <div class="form-row">
-            <x-form-group label="Periodo dell’operazione" name="period"><select id="field-period" name="period" class="form-sel" x-model="period">@foreach(['day'=>'Giornata','15'=>'Ultimi 15 giorni','30'=>'Ultimi 30 giorni','month'=>'Mese','custom'=>'Intervallo personalizzato'] as $key=>$label)<option value="{{ $key }}" @selected($filters['period']===(string)$key)>{{ $label }}</option>@endforeach</select></x-form-group>
-            <x-form-group label="Operazione" name="operation"><select id="field-operation" name="operation" class="form-sel">@foreach(\App\Services\AgencyCommunicationOperations::LABELS as $value=>$label)<option value="{{ $value }}" @selected($filters['operation']===$value)>{{ $label }}</option>@endforeach</select></x-form-group>
+    <details class="communication-search" @if($errors->any()) open @endif><summary>Filtra elenco</summary>
+    <form id="communication-operation-filters" method="GET" x-data="{period:@js($filters['period'])}" class="client-search-form communication-filters" data-compact-filter-results aria-label="Filtra operazioni da comunicare">
+        <div class="communication-filter-primary">
+            <x-form-group label="Agenzia" name="agency"><select id="field-agency" name="agency" class="form-sel"><option value="">Tutte le agenzie</option>@foreach($options['agencies'] as $agencyOption)<option value="{{ $agencyOption->id }}" @selected((string)($filters['agency']??'')===(string)$agencyOption->id)>{{ $agencyOption->name }}</option>@endforeach</select></x-form-group>
+            <x-form-group label="Periodo" name="period"><select id="field-period" name="period" class="form-sel" x-model="period">@foreach(['day'=>'Giornata','15'=>'Ultimi 15 giorni','30'=>'Ultimi 30 giorni','month'=>'Mese','custom'=>'Intervallo personalizzato'] as $key=>$label)<option value="{{ $key }}" @selected($filters['period']===(string)$key)>{{ $label }}</option>@endforeach</select></x-form-group>
             <div x-show="period==='day'"><x-form-group label="Giornata" name="date"><input id="field-date" class="form-in" type="date" name="date" value="{{ $filters['date'] }}" max="{{ today()->toDateString() }}" :disabled="period!=='day'"></x-form-group></div>
             <div x-show="period==='month'" x-cloak><x-form-group label="Mese" name="month"><input id="field-month" class="form-in" type="month" name="month" value="{{ $filters['month'] }}" :disabled="period!=='month'"></x-form-group></div>
-            <div x-show="period==='custom'" x-cloak><x-form-group label="Dal" name="from"><input id="field-from" class="form-in" type="date" name="from" value="{{ $filters['from'] ?? '' }}" max="{{ today()->toDateString() }}" :disabled="period!=='custom'" :required="period==='custom'"></x-form-group></div>
-            <div x-show="period==='custom'" x-cloak><x-form-group label="Al" name="to"><input id="field-to" class="form-in" type="date" name="to" value="{{ $filters['to'] ?? '' }}" max="{{ today()->toDateString() }}" :disabled="period!=='custom'" :required="period==='custom'"></x-form-group></div>
-            <x-form-group label="Agenzia" name="agency"><select id="field-agency" name="agency" class="form-sel"><option value="">Tutte le agenzie</option>@foreach($options['agencies'] as $agencyOption)<option value="{{ $agencyOption->id }}" @selected((string)($filters['agency'] ?? '')===(string)$agencyOption->id)>{{ $agencyOption->name }}</option>@endforeach</select></x-form-group>
-            <x-form-group label="Compagnia" name="company"><select id="field-company" name="company" class="form-sel"><option value="">Tutte le compagnie</option>@foreach($options['companies'] as $company)<option value="{{ $company }}" @selected(($filters['company'] ?? '')===$company)>{{ $company }}</option>@endforeach</select></x-form-group>
-            <x-form-group label="Stato" name="status"><select id="field-status" name="status" class="form-sel"><option value="">Tutti gli stati</option>@foreach(\App\Domain\Core\Queries\PolicyPortfolioQuery::STATES as $value=>$label)<option value="{{ $value }}" @selected(($filters['status'] ?? '')===$value)>{{ $label }}</option>@endforeach</select></x-form-group>
-            <x-form-group label="Cerca cliente, polizza o appendice" name="search"><input id="field-search" class="form-in" name="search" value="{{ $filters['search'] ?? '' }}" maxlength="255"></x-form-group>
-        </div><div class="search-form-actions"><button class="btn btn-p">Applica filtri</button><a class="btn btn-g" href="{{ route('agency-communications.index') }}">Azzera filtri</a></div>
+            <x-form-group label="Cliente, polizza o appendice" name="search"><input id="field-search" type="search" class="form-in" name="search" value="{{ $filters['search']??'' }}" maxlength="255"></x-form-group>
+        </div>
+        <div class="communication-filter-dates" x-show="period==='custom'" x-cloak>
+            <x-form-group label="Dal" name="from"><input id="field-from" class="form-in" type="date" name="from" value="{{ $filters['from']??'' }}" max="{{ today()->toDateString() }}" :disabled="period!=='custom'" :required="period==='custom'"></x-form-group>
+            <x-form-group label="Al" name="to"><input id="field-to" class="form-in" type="date" name="to" value="{{ $filters['to']??'' }}" max="{{ today()->toDateString() }}" :disabled="period!=='custom'" :required="period==='custom'"></x-form-group>
+        </div>
+        <div class="collection-filter-controls">
+            <details class="search-more" @if($otherFilters) open @endif><summary class="btn btn-g">Altri filtri{{ $otherFilters ? ' (attivi)' : '' }}</summary>
+                <div class="search-more-fields">
+                    <x-form-group label="Operazione" name="operation"><select id="field-operation" name="operation" class="form-sel">@foreach(\App\Services\AgencyCommunicationOperations::LABELS as $value=>$label)<option value="{{ $value }}" @selected($filters['operation']===$value)>{{ $label }}</option>@endforeach</select></x-form-group>
+                    <x-form-group label="Compagnia" name="company"><select id="field-company" name="company" class="form-sel"><option value="">Tutte le compagnie</option>@foreach($options['companies'] as $company)<option value="{{ $company }}" @selected(($filters['company']??'')===$company)>{{ $company }}</option>@endforeach</select></x-form-group>
+                    <x-form-group label="Stato polizza" name="status"><select id="field-status" name="status" class="form-sel"><option value="">Tutti gli stati</option>@foreach(\App\Domain\Core\Queries\PolicyPortfolioQuery::STATES as $value=>$label)<option value="{{ $value }}" @selected(($filters['status']??'')===$value)>{{ $label }}</option>@endforeach</select></x-form-group>
+                </div>
+                <div data-column-filters></div>
+            </details>
+            <div class="search-form-actions"><button class="btn btn-p">Applica filtri</button><a class="btn btn-g" href="{{ route('agency-communications.index') }}">Azzera filtri</a></div>
+        </div>
     </form>
-    <p class="u-mb-md">{{ \App\Services\AgencyCommunicationOperations::LABELS[$filters['operation']] }}: {{ $range }}</p>
-    <p class="u-text-meta u-mb-md">Seleziona polizze e aggiunte di coperture per agenzia, controlla premi e allegati, poi conferma un’unica email. Le appendici compaiono nella giornata in cui sono state registrate, anche per polizze precedenti.</p>
-    @unless($mailReady)<p class="u-mb-md">Per inviare, completa la casella in <a href="{{ route('email-settings.edit') }}">Impostazioni email</a>. Puoi già preparare e controllare la selezione.</p>@endunless
+    </details>
+    @unless($mailReady)<p class="communication-mail-notice">Puoi preparare l’email. @can('system.admin')Per inviarla, completa la casella nelle <a href="{{ route('email-settings.edit') }}">Impostazioni email</a>.@else Per inviarla, un amministratore deve configurare la casella di posta.@endcan</p>@endunless
+    <x-panel title="Polizze e variazioni da comunicare">
+        <x-slot:headerActions><p class="list-results">{{ $range }}</p></x-slot:headerActions>
+        @include('agency-communications.batches',['batchRoute'=>'agency-communications.review','batchSingular'=>'operazione da comunicare','batchPlural'=>'operazioni da comunicare'])
+    </x-panel>
+    <details class="communication-manual-selection" @if(request('page') || filled(request('_table_filters'))) open @endif><summary>Scegli singole operazioni</summary>
     <section data-communication-selection data-selection-user="{{ auth()->id() }}" data-selection-scope="{{ $selectionScope }}" data-selection-field="operations">
-        @include('agency-communications.selection-actions', ['reviewRoute'=>'agency-communications.review'])
-        <x-panel title="Polizze e variazioni del periodo">
-            <p class="communication-pagination-summary" data-table-page-summary>{{ number_format($policies->total(), 0, ',', '.') }} {{ $policies->total() === 1 ? 'operazione' : 'operazioni' }} · Pagina {{ $policies->currentPage() }} di {{ $policies->lastPage() }}</p>
+        <x-panel title="Polizze e variazioni">
+            <x-slot:headerActions><p class="list-results" data-table-page-summary>{{ number_format($policies->total(),0,',','.') }} {{ $policies->total()===1 ? 'operazione' : 'operazioni' }} / {{ $range }}@if($policies->hasPages()) / Pagina {{ $policies->currentPage() }} di {{ $policies->lastPage() }}@endif</p></x-slot:headerActions>
+            @include('agency-communications.selection-actions')
             <div class="client-table-scroll" role="region" aria-label="Operazioni da comunicare alle agenzie" tabindex="0">
-                <table class="t-table"><thead><tr><th>Seleziona</th><th>Inserita il</th><th>Ultimo rinnovo</th><th>Operazione</th><th>Agenzia</th><th>Contraente</th><th>Polizza</th><th>Riferimento appendice</th><th>Compagnia</th><th>Premio dell’operazione</th><th>Stato polizza</th><th>Comunicazione</th></tr></thead><tbody>
+                <table class="t-table" data-list-details="agency-operations" data-details-label="Altri dati" data-filter-form="communication-operation-filters" data-table-query="{{ json_encode($filters) }}"><thead><tr><th>Seleziona</th><th data-list-detail>Inserita il</th><th data-list-detail>Ultimo rinnovo</th><th>Operazione</th><th>Agenzia</th><th>Contraente</th><th>Polizza</th><th data-list-detail>Riferimento appendice</th><th data-list-detail>Compagnia</th><th>Premio dell’operazione</th><th data-list-detail>Stato polizza</th><th>Comunicazione</th></tr></thead><tbody>
                     @forelse($policies as $policy)
                         @php($agency = $policy->supplierAgency)
                         @php($change = $policy->communicationChange)
                         @php($delivery = $change ? $changeDeliveries->get($change->id) : $deliveries->get($policy->id))
                         @php($eligible = $agency && in_array($policy->status,['active','renewed']) && !$policy->expires_on->lt(today()) && (!$change || !$change->expires_on->lt(today())))
-                        <tr><td>
+                        <tr data-list-label="{{ $policy->number }} · {{ $policy->client->name }}"><td>
                             @if($eligible)
                                 <input type="checkbox" value="{{ $change ? 'change-'.$change->id : $policy->id }}" data-communication-item data-agency="{{ $agency->id }}" aria-label="{{ $change ? 'Includi appendice '.$change->reference.' della polizza '.$policy->number : 'Includi polizza '.$policy->number }}" @disabled($delivery || $agency->status !== 'active')>
                             @endif
@@ -44,6 +61,9 @@
                     @empty<tr><td colspan="12">Nessuna operazione nel periodo con i filtri scelti.</td></tr>@endforelse
                 </tbody></table>
             </div>{{ $policies->links() }}
+            @include('agency-communications.selection-groups',['reviewRoute'=>'agency-communications.review'])
         </x-panel>
     </section>
+    </details>
+    </div>
 </x-app-layout>

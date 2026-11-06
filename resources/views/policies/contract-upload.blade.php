@@ -1,12 +1,18 @@
 <x-form-section title="Carica il contratto">
-    <p class="u-mb-md">Scegli il PDF ricevuto dalla compagnia: leggeremo numero di polizza, date, premio e frazionamento. Poi potrai controllare e correggere i dati prima di confermare.</p>
-    @if($selectedQuote)<p class="u-mb-md">Preventivo {{ $selectedQuote->reference }} di {{ $client->name }} / {{ $selectedQuote->company->name }}.</p>@endif
+    @if($selectedQuote)
+        <div class="contract-approved-proposal">
+            <strong>Proposta approvata · {{ $selectedQuote->reference }}</strong>
+            <p>{{ $client->name }} · {{ $selectedQuote->company->name }} · {{ $selectedQuote->agency?->name ?: 'Rapporto diretto' }}</p>
+            <p>{{ $selectedQuote->product }} · {{ \App\Support\Money::format($selectedQuote->premium_cents) }} · {{ $selectedQuote->payment_frequency }}</p>
+        </div>
+    @endif
+    <p class="u-mb-md">Carica il PDF della compagnia per leggere il numero di polizza, le date, il premio e il frazionamento. Potrai controllare i dati e i titoli prima di confermare.</p>
     <x-form-group label="Contratto PDF" name="contract" required>
         <input id="field-contract" class="form-in" type="file" name="contract" accept="application/pdf,.pdf" required aria-describedby="contract-read-status">
         <p class="u-text-meta">Massimo 10 MB. Il contratto verrà conservato nella polizza dopo la tua conferma.</p>
     </x-form-group>
     <p id="contract-read-status" data-contract-status role="status" aria-live="polite">Carica il contratto per iniziare.</p>
-    <div class="insurance-form-actions"><button type="button" class="btn btn-g" data-contract-manual hidden>Completa i dati manualmente</button><a class="btn btn-g" data-contract-initial-cancel href="{{ $client->exists ? route('clients.show', $client) : route('policies.index') }}">Annulla</a></div>
+    <div class="insurance-form-actions"><button type="button" class="btn btn-g" data-contract-manual hidden>Completa i dati manualmente</button><a class="btn btn-g" data-contract-initial-cancel href="{{ isset($source) ? route('clients.policies.show',[$client,$source]) : ($selectedQuote ? route('quotes.show',$selectedQuote->quoteCase) : ($client->exists ? route('clients.show', $client) : route('policies.index'))) }}">Annulla</a></div>
     <ul data-contract-warnings class="contract-warnings" hidden></ul>
     <details data-contract-source hidden><summary>Consulta il testo letto dal contratto</summary><pre class="contract-source" data-contract-text></pre></details>
     @if(!$selectedQuote && $approvedQuotes->isNotEmpty())

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -64,7 +65,14 @@ class Attachment extends Model
 
     protected static function booted(): void
     {
+        static::updating(function (Attachment $attachment) {
+            if ($attachment->isDirty(['disk','path','attachable_type','attachable_id','insurance_policy_id','insurance_form_document_id','insurance_form_submission_id','original_name','document_category'])
+                && ($attachment->tabletSignatures()->exists() || $attachment->signatureResult()->exists())) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Il documento appartiene a una firma registrata. Conserva questa copia e aggiungi una nuova versione.']);
+            }
+        });
         static::deleting(function (Attachment $attachment) {
+            if ($attachment->tabletSignatures()->exists() || $attachment->signatureResult()->exists()) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Originale e copia con firma devono restare nello storico.']);
             if ($attachment->insurance_policy_change_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'L’allegato appartiene allo storico di una variazione contrattuale e deve essere conservato.']);
             if ($attachment->insurance_quote_case_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Il documento appartiene a una pratica preventivi e deve restare nello storico.']);
             if ($attachment->insurance_claim_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Il documento appartiene allo storico di un sinistro e deve essere conservato.']);
@@ -100,6 +108,11 @@ class Attachment extends Model
         return $this->belongsTo(InsurancePolicy::class);
     }
 
+    public function insuranceQuote(): BelongsTo
+    {
+        return $this->belongsTo(InsuranceQuote::class);
+    }
+
     public function vehicle(): BelongsTo
     {
         return $this->belongsTo(ClientVehicle::class, 'vehicle_id');
@@ -127,6 +140,20 @@ class Attachment extends Model
     }
     public function previousVersion(): BelongsTo { return $this->belongsTo(self::class, 'previous_version_id'); }
     public function formDocument(): BelongsTo { return $this->belongsTo(InsuranceFormDocument::class,'insurance_form_document_id'); }
+    public function tabletSignatures() { return $this->hasMany(DocumentSignature::class, 'source_attachment_id'); }
+    public function latestTabletSignature() { return $this->hasOne(DocumentSignature::class, 'source_attachment_id')->latestOfMany(); }
+    public function signatureResult() { return $this->hasOne(DocumentSignature::class, 'signed_attachment_id'); }
+    public function scopeCurrentDocumentVersion(Builder $query): Builder
+    {
+        /** Le copie firmate vengono versionate sul modulo, gli altri documenti sull’allegato stesso. */
+        return $query->whereDoesntHave('newerVersion')->where(fn ($files) => $files->whereNull('insurance_form_submission_id')
+            ->orWhereHas('formDocument.latestSubmission',fn ($latest) => $latest->whereColumn('insurance_form_submissions.id','attachments.insurance_form_submission_id')));
+    }
+    public function isHistoricalDocument(): bool
+    {
+        if ($this->newerVersion) return true;
+        return $this->insurance_form_submission_id && (int)$this->formDocument?->latestSubmission?->id !== (int)$this->insurance_form_submission_id;
+    }
     public function newerVersion(): \Illuminate\Database\Eloquent\Relations\HasOne { return $this->hasOne(self::class, 'previous_version_id'); }
     public function documentRequest(): BelongsTo { return $this->belongsTo(ClientDocumentRequest::class, 'document_request_id'); }
     public function checklistRequests() { return $this->belongsToMany(ClientDocumentRequest::class, 'client_document_request_files'); }

@@ -3,7 +3,6 @@
 namespace App\Support\Monitoring;
 
 use App\Models\SystemCommandRun;
-use App\Support\Http\ProviderErrorSanitizer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Throwable;
@@ -35,7 +34,9 @@ trait TracksSystemCommandRuns
         try {
             $exitCode = $callback();
 
-            $run->update([
+            /** L'assegnazione esplicita conserva l'avvio anche nei database con aggiornamento automatico del primo timestamp. */
+            SystemCommandRun::whereKey($run->id)->update([
+                'started_at' => $run->getRawOriginal('started_at'),
                 'status' => $exitCode === Command::SUCCESS
                     ? 'succeeded'
                     : 'failed',
@@ -45,19 +46,19 @@ trait TracksSystemCommandRuns
 
             return $exitCode;
         } catch (Throwable $exception) {
-            $run->update([
-                'status' => 'failed',
-                'exit_code' => Command::FAILURE,
-                'error_message' => Str::limit(
-                    ProviderErrorSanitizer::safeText(
-                        $exception->getMessage()
-                    ),
-                    1000
-                ),
-                'finished_at' => now(),
-            ]);
-
-            throw $exception;
+            try {
+                /** Il tipo e il codice descrivono l'errore senza conservare query, credenziali o dati personali del messaggio. */
+                SystemCommandRun::whereKey($run->id)->update([
+                    'started_at' => $run->getRawOriginal('started_at'),
+                    'status' => 'failed',
+                    'exit_code' => Command::FAILURE,
+                    'error_message' => $exception::class.' (codice '.$exception->getCode().').',
+                    'finished_at' => now(),
+                ]);
+            } finally {
+                /** Un problema nel registro non deve sostituire l'errore che ha interrotto il controllo. */
+                throw $exception;
+            }
         }
     }
 }

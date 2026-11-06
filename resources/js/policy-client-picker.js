@@ -10,6 +10,7 @@ function initPolicyClientPicker() {
         const quick = root.querySelector('[data-quick-client]');
         const keep = root.querySelector('[data-keep-client]');
         const deferred = root.hasAttribute('data-deferred-client');
+        const requester = form.querySelector('[data-quote-requester]');
         let creatingClient = false;
         let contractClientValues = {};
         function deferClient(enabled) {
@@ -45,8 +46,17 @@ function initPolicyClientPicker() {
         }
         async function choose(client) {
             if (String(client.id) === selected.value) { ++generation; pending?.abort(); loading = false; showSelected(); return true; }
-            if (selected.value && hasLinkedData() && !window.confirm(deferred ? `Cambiare il contraente da ${selectedName} a ${client.name}? Verifica che il contratto caricato sia quello corretto. Il veicolo o il bene collegato dovrà essere riselezionato.` : `Cambiare cliente da ${selectedName} a ${client.name}? Veicolo, polizza collegata, classe e allegati selezionati verranno rimossi dalla compilazione. I dati già salvati restano nel cliente precedente.`)) {
-                ++generation; pending?.abort(); loading = false; showSelected(); return false;
+            const replacingClient = Boolean(selected.value);
+            const customRequester = Boolean(requester?.value.trim() && requester.value.trim() !== selectedName);
+            const linked = replacingClient && hasLinkedData();
+            if (replacingClient && (linked || customRequester)) {
+                const changes = [];
+                if (deferred) changes.push('Verifica il contratto caricato e riseleziona il veicolo o il bene collegato.');
+                else if (linked) changes.push('Veicolo, polizza, classe e allegati selezionati verranno rimossi dalla compilazione.');
+                if (customRequester) changes.push('Il richiedente prenderà il nome del nuovo cliente.');
+                if (!window.confirm(`Cambiare cliente da ${selectedName} a ${client.name}? ${changes.join(' ')}`)) {
+                    ++generation; pending?.abort(); loading = false; showSelected(); return false;
+                }
             }
             const current = ++generation;
             pending?.abort();
@@ -66,6 +76,7 @@ function initPolicyClientPicker() {
                 deferClient(false);
                 selected.value = String(client.id);
                 selectedName = client.name;
+                if (requester && (replacingClient || !customRequester)) requester.value = client.name;
                 for (const vehicle of data.vehicles) {
                     const option = new Option([vehicle.plate, vehicle.make, vehicle.model].filter(Boolean).join(' / '), vehicle.id);
                     option.dataset.cu = vehicle.merit_class_cu || '';

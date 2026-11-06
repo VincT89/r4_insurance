@@ -1,19 +1,45 @@
 <x-app-layout :title="'Titolo #'.$title->id"><x-page-header><x-slot:title>{{ \App\Models\InsuranceTitle::KINDS[$title->kind] }} {{ $title->reference ?: '#'.$title->id }}</x-slot:title><x-slot:actions>@can('system.admin')<a class="btn btn-g" href="{{ route('commissions.show',$title) }}">Provvigione</a>@endcan<a class="btn btn-g" href="{{ route('titles.index',['policy'=>$title->insurance_policy_id]) }}">Titoli</a><a class="btn btn-g" href="{{ route('clients.policies.show',[$title->policy->client_id,$title->policy,'tab'=>'payments']) }}">{{ $title->contract->number }}</a></x-slot:actions></x-page-header>
+@include('ledger.recorded-payment', ['policy'=>$title->policy])
 @if(in_array($title->policy->status,\App\Models\InsurancePolicy::CLOSED_STATUSES,true))
     <div class="deadline-notice"><p>La polizza è {{ mb_strtolower($title->policy->status_label) }}. Verifica con la compagnia gli importi ancora dovuti prima di registrare altri movimenti.</p><p class="u-text-meta u-mt-sm">Incassi e quietanze restano nello storico. Un eventuale rimborso va verificato separatamente: lo storno non registra una restituzione al cliente.</p></div>
 @endif
 @if($title->kind === 'adjustment')<p class="u-mb-md">Conguaglio {{ $title->direction === 'refund' ? 'da rimborsare al cliente' : 'da incassare' }}. Non modifica il periodo di copertura.</p>@endif
 @if($title->insurance_policy_change_id && !$title->affects_coverage && $title->kind !== 'adjustment')<div class="deadline-notice"><p>Titolo del premio aggiuntivo: <a href="{{ route('clients.policy-changes.show',[$title->policy->client_id,$title->insurance_policy_change_id]) }}">apri l’appendice e i suoi documenti</a>. L’incasso di questo titolo non estende la copertura del contratto di base.</p></div>@endif
-<x-panel title="Dati del titolo" padded><dl class="client-registry-details"><div><dt>Contraente</dt><dd>{{ $title->policy->client->name }}</dd></div><div><dt>Agenzia / compagnia</dt><dd>{{ $title->contract->supplierAgency?->name ?: 'Rapporto diretto' }} / {{ $title->contract->company }}</dd></div><div><dt>Scadenza pagamento</dt><dd><x-status-text :alert="$title->state === 'overdue'">{{ $title->due_on->format('d/m/Y') }}</x-status-text></dd></div><div><dt>Periodo di copertura</dt><dd>{{ $title->coverage_from->format('d/m/Y') }} – {{ $title->coverage_to->format('d/m/Y') }}</dd></div><div><dt>Frazionamento</dt><dd>{{ $title->payment_frequency }}</dd></div><div><dt>Metodo previsto</dt><dd>{{ $title->payment_method }}</dd></div><div><dt>Importo</dt><dd>{{ \App\Support\Money::format($title->amount_cents) }}</dd></div><div><dt>{{ $title->direction === 'refund' ? 'Rimborsato' : 'Incassato' }}</dt><dd>{{ \App\Support\Money::format($title->collected_cents) }}</dd></div><div><dt>Residuo</dt><dd><x-status-text :alert="in_array($title->state, ['due_today', 'partial', 'overdue'], true)">{{ \App\Support\Money::format($title->balance_cents) }}</x-status-text></dd></div><div><dt>Stato</dt><dd><x-title-status :title="$title" /></dd></div></dl>@if($title->notes)<p>{{ $title->notes }}</p>@endif @if($title->cancelled_at)<p>@if($title->cancelled_residual_cents)Residuo annullato: {{ \App\Support\Money::format($title->cancelled_residual_cents) }}. Incassi conservati: {{ \App\Support\Money::format($title->collected_cents) }}. @endif Annullato il {{ $title->cancelled_at->format('d/m/Y') }}: {{ $title->cancellation_reason }}</p>@endif</x-panel>
-@if($title->collections->whereNull('voided_at')->isNotEmpty())
+<x-panel title="Dati del titolo" padded>
+    <dl class="client-registry-details">
+        <div><dt>Contraente</dt><dd>{{ $title->policy->client->name }}</dd></div>
+        <div><dt>Agenzia / compagnia</dt><dd>{{ $title->contract->supplierAgency?->name ?: 'Rapporto diretto' }} / {{ $title->contract->company }}</dd></div>
+        <div><dt>Scadenza pagamento</dt><dd><x-status-text :alert="$title->state === 'overdue'">{{ $title->due_on->format('d/m/Y') }}</x-status-text></dd></div>
+        <div><dt>Periodo di copertura</dt><dd>{{ $title->coverage_from->format('d/m/Y') }} – {{ $title->coverage_to->format('d/m/Y') }}</dd></div>
+        <div><dt>Frazionamento</dt><dd>{{ $title->payment_frequency }}</dd></div>
+        <div><dt>Metodo previsto</dt><dd>{{ $title->payment_method }}</dd></div>
+        <div><dt>Importo</dt><dd>{{ \App\Support\Money::format($title->amount_cents) }}</dd></div>
+        <div><dt>{{ $title->direction === 'refund' ? 'Rimborsato' : 'Incassato' }}</dt><dd>{{ \App\Support\Money::format($title->collected_cents) }}</dd></div>
+        @if($title->allowance_cents>0)<div><dt>Abbuoni registrati</dt><dd>{{ \App\Support\Money::format($title->allowance_cents) }}</dd></div>@endif
+        <div><dt>Residuo</dt><dd><x-status-text :alert="in_array($title->state, ['due_today', 'partial', 'overdue'], true)">{{ \App\Support\Money::format($title->balance_cents) }}</x-status-text></dd></div>
+        <div><dt>Stato</dt><dd><x-title-status :title="$title" /></dd></div>
+    </dl>
+    @if($title->notes)<p>{{ $title->notes }}</p>@endif
+    @if($title->cancelled_at)<p>@if($title->cancelled_residual_cents)Residuo annullato: {{ \App\Support\Money::format($title->cancelled_residual_cents) }}. Incassi conservati: {{ \App\Support\Money::format($title->collected_cents) }}. @endif Annullato il {{ $title->cancelled_at->format('d/m/Y') }}: {{ $title->cancellation_reason }}</p>@endif
+</x-panel>
+@php
+    $recordedMovements = $title->collections->whereNull('voided_at');
+    $pendingMovements = $recordedMovements->filter(fn ($payment) => $deliveries->get($payment->id)?->status !== 'sent');
+    $movementNames = $title->direction === 'refund' ? ['rimborso', 'rimborsi'] : ['incasso', 'incassi'];
+@endphp
+@if($title->allowance_cents>0 && $title->affects_coverage && !$title->cancelled_at)
+<x-panel title="Conferma separata della copertura" padded>
+    @include('ledger.allowance-coverage',['coverageTitle'=>$title,'allowanceOrigin'=>'title'])
+</x-panel>
+@endif
+@if($recordedMovements->isNotEmpty())
 <div class="deadline-notice">
-    @php($pendingCollections = $title->collections->whereNull('voided_at')->filter(fn ($payment) => ($deliveries->get($payment->id)?->status) !== 'sent'))
-    @if($pendingCollections->isNotEmpty())
-        <p>{{ $pendingCollections->count() }} {{ $pendingCollections->count() === 1 ? 'incasso in attesa di completare la comunicazione' : 'incassi in attesa di completare la comunicazione' }} all’agenzia. Il pagamento è già registrato e il residuo è aggiornato.</p>
+    @if($pendingMovements->isNotEmpty())
+        <p>{{ $pendingMovements->count() }} {{ $movementNames[$pendingMovements->count() === 1 ? 0 : 1] }} da comunicare all’agenzia. Il residuo del titolo è già aggiornato.</p>
         @if(!$title->contract->supplier_agency_id)<p class="u-text-meta">Associa un’agenzia alla polizza per preparare il riepilogo.</p>@endif
-        @can('system.admin')<a class="btn btn-g u-mt-sm" href="{{ route('agency-communications.collections',['scope'=>'pending','agency'=>$title->contract->supplier_agency_id,'search'=>$title->contract->number]) }}">Controlla comunicazioni degli incassi</a>@else<p class="u-text-meta">L’admin può controllare e inviare il riepilogo cumulativo.</p>@endcan
+        @can('system.admin')<a class="btn btn-g u-mt-sm" href="{{ route('agency-communications.collections',['scope'=>'pending','agency'=>$title->contract->supplier_agency_id,'search'=>$title->contract->number]) }}">Controlla comunicazioni all’agenzia</a>@else<p class="u-text-meta">L’admin può controllare e inviare il riepilogo cumulativo.</p>@endcan
     @else
-        <p>Gli incassi registrati risultano inclusi in comunicazioni accettate dal server di posta.</p>
+        <p>I movimenti registrati sono inclusi in comunicazioni accettate dal server di posta.</p>
     @endif
     @can('system.admin')@foreach($deliveries->unique('id') as $delivery)<p class="u-text-meta u-mt-sm"><a href="{{ route('agency-communications.show',$delivery->id) }}">{{ \App\Models\AgencyCommunication::STATUSES[$delivery->status] }}</a></p>@endforeach@endcan
 </div>
@@ -21,11 +47,26 @@
 @can('updateRegistry',$title->policy->client)@if(!$title->cancelled_at && $title->balance_cents>0)
 <x-panel :title="$title->direction === 'refund' ? 'Registra rimborso al cliente' : 'Registra pagamento'" padded>
     @include('ledger.collection-form',['collectionPolicy'=>$title->policy,'collectionTitles'=>collect([$title]),'chooseTitle'=>false,'collectionAction'=>route('titles.collect',$title)])
+    @can('ledger.manage')@include('ledger.allowance-form',['allowanceTitles'=>collect([$title]),'chooseAllowanceTitle'=>false,'allowanceAction'=>route('titles.allowances',$title)])@endcan
 </x-panel>
 @endif@endcan
-<x-panel title="Movimenti del titolo"><div class="client-table-scroll" role="region" aria-label="Movimenti del titolo" tabindex="0"><table class="t-table"><thead><tr><th>Data</th><th>Importo</th><th>Metodo</th><th>Destinatario</th><th>Consulente</th><th>Stato</th><th>Documento</th><th>Azioni</th></tr></thead><tbody>@forelse($title->collections as $payment)<tr><td>{{ $payment->received_on->format('d/m/Y') }}</td><td>{{ \App\Support\Money::format($payment->amount_cents) }}</td><td>{{ $payment->payment_method }}</td><td>{{ \App\Models\InsuranceCollection::RECIPIENTS[$payment->recipient] }}</td><td>{{ $payment->consultant?->name ?: 'Non indicato' }}</td><td>{{ $payment->voided_at ? 'Stornato: '.$payment->void_reason : 'Registrato' }}</td><td>{{ \App\Models\InsuranceCollection::DOCUMENT_TYPES[$payment->document_type] }}@foreach($payment->documents as $document)<p><a href="{{ route('attachments.download',$document) }}">{{ $document->original_name }}</a></p>@endforeach</td><td>@can('ledger.manage')@if(!$payment->voided_at)<details><summary>Storna</summary><form method="POST" action="{{ route('collections.void',$payment) }}">@csrf<x-form-group label="Motivo storno" name="reason" :for="'void-'.$payment->id" required><input class="form-in" name="reason" minlength="5" maxlength="1000" required></x-form-group><button class="btn btn-g">Conferma storno</button></form></details>@endif@endcan</td></tr>@empty<tr><td colspan="8">Nessun movimento registrato.</td></tr>@endforelse</tbody></table></div></x-panel>
+@include('ledger.allowance-history')
+<x-panel title="Movimenti del titolo" id="movimenti-del-titolo">
+<div class="client-table-scroll" role="region" aria-label="Movimenti del titolo" tabindex="0"><table class="t-table" data-list-details>
+<thead><tr><th>Data</th><th>Importo</th><th>Metodo</th><th data-list-detail>Destinatario</th><th data-list-detail>Consulente</th><th>Stato</th><th data-list-detail>Documento</th><th>Azioni</th></tr></thead>
+<tbody>
+@forelse($title->collections as $payment)
+<tr data-list-label="Movimento #{{ $payment->id }} del {{ $payment->received_on->format('d/m/Y') }}">
+<td>{{ $payment->received_on->format('d/m/Y') }}</td><td>{{ \App\Support\Money::format($payment->amount_cents) }}</td><td>{{ $payment->payment_method }}</td>
+<td>{{ \App\Models\InsuranceCollection::RECIPIENTS[$payment->recipient] }}</td><td>{{ $payment->consultant?->name ?: 'Non indicato' }}</td><td>{{ $payment->voided_at ? 'Stornato: '.$payment->void_reason : 'Registrato' }}</td><td>{{ \App\Models\InsuranceCollection::DOCUMENT_TYPES[$payment->document_type] }}@foreach($payment->documents as $document)<p><a href="{{ route('attachments.download',$document) }}">{{ $document->original_name }}</a></p>@endforeach</td>
+<td>@can('ledger.manage')@if(!$payment->voided_at)<details><summary>Storna</summary><form method="POST" action="{{ route('collections.void',$payment) }}">@csrf<x-form-group label="Motivo storno" name="reason" :for="'void-'.$payment->id" required><input class="form-in" name="reason" minlength="5" maxlength="1000" required></x-form-group><button class="btn btn-g">Conferma storno</button></form></details>@endif@endcan</td></tr>
+@empty
+<tr><td colspan="8">Nessun movimento registrato.</td></tr>
+@endforelse
+</tbody></table></div>
+</x-panel>
 <x-panel title="Quietanze e documenti" padded><p class="u-text-meta">Allega le quietanze rilasciate dalla compagnia. La registrazione del titolo non produce un documento ufficiale della compagnia.</p>
 @foreach($title->documents->whereNull('insurance_collection_id') as $document)<p><a href="{{ route('attachments.download',$document) }}">{{ $document->original_name }}</a></p>@endforeach
 @can('updateRegistry',$title->policy->client)<form method="POST" enctype="multipart/form-data" action="{{ route('titles.documents',$title) }}">@csrf<x-form-group label="Allega quietanze (PDF)" name="files" for="quietance-files" required><input class="form-in" type="file" name="files[]" multiple accept="application/pdf,.pdf" required></x-form-group><div class="insurance-form-actions"><button class="btn btn-p">Carica documenti</button></div></form>@endcan</x-panel>
-@can('ledger.manage')@if(!$title->cancelled_at && !$title->collected_cents)<x-panel padded><details><summary>Annulla titolo</summary><form method="POST" action="{{ route('titles.cancel',$title) }}">@csrf<x-form-group label="Motivo annullamento" name="reason" for="cancel-title-reason" required><input class="form-in" name="reason" minlength="5" maxlength="1000" required></x-form-group><button class="btn btn-g">Conferma annullamento</button></form></details></x-panel>@endif@endcan
+@can('ledger.manage')@if(!$title->cancelled_at && !$title->collected_cents && !$title->allowance_cents)<x-panel padded><details><summary>Annulla titolo</summary><form method="POST" action="{{ route('titles.cancel',$title) }}">@csrf<x-form-group label="Motivo annullamento" name="reason" for="cancel-title-reason" required><input class="form-in" name="reason" minlength="5" maxlength="1000" required></x-form-group><button class="btn btn-g">Conferma annullamento</button></form></details></x-panel>@endif@endcan
 </x-app-layout>

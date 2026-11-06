@@ -81,7 +81,8 @@ class InsuranceWorkspaceTest extends TestCase
         $this->postJson(route('policies.store'),$data+['client_id'=>$other->id,'entry_mode'=>'new'])->assertUnprocessable()->assertJsonValidationErrors('insurance_quote_id');
         $this->postJson(route('policies.store'),$data+['client_id'=>$owned->id,'vehicle_id'=>$vehicle->id])->assertUnprocessable()->assertJsonValidationErrors('vehicle_id');
         $this->get(route('reports.index'))->assertForbidden();
-        $this->get(route('agency-communications.index'))->assertForbidden();
+        $this->get(route('agency-communications.index'))->assertOk();
+        $this->get(route('email-settings.edit'))->assertForbidden();
         \Livewire\Livewire::test(\App\Livewire\Dashboard\RecentActivity::class)->assertForbidden();
     }
 

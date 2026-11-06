@@ -14,15 +14,16 @@
                 <a href="{{ $url }}" @class(['overview-total', 'is-alert' => $alert])><span>{{ $label }}</span><strong @class(['status-alert' => $alert])>{{ number_format($value, 0, ',', '.') }}</strong></a>
             @endforeach
         </section>
-        <x-panel :title="'Incassi di oggi / '.today()->format('d/m/Y')" class="collection-summary">
+        <x-panel :title="'Incassi '.today()->format('j/n/y')" class="collection-summary">
             <x-slot:headerActions><a class="btn btn-g btn-sm" href="{{ route('collections.index') }}">Apri contabilità</a></x-slot:headerActions>
             <dl class="collection-summary-values">
                 <div><dt>Incassi</dt><dd>{{ \App\Support\Money::format((int)$todayCollections->receipts) }}</dd></div>
                 <div><dt>Rimborsi</dt><dd>{{ \App\Support\Money::format((int)$todayCollections->refunds) }}</dd></div>
                 <div><dt>Saldo incassi meno rimborsi</dt><dd>{{ \App\Support\Money::format((int)$todayCollections->total) }}</dd></div>
-                <div><dt>Saldo della nostra agenzia</dt><dd>{{ \App\Support\Money::format((int)$todayCollections->ours) }}</dd></div>
-                <div><dt>Saldo compagnie e altre agenzie</dt><dd>{{ \App\Support\Money::format((int)$todayCollections->total-(int)$todayCollections->ours) }}</dd></div>
             </dl>
+            <details class="collection-cash-details"><summary>Ripartizione per chi ha gestito il pagamento</summary>
+                <dl><div><dt>Saldo della nostra agenzia</dt><dd>{{ \App\Support\Money::format((int)$todayCollections->ours) }}</dd></div><div><dt>Saldo compagnie e altre agenzie</dt><dd>{{ \App\Support\Money::format((int)$todayCollections->total-(int)$todayCollections->ours) }}</dd></div></dl>
+            </details>
             <p class="collection-summary-note">Data effettiva del pagamento. Gli storni sono esclusi.</p>
         </x-panel>
         <x-payment-summary :summary="$paymentSummary" />
@@ -45,7 +46,7 @@
                 <section id="today-policies" aria-label="Polizze inserite oggi">
                 <x-dashboard-section title="Polizze inserite oggi" :empty="$todayPolicies->total() === 0" message="Nessuna polizza aperta oggi e ancora attiva.">
                 <x-slot:actions>@can('system.admin')<a href="{{ route('agency-communications.index') }}" class="btn btn-g btn-sm">Riepilogo per le agenzie</a>@endcan</x-slot:actions>
-                <div class="client-table-scroll" role="region" aria-label="Polizze inserite oggi" tabindex="0"><table class="t-table"><thead><tr><th>Ora</th><th>Contraente</th><th>Polizza</th><th>Agenzia</th><th>Premio di polizza</th><th>Stato</th><th>Comunicazione</th></tr></thead><tbody>
+                <div class="client-table-scroll" role="region" aria-label="Polizze inserite oggi" tabindex="0"><table class="t-table" data-list-details="dashboard-policies" data-details-label="Altri dati"><thead><tr><th data-list-detail>Ora</th><th>Contraente</th><th>Polizza</th><th data-list-detail>Agenzia</th><th>Premio di polizza</th><th>Stato</th><th>Comunicazione</th></tr></thead><tbody>
                     @forelse($todayPolicies as $policy)<tr><td>{{ $policy->created_at->format('H:i') }}</td><td><a href="{{ route('clients.show',$policy->client_id) }}">{{ $policy->client->name }}</a></td><td><a class="u-nowrap" href="{{ route('clients.policies.show',[$policy->client_id,$policy]) }}">{{ $policy->number }}</a><div class="u-text-meta">{{ $policy->company }}</div></td><td>{{ $policy->supplierAgency?->name ?: 'Da assegnare' }}</td><td class="u-nowrap">{{ $policy->premium !== null ? number_format((float) $policy->premium, 2, ',', '.').' €' : 'Non indicato' }}</td><td><x-policy-status :policy="$policy" /></td><td>{{ $policy->ad_horas ? 'Ad horas' : 'Riepilogo serale' }}</td></tr>@empty<tr><td colspan="7">Nessuna polizza in questa pagina. Torna alla prima pagina dell’elenco.</td></tr>@endforelse
                 </tbody></table></div>{{ $todayPolicies->links() }}</x-dashboard-section>
                 </section>

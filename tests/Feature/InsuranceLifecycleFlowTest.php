@@ -138,7 +138,8 @@ class InsuranceLifecycleFlowTest extends TestCase
         $this->assertSame(7200, $titles[2]->commission->expected_cents);
         $this->assertSame(3000, $titles[3]->commission->expected_cents);
         $this->assertSame(0, $titles[2]->commission->accrued_cents);
-        $this->assertSame('Dati aggiornati: predisporre nuovi moduli', $package->fresh()->state_label);
+        $this->assertSame('Periodo precedente', $package->fresh()->state_label);
+        $this->assertFalse($package->fresh()->currentData());
         $this->assertDatabaseCount('insurance_form_packages', 1);
         $this->assertDatabaseCount('insurance_collections', 2);
         $this->assertSame(0, $this->admin->visibleNotifications()->where('data->kind', 'policy')->count());

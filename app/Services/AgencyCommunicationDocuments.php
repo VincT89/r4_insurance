@@ -52,7 +52,7 @@ class AgencyCommunicationDocuments
 
     public function editable(AgencyCommunication $message, User $user): bool
     {
-        return $user->status === 'active' && $user->canManageSystem() && (int)$message->user_id === $user->id
+        return $user->canManageAgencyCommunications() && (int)$message->user_id === $user->id
             && $message->status === 'review' && $message->review_expires_at->isFuture();
     }
 
@@ -78,7 +78,7 @@ class AgencyCommunicationDocuments
         try {
             DB::transaction(function () use ($message, $user, $data, $uploads, &$paths) {
                 $message = AgencyCommunication::whereKey($message->id)->lockForUpdate()->firstOrFail();
-                abort_unless($user->status === 'active' && $user->canManageSystem() && (int)$message->user_id === $user->id, 403);
+                abort_unless($user->canManageAgencyCommunications() && (int)$message->user_id === $user->id, 403);
                 if (!$this->editable($message,$user)) $this->fail('Gli allegati possono essere scelti soltanto prima di confermare un riepilogo valido.');
                 $this->checkRevision($message, (int)$data['attachment_revision']);
                 $keepIds = $data['keep_ids'] ?? [];

@@ -157,7 +157,7 @@ class OperationalReminderFlowTest extends TestCase
         $component->call('$refresh')->assertViewHas('unreadNotificationsCount', 1)->assertSee('Residuo 100,00 €');
         $this->assertSame(0, $this->visible(CollectionCommunicationReminders::TYPE)->count());
         $this->actingAs($this->operator);
-        Livewire::test(NotificationDropdown::class)->assertDontSee('Incassi da comunicare');
+        Livewire::test(NotificationDropdown::class)->assertSee('Incassi da comunicare')->assertSee('Attività sinistri');
     }
 
     public function test_delivery_set_keeps_latest_state_and_title_agency_without_multiplying_payments(): void
@@ -298,6 +298,51 @@ class OperationalReminderFlowTest extends TestCase
         $this->assertSame(2,DB::table('system_command_runs')->where('command','insurance:deadline-reminders')->where('status','succeeded')->count());
         $this->get(route('deadlines.index',['period'=>'overdue','kind'=>'title','agency'=>$this->agency->id]))->assertOk()->assertSee('Ultimo controllo notifiche')->assertViewHas('deadlines',fn($rows)=>$rows->total()===1 && (int)$rows->first()->balance_cents===9900);
         $this->assertSame(0,AgencyCommunication::count());
+    }
+
+    public function test_scheduled_failure_is_recorded_without_private_exception_details(): void
+    {
+        $this->mock(DeadlineReminders::class)->shouldReceive('forUser')->once()->andReturnUsing(function () {
+            $this->travel(5)->seconds();
+            return DB::select('select ? from missing_reminder_fixture_table', ['DATO_RISERVATO_DIMOSTRATIVO']);
+        });
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('insurance:deadline-reminders');
+            $this->fail('Il controllo deve propagare il problema originale.');
+        } catch (\Illuminate\Database\QueryException $exception) {
+            $run = \App\Models\SystemCommandRun::sole();
+            $this->assertSame('insurance:deadline-reminders', $run->command);
+            $this->assertSame('failed', $run->status);
+            $this->assertSame(1, $run->exit_code);
+            $this->assertTrue($run->started_at->equalTo(now()->subSeconds(5)));
+            $this->assertTrue($run->finished_at->equalTo(now()));
+            $this->assertSame($exception::class.' (codice '.$exception->getCode().').', $run->error_message);
+            $this->assertStringNotContainsString('DATO_RISERVATO_DIMOSTRATIVO', $run->error_message);
+            $this->assertStringNotContainsString('missing_reminder_fixture_table', $run->error_message);
+            $this->assertDatabaseMissing('system_heartbeats', ['name'=>'insurance-deadline-reminders']);
+        }
+    }
+
+    public function test_scheduled_failure_preserves_the_original_error_if_tracking_cannot_be_saved(): void
+    {
+        $original = new \RuntimeException('Errore dimostrativo del controllo', 17);
+        $this->mock(DeadlineReminders::class)->shouldReceive('forUser')->once()->andThrow($original);
+        $failTracking = true;
+        DB::connection()->beforeExecuting(function ($query) use (&$failTracking) {
+            if ($failTracking && str_starts_with($query, 'update "system_command_runs"')) {
+                throw new \RuntimeException('Errore dimostrativo durante la registrazione');
+            }
+        });
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('insurance:deadline-reminders');
+            $this->fail('Il controllo deve propagare il problema originale.');
+        } catch (\Throwable $exception) {
+            $this->assertSame($original, $exception);
+        } finally {
+            $failTracking = false;
+        }
     }
 
     public function test_document_alerts_identify_each_file_and_keep_read_history_when_the_deadline_passes(): void

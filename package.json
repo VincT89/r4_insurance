@@ -8,23 +8,23 @@
         "build": "vite build",
         "dev": "vite",
         "pretest:tables": "node scripts/prepare-excel.mjs",
-        "test:tables": "node --test tests/Frontend/table-pagination.test.mjs tests/Frontend/table-workbook.test.mjs tests/Frontend/collection-report.test.mjs tests/Frontend/communication-selection.test.mjs"
+        "test:tables": "node --test tests/Frontend/table-pagination.test.mjs tests/Frontend/table-workbook.test.mjs tests/Frontend/collection-report.test.mjs tests/Frontend/communication-selection.test.mjs tests/Frontend/allowance-totals.test.mjs"
     },
     "devDependencies": {
         "alpinejs": "^3.4.2",
-        "autoprefixer": "^10.4.2",
-        "esbuild": "0.28.2",
         "assert": "2.1.0",
+        "autoprefixer": "^10.4.2",
         "buffer": "6.0.3",
+        "concurrently": "^9.0.1",
         "create-hash": "1.2.0",
+        "esbuild": "0.28.2",
         "events": "3.3.0",
+        "laravel-vite-plugin": "^3.0.0",
+        "postcss": "^8.4.31",
         "process": "0.11.10",
         "randombytes": "2.1.0",
         "stream-browserify": "3.0.0",
         "util": "0.12.5",
-        "concurrently": "^9.0.1",
-        "laravel-vite-plugin": "^3.0.0",
-        "postcss": "^8.4.31",
         "vite": "~8.1.6"
     },
     "overrides": {
@@ -38,7 +38,9 @@
         "jspdf": "4.2.1",
         "jspdf-autotable": "5.0.9",
         "lucide": "^1.14.0",
+        "pdf-lib": "1.17.1",
         "pdfjs-dist": "6.4.299",
+        "quill": "2.0.3",
         "tesseract.js": "7.0.0"
     }
 }

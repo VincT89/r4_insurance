@@ -8,6 +8,8 @@ class InsurancePolicyChange extends Model
 {
     public const KINDS = ['replacement'=>'Sostituzione', 'addition'=>'Aggiunta di coperture', 'renewal'=>'Rinnovo'];
     protected $guarded = ['id'];
+    public function isCompanyChange(): bool { return $this->kind === 'renewal' && (int)$this->source_policy_id !== (int)$this->result_policy_id; }
+    public function getKindLabelAttribute(): string { return $this->isCompanyChange() ? 'Cambio compagnia alla scadenza' : (self::KINDS[$this->kind] ?? $this->kind); }
     protected function casts(): array
     {
         return ['effective_on'=>'date', 'expires_on'=>'date', 'premium_cents'=>'integer', 'snapshot'=>'encrypted:array'];
@@ -25,4 +27,5 @@ class InsurancePolicyChange extends Model
     public function documents() { return $this->hasMany(Attachment::class); }
     public function formPackages() { return $this->hasMany(InsuranceFormPackage::class); }
     public function titles() { return $this->hasMany(InsuranceTitle::class); }
+    public function replacementSchedule() { return $this->hasOne(PolicyReplacementSchedule::class); }
 }

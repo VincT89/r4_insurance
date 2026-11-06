@@ -41,6 +41,18 @@ class QuoteRequestContextTest extends TestCase
     }
     private function emailInput(array $extra=[]): array { return array_replace(['supplier_company_id'=>$this->company->id,'subject'=>'Richiesta coperture','body'=>'Buongiorno, si richiede la proposta per le coperture concordate con il cliente.'],$extra); }
 
+    public function test_requester_defaults_to_the_selected_client_and_survives_a_validation_error_after_a_client_change(): void
+    {
+        $this->assertSame($this->client->name, $this->createCase()->requester_name);
+        $other = Client::factory()->create();
+        $start = route('quotes.create', ['client_id'=>$this->client->id]);
+        $this->from($start)->post(route('quotes.store'), $this->input([
+            'client_id'=>$other->id, 'subject'=>'', 'requester_name'=>'Referente dimostrativo',
+        ]))->assertSessionHasErrors('subject');
+        $this->get($start)->assertOk()->assertViewHas('client', fn($client) => $client->is($other))
+            ->assertSee('value="Referente dimostrativo"', false);
+    }
+
     public function test_optional_documents_and_current_contract_never_change_existing_policy(): void
     {
         $policy=$this->policy(); $before=$policy->refresh()->getAttributes();

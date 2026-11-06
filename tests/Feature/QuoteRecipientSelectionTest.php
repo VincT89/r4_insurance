@@ -122,6 +122,39 @@ class QuoteRecipientSelectionTest extends TestCase
         $this->get(route('quote-email-batches.show',$messages->first()->review_batch_id))->assertOk()->assertSee('Conferma e invia a 3 destinatari')->assertSee('richiesta.pdf');
     }
 
+    public function test_compose_shows_only_compatible_groups_and_restores_the_manual_choices_after_an_error(): void
+    {
+        $pair = QuoteRecipients::key($this->company->id, $this->agency->id);
+        $extra = QuoteRecipients::key($this->other->id, $this->agency->id);
+        $groupData = ['insurance_branch_id'=>$this->case->insurance_branch_id, 'status'=>'active', 'recipient_keys'=>[$pair]];
+        $group = QuoteRecipientGroup::create($groupData + ['name'=>'Deleghe CU iniziali', 'cu_from'=>1, 'cu_to'=>5]);
+        $otherGroup = QuoteRecipientGroup::create($groupData + ['name'=>'Deleghe altre classi', 'cu_from'=>7, 'cu_to'=>12]);
+        $this->case->update(['merit_class_cu'=>3, 'quote_recipient_group_id'=>$group->id, 'recipient_group_snapshot'=>['name'=>$group->name, 'recipient_keys'=>[$pair]]]);
+        $url = route('quotes.emails.create', $this->case);
+        $this->get($url)->assertOk()->assertSee('Classe CU 3')->assertSee($group->name)->assertDontSee('Deleghe altre classi');
+        $this->from($url)->post(route('quotes.emails.review',$this->case), $this->input([$extra], ['recipient_group_choice'=>$group->id, 'body'=>'breve']))
+            ->assertSessionHasErrors('body');
+        $page = $this->get($url)->assertOk();
+        $dom = new \DOMDocument;
+        @$dom->loadHTML($page->getContent());
+        $xpath = new \DOMXPath($dom);
+        $spunte = $xpath->query('//input[@name="recipient_keys[]" and @checked]');
+        $this->assertCount(1, $spunte);
+        $this->assertSame($extra, $spunte->item(0)->getAttribute('value'));
+        $this->assertSame((string)$group->id, $xpath->evaluate('string(//select[@name="recipient_group_choice"]/option[@selected]/@value)'));
+        $this->post(route('quotes.emails.review',$this->case), $this->input([$extra], ['recipient_group_choice'=>$otherGroup->id]))
+            ->assertSessionHasErrors('recipient_group_choice');
+        $this->assertDatabaseCount('insurance_quote_emails', 0);
+        $message = $this->review([$extra], ['recipient_group_choice'=>$group->id])->sole();
+        $this->assertSame($group->id, $message->payload['recipient_group']['id']);
+        $this->assertSame($extra, $message->payload['target']['key']);
+        $draft = $this->get(route('quotes.emails.create', [$this->case, 'draft'=>$message->id]))->assertOk();
+        @$dom->loadHTML($draft->getContent());
+        $restored = new \DOMXPath($dom);
+        $this->assertSame((string)$group->id, $restored->evaluate('string(//select[@name="recipient_group_choice"]/option[@selected]/@value)'));
+        $this->assertSame($extra, $restored->evaluate('string(//input[@name="recipient_keys[]" and @checked]/@value)'));
+    }
+
     public function test_editing_a_preview_preserves_text_recipients_and_files_and_retires_the_previous_batch(): void
     {
         $this->mock(QuoteRequestEmailTransport::class)->shouldNotReceive('send');

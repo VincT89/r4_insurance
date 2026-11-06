@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany, HasOne};
 
 class InsurancePolicy extends Model
 {
     public const CATEGORY_SUGGESTIONS = ['RC auto', 'Infortuni', 'RC persone'];
     public const STATUSES = ['active' => 'Attiva', 'renewed' => 'Rinnovata', 'expired' => 'Scaduta', 'suspended' => 'Sospesa', 'replaced' => 'Sostituita', 'cancelled' => 'Annullata', 'ceased' => 'Cessata', 'review' => 'Da verificare'];
     public const CLOSED_STATUSES = ['replaced', 'cancelled', 'ceased'];
-    public const PAYMENT_STATUSES = ['unpaid' => 'Non pagata', 'paid' => 'Pagata'];
+    public const PAYMENT_STATUSES = ['unpaid' => 'Da saldare', 'paid' => 'Saldata'];
     public const PAYMENT_METHODS = ['Bonifico a Compagnia', 'Bonifico a Intermediario', 'Assegno a Compagnia', 'Assegno a Intermediario', 'Contanti a Intermediario', 'Contanti a Compagnia', 'Carta di credito a Intermediario', 'Carta di credito a Compagnia', 'Finanziamento'];
     public const PAYMENT_FREQUENCIES = ['Unico', 'Annuale', 'Semestrale', 'Quadrimestrale', 'Trimestrale', 'Mensile'];
 
@@ -26,6 +26,18 @@ class InsurancePolicy extends Model
     public function titles(): HasMany { return $this->hasMany(InsuranceTitle::class); }
     public function changes(): HasMany { return $this->hasMany(InsurancePolicyChange::class, 'source_policy_id'); }
     public function incomingChanges(): HasMany { return $this->hasMany(InsurancePolicyChange::class, 'result_policy_id'); }
+    public function companyChangeFrom(): HasOne { return $this->hasOne(InsurancePolicyChange::class,'result_policy_id')->where('kind','renewal')->whereColumn('source_policy_id','<>','result_policy_id')->latest('id'); }
+    public function companyChangeTo(): HasOne { return $this->hasOne(InsurancePolicyChange::class,'source_policy_id')->where('kind','renewal')->whereColumn('source_policy_id','<>','result_policy_id')->latest('id'); }
+    public function scopeWithoutCompanySuccessor(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder { return $query->whereDoesntHave('companyChangeTo'); }
+    public function replacementFrom(): HasOne { return $this->hasOne(InsurancePolicyChange::class,'result_policy_id')->where('kind','replacement')->latest('id'); }
+    public function replacementTo(): HasOne { return $this->hasOne(InsurancePolicyChange::class,'source_policy_id')->where('kind','replacement')->whereDoesntHave('replacementSchedule',fn($q)=>$q->where('state','cancelled'))->latest('id'); }
+    public function scopeWithoutContractSuccessor(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder { return $query->withoutCompanySuccessor()->whereDoesntHave('replacementTo'); }
+    public function hasPendingReplacement(): bool { return $this->replacementTo?->replacementSchedule?->state === 'pending' || $this->replacementFrom?->replacementSchedule?->state === 'pending'; }
+    public function latestRenewal(): HasOne
+    {
+        return $this->hasOne(InsurancePolicyChange::class, 'result_policy_id')
+            ->ofMany(['id'=>'max'], fn ($query) => $query->where('kind', 'renewal'));
+    }
     public function formPackages(): HasMany { return $this->hasMany(InsuranceFormPackage::class); }
     public function coverageChecks(): HasMany { return $this->hasMany(InsuranceCoverageCheck::class); }
     public function claims(): HasMany { return $this->hasMany(InsuranceClaim::class); }
@@ -72,7 +84,7 @@ class InsurancePolicy extends Model
 
     public function contracts(): HasMany
     {
-        return $this->documents()->where('document_category', 'policy')->whereDoesntHave('newerVersion')->orderByDesc('id');
+        return $this->documents()->where('document_category', 'policy')->whereDoesntHave('newerVersion')->whereDoesntHave('signatureResult')->with('latestTabletSignature.signedFile')->orderByDesc('id');
     }
 
     public function getIsExpiredAttribute(): bool

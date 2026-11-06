@@ -1,5 +1,7 @@
 import { exportColumnType } from './table-export-values.js';
 import { collectionExportFooters } from './collection-totals.js';
+import { allowanceExportFooters } from './allowance-totals.js';
+import { initializeListDetails, initializeListFilters } from './list-details.js';
 
 const states = new WeakMap();
 let serial = 0;
@@ -13,6 +15,26 @@ const element = (tag, attributes = {}, content) => {
     return node;
 };
 const button = (label, action) => { const b = element('button', { type: 'button', class: 'btn btn-g btn-sm' }, label); b.addEventListener('click', action); return b; };
+function labelTableRows(table) {
+    const head = table.tHead;
+    if (head?.rows.length !== 1 || !table.tBodies.length) return;
+    const headers = [...head.rows[0].cells];
+    if (headers.some(cell => cell.colSpan !== 1)) return;
+    if (!table.parentElement.classList.contains('client-table-scroll')) {
+        const title = text(table.closest('.panel')?.querySelector('.panel-title')?.textContent || document.querySelector('[role="heading"][aria-level="1"], h1')?.textContent || document.title);
+        const wrapper = element('div', {class:'client-table-scroll',role:'region','aria-label':title,tabindex:'0'});
+        table.before(wrapper);
+        wrapper.append(table);
+    }
+    for (const row of table.tBodies[0].rows) {
+        if (row.cells.length !== headers.length || [...row.cells].some(cell => cell.colSpan !== 1)) continue;
+        [...row.cells].forEach((cell, index) => {
+            if (!cell.hasAttribute('data-label')) cell.dataset.label = text(headers[index].textContent);
+        });
+    }
+    table.setAttribute('data-responsive-table', '');
+    table.toggleAttribute('data-empty-table', ![...table.tBodies[0].rows].some(row => row.cells.length === headers.length && ![...row.cells].some(cell => cell.colSpan !== 1)));
+}
 export function tableExportUrl(currentUrl, pageName = 'page', appliedFilters = {}) {
     const url = new URL(currentUrl);
     /** Freeze server defaults, such as today's payment dates, for every export page. */
@@ -89,7 +111,7 @@ export function storeTableFilters(rules, mode, columns) {
 }
 
 function initialize(table, index) {
-    if (states.has(table)) return;
+    if (states.has(table) || table.dataset.tableTools==='none') return;
     const headers = [...table.querySelectorAll('thead tr:first-child th')];
     const columns = headers.map((h, i) => ({ index: i, name: text(h.textContent), exportType: h.dataset.exportType || exportColumnType(text(h.textContent)) })).filter(c => c.name && !/^(azioni|seleziona)$/i.test(c.name));
     if (!columns.length || !table.tBodies.length) return;
@@ -99,9 +121,12 @@ function initialize(table, index) {
     const pager = panel.querySelector('nav[role="navigation"]');
     const serverSummary = panel.querySelector('[data-table-page-summary]');
     const paginated = !!pager?.querySelector('a[href]');
+    /** Le tabelle vuote non hanno azioni utili; restano disponibili i filtri integrati e gli elenchi paginati. */
+    if (!table.dataset.filterForm && !paginated && ![...body.rows].some(row => row.cells.length === headers.length && !row.querySelector('td[colspan]'))) return;
     const state = { rows: null, applied: [], page: 1, busy: false, original: [...body.children], index, mode: 'all', invalidFilters:false };
     states.set(table, state);
     const accounting = table.matches('[data-collection-table]');
+    const exportOnly = table.hasAttribute('data-export-only');
     const accountingWorkspace = accounting ? table.closest('[data-collection-workspace]') : null;
     const title = text(table.closest('[role="region"]')?.getAttribute('aria-label') || panel.querySelector('.panel-title')?.textContent || document.querySelector('h1, [role="heading"][aria-level="1"]')?.textContent || document.title);
     const toolbar = element('div', { class: 'table-tools', 'data-table-tools': id });
@@ -119,16 +144,25 @@ function initialize(table, index) {
     const info = element('p', { class: 'u-text-meta table-export-status', role: 'status', 'aria-live': 'polite' });
     const navigation = element('div', { class: 'table-filter-pagination', hidden: '' });
     const pageLabel = element('span', { class: 'u-text-meta' });
-    const toggle = button('Filtra tabella', () => { filters.hidden = !filters.hidden; toggle.setAttribute('aria-expanded', String(!filters.hidden)); if (!filters.hidden) picker.querySelector('button')?.focus(); });
+    const toggle = button('Filtra tabella', () => { filters.hidden = !filters.hidden; toggle.setAttribute('aria-expanded', String(!filters.hidden)); if (!filters.hidden) picker.querySelector('select')?.focus(); });
     toggle.setAttribute('aria-controls', id); toggle.setAttribute('aria-expanded', 'false');
     const excel = button('Esporta Excel', () => download('xlsx'));
     const pdf = button(accounting ? 'Stampa / PDF di tutti' : 'Esporta PDF', () => download('pdf'));
-    if (!filterForm) actions.append(toggle);
+    if (!filterForm && !exportOnly) actions.append(toggle);
     actions.append(excel, pdf);
-    const instructions = element('p', { class: 'table-filter-help' }, 'Scegli cosa filtrare, inserisci il valore e premi Applica filtri. Puoi aggiungere più criteri.');
+    const instructions = element('p', { class: 'table-filter-help' }, 'Puoi aggiungere criteri specifici e applicarli insieme agli altri filtri.');
     const picker = element('div', { class: 'table-filter-picker', role: 'group', 'aria-label': 'Scegli cosa filtrare' });
-    columns.forEach(column => picker.append(button(column.name, () => { addRule(column); rules.lastElementChild.querySelector('input')?.focus(); })));
-    const pickerTitle = element('p', { class: 'table-filter-label' }, 'Filtra per');
+    const fieldPicker = element('select', { id: `${id}-column`, class: 'form-sel' });
+    fieldPicker.append(element('option', { value: '' }, 'Scegli un campo'));
+    columns.forEach(column => fieldPicker.append(element('option', { value: String(column.index) }, column.name)));
+    const add = button('Aggiungi filtro', () => {
+        const column = columns.find(column => String(column.index) === fieldPicker.value);
+        if (!column) return;
+        addRule(column); rules.lastElementChild.querySelector('input')?.focus(); fieldPicker.value = ''; refreshEditor();
+    });
+    fieldPicker.addEventListener('change', refreshEditor);
+    picker.append(fieldPicker, add);
+    const pickerTitle = element('label', { class: 'table-filter-label', for: fieldPicker.id }, 'Filtra per');
     const combinationLabel = element('span', { class: 'table-filter-label' }, 'Mostra le righe che rispettano');
     mode.prepend(combinationLabel);
     const filterActions = element('div', { class: 'table-tools-actions' });
@@ -138,11 +172,11 @@ function initialize(table, index) {
     if (!filterForm) filters.append(filterActions);
     toolbar.append(actions, info, navigation);
     if (filterForm) (filterForm.querySelector('[data-column-filters]') || filterForm).append(filters);
-    else actions.after(filters);
+    else if (!exportOnly) actions.after(filters);
     let anchor = table;
     if (table.parentElement?.classList.contains('client-table-scroll') || table.parentElement?.classList.contains('attachments-table-wrap')) anchor = table.parentElement;
-    const accountingActions = accountingWorkspace?.querySelector('[data-collection-actions]');
-    if (accountingActions) accountingActions.append(toolbar); else anchor.before(toolbar);
+    const actionsContainer = accountingWorkspace?.querySelector('[data-collection-actions]') || (exportOnly && panel.querySelector('[data-export-controls]'));
+    if (actionsContainer) actionsContainer.append(toolbar); else anchor.before(toolbar);
     accountingWorkspace?.addEventListener('click',event=> {
         const control = event.target.closest('[data-collection-export]');
         if (control && accountingWorkspace.contains(control)) download(control.dataset.collectionExport,control.dataset.collectionGroup ?? null);
@@ -161,9 +195,13 @@ function initialize(table, index) {
             : type === 'date'
                 ? [['eq','Il giorno'], ['gte','Dal giorno'], ['lte','Fino al giorno'], ['between','Tra due date'], ['empty','Data mancante']]
                 : [['eq','Uguale a'], ['gte','Almeno'], ['lte','Al massimo'], ['between','Tra due valori'], ['empty','Valore mancante']];
-        const operators = element('div', { class: 'table-filter-operators', role: 'group', 'aria-label': `Condizione per ${column.name}` });
         const fields = element('div', { class: 'table-filter-values' });
         const inputId = `${id}-value-${++serial}`;
+        const operators = element('select', { id: `${inputId}-operator`, class: 'form-sel', 'aria-label': `Condizione per ${column.name}` });
+        choices.forEach(([key, label]) => operators.append(element('option', { value: key }, label)));
+        operators.value = operator;
+        const operatorLabel = element('label', { for: operators.id, class: 'table-filter-value' });
+        operatorLabel.append(element('span', { class: 'table-filter-label' }, 'Condizione'), operators);
         const value = element('input', { id: inputId, class: 'form-in', type: type === 'date' ? 'date' : 'text', 'aria-label': `Valore per ${column.name}`, maxlength: '500', placeholder: type === 'number' ? 'Inserisci un importo o un numero' : `Scrivi ${column.name.toLocaleLowerCase('it')}` });
         if (type === 'number') value.inputMode = 'decimal';
         const valueLabel = element('label', { for: inputId, class: 'table-filter-value' });
@@ -179,24 +217,21 @@ function initialize(table, index) {
             value.required = !valueLabel.hidden; to.required = !toLabel.hidden;
             valueTitle.textContent = operator === 'between' ? 'Da' : type === 'date' ? 'Data' : 'Valore';
         };
-        choices.forEach(([key,label]) => {
-            const choice = button(label, () => { operator = key; [...operators.children].forEach(b => b.setAttribute('aria-pressed', String(b === choice))); update(); });
-            choice.setAttribute('aria-pressed', String(operator === key)); operators.append(choice);
-        });
-        const remove = button('Rimuovi filtro', () => { row.remove(); refreshEditor(); picker.querySelector('button')?.focus(); });
+        operators.addEventListener('change', () => { operator = operators.value; update(); });
+        const remove = button('Rimuovi filtro', () => { row.remove(); refreshEditor(); fieldPicker.focus(); });
         remove.setAttribute('aria-label', `Rimuovi filtro ${column.name}`);
-        fields.append(valueLabel, toLabel, remove);
-        row.append(legend, operators, fields);
+        fields.append(operatorLabel, valueLabel, toLabel, remove);
+        row.append(legend, fields);
         row.read = () => ({ column: column.index, type, operator, value: value.disabled ? '' : value.value.trim(), to: to.disabled ? '' : to.value.trim() });
         rules.append(row); update(); refreshEditor();
     }
-    function refreshEditor() { mode.hidden = rules.children.length < 2; apply.disabled = !rules.children.length; }
+    function refreshEditor() { mode.hidden = rules.children.length < 2; apply.disabled = !rules.children.length; add.disabled = !fieldPicker.value || rules.children.length >= 20; }
     refreshEditor();
     function rowsFrom(sourceTable) {
         return [...sourceTable.tBodies[0].rows].filter(r => r.cells.length === headers.length && !r.querySelector('td[colspan]'))
             .map(node => ({ node, cells: [...node.cells].map(c => {
                 const clone = c.cloneNode(true);
-                clone.querySelectorAll('button, form, [role="dialog"], script, style, summary').forEach(n => n.remove());
+                clone.querySelectorAll('button, form, [role="dialog"], script, style, summary, [data-table-export-ignore]').forEach(n => n.remove());
                 /** Block boundaries must survive extraction, including details that are collapsed on screen. */
                 clone.querySelectorAll('div, p, br, li').forEach(n => { n.before(' '); n.after(' '); });
                 return text(clone.textContent);
@@ -287,14 +322,15 @@ function initialize(table, index) {
             for (const rule of restored.rules) addRule(columns.find(column=>column.index===rule.column), rule);
             state.applied = readRules();
             if (state.applied.length) {
-                const details = filters.closest('details'); if (details) details.open = true;
+                const details = filters.closest('details');
+                if (details && !filterForm.hasAttribute('data-compact-filter-results')) details.open = true;
                 info.textContent = 'Applicazione dei filtri a tutti i risultati…';
                 busy(async () => { await load(); render(); });
             }
         } catch (error) {
             info.textContent = error.message;
             /** An invalid saved accounting filter must never produce an apparently filtered financial report. */
-            if (accounting) {state.invalidFilters=true;[excel,pdf,...(accountingWorkspace?.querySelectorAll('[data-collection-export]') || [])].forEach(button=>button.disabled=true);}
+            if (accounting || table.matches('[data-allowance-table]')) {state.invalidFilters=true;[excel,pdf,...(accountingWorkspace?.querySelectorAll('[data-collection-export]') || [])].forEach(button=>button.disabled=true);}
         }
     } else filters.addEventListener('submit', event => {
         event.preventDefault();
@@ -309,18 +345,21 @@ function initialize(table, index) {
         await busy(async () => {
             await load(); const matched = matching();
             const rows = matched.map(r => columns.map(c => r.cells[c.index]));
-            const footers = table.matches('[data-collection-table]') ? collectionExportFooters(matched.map(row => row.node.dataset), columns.map(column=>column.name)) : [];
+            const footers = table.matches('[data-collection-table]') ? collectionExportFooters(matched.map(row => row.node.dataset), columns.map(column=>column.name))
+                : (table.matches('[data-allowance-table]') ? allowanceExportFooters(matched.map(row => row.node.dataset), columns.map(column=>column.name)) : []);
             info.textContent = `Preparazione ${format === 'xlsx' ? 'Excel' : 'PDF'}: ${rows.length} ${rows.length === 1 ? 'riga' : 'righe'}…`;
             const operators = { contains:'contiene', not_contains:'non contiene', starts:'inizia con', eq:'uguale a', ne:'diverso da', gt:'maggiore / dopo', gte:'maggiore o uguale', lt:'minore / prima', lte:'minore o uguale', between:'compreso tra', empty:'vuoto', filled:'compilato' };
             const filtersText = state.applied.map(r => `${columns.find(c=>c.index===r.column)?.name}: ${operators[r.operator]} ${r.value}${r.to ? ' e '+r.to : ''}`).join(state.mode === 'any' ? ' oppure ' : '; ');
-            const searchLabels = { search:'Ricerca', client:'Cliente', policy:'Polizza', client_type:'Tipo cliente', status:'Stato', category:'Ramo', subcategory:'Sottoramo', period:'Periodo', operation:'Operazione', date:'Giornata', month:'Mese', date_basis:'Data di riferimento', agency:'Agenzia', payment_frequency:'Frazionamento', from:'Dal', to:'Al', titles_from:'Scadenza titoli dal', titles_to:'Scadenza titoli al', payment_method:'Modalità di pagamento', supplier_company_id:'Compagnia', company:'Compagnia', responsible:'Responsabile cliente', branch:'Ramo principale', subbranch:'Sottoramo', basis:'Base di calcolo', on:'Valide alla data', state:'Stato', review:'Solo da verificare', document_view:'Versioni documenti', unassigned:'Compagnia da assegnare', import_review:'Dati importati da verificare', kind:'Anagrafica', result:'Esito',direction:'Movimento',recipient:'Gestito da',consultant:'Consulente',document_type:'Tipo documento' };
+            const searchLabels = { search:'Ricerca', client:'Cliente', policy:'Polizza', client_type:'Tipo cliente', status:'Stato', category:'Ramo', subcategory:'Sottoramo', period:'Periodo', operation:'Operazione', date:'Giornata', month:'Mese', date_basis:'Data di riferimento', agency:'Agenzia', payment_frequency:'Frazionamento', from:'Dal', to:'Al', titles_from:'Scadenza titoli dal', titles_to:'Scadenza titoli al', payment_method:'Modalità di pagamento', supplier_company_id:'Compagnia', company:'Compagnia', responsible:'Responsabile cliente', branch:'Ramo principale', subbranch:'Sottoramo', basis:'Base di calcolo', on:'Valide alla data', state:'Stato', review:'Solo da verificare', document_view:'Versioni documenti', unassigned:'Compagnia da assegnare', import_review:'Dati importati da verificare', kind:'Anagrafica', result:'Esito',direction:'Movimento',recipient:'Gestito da',consultant:'Consulente',document_type:'Tipo documento',plate:'Targa',cu:'Classe CU',merit_class_cu:'Classe CU',company_id:'Compagnia',agency_id:'Agenzia',expires_from:'Scadenza dal',expires_to:'Scadenza al' };
+            Object.assign(searchLabels, {borne_by:'Chi sostiene l’abbuono',bearer_agency:'Agenzia che sostiene l’abbuono'});
             const appliedUrl = tableExportUrl(location.href, pager?.dataset.pageName || 'page', JSON.parse(table.dataset.tableQuery || '{}'));
             const searchFilters = [...appliedUrl.searchParams].filter(([key,value]) => searchLabels[key] && value).map(([key,value]) => {
                 const field = [...document.querySelectorAll('form[method="GET"] [name]')].find(el => el.name === key);
                 if (field?.disabled && !accounting) return null;
                 const label = field?.dataset.exportLabel || text(field?.labels?.[0]?.textContent) || searchLabels[key];
                 const display = field?.dataset.exportValue || [...(field?.options || [])].find(option => option.value === value)?.textContent || (key === 'document_view' ? ({ current:'Documenti correnti', history:'Tutte le versioni' }[value] || value) : value);
-                return `${label}: ${display}`;
+                const readable = field?.type === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(display) ? display.split('-').reverse().join('/') : display;
+                return `${label}: ${readable}`;
             }).filter(Boolean).join('; ');
             let exported = rows.length;
             if (accounting) {
@@ -336,7 +375,13 @@ function initialize(table, index) {
     }
 }
 
-function init() { eligible(document).forEach(initialize); }
+function init() {
+    document.querySelectorAll('form[data-list-filters]').forEach(initializeListFilters);
+    eligible(document).forEach((table, index) => { labelTableRows(table); initializeListDetails(table); initialize(table, index); });
+}
+document.addEventListener('table:rendered', event => {
+    if (event.target.matches?.('table.t-table')) labelTableRows(event.target);
+});
 document.addEventListener('DOMContentLoaded', init);
 document.addEventListener('livewire:navigated', init);
 document.addEventListener('livewire:initialized', () => { window.Livewire.hook('commit', ({ succeed }) => succeed(() => queueMicrotask(init))); });

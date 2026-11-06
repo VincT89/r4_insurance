@@ -11,6 +11,7 @@ const unique = values => [...new Set(values.filter(value => value !== null && va
 const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const datePattern = '(?:\\d{1,2}[/.\\-]\\d{1,2}[/.\\-]\\d{4}|\\d{4}-\\d{2}-\\d{2})';
 const moneyPattern = '(?:\\d{1,3}(?:[. ]\\d{3})+(?:,\\d{2})?|\\d+(?:[,.]\\d{2})?)';
+const timePrefix = '(?:(?:dalle|alle) ore \\d{1,2}(?:[:.]\\d{2})?(?: del|,)?[ \\t]*)?';
 
 function isoDate(raw) {
     let year, month, day;
@@ -35,9 +36,12 @@ export function parsePolicyContract(source, {companies = [], categories = [], su
     const candidates = {}, warnings = [];
     const capture = (label, pattern, convert = normalize, scope = text) => unique([...scope.matchAll(new RegExp(`(?:^|[\\s;|])(?:${label})[ \\t]*(?:[:：#]|n[.°º]?|numero)?[ \\t]*\\n?[ \\t]*(${pattern})`, 'gim'))].map(match => convert(match[1])));
     candidates.number = capture('numero (?:di )?polizza|n[.°º]?\\s*(?:di )?polizza|polizza\\s*(?:n[.°º]?|numero)|numero (?:di )?contratto|contratto\\s*n[.°º]?', '[A-Z0-9][A-Z0-9/_.\\-]{1,99}', value => /\d/.test(value) ? value.toUpperCase() : null);
-    candidates.starts_on = capture('(?:data (?:di )?)?decorrenza(?: (?:della )?(?:polizza|contratto|copertura))?|inizio (?:copertura|assicurazione)', `(?:alle ore \\d{1,2}(?:[:.]\\d{2})? del )?${datePattern}`, value => isoDate(value.match(new RegExp(datePattern))[0]));
-    candidates.expires_on = capture('(?:data (?:di )?)?scadenza (?:della )?(?:polizza|contratto|copertura)|fine (?:copertura|assicurazione)|scadenza(?![ \\t]+(?:rata|premio|pagamento|titolo))', datePattern, isoDate);
-    candidates.premium = capture('premio (?:totale (?:di polizza|del contratto)|totale|complessivo|annuo(?: lordo| totale)?|annuale(?: lordo| totale)?)|totale premio (?:annuo|annuale)', `(?:€|EUR)?[ \\t]*${moneyPattern}`, value => money(value.replace(/€|EUR/gi, '').trim()));
+    candidates.starts_on = capture('(?:data (?:di )?)?decorrenza(?: (?:della )?(?:polizza|contratto|copertura))?|(?:data (?:di )?)?effetto(?: (?:della )?polizza)?|inizio (?:copertura|assicurazione)', `${timePrefix}${datePattern}`, value => isoDate(value.match(new RegExp(datePattern))[0]));
+    candidates.expires_on = capture('(?:data (?:di )?)?scadenza (?:della )?(?:polizza|contratto|copertura)|fine (?:copertura|assicurazione)|scadenza(?![ \\t]+(?:rata|premio|pagamento|titolo))', `${timePrefix}${datePattern}`, value => isoDate(value.match(new RegExp(datePattern))[0]));
+    const amounts = label => capture(label, `(?:€|EUR)?[ \\t]*${moneyPattern}`, value => money(value.replace(/€|EUR/gi, '').trim()));
+    const totalPremium = amounts('premio (?:totale(?: (?:di polizza|del contratto))?|complessivo|di polizza)');
+    const annualPremium = amounts('premio (?:annuo|annuale|totale annuo|totale annuale)(?: lordo| totale)?|totale premio (?:annuo|annuale)');
+    candidates.premium = totalPremium.length ? totalPremium : annualPremium;
     candidates.installment_premium = capture('premio (?:di )?rata|importo (?:della )?rata', `(?:€|EUR)?[ \\t]*${moneyPattern}`, value => money(value.replace(/€|EUR/gi, '').trim()));
     candidates.payment_frequency = capture('frazionamento(?: (?:del )?premio)?|periodicit[aà](?: (?:del )?pagamento)?', 'annuale|annuo|semestrale|quadrimestrale|trimestrale|mensile|unico|unica soluzione', value => ({annuo:'Annuale', 'unica soluzione':'Unico'}[value.toLowerCase()] || value[0].toUpperCase() + value.slice(1).toLowerCase()));
     candidates.merit_class_cu = capture('classe (?:di merito )?(?:universale|CU)(?: di assegnazione)?|CU di assegnazione', '\\d{1,2}\\b', value => +value >= 1 && +value <= 18 ? String(+value) : null);
@@ -45,12 +49,17 @@ export function parsePolicyContract(source, {companies = [], categories = [], su
     const labelledLine = label => capture(label, '[^\\n;|]{1,255}');
     candidates.product = labelledLine('prodotto(?: assicurativo)?|nome (?:del )?prodotto');
     candidates.insured_subject = labelledLine('bene assicurato|soggetto assicurato');
-    function catalogue(label, options, scope = text) {
+    function catalogue(label, options, scope = text, firstPart = false) {
         const labelled = capture(label, '[^\\n;|]{1,150}', normalize, scope);
-        return unique(options.filter(option => labelled.some(value => key(value) === key(option))));
+        return unique(options.filter(option => labelled.some(value => key(firstPart ? value.split('/')[0] : value) === key(option))));
     }
-    candidates.category = catalogue('ramo(?: assicurativo)?', categories);
+    candidates.category = catalogue('ramo(?: assicurativo)?', categories, text, true);
     candidates.subcategory = catalogue('sottoramo', Object.values(subcategories).flat());
+    if (!candidates.subcategory.length && candidates.category.length === 1) {
+        const branch = candidates.category[0], available = subcategories[branch] || [];
+        const combined = labelledLine('ramo(?: assicurativo)?').map(value => value.split('/')).filter(parts => key(parts[0]) === key(branch));
+        candidates.subcategory = unique(available.filter(option => combined.some(parts => parts.slice(1).some(part => key(part) === key(option)))));
+    }
     candidates.company = catalogue('compagnia(?: assicuratrice| di assicurazione)?|impresa(?: assicuratrice| di assicurazione)?', companies);
     if (!candidates.company.length) candidates.company = companies.filter(company => new RegExp(`(?:^|\\W)${escape(company)}(?:$|\\W)`, 'im').test(text));
     if (candidates.company.length === 1) {
@@ -58,7 +67,7 @@ export function parsePolicyContract(source, {companies = [], categories = [], su
         const names = catalogue('agenzia(?: intermediaria)?|intermediario', available.map(agency => agency.name));
         candidates.supplier_agency_id = available.filter(agency => names.includes(agency.name)).map(agency => String(agency.id));
     }
-    candidates.payment_method = capture('modalit[aà] (?:di )?pagamento|metodo (?:di )?pagamento', 'Bonifico a Compagnia|Bonifico a Intermediario|Assegno a Compagnia|Assegno a Intermediario|Contanti a Intermediario|Contanti a Compagnia|Carta di credito a Intermediario|Carta di credito a Compagnia|Finanziamento');
+    candidates.payment_method = capture('modalit[aà] (?:di )?pagamento|metodo (?:di )?pagamento|metodo previsto|pagamento previsto', 'Bonifico a Compagnia|Bonifico a Intermediario|Assegno a Compagnia|Assegno a Intermediario|Contanti a Intermediario|Contanti a Compagnia|Carta di credito a Intermediario|Carta di credito a Compagnia|Finanziamento');
 
     /** Personal identifiers are read only inside the contracting party block, never from the insurer or vehicle owner. */
     const clientBlock = text.match(/(?:^|\n)\s*(?:dati (?:del )?)?contraente\b[^\n]*\n?[\s\S]*?(?=\n\s*(?:dati (?:dell[’']?\s*)?)?(?:assicurato|proprietario|veicolo|compagnia|intermediario|agenzia|garanzie|premio|decorrenza|condizioni)\b|(?![\s\S]))/im)?.[0] || '';
@@ -79,12 +88,13 @@ export function parsePolicyContract(source, {companies = [], categories = [], su
     clientCapture('province', 'provincia', '[A-Z]{2}\\b', key);
     if (client.name) client.client_type = /ragione sociale|sede legale/i.test(clientBlock) ? 'company' : 'person';
 
-    if (candidates.premium.length && /premio annu(?:o|ale)/i.test(text) && candidates.starts_on.length === 1 && candidates.expires_on.length === 1) {
+    if (candidates.premium.length && !totalPremium.length && annualPremium.length && candidates.starts_on.length === 1 && candidates.expires_on.length === 1) {
         const start = new Date(candidates.starts_on[0] + 'T00:00:00Z');
         const end = new Date(candidates.expires_on[0] + 'T00:00:00Z');
         const days = (end - start) / 86400000;
         if (days < 365 || days > 366) { candidates.premium = []; warnings.push('Il contratto indica un premio annuo e una durata diversa da un anno: verifica il premio totale della copertura.'); }
     }
+    if (/(?:^|\n)\s*(?:documento di prova|bozza|preventivo\b|proposta\b)/im.test(text.slice(0, 800))) warnings.push('Il PDF è indicato come prova, bozza o proposta. Controlla il contratto definitivo prima di confermare la polizza.');
     const values = {};
     for (const [field, found] of Object.entries(candidates)) {
         if (found.length === 1) values[field] = found[0];

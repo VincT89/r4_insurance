@@ -42,6 +42,7 @@ function initialize(root) {
     let saved, available = true;
     try { saved = JSON.parse(sessionStorage.getItem(key)); } catch { available = false; }
     const selection = new CommunicationSelection(root.dataset.selectionScope, saved);
+    const collections = root.dataset.selectionField === 'collections';
     const message = root.querySelector('[data-selection-message]');
     if (saved && saved.scope !== selection.scope) message.textContent = 'Filtri cambiati: la precedente selezione è stata azzerata.';
     else if (saved?.expires <= Date.now()) message.textContent = 'La selezione precedente è scaduta: ricontrolla gli elementi da inviare.';
@@ -52,15 +53,21 @@ function initialize(root) {
             else if (selection.items.has(input.value) && selection.items.get(input.value) !== input.dataset.agency) selection.items.delete(input.value);
             input.checked = selection.items.has(input.value) && !input.disabled;
         }
+        let agencies = 0;
         for (const form of root.querySelectorAll('[data-review-agency]')) {
             const ids = selection.forAgency(form.dataset.reviewAgency);
             form.hidden = !ids.length;
+            if (ids.length) agencies++;
             form.querySelector('[data-agency-count]').textContent = `${ids.length} ${ids.length === 1 ? 'selezionato' : 'selezionati'}`;
             form.querySelector('[data-selection-inputs]').replaceChildren(...ids.map(id => {
                 const input = document.createElement('input'); input.type = 'hidden'; input.name = `${root.dataset.selectionField}[]`; input.value = id; return input;
             }));
         }
-        root.querySelector('[data-selection-count]').textContent = selection.items.size ? `${selection.items.size} ${selection.items.size === 1 ? 'elemento selezionato' : 'elementi selezionati'} in tutte le pagine` : 'Nessun elemento selezionato';
+        const groups = root.querySelector('[data-selection-groups]');
+        if (groups) { groups.hidden = !agencies; groups.dataset.agencies = String(agencies); }
+        root.querySelector('[data-selection-count]').textContent = selection.items.size
+            ? `${selection.items.size} ${collections ? (selection.items.size === 1 ? 'incasso selezionato' : 'incassi selezionati') : (selection.items.size === 1 ? 'operazione selezionata' : 'operazioni selezionate')}`
+            : (collections ? 'Nessun incasso selezionato' : 'Nessuna operazione selezionata');
         root.querySelector('[data-clear-selection]').disabled = !selection.items.size;
         try { sessionStorage.setItem(key, JSON.stringify(selection.snapshot())); } catch { available = false; }
         if (!available) message.textContent = 'Il browser non consente di conservare la selezione: prepara il riepilogo prima di cambiare pagina.';

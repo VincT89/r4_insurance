@@ -30,6 +30,7 @@ class NotificationController extends Controller
     {
         $this->authorize('system.admin');
         $notification = auth()->user()->visibleNotifications()->findOrFail($id);
+        abort_if($notification->type === \App\Services\PolicyFormReminder::TYPE, 409, 'Concludi la scelta dei moduli dalla polizza.');
         $notification->delete();
 
         return back()->with('success', 'Notifica eliminata.');

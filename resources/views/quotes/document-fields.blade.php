@@ -7,6 +7,13 @@
     <div data-file-details></div>
 </div>
 <div class="form-row u-mt-md">
-    @include('clients.vehicles.registration-upload', ['registrationField' => 'vehicle_files'])
+    @if($contextualVehicle ?? false)
+        <details data-registration-section @if($errors->hasAny(['vehicle_files','vehicle_files.*'])) data-keep-open open @endif>
+            <summary>Libretto del veicolo</summary>
+            @include('clients.vehicles.registration-upload', ['registrationField' => 'vehicle_files'])
+        </details>
+    @else
+        @include('clients.vehicles.registration-upload', ['registrationField' => 'vehicle_files'])
+    @endif
     <x-form-group label="Altri documenti per la richiesta" name="files"><input id="field-files" class="form-in" type="file" name="files[]" multiple accept="application/pdf,.pdf"><p class="u-text-meta">Documenti aziendali, dell’immobile, polizza attuale o altre informazioni utili alla compagnia.</p></x-form-group>
 </div>

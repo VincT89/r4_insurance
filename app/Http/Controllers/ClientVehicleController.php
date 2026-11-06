@@ -15,6 +15,7 @@ class ClientVehicleController extends Controller
     {
         $this->authorize('viewAny', Client::class);
         $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
             'client' => ['nullable', 'string', 'max:255'],
             'plate' => ['nullable', 'string', 'max:20'],
             'merit_class_cu' => ['nullable', 'integer', 'between:1,18'],
@@ -39,6 +40,16 @@ class ClientVehicleController extends Controller
                 }
             })
             ->when(filled($filters['plate'] ?? null), fn ($q) => $q->where('plate', 'like', '%'.strtoupper(preg_replace('/\s+/', '', $filters['plate'])).'%'))
+            ->when(filled($filters['search'] ?? null), function ($query) use ($filters) {
+                $term = trim($filters['search']);
+                $plate = '%'.strtoupper(preg_replace('/\s+/', '', $term)).'%';
+                $name = '%'.mb_strtolower($term).'%';
+                $query->where(function ($match) use ($plate, $name) {
+                    $match->where('plate', 'like', $plate)->orWhereHas('client', fn ($client) =>
+                        $client->where(fn ($identity) => $identity->whereRaw('LOWER(name) LIKE ?', [$name])->orWhereRaw('LOWER(company_name) LIKE ?', [$name]))
+                    );
+                });
+            })
             ->when($filters['merit_class_cu'] ?? null, fn ($q, $cu) => $q->where('merit_class_cu', $cu))
             /** Tutti i filtri assicurativi devono corrispondere alla stessa polizza del veicolo. */
             ->when($hasPolicyFilters, fn ($q) => $q->whereHas('policies', $policies))

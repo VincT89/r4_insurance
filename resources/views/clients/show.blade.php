@@ -8,16 +8,18 @@
             @can('updateRegistry', $client)
                 <a href="{{ route('quotes.create', ['client_id' => $client->id]) }}" class="btn btn-p">Nuovo preventivo</a>
                 <a href="{{ route('clients.policies.create', [$client, 'category' => request('category'), 'subcategory' => request('subcategory')]) }}" class="btn btn-g">Nuova polizza</a>
-                <a href="{{ route('clients.edit', $client) }}" class="btn btn-g">Modifica anagrafica</a>
             @endcan
         </x-slot:actions>
     </x-page-header>
-    <p class="client-identity-line">{{ $client->client_type_label }} / {{ $client->status_label }}
-        @if($client->tax_code) / Codice fiscale: {{ $client->tax_code }}@endif
-        @if($client->vat_number) / Partita IVA: {{ $client->vat_number }}@endif
+    <p class="client-identity-line client-identity-actions">
+        <span>{{ $client->client_type_label }} / {{ $client->status_label }}
+            @if($client->tax_code) / Codice fiscale: {{ $client->tax_code }}@endif
+            @if($client->vat_number) / Partita IVA: {{ $client->vat_number }}@endif
+        </span>
+        @can('updateRegistry', $client)<a href="{{ route('clients.edit',$client) }}">Modifica anagrafica</a>@endcan
     </p>
     <nav class="client-section-nav client-main-nav" aria-label="Sezioni della scheda cliente">
-        @foreach(['policies' => 'Polizze', 'registry' => 'Anagrafica', 'vehicles' => 'Veicoli', 'documents' => 'Documenti', 'deadlines' => 'Scadenze'] as $key => $label)
+        @foreach(['policies' => 'Polizze', 'registry' => 'Anagrafica', 'vehicles' => 'Veicoli', 'documents' => 'Documenti e firme', 'deadlines' => 'Scadenze'] as $key => $label)
             <a href="{{ route('clients.show', [$client, 'tab' => $key]) }}" @if($tab === $key) aria-current="page" @endif>{{ $label }}</a>
         @endforeach
         <a href="{{ route('quotes.index',['client'=>$client->id]) }}">Preventivi</a>
@@ -29,7 +31,7 @@
         <details class="client-nav-more" x-data @click.outside="$el.open = false" @keydown.escape.stop="$el.open = false; $el.querySelector('summary').focus()">
             <summary @class(['is-current' => isset($secondaryTabs[$tab])])>{{ $secondaryTabs[$tab] ?? 'Altre sezioni' }}</summary>
             <div class="client-more-links">
-                <a href="{{ route('clients.forms.index',$client) }}">Moduli e firme</a>
+                <a href="{{ route('clients.forms.index',$client) }}">Storico moduli e firme</a>
                 <a href="{{ route('claims.index',['client'=>$client->id]) }}">Sinistri</a>
                 @foreach($secondaryTabs as $key => $label)
                     <a href="{{ route('clients.show', [$client, 'tab' => $key]) }}" @if($tab === $key) aria-current="page" @endif>{{ $label }}</a>

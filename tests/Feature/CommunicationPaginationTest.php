@@ -91,6 +91,7 @@ class CommunicationPaginationTest extends TestCase
         $this->post($url, array_replace($data, ['date'=>'2026-10-18']))->assertSessionHasErrors('policies');
         $this->post($url, array_replace($data, ['policies'=>[$ids[0], $ids[0]]]))->assertSessionHasErrors('policies.0');
         $this->post($url, array_replace($data, ['policies'=>array_slice($ids, 0, 501)]))->assertSessionHasErrors('policies');
+        $this->post($url,['all_matching'=>1,'date'=>'2026-10-19'])->assertSessionHasErrors('policies');
         InsurancePolicy::whereKey($ids[526])->update(['status'=>'cancelled']);
         $this->post($url, $data)->assertSessionHasErrors('policies');
         InsurancePolicy::whereKey($ids[526])->update(['status'=>'active', 'supplier_agency_id'=>null]);
@@ -114,12 +115,58 @@ class CommunicationPaginationTest extends TestCase
         $review = route('agency-communications.collections-review', $this->agency);
         $this->post($review, $filters+['collections'=>$selected])->assertSessionHasNoErrors()->assertRedirect();
         $this->assertSame($selected, array_column(AgencyCommunication::firstOrFail()->payload['collections'], 'id'));
+        $this->post($review,$filters+['all_matching'=>1])->assertSessionHasErrors('collections');
         InsuranceCollection::whereKey($ids[526])->update(['voided_at'=>now()]);
         $this->post($review, $filters+['collections'=>$selected])->assertSessionHasErrors('collections');
         $this->get($url)->assertViewHas('payments', fn ($p) => $p->total() === 526);
         $this->get(route('agency-communications.collections', ['to'=>'2026-10-18']))->assertSessionHasErrors('to');
         $other = SupplierCompany::create(['name'=>'Compagnia Borgo', 'status'=>'active']);
         $this->get(route('agency-communications.collections', array_replace($filters, ['company'=>$other->id])))->assertViewHas('payments', fn ($p) => $p->total() === 0);
+    }
+
+    public function test_direct_policy_preparation_uses_all_pages_without_including_other_agencies_or_ineligible_contracts(): void
+    {
+        $ids=$this->policies(30);
+        $other=SupplierAgency::create(['name'=>'Altra agenzia','status'=>'active']);
+        InsurancePolicy::whereKey($ids[27])->update(['supplier_agency_id'=>$other->id]);
+        InsurancePolicy::whereKey($ids[28])->update(['created_at'=>today()->subDay()]);
+        InsurancePolicy::whereKey($ids[29])->update(['status'=>'cancelled']);
+        $filters=['period'=>'day','date'=>'2026-10-19','agency'=>$this->agency->id];
+        $this->get(route('agency-communications.index',$filters+['page'=>2]))->assertOk()
+            ->assertViewHas('batches',fn($batches)=>$batches->count()===1 && $batches->first()['count']===27);
+        $url=route('agency-communications.review',$this->agency);
+        $this->post($url,$filters+['all_matching'=>1])->assertSessionHasNoErrors()->assertRedirect();
+        $message=AgencyCommunication::latest('id')->firstOrFail();
+        $this->assertSame(array_slice($ids,0,27),$message->payload['policy_ids']);
+        $this->assertSame('review',$message->status);
+        $this->post($url,$filters+['all_matching'=>1,'policies'=>[$ids[0]]])->assertSessionHasErrors('policies');
+        $this->post($url,$filters+['all_matching'=>0])->assertSessionHasErrors('all_matching');
+        $this->post($url,$filters+['all_matching'=>1,'_table_filters'=>'{}'])->assertSessionHasErrors('policies');
+        $this->post($url,array_replace($filters,['agency'=>$other->id,'all_matching'=>1]))->assertSessionHasErrors('policies');
+        $this->assertSame(1,AgencyCommunication::count());
+    }
+
+    public function test_direct_collection_preparation_excludes_sent_uncertain_running_voided_and_out_of_period_movements(): void
+    {
+        $ids=$this->collections(30);
+        InsuranceCollection::whereKey($ids[28])->update(['voided_at'=>now()]);
+        InsuranceCollection::whereKey($ids[29])->update(['received_on'=>today()->subDay()]);
+        foreach(['sent','sending','uncertain'] as $index=>$status) {
+            $claimed=AgencyCommunication::create(['supplier_agency_id'=>$this->agency->id,'user_id'=>$this->admin->id,'status'=>$status,
+                'payload'=>['kind'=>'collections','recipient'=>['name'=>$this->agency->name,'address'=>$this->agency->email],'policies'=>[],'collections'=>[]],
+                'fingerprint'=>hash('sha256',$status),'review_expires_at'=>now()->addMinutes(30)]);
+            DB::table('agency_communication_collections')->insert(['agency_communication_id'=>$claimed->id,'insurance_collection_id'=>$ids[$index],'delivery_key'=>hash('sha256','claimed-'.$status)]);
+        }
+        $filters=['from'=>'2026-10-19','to'=>'2026-10-19','agency'=>$this->agency->id];
+        $this->get(route('agency-communications.collections',$filters+['page'=>2]))->assertOk()
+            ->assertViewHas('batches',fn($batches)=>$batches->count()===1 && $batches->first()['count']===25);
+        $url=route('agency-communications.collections-review',$this->agency);
+        $this->post($url,$filters+['all_matching'=>1])->assertSessionHasNoErrors()->assertRedirect();
+        $message=AgencyCommunication::latest('id')->firstOrFail();
+        $this->assertSame(array_slice($ids,3,25),array_column($message->payload['collections'],'id'));
+        $this->assertSame('review',$message->status);
+        $this->post($url,$filters+['all_matching'=>1,'collections'=>[$ids[3]]])->assertSessionHasErrors('collections');
+        $this->post($url,$filters+['all_matching'=>1,'_table_filters'=>'{}'])->assertSessionHasErrors('collections');
     }
 
     public function test_history_exports_include_all_pages_with_stable_order_and_no_permission_bypass(): void
@@ -131,8 +178,11 @@ class CommunicationPaginationTest extends TestCase
         $this->assertCount(25, $first); $this->assertCount(5, $last);
         $this->assertSame([], array_values(array_intersect($first->pluck('id')->all(), $last->pluck('id')->all())));
         $this->get($url.'&_table_all=1', ['X-Table-Export'=>'1'])->assertViewHas('messages', fn ($p) => $p->count() === 30);
-        $this->actingAs(User::factory()->create(['role'=>UserRole::Operator, 'status'=>'active']));
-        foreach (['agency-communications.index', 'agency-communications.collections', 'agency-communications.history'] as $route) $this->get(route($route, ['_table_all'=>1]), ['X-Table-Export'=>'1'])->assertForbidden();
+        $operator=User::factory()->create(['role'=>UserRole::Operator, 'status'=>'active']);
+        $this->actingAs($operator);
+        $this->get($url.'&_table_all=1', ['X-Table-Export'=>'1'])->assertOk()->assertViewHas('messages', fn ($p) => $p->count() === 30);
+        $operator->update(['status'=>'inactive']);
+        foreach (['agency-communications.index', 'agency-communications.collections', 'agency-communications.history'] as $route) $this->actingAs($operator)->getJson(route($route, ['_table_all'=>1]), ['X-Table-Export'=>'1'])->assertForbidden();
     }
 
     public function test_selection_survives_empty_filter_fields_and_back_from_review_but_not_a_changed_search(): void

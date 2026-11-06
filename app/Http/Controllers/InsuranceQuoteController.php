@@ -26,13 +26,16 @@ class InsuranceQuoteController extends Controller
     }
     public function create(Request $request)
     {
-        $this->authorize('create',Client::class);$request->validate(['client_id'=>['nullable','integer'],'purpose'=>['nullable',Rule::in(array_keys(InsuranceQuoteCase::PURPOSES))],'current_policy_id'=>['nullable','integer']]);
-        $clientId=$request->input('client_id', $request->old('client_id'));
-        $client=$clientId ? Client::current()->visibleTo($request->user())->findOrFail($clientId) : new Client;
+        $this->authorize('create',Client::class);$request->validate(['client_id'=>['nullable','integer'],'purpose'=>['nullable',Rule::in(array_keys(InsuranceQuoteCase::PURPOSES))],'current_policy_id'=>['nullable','integer'],'vehicle_id'=>['nullable','integer']]);
+        $clientId = $request->old('client_id', $request->input('client_id'));
+        $client = is_scalar($clientId) && filled($clientId)
+            ? Client::current()->visibleTo($request->user())->findOrFail($clientId) : new Client;
         if($client->exists)$this->authorize('updateRegistry',$client);
         $currentPolicies=$client->exists ? $client->policies()->orderBy('number')->get() : collect();
-        $source=$request->filled('current_policy_id') ? $currentPolicies->firstWhere('id',$request->integer('current_policy_id')) : null;
-        abort_if($request->filled('current_policy_id') && !$source,404);
+        $restoring = $request->session()->hasOldInput('client_id');
+        $sourceId = $restoring ? $request->old('current_policy_id') : $request->input('current_policy_id');
+        $source = is_scalar($sourceId) && filled($sourceId) ? $currentPolicies->firstWhere('id', $sourceId) : null;
+        abort_if(!$restoring && filled($sourceId) && !$source, 404);
         return view('quotes.create',['client'=>$client,'currentPolicies'=>$currentPolicies,'source'=>$source,'purpose'=>$request->input('purpose','new'),'vehicles'=>$client->exists ? $client->vehicles()->orderBy('plate')->get() : collect(),'recipientGroups'=>\App\Models\QuoteRecipientGroup::where('status','active')->with(['companies'=>fn($q)=>$q->where('supplier_companies.status','active')])->orderBy('cu_from')->orderBy('name')->get(),'branches'=>InsuranceBranch::where('status','active')->with(['subbranches'=>fn($q)=>$q->where('status','active')])->orderBy('name')->get()]);
     }
     public function store(Request $request)
@@ -55,6 +58,7 @@ class InsuranceQuoteController extends Controller
         try {
             $case=DB::transaction(function () use ($client,$values,$request,$documents,$uploads,&$stored) {
                 $client=Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
+                $values['requester_name'] ??= $client->name;
                 $policy=!empty($values['current_policy_id']) ? $client->policies()->whereKey($values['current_policy_id'])->lockForUpdate()->firstOrFail() : null;
                 if (in_array($values['purpose']??'new',['replacement','addition'],true)) {
                     app(\App\Services\InsurancePolicyChanges::class)->check($policy,$values['purpose']);
@@ -98,12 +102,17 @@ class InsuranceQuoteController extends Controller
     }
     public function show(Request $request, InsuranceQuoteCase $quoteCase)
     {
-        $this->authorize('view',$quoteCase->client);$quoteCase->load(['branch','subbranch','currentPolicy','documents.uploader','quotes.company.agencies','quotes.agency','quotes.documents','quotes.policy','quotes.policyChange']);
+        $this->authorize('view',$quoteCase->client);
+        $request->validate(['proposal'=>['nullable','integer','min:1']]);
+        $quoteCase->load(['branch','subbranch','currentPolicy','documents.uploader','quotes.company.agencies','quotes.agency','quotes.documents','quotes.policy.contracts','quotes.policyChange']);
+        $focusedId = $request->input('proposal') ?? $request->old('_proposal_id') ?? $request->session()->get('proposal_focus');
+        $activeQuote = $quoteCase->quotes->firstWhere('id', $focusedId);
+        abort_if($request->filled('proposal') && !$activeQuote, 404);
         $companies=$quoteCase->availableCompanies()->with('agencies')->get();
         $emailFilters = $request->validate(['email_company'=>['nullable','integer'],'email_state'=>['nullable','in:'.implode(',',array_keys(\App\Models\InsuranceQuoteEmail::STATUSES))],'email_month'=>['nullable','date_format:Y-m']]);
         $emails = $quoteCase->emails()->with(['company','agency','user'])->when($emailFilters['email_company']??null,fn($q,$id)=>$q->where('supplier_company_id',$id))->when($emailFilters['email_state']??null,fn($q,$state)=>$q->where('status',$state));
         if($month=$emailFilters['email_month']??null){$start=\Illuminate\Support\Carbon::createFromFormat('!Y-m',$month);$emails->where('created_at','>=',$start)->where('created_at','<',$start->copy()->addMonth());}
-        return view('quotes.show',['case'=>$quoteCase,'companies'=>$companies,'emailFilters'=>$emailFilters,'emails'=>$emails->latest()->paginate(TableListing::perPage(15),['*'],'requests_page')->withQueryString()]);
+        return view('quotes.show',['case'=>$quoteCase,'activeQuote'=>$activeQuote,'companies'=>$companies,'emailFilters'=>$emailFilters,'emails'=>$emails->latest()->paginate(TableListing::perPage(15),['*'],'requests_page')->withQueryString()]);
     }
     public function request(Request $request,InsuranceQuoteCase $quoteCase,InsuranceQuoteWorkflow $workflow)
     {
@@ -113,7 +122,8 @@ class InsuranceQuoteController extends Controller
             $target=app(\App\Services\QuoteRecipients::class)->resolve([$data['recipient_key']],case:$quoteCase)->first();
             $data['supplier_company_id']=$target['company_id']; $data['supplier_agency_id']=$target['agency_id'];
         }
-        $quote=$workflow->request($quoteCase,$data['supplier_company_id'],$data['requested_on'],$data['supplier_agency_id']??null);return redirect()->to(route('quotes.show',$quoteCase).'#proposal-'.$quote->id)->with('success','Richiesta registrata.');
+        $quote=$workflow->request($quoteCase,$data['supplier_company_id'],$data['requested_on'],$data['supplier_agency_id']??null);
+        return redirect()->to(route('quotes.show',$quoteCase).'#proposal-'.$quote->id)->with('proposal_focus', $quote->id)->with('success','Richiesta registrata.');
     }
     public function change(Request $request,InsuranceQuote $quote,string $action,InsuranceQuoteWorkflow $workflow)
     {
@@ -135,6 +145,12 @@ class InsuranceQuoteController extends Controller
                 ->withErrors($exception->errors(), 'proposal_'.$quote->id.'_'.$action)
                 ->withInput(array_replace($request->except(['files','_token']), ['_proposal_id'=>$quote->id, '_proposal_action'=>$action]));
         }
-        return redirect()->to(route('quotes.show',$quote->insurance_quote_case_id).'#proposal-'.$quote->id)->with('success','Preventivo aggiornato.');
+        $message = match ($action) {
+            'receive'=>'Risposta registrata. La proposta è disponibile nel confronto.',
+            'submit'=>'Presentazione al cliente registrata.',
+            'approve'=>'Approvazione del cliente registrata.',
+            'reject'=>'Rifiuto del cliente registrato.',
+        };
+        return redirect()->to(route('quotes.show',$quote->insurance_quote_case_id).'#proposal-'.$quote->id)->with('success',$message);
     }
 }

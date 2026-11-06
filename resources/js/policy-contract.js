@@ -16,11 +16,26 @@ function initPolicyContracts() {
         const fingerprint = form.querySelector('[data-contract-fingerprint]'), refresh = form.querySelector('[data-refresh-contract-schedule]');
         const errors = form.querySelector('[data-contract-errors]'), review = form.elements.contract_reviewed;
         const catalog = JSON.parse(form.querySelector('[data-contract-catalog]').textContent);
-        const transition = form.hasAttribute('data-policy-transition'), saveLabel = save.textContent;
+        const transition = form.hasAttribute('data-policy-transition'), renewalSource = form.querySelector('[data-renewal-source]');
+        let saveLabel = save.textContent, clearedRenewalNumber = false;
         const initial = Object.fromEntries(Object.keys(contractLabels).map(name => [name, form.elements.namedItem(name)?.value || '']));
         let generation = 0, reading = false, submitting = false, readerAbort, scheduleAbort, scheduleGeneration = 0, scheduleTimer;
         let autoValues = {}, validFile = false;
         function enableSave() { save.disabled = submitting || reading || !validFile || ((transition || form.elements.titles_mode.value === 'automatic') && !fingerprint.value); }
+        function updateRenewalMode() {
+            if(!renewalSource)return;
+            const normalize=value=>String(value||'').trim().replace(/\s+/g,' ').toLocaleUpperCase('it');
+            const changed=normalize(form.elements.company.value)!==normalize(renewalSource.dataset.company);
+            const number=form.elements.number, product=form.elements.product;
+            if(changed && normalize(number.value)===normalize(renewalSource.dataset.number)) { number.value=''; clearedRenewalNumber=true; }
+            else if(!changed && clearedRenewalNumber && !number.value) { number.value=renewalSource.dataset.number; clearedRenewalNumber=false; }
+            if(changed && product?.value && product.value===renewalSource.dataset.product) product.value='';
+            form.elements.status.value=changed ? 'active' : 'renewed';
+            form.querySelector('[data-contract-company-change]').hidden=!changed;
+            form.querySelector('[data-contract-renewal-note]').hidden=changed;
+            saveLabel=changed ? 'Conferma nuova polizza' : 'Conferma rinnovo';
+            if(!submitting)save.textContent=saveLabel;
+        }
         function addWarning(message) { const item = document.createElement('li'); item.textContent = message; warnings.append(item); warnings.hidden = false; }
         function showFields() { fields.hidden = false; form.querySelector('[data-contract-initial-cancel]').hidden = true; }
         function fieldNote(field, message) {
@@ -67,7 +82,7 @@ function initPolicyContracts() {
                 }
                 table.append(caption, head, body); schedule.replaceChildren(table); schedule.hidden = false;
                 fingerprint.value = data.fingerprint;
-                scheduleStatus.textContent = `${manualTitles ? 'I titoli ordinari andranno inseriti manualmente. Gli eventuali conguagli elencati saranno creati alla conferma.' : 'Questi titoli saranno creati alla conferma.'} Incassi e rimborsi effettivi si registrano quando avvengono.${data.cancelled_cents ? ` Residui della vecchia polizza da annullare: ${money(data.cancelled_cents)}. Gli incassi ricevuti restano conservati.` : ''}`;
+                scheduleStatus.textContent = `${data.scheduled ? `Sostituzione programmata dal ${date(form.elements.starts_on.value)}. La vecchia polizza resta operativa fino al cambio. ` : ''}${manualTitles ? 'I titoli ordinari andranno inseriti manualmente. Gli eventuali conguagli elencati saranno creati alla conferma.' : 'Questi titoli saranno creati alla conferma.'} Incassi e rimborsi effettivi si registrano quando avvengono.${data.cancelled_cents ? ` Residui della vecchia polizza da annullare${data.scheduled ? ' alla decorrenza' : ''}: ${money(data.cancelled_cents)}. Gli incassi ricevuti restano conservati.` : ''}`;
             } catch (error) { if (error.name !== 'AbortError' && current === scheduleGeneration) scheduleStatus.textContent = 'Calcolo non disponibile. Controlla la connessione e premi Ricalcola titoli.'; }
             finally { if (current === scheduleGeneration) enableSave(); }
         }
@@ -101,7 +116,10 @@ function initPolicyContracts() {
                 if (field.value !== value) addWarning(`${contractLabels[name]}: nel contratto risulta “${value}”; il dato modificato nel modulo è stato conservato.`);
                 return false;
             }
+            const changed = field.value !== value;
             field.value = value; autoValues[name] = value;
+            /** Unchanged parent selections must keep the agency and subbranch already chosen in the quote. */
+            if (!changed) return true;
             field.dispatchEvent(new Event('input', {bubbles:true})); field.dispatchEvent(new Event('change', {bubbles:true}));
             if (['company','category'].includes(name)) await tick();
             return true;
@@ -119,7 +137,7 @@ function initPolicyContracts() {
             const choice = form.querySelector('[data-contract-quote-choice]'); if (choice) choice.hidden = true;
             for (const [name,value] of Object.entries(autoValues)) {
                 const field = form.elements.namedItem(name);
-                if (field?.value === value) { field.value = initial[name]; field.dispatchEvent(new Event('change', {bubbles:true})); }
+                if (field?.value === value && field.value !== initial[name]) { field.value = initial[name]; field.dispatchEvent(new Event('change', {bubbles:true})); }
             }
             autoValues = {}; form.querySelectorAll('.contract-field-note').forEach(note => note.remove());
             form.querySelector('[data-policy-client-picker]')?.dispatchEvent(new Event('contract-client-reset'));
@@ -158,11 +176,13 @@ function initPolicyContracts() {
         manual.addEventListener('click', () => { generation++; readerAbort?.abort(); reading = false; manual.hidden = true; showFields(); status.textContent = 'Lettura interrotta. Completa i dati controllando il contratto.'; void renderSchedule(); enableSave(); });
         refresh.addEventListener('click', () => { review.checked = false; void renderSchedule(); });
         form.addEventListener('input', event => {
+            if(event.target.name==='company')updateRenewalMode();
+            if(event.target.name==='number' && event.target.value)clearedRenewalNumber=false;
             if (!['contract_reviewed','quote_changes_confirmed'].includes(event.target.name)) review.checked = false;
             if (scheduleNames.includes(event.target.name) || (transition && !['contract','contract_reviewed','quote_changes_confirmed'].includes(event.target.name))) invalidateSchedule();
             if (Object.hasOwn(catalog.quote || {}, event.target.name)) differences();
         });
-        form.addEventListener('change', event => { if (event.target.name === 'titles_mode' || (transition && !['contract','contract_reviewed','quote_changes_confirmed'].includes(event.target.name))) invalidateSchedule(); });
+        form.addEventListener('change', event => { if(event.target.name==='company')updateRenewalMode(); if (event.target.name === 'titles_mode' || (transition && !['contract','contract_reviewed','quote_changes_confirmed'].includes(event.target.name))) invalidateSchedule(); });
         form.querySelector('[data-use-contract-quote]')?.addEventListener('click', () => {
             const select = form.querySelector('[data-contract-quote]');
             if (select.value) window.location.assign(select.value); else select.focus();
@@ -192,6 +212,7 @@ function initPolicyContracts() {
         form.addEventListener('client-context-loaded', () => { review.checked = false; differences(); });
         window.addEventListener('pagehide', () => { readerAbort?.abort(); scheduleAbort?.abort(); clearTimeout(scheduleTimer); }, {once:true});
         differences();
+        updateRenewalMode();
     });
 }
 

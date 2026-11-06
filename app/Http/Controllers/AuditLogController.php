@@ -23,9 +23,10 @@ class AuditLogController extends Controller
     ];
 
     private const ACTION_FILTERS = [
+        'allowances' => ['label'=>'Abbuoni, recuperi e conferme di copertura', 'actions'=>['allowance_recorded','allowance_voided','allowance_recovery_recorded','allowance_recovery_voided','allowance_coverage_confirmed','allowance_coverage_revoked']],
         'commissions' => ['label'=>'Provvigioni e liquidazioni', 'actions'=>['commission_created','commission_revised','commission_voided','commission_calculated','commission_base_recorded','commission_accrued','commission_confirmed','commission_settled','commission_reversed','commission_adjusted']],
-        'ledger' => ['label' => 'Rate, rinnovi e incassi', 'actions' => ['titles_generated', 'title_created', 'title_cancelled', 'collection_recorded', 'collection_voided', 'policy_renewed']],
-        'reversals' => ['label' => 'Annullamenti e storni', 'actions' => ['title_cancelled', 'collection_voided', 'commission_reversed', 'commission_adjusted']],
+        'ledger' => ['label' => 'Titoli, rinnovi e contabilità', 'actions' => ['titles_generated', 'title_created', 'title_cancelled', 'title_residual_cancelled', 'collection_recorded', 'collection_voided', 'refund_recorded', 'refund_voided', 'policy_renewed', 'allowance_recorded', 'allowance_voided', 'allowance_recovery_recorded', 'allowance_recovery_voided', 'allowance_coverage_confirmed', 'allowance_coverage_revoked']],
+        'reversals' => ['label' => 'Annullamenti e storni', 'actions' => ['title_cancelled', 'title_residual_cancelled', 'collection_voided', 'refund_voided', 'commission_reversed', 'commission_adjusted', 'allowance_voided', 'allowance_recovery_voided', 'allowance_coverage_revoked']],
         'claims' => ['label'=>'Operazioni sui sinistri','actions'=>['claim_created','claim_updated','claim_status','claim_note','claim_activity_added','claim_activity_completed','claim_activity_rescheduled','claim_activity_cancelled']],
         'login' => ['label' => 'Accessi', 'actions' => ['login']],
         'logout' => ['label' => 'Uscite', 'actions' => ['logout']],

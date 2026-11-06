@@ -29,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\SupplierAgency::class, \App\Policies\SupplierAgencyPolicy::class);
         Gate::policy(\App\Models\SupplierCompany::class, \App\Policies\SupplierCompanyPolicy::class);
         Gate::define('system.admin', fn (User $user) => $user->canManageSystem());
+        Gate::define('communications.manage', fn (User $user) => $user->canManageAgencyCommunications());
         Gate::define('ledger.manage', fn (User $user) => $user->canViewAllClients());
+        Gate::define('forms.manage', fn (User $user) => $user->canViewAllClients());
     }
 }

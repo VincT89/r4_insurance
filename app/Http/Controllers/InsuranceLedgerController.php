@@ -1,8 +1,9 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\{Client,InsurancePolicy,InsuranceTitle,InsuranceCollection,User};
-use App\Services\{InsuranceLedger,ClientDocumentRegistry};
+use App\Models\{Client,InsurancePolicy,InsuranceTitle,InsuranceCollection,InsuranceAllowance,User};
+use App\Services\{InsuranceLedger,InsuranceAllowances,ClientDocumentRegistry};
+use App\Http\Requests\StoreInsuranceAllowanceRequest;
 use App\Support\{Money,TableListing};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,9 @@ class InsuranceLedgerController extends Controller
         $contextPolicy=($filters['policy']??null) ? InsurancePolicy::whereIn('client_id',Client::current()->visibleTo(auth()->user())->select('id'))->with('client')->findOrFail($filters['policy']) : null;
         abort_if($contextClient && $contextPolicy && (int)$contextClient->id !== (int)$contextPolicy->client_id,404);
         $contextClient ??= $contextPolicy?->client;
-        return compact('contextParameters','contextClient','contextPolicy');
+        $ledgerPeriodParameters=\Illuminate\Support\Arr::only($filters,['month','from','to','company','agency']);
+        if(!filled($filters['month']??null) && !filled($filters['from']??null) && !filled($filters['to']??null))$ledgerPeriodParameters['month']='';
+        return compact('contextParameters','contextClient','contextPolicy','ledgerPeriodParameters');
     }
     private function options(): array
     {
@@ -57,10 +60,12 @@ class InsuranceLedgerController extends Controller
     public function show(InsuranceTitle $title)
     {
         $this->access($title);
-        $title->load(['policy.client','supplierAgency','collections.consultant','collections.documents','documents']);
+        $title->load(['policy.client','supplierAgency','collections.consultant','collections.documents','documents','allowances.author','allowances.voidedBy','coverageConfirmedBy']);
         foreach ($title->collections as $payment) $payment->setRelation('title', $title);
         $deliveries = app(\App\Services\CollectionCommunicationStatus::class)->deliveries($title->collections);
-        return view('ledger.show',compact('title','deliveries')+$this->options());
+        $options=$this->options();
+        $allowanceAgencies=\App\Models\SupplierAgency::where('status','active')->orderBy('name')->get(['id','name']);
+        return view('ledger.show',compact('title','deliveries','allowanceAgencies')+$options);
     }
     public function schedule(InsurancePolicy $policy,InsuranceLedger $ledger)
     {
@@ -94,7 +99,9 @@ class InsuranceLedgerController extends Controller
         /** Resolve the selected title through this policy so another contract cannot be charged. */
         $title=$policy->titles()->findOrFail($request->integer('title_id'));
         $this->savePayment($request,$title,$ledger);
-        return redirect()->to(route('clients.policies.show',[$policy->client_id,$policy,'tab'=>'payments']))->with('success','Pagamento registrato. Titolo saldato e contabilità aggiornata.');
+        $message = $title->direction === 'refund' ? 'Rimborso registrato.' : 'Pagamento registrato.';
+        return redirect()->to(route('clients.policies.show',[$policy->client_id,$policy,'tab'=>'payments']))
+            ->with('success', $message.' Titolo saldato e contabilità aggiornata.');
     }
     private function savePayment(Request $request,InsuranceTitle $title,InsuranceLedger $ledger): void
     {
@@ -109,8 +116,101 @@ class InsuranceLedgerController extends Controller
             if($payment->wasRecentlyCreated && $request->hasFile('files'))app(ClientDocumentRegistry::class)->uploadMany($client,$request->file('files'),['document_category'=>'collection','insurance_policy_id'=>$title->insurance_policy_id,'insurance_title_id'=>$title->id,'insurance_collection_id'=>$payment->id]);
             return $payment;
         });
+        $request->session()->flash('recorded_payment', [
+            'policy_id' => $title->insurance_policy_id,
+            'title_id' => $title->id,
+            'date' => $payment->received_on->toDateString(),
+            'amount' => Money::format($payment->amount_cents),
+            'method' => $payment->payment_method,
+            'refund' => $payment->direction === 'refund',
+        ]);
     }
-    public function void(Request $request,InsuranceCollection $collection,InsuranceLedger $ledger){$this->authorize('ledger.manage');$data=$request->validate(['reason'=>['required','string','min:5','max:1000']]);$ledger->void($collection,$data['reason']);return to_route('titles.show',$collection->insurance_title_id)->with('success','Incasso stornato. Lo storico è conservato.');}
+    public function void(Request $request, InsuranceCollection $collection, InsuranceLedger $ledger)
+    {
+        $this->authorize('ledger.manage');
+        $this->access($collection->title, true);
+        $data = $request->validate(['reason'=>['required','string','min:5','max:1000']]);
+        $ledger->void($collection, $data['reason']);
+        $message = $collection->direction === 'refund' ? 'Rimborso stornato.' : 'Incasso stornato.';
+        return to_route('titles.show', $collection->insurance_title_id)->with('success', $message.' Lo storico è conservato.');
+    }
+    private function allowanceValues(StoreInsuranceAllowanceRequest $request): array
+    {
+        $data=$request->validated();
+        return [
+            'amount_cents'=>Money::cents($data['allowance_amount']), 'effective_on'=>$data['allowance_on'],
+            'borne_by'=>$data['allowance_borne_by'], 'supplier_agency_id'=>isset($data['allowance_agency_id']) ? (int)$data['allowance_agency_id'] : null,
+            'reason'=>$data['allowance_reason'], 'reference'=>$data['allowance_reference'] ?? null,
+            'expected_balance_cents'=>(int)$data['allowance_balance'], 'idempotency_key'=>$data['allowance_key'],
+        ];
+    }
+    public function allowance(StoreInsuranceAllowanceRequest $request, InsuranceTitle $title, InsuranceAllowances $allowances)
+    {
+        $this->access($title,true);
+        $allowances->record($title,$this->allowanceValues($request));
+        return to_route('titles.show',$title)->with('success','Abbuono registrato. Residuo aggiornato; gli incassi restano separati.');
+    }
+    public function allowanceForPolicy(StoreInsuranceAllowanceRequest $request, InsurancePolicy $policy, InsuranceAllowances $allowances)
+    {
+        $this->authorize('updateRegistry',$policy->client);
+        /** Il titolo viene risolto nella polizza per impedire registrazioni su un altro contratto. */
+        $title=$policy->titles()->findOrFail((int)$request->validated('allowance_title_id'));
+        $allowances->record($title,$this->allowanceValues($request));
+        return to_route('clients.policies.show',[$policy->client_id,$policy,'tab'=>'payments','title'=>$title->id])
+            ->with('success','Abbuono registrato. Residuo aggiornato; gli incassi restano separati.');
+    }
+    private function allowanceDestination(InsuranceTitle $title, ?string $origin)
+    {
+        return match ($origin) {
+            'policy'=>to_route('clients.policies.show',[$title->policy->client_id,$title->policy,'tab'=>'payments','title'=>$title->id]),
+            'accounting'=>to_route('allowances.index',['policy'=>$title->insurance_policy_id,'month'=>'']),
+            default=>to_route('titles.show',$title),
+        };
+    }
+    public function voidAllowance(Request $request, InsuranceAllowance $allowance, InsuranceAllowances $allowances)
+    {
+        $this->authorize('ledger.manage');
+        $this->access($allowance->title,true);
+        $data=$request->validate(['allowance_void_reason'=>['required','string','min:5','max:1000'],'allowance_origin'=>['nullable','in:title,policy,accounting']]);
+        $allowances->void($allowance,$data['allowance_void_reason']);
+        return $this->allowanceDestination($allowance->title,$data['allowance_origin']??null)->with('success','Abbuono stornato. Residuo aggiornato e storico conservato.');
+    }
+    public function confirmAllowanceCoverage(Request $request, InsuranceTitle $title, InsuranceAllowances $allowances)
+    {
+        $this->authorize('ledger.manage');
+        $this->access($title,true);
+        $data=$request->validate(['coverage_fingerprint'=>['required','string','size:64'], 'coverage_note'=>['required','string','min:5','max:1000'], 'coverage_action'=>['required','in:confirm,revoke'], 'allowance_origin'=>['nullable','in:title,policy']]);
+        if($data['coverage_action']==='revoke') $allowances->revokeCoverage($title,$data['coverage_fingerprint'],$data['coverage_note']);
+        else $allowances->confirmCoverage($title,$data['coverage_fingerprint'],$data['coverage_note']);
+        return $this->allowanceDestination($title,$data['allowance_origin']??null)->with('success',$data['coverage_action']==='revoke' ? 'Conferma di copertura annullata. Lo storico è conservato.' : 'Copertura del titolo confermata separatamente dall’abbuono.');
+    }
+    public function allowances(Request $request)
+    {
+        $this->authorize('viewAny',Client::class);
+        $filters=\Illuminate\Support\Arr::only($this->filters($request),['search','month','from','to','agency','company','client','policy','category','subcategory','state']);
+        $filters+=$request->validate(['borne_by'=>['nullable',Rule::in(array_keys(InsuranceAllowance::BEARERS))], 'bearer_agency'=>['nullable','integer'], 'state'=>['nullable','in:recorded,voided'], 'recovery_state'=>['nullable',Rule::in(array_keys(InsuranceAllowance::RECOVERY_STATES))]]);
+        if(!$request->hasAny(['month','from','to']))$filters+=['from'=>today()->toDateString(),'to'=>today()->toDateString()];
+        $query=InsuranceAllowance::whereIn('insurance_title_id',$this->titleQuery($filters)->select('id'));
+        $this->dates($query,'effective_on',$filters);
+        if($filters['borne_by']??null)$query->where('borne_by',$filters['borne_by']);
+        if($filters['bearer_agency']??null)$query->where('borne_by','agency')->where('supplier_agency_id',$filters['bearer_agency']);
+        if(($filters['state']??null)==='voided')$query->whereNotNull('voided_at');
+        elseif(($filters['state']??null)==='recorded')$query->whereNull('voided_at');
+        if ($state=$filters['recovery_state']??null) {
+            $query->where('borne_by','agency')->whereNull('voided_at');
+            if ($state==='recovered') $query->whereColumn('recovered_cents','amount_cents');
+            else {
+                $query->whereColumn('recovered_cents','<','amount_cents');
+                if ($state==='partial') $query->where('recovered_cents','>',0);
+            }
+        }
+        $totals=(clone $query)->whereNull('voided_at')->selectRaw("COALESCE(SUM(amount_cents),0) as amount, COALESCE(SUM(CASE WHEN borne_by='agency' THEN recovered_cents ELSE 0 END),0) as recovered, COALESCE(SUM(CASE WHEN borne_by='agency' THEN amount_cents-recovered_cents ELSE 0 END),0) as outstanding")->first();
+        $totalCents=(int)$totals->amount;
+        $recoveredCents=(int)$totals->recovered;
+        $outstandingCents=(int)$totals->outstanding;
+        $allowances=$query->with(['title.policy.client','title.supplierAgency','author','voidedBy'])->orderByDesc('effective_on')->orderByDesc('id')->paginate(TableListing::perPage(25))->withQueryString();
+        return view('ledger.allowances',compact('allowances','filters','totalCents','recoveredCents','outstandingCents')+$this->options()+$this->context($filters));
+    }
     public function document(Request $request,InsuranceTitle $title)
     {
         $this->access($title,true);$request->validate(['files'=>['required','array','min:1','max:10'],'files.*'=>['file','max:10240','mimes:pdf','extensions:pdf']]);

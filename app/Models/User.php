@@ -70,7 +70,12 @@ class User extends Authenticatable
     public function visibleNotifications(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->notifications()->where(function ($query) {
-            $query->whereNotIn('type', [\App\Services\ClaimReminders::TYPE, \App\Services\DeadlineReminders::TYPE, InsurancePolicyCorrection::NOTIFICATION_TYPE, \App\Services\CollectionCommunicationReminders::TYPE, \App\Services\CollectionCommunicationReminders::REVERSAL_TYPE])
+            $query->whereNotIn('type', [\App\Services\ClaimReminders::TYPE, \App\Services\DeadlineReminders::TYPE, InsurancePolicyCorrection::NOTIFICATION_TYPE, \App\Services\CollectionCommunicationReminders::TYPE, \App\Services\CollectionCommunicationReminders::REVERSAL_TYPE, \App\Services\PolicyFormReminder::TYPE])
+                ->orWhere(function ($query) {
+                    $policies = InsurancePolicy::whereIn('client_id', Client::current()->visibleTo($this)->select('id'))
+                        ->when(!$this->canManageSystem(), fn ($q) => $q->where(fn ($work) => $work->whereNull('work_closed_at')->orWhere('work_closed_at','>=',today())));
+                    $query->where('type', \App\Services\PolicyFormReminder::TYPE)->whereIn('data->policy_id', $policies->select('id'));
+                })
                 ->orWhere(function ($query) {
                     $query->where('type', InsurancePolicyCorrection::NOTIFICATION_TYPE)->whereIn('data->client_id', Client::current()->visibleTo($this)->select('id'));
                 })->orWhere(function ($query) {
@@ -121,8 +126,10 @@ class User extends Authenticatable
             'agency_communications' => ['user_id'],
             'insurance_quote_cases' => ['created_by'],
             'insurance_quotes' => ['approved_by'],
-            'insurance_titles' => ['created_by'],
+            'insurance_titles' => ['created_by', 'coverage_confirmed_by'],
             'insurance_collections' => ['created_by', 'consultant_id', 'voided_by'],
+            'insurance_allowances' => ['created_by', 'voided_by'],
+            'insurance_allowance_recoveries' => ['created_by', 'voided_by'],
             'insurance_policies' => ['work_closed_by'],
             'insurance_policy_corrections' => ['requested_by', 'resolved_by'],
             'insurance_quote_emails' => ['user_id'],
@@ -131,6 +138,7 @@ class User extends Authenticatable
             'insurance_form_templates' => ['created_by', 'approved_by'],
             'insurance_form_packages' => ['created_by'],
             'insurance_form_submissions' => ['created_by', 'reviewed_by'],
+            'document_signatures' => ['created_by'],
             'insurance_coverage_checks' => ['created_by'],
             'insurance_claims' => ['assigned_to', 'created_by'],
             'insurance_claim_activities' => ['completed_by'],
@@ -190,6 +198,11 @@ class User extends Authenticatable
     public function canManageSystem(): bool
     {
         return $this->isAdmin();
+    }
+
+    public function canManageAgencyCommunications(): bool
+    {
+        return $this->canViewAllClients();
     }
 
     public function isOperator(): bool

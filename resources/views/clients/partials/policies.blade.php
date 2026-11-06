@@ -1,3 +1,10 @@
+@php
+    $visibleSignatures = $openSignatures->whereIn('package.insurance_policy_id',$policies->modelKeys());
+    $signaturesByPolicy = $visibleSignatures->groupBy('package.insurance_policy_id');
+@endphp
+@if($visibleSignatures->isNotEmpty())
+    <div class="client-mobile-signatures">@include('insurance-forms.open-signatures',['openSignatures'=>$visibleSignatures])</div>
+@endif
 <nav class="client-section-nav client-policy-nav" aria-label="Tipologie di polizza">
     <a href="{{ route('clients.show', [$client, 'tab' => 'policies']) }}" @if(!request('category')) aria-current="page" @endif>Tutte le polizze</a>
     @foreach($policyCategories as $policyCategory)
@@ -20,7 +27,16 @@
                         <td data-label="Scadenza" data-export-type="date"><x-status-text :alert="$policy->is_expired">{{ $policy->expires_on->format('d/m/Y') }}</x-status-text><div class="u-text-meta">Dal {{ $policy->starts_on->format('d/m/Y') }}</div></td>
                         <td data-label="Stato"><x-policy-status :policy="$policy" /></td>
                         <td data-label="Azioni"><div class="policy-row-actions"><a href="{{ route('clients.policies.show', [$client, $policy]) }}">Apri polizza</a><x-policy-contract-link :policy="$policy" />@can('updateRegistry',$client)@can('ledger.manage')@if($policy->has_payable_titles)<a href="{{ route('clients.policies.show', [$client, $policy, 'tab'=>'payments']).'#payment-entry' }}">Registra pagamento</a>@endif@endcan
-                        @endcan</div></td>
+                        @endcan</div>
+                            @php($pending = $signaturesByPolicy->get($policy->id, collect()))
+                            @if($pending->count() === 1)
+                                <a class="client-policy-signature" href="{{ $pending->first()->signatureActionUrl() }}"><strong>{{ $pending->first()->signatureActionLabel() }}</strong><span>{{ $pending->first()->title }}@if($period = $pending->first()->package->policy_period) · {{ $period }}@endif</span></a>
+                            @elseif($pending->isNotEmpty())
+                                <details class="client-policy-signatures"><summary>Moduli da firmare o controllare ({{ $pending->count() }})</summary>
+                                    @each('insurance-forms.open-signature',$pending,'document')
+                                </details>
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
                 </tbody>

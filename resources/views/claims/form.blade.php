@@ -1,5 +1,6 @@
 <x-app-layout :title="$claim?'Modifica sinistro':'Nuovo sinistro'">
-<x-page-header><x-slot:title>{{ $claim?'Modifica sinistro · '.$claim->reference:'Nuovo sinistro' }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ $claim?route('claims.show',$claim):route('claims.index') }}">{{ $claim?'Scheda sinistro':'Sinistri' }}</a></x-slot:actions></x-page-header>
+@php($returnUrl = $claim ? route('claims.show',$claim) : ($policy ? route('clients.policies.show',[$policy->client_id,$policy]) : route('claims.index')))
+<x-page-header><x-slot:title>{{ $claim?'Modifica sinistro · '.$claim->reference:'Nuovo sinistro' }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ $returnUrl }}">{{ $claim ? 'Scheda sinistro' : ($policy ? 'Torna alla polizza' : 'Sinistri') }}</a></x-slot:actions></x-page-header>
 @if(!$policy)
 <p class="claim-intro">Cerca il cliente o la polizza, poi seleziona il contratto a cui collegare il sinistro.</p>
 @include('claims.filters',['selecting'=>true])
@@ -22,7 +23,7 @@
 <x-form-section title="Prossima attività"><div class="form-row"><x-form-group label="Attività da svolgere" name="activity_label"><input class="form-in" name="activity_label" maxlength="200" value="{{ $safeOld('activity_label') }}" placeholder="Per esempio: richiedere i documenti mancanti"></x-form-group><x-form-group label="Da svolgere entro" name="activity_due_on"><input class="form-in" type="date" name="activity_due_on" value="{{ $safeOld('activity_due_on') }}"></x-form-group></div><p class="u-text-meta">Avviso interno all’operatore assegnato e agli admin 3 giorni prima e il giorno previsto. Le attività non completate restano tra gli arretrati.</p></x-form-section>
 <x-form-section title="Documenti iniziali"><x-form-group label="Allegati del sinistro" name="files"><input class="form-in" type="file" name="files[]" multiple accept=".pdf,.jpg,.jpeg,.png"><p class="u-text-meta">Puoi selezionare più file: PDF, JPG o PNG. Fino a 10 file, 10 MB ciascuno e 50 MB totali.</p></x-form-group></x-form-section>
 @endif
-<div class="insurance-form-actions"><a class="btn btn-g" href="{{ $claim?route('claims.show',$claim):route('claims.index') }}">Annulla</a><button class="btn btn-p">{{ $claim?'Salva modifiche':'Apri sinistro' }}</button></div>
+<div class="insurance-form-actions"><a class="btn btn-g" href="{{ $returnUrl }}">Annulla</a><button class="btn btn-p">{{ $claim?'Salva modifiche':'Apri sinistro' }}</button></div>
 </form></x-panel>
 @endif
 </x-app-layout>

@@ -27,7 +27,7 @@
         </div>
       @endif
     </div>
-    <div class="dropdown-body">
+    <div class="dropdown-body" wire:key="notifications-page-{{ $notificationPage }}">
       @forelse($latestNotifications ?? [] as $notification)
         @php
             $deadline = $notification->type === \App\Services\DeadlineReminders::TYPE;
@@ -50,13 +50,13 @@
             <div class="notif-item-body">{{ $detail['message'] ?? $notification->data['message'] ?? '' }}</div>
             <div class="notif-item-time">{{ $notification->updated_at->locale('it')->diffForHumans() }}</div>
           </button>
-          @can('system.admin')
+          @can('system.admin')@if($notification->type !== \App\Services\PolicyFormReminder::TYPE)
           <button type="button" wire:click="deleteNotification('{{ $notification->id }}')" class="notif-item-delete" title="Elimina notifica" aria-label="Elimina notifica" @click.stop>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
             </svg>
           </button>
-          @endcan
+          @endif@endcan
         </div>
       @empty
         <div class="notif-empty">
@@ -66,10 +66,20 @@
         </div>
       @endforelse
     </div>
+    @if($notificationsTotal > 10)
+      <nav class="notification-paging" aria-label="Paginazione degli avvisi">
+        <span aria-live="polite">Avvisi {{ ($notificationPage - 1) * 10 + 1 }}–{{ min($notificationPage * 10, $notificationsTotal) }} di {{ $notificationsTotal }}</span>
+        <div>
+          <button type="button" class="btn btn-g btn-sm" wire:click="previousNotificationsPage" wire:loading.attr="disabled" @disabled($notificationPage <= 1) @click.stop>Avvisi precedenti</button>
+          <button type="button" class="btn btn-g btn-sm" wire:click="nextNotificationsPage" wire:loading.attr="disabled" @disabled($notificationPage >= $notificationPages) @click.stop>Altri avvisi</button>
+        </div>
+      </nav>
+    @endif
     <div class="notification-links">
       <a href="{{ route('deadlines.index',['period'=>'15']) }}">Scadenze entro 15 giorni</a>
       <a href="{{ route('deadlines.index',['period'=>'overdue']) }}">Già scadute</a>
-      @can('system.admin')<a href="{{ route('agency-communications.collections',['scope'=>'pending']) }}">Incassi da comunicare</a>@endcan
+      <a href="{{ route('claims.index',['reminder'=>'all']) }}">Attività sinistri</a>
+      @can('communications.manage')<a href="{{ route('agency-communications.collections',['scope'=>'pending']) }}">Incassi da comunicare</a>@endcan
     </div>
   </div>
 </div>

@@ -10,7 +10,7 @@ class InsuranceImportPreviewController extends Controller
 {
     public function index(Request $request, InsuranceImportPreview $preview)
     {
-        $sections = ['overview' => 'Riepilogo', 'registry' => 'Esito anagrafiche', 'policies' => 'Esito polizze', 'branches' => 'Rami e sottorami', 'providers' => 'Compagnie e agenzie', 'issues' => 'Controlli', 'mapping' => 'Campi da importare'];
+        $sections = ['overview' => 'Riepilogo', 'registry' => 'Esito anagrafiche', 'policies' => 'Esito polizze', 'reconciliation'=>'Riconciliazione', 'branches' => 'Rami e sottorami', 'providers' => 'Compagnie e agenzie', 'issues' => 'Controlli', 'mapping' => 'Campi da importare'];
         $section = $request->validate(['section' => ['nullable', Rule::in(array_keys($sections))]])['section'] ?? 'overview';
         $registryCounts = \App\Models\RegistryImportEntry::where('kind', '!=', 'lock')->get(['kind','status'])->groupBy('kind')->map(fn ($entries) => $entries->countBy('status')->all())->all();
         $registryEntries = null;
@@ -30,15 +30,27 @@ class InsuranceImportPreviewController extends Controller
                 ->when($filters['result'] ?? null, fn ($q,$v) => $q->where('status',$v))
                 ->orderBy('status')->orderBy('source_name')->paginate(\App\Support\TableListing::perPage(25))->withQueryString();
         }
+        $reconciliation=null;$comparisonRows=null;
         try {
             $summary = $preview->summary();
+            if ($summary && $section==='reconciliation') {
+                $filters=$request->validate(['comparison'=>['nullable',Rule::in(['attention',...array_keys(\App\Services\InsuranceImportReconciliation::STATES)])],'search'=>['nullable','string','max:255']]);
+                $reconciliation=app(\App\Services\InsuranceImportReconciliation::class)->report();
+                $filtered=$reconciliation['rows']->filter(function($row) use($filters) {
+                    if (($filters['comparison']??'attention')==='attention' && $row['state']==='matching') return false;
+                    if (($filters['comparison']??'attention')!=='attention' && $row['state']!==$filters['comparison']) return false;
+                    return !filled($filters['search']??null) || str_contains(mb_strtoupper($row['number'].' '.$row['company'].' '.$row['client_name']),mb_strtoupper($filters['search']));
+                })->values();
+                $page=\Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();$perPage=\App\Support\TableListing::perPage(25);
+                $comparisonRows=new \Illuminate\Pagination\LengthAwarePaginator($filtered->forPage($page,$perPage)->values(),$filtered->count(),$perPage,$page,['path'=>$request->url(),'query'=>$request->query()]);
+            }
             if ($summary && $section === 'branches') {
                 $summary['taxonomy'] = app(\App\Services\InsuranceCatalog::class)->previewTaxonomy($summary['taxonomy']);
             }
         } catch (\RuntimeException | \JsonException $e) {
             return response()->view('imports.preview', compact('sections', 'section') + ['summary' => null, 'error' => 'L’anteprima è incompleta o è stata modificata. Rigenerare il lotto prima di proseguire.'], 409);
         }
-        return response()->view('imports.preview', compact('sections', 'section', 'summary', 'registryCounts', 'registryEntries', 'policyCounts', 'policyEntries'))
+        return response()->view('imports.preview', compact('sections', 'section', 'summary', 'registryCounts', 'registryEntries', 'policyCounts', 'policyEntries','reconciliation','comparisonRows'))
             ->header('Cache-Control', 'private, no-store');
     }
 

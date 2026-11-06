@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(SecurityHeaders::class);
         $middleware->trimStrings(except: ['smtp_password']);
-        $middleware->web(append: [\App\Http\Middleware\EnsureActiveUser::class, \App\Http\Middleware\RememberAppearance::class]);
+        $middleware->web(append: [\App\Http\Middleware\EnsureActiveUser::class, \App\Http\Middleware\RememberAppearance::class, \App\Http\Middleware\ActivatePolicyReplacements::class]);
 
         $middleware->alias([
             'force.password.change' => ForcePasswordChange::class,

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{Attachment, Client, ClientDocumentRequest, InsuranceBranch, InsurancePolicy, InsuranceSubbranch};
+use App\Models\{Attachment, Client, ClientDocumentRequest, InsuranceBranch, InsuranceFormDocument, InsurancePolicy, InsuranceSubbranch};
 use Illuminate\Support\Facades\{DB, Gate, Storage};
 use Illuminate\Validation\ValidationException;
 
@@ -62,5 +62,38 @@ class InsuranceDocumentation
             ->with(['client', 'policy', 'documents.latestSubmission'])->latest('id')->first();
         $templates = app(InsuranceForms::class)->available($policy, $client);
         return compact('package', 'templates');
+    }
+
+    public function policySignatures(Client $client, InsurancePolicy $policy): array
+    {
+        $renewal = $policy->latestRenewal?->id;
+        $packages = $client->formPackages()->where('insurance_policy_id',$policy->id)->select('id');
+        $query = InsuranceFormDocument::where('signature_required',true)->whereIn('insurance_form_package_id',$packages);
+        if ($renewal) {
+            /** Le copie già controllate nei periodi precedenti restano nello storico. Quelle ancora aperte possono arrivare anche dopo il rinnovo. */
+            $query->where(fn ($docs) => $docs->whereHas('package',fn ($packages) => $packages->where('insurance_policy_change_id','>=',$renewal))
+                ->orWhereDoesntHave('latestSubmission',fn ($versions) => $versions->where('status','validated')));
+        }
+        $documents = $query->with(['package:id,insurance_policy_id,insurance_policy_change_id,client_id,created_at,snapshot','generated','latestSubmission.files'])
+            ->orderByDesc('insurance_form_package_id')->orderBy('title')->orderBy('id')
+            ->get(['id','insurance_form_package_id','title','template_version','signature_required']);
+        [$previous,$current] = $documents->partition(fn ($doc) => $renewal && (int)$doc->package->insurance_policy_change_id < $renewal);
+        return [
+            'toSign'=>$current->filter(fn ($doc) => !$doc->latestSubmission || $doc->latestSubmission->status === 'rejected'),
+            'toReview'=>$current->filter(fn ($doc) => $doc->latestSubmission?->status === 'received'),
+            'completed'=>$current->filter(fn ($doc) => $doc->latestSubmission?->status === 'validated'),
+            'previous'=>$previous,
+        ];
+    }
+
+    public function openSignatures(Client $client, ?int $policyId = null, bool $clientOnly = false): \Illuminate\Database\Eloquent\Collection
+    {
+        $packages = $client->formPackages()->when($policyId !== null,fn ($q) => $q->where('insurance_policy_id',$policyId))
+            ->when($clientOnly,fn ($q) => $q->whereNull('insurance_policy_id'))->select('id');
+        return InsuranceFormDocument::where('signature_required',true)->whereIn('insurance_form_package_id',$packages)
+            ->whereDoesntHave('latestSubmission',fn ($q) => $q->where('status','validated'))
+            ->with(['package:id,client_id,insurance_policy_id,created_at,snapshot','package.policy:id,number','latestSubmission:id,insurance_form_document_id,status,version'])
+            ->orderByDesc('insurance_form_package_id')->orderBy('title')->orderBy('id')
+            ->get(['id','insurance_form_package_id','title']);
     }
 }

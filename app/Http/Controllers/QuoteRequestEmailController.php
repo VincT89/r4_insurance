@@ -27,7 +27,7 @@ class QuoteRequestEmailController extends Controller
     {
         $this->authorize('updateRegistry',$quoteCase->client);
         $batch = $request->has('recipient_selection_present') || $request->has('recipient_keys');
-        $recipients = $batch ? QuoteRecipients::rules() : ['supplier_company_id'=>['required','integer'], 'supplier_agency_id'=>['nullable','integer']];
+        $recipients = $batch ? QuoteRecipients::rules() + ['recipient_group_choice'=>['nullable','integer','min:1']] : ['supplier_company_id'=>['required','integer'], 'supplier_agency_id'=>['nullable','integer']];
         $data = $request->validate($recipients + ['draft_id'=>['nullable','uuid',\Illuminate\Validation\Rule::prohibitedIf(!$batch)], 'subject'=>['required','string','max:180','not_regex:/[\r\n\x00]/'], 'body'=>['required','string','min:20','max:20000','not_regex:/\x00/'], 'document_ids'=>['nullable','array','list','max:10'],'document_ids.*'=>['integer','distinct']] + QuoteRequestDocuments::rules(), ['recipient_keys.required'=>'Seleziona almeno una compagnia o un’agenzia.']);
         if ($batch) {
             $messages = $workflow->prepareBatch($quoteCase,$request->user(),$data,QuoteRequestDocuments::uploads($request));
@@ -47,7 +47,10 @@ class QuoteRequestEmailController extends Controller
 
     public function batchShow(string $batch, AgencyMailConfiguration $configuration)
     {
-        $messages = $this->batchMessages($batch);
+        $messages = $this->batchMessages($batch)->sortBy(function (InsuranceQuoteEmail $message) {
+            $target = $message->payload['target'];
+            return [mb_strtolower($target['company_name']), mb_strtolower($target['agency_name'] ?? ''), $message->id];
+        })->values();
         return response()->view('quotes.email-batch',['batch'=>$batch,'messages'=>$messages,'case'=>$messages->first()->quoteCase,'payload'=>$messages->first()->payload,'mailReady'=>$configuration->ready()])->header('Cache-Control','no-store, private');
     }
 

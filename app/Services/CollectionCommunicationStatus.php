@@ -46,6 +46,11 @@ class CollectionCommunicationStatus
             ->orWhereIn('insurance_collections.id', $this->claimedPayments()->whereIn('communication.status', ['sending','uncertain'])));
     }
 
+    public function unclaimed(Builder $query): Builder
+    {
+        return $query->whereNotIn('insurance_collections.id', $this->claimedPayments());
+    }
+
     public function attention(Builder $query): Builder
     {
         return $this->pending($query)->whereIn('insurance_collections.id', $this->claimedPayments()->where(fn ($q) => $q->where('communication.status', 'uncertain')

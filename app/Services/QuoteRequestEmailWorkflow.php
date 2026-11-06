@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{InsuranceQuoteCase, InsuranceQuoteEmail, SupplierCompany, User};
+use App\Models\{InsuranceQuoteCase, InsuranceQuoteEmail, QuoteRecipientGroup, SupplierCompany, User};
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\{DB, Storage};
 use Illuminate\Support\Str;
@@ -112,6 +112,7 @@ class QuoteRequestEmailWorkflow
                 }
                 $body = $agencyId ? 'Compagnia richiesta: '.$this->line($target['company']->name)."\n\n".$data['body'] : $data['body'];
                 $payload = ['from' => $this->configuration->sender(), 'recipient' => $this->recipient($target), 'target' => app(QuoteRecipients::class)->snapshot($target), 'subject' => $data['subject'], 'body' => $body, 'request_body' => $data['body'], 'attachments' => $attachments];
+                if (isset($data['recipient_group'])) $payload['recipient_group'] = $data['recipient_group'];
                 $message->update(['payload' => $payload, 'fingerprint' => $this->fingerprint($payload, $case, $target)]);
                 $this->audit($message, 'quote_email_review', 'Preparata richiesta a '.$target['name'].' per '.$target['company']->name.'.');
                 return $message;
@@ -131,6 +132,13 @@ class QuoteRequestEmailWorkflow
                 abort_unless($user->can('updateRegistry', $case->client), 403);
                 $previous = !empty($data['draft_id']) ? $this->editableDraft($case, $user, $data['draft_id'], true) : collect();
                 $targets = app(QuoteRecipients::class)->resolve($data['recipient_keys'], email: true, case: $case);
+                if (!empty($data['recipient_group_choice'])) {
+                    $group = QuoteRecipientGroup::forRequest($case->insurance_branch_id, $case->insurance_subbranch_id, $case->merit_class_cu)
+                        ->with('companies')->find($data['recipient_group_choice']);
+                    if (!$group || $case->purpose === 'addition') throw ValidationException::withMessages(['recipient_group_choice'=>'Il gruppo non è più compatibile con la richiesta. Controlla le spunte e scegli un altro gruppo o la selezione manuale.']);
+                    /** Il gruppo serve a riaprire la bozza. Solo i destinatari effettivamente spuntati generano email. */
+                    $data['recipient_group'] = ['id'=>$group->id, 'name'=>$group->name, 'recipient_keys'=>$group->recipientKeys()];
+                }
                 $batch = (string) Str::uuid();
                 $messages = collect();
                 foreach ($targets as $target) {

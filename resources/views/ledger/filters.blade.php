@@ -1,4 +1,4 @@
-<form id="ledger-filters" method="GET" class="client-search-form" aria-label="Filtra {{ $isCollections ? 'incassi' : 'titoli' }}" x-data="{branch:@js($filters['category']??''),subbranches:@js($branches->mapWithKeys(fn($b)=>[$b->name=>$b->subbranches->pluck('name')->all()])),from:@js($filters['from']??''),to:@js($filters['to']??''),month:@js($filters['month']??'')}">
+<form id="ledger-filters" method="GET" class="client-search-form" data-list-filters aria-label="Filtra {{ $isCollections ? 'incassi' : 'titoli' }}" x-data="{branch:@js($filters['category']??''),subbranches:@js($branches->mapWithKeys(fn($b)=>[$b->name=>$b->subbranches->pluck('name')->all()])),from:@js($filters['from']??''),to:@js($filters['to']??''),month:@js($filters['month']??'')}">
 @foreach(['client','policy'] as $key)@if($filters[$key]??null)<input type="hidden" name="{{ $key }}" value="{{ $filters[$key] }}">@endif @endforeach
 <x-form-group label="Cliente o numero polizza" name="search"><input class="form-in" name="search" value="{{ $filters['search']??'' }}"></x-form-group>
 @if($isCollections)
@@ -6,12 +6,13 @@
 @else
 <x-form-group label="Mese scadenza" name="month"><input class="form-in" type="month" name="month" x-model="month" @change="from='';to=''" value="{{ $filters['month']??'' }}"></x-form-group>
 @endif
-@foreach(['agency'=>['Agenzia',$agencies],'company'=>['Compagnia',$companies]] as $key=>[$label,$items])<x-form-group :label="$label" :name="$key"><select class="form-sel" name="{{ $key }}"><option value="">Tutte</option>@foreach($items as $item)<option value="{{ $item->id }}" @selected(($filters[$key]??'')==$item->id)>{{ $item->name }}</option>@endforeach</select></x-form-group>@endforeach
-<x-form-group label="Movimento" name="direction"><select class="form-sel" name="direction"><option value="">Incassi e rimborsi</option><option value="receipt" @selected(($filters['direction']??'')==='receipt')>Incassi</option><option value="refund" @selected(($filters['direction']??'')==='refund')>Rimborsi</option></select></x-form-group>
+<x-form-group label="Compagnia" name="company"><select class="form-sel" name="company"><option value="">Tutte</option>@foreach($companies as $company)<option value="{{ $company->id }}" @selected(($filters['company']??'')==$company->id)>{{ $company->name }}</option>@endforeach</select></x-form-group>
 <x-form-group label="Stato" name="state"><select class="form-sel" name="state"><option value="">Tutti</option>@foreach($isCollections ? ['recorded'=>'Registrato','voided'=>'Stornato'] : \Illuminate\Support\Arr::except(\App\Models\InsuranceTitle::STATES, ['partial']) as $key=>$label)<option value="{{ $key }}" @selected(($filters['state']??'')===$key)>{{ ($filters['direction']??'') === 'refund' ? ($key === 'paid' ? 'Rimborsati' : ($key === 'open' ? 'Da rimborsare' : $label)) : $label }}</option>@endforeach</select></x-form-group>
 <div class="search-form-actions"><button type="submit" class="btn btn-p">Applica filtri</button><a class="btn btn-g" href="{{ route($isCollections ? 'collections.index' : 'titles.index', $contextParameters) }}">Azzera filtri</a></div>
-<details class="search-more" @if(collect($filters)->only(['payment_method','category','subcategory','consultant','document_type','recipient','kind','payment_frequency',...($isCollections ? ['month'] : ['from','to'])])->filter()->isNotEmpty()) open @endif>
-<summary class="btn btn-g">Filtri avanzati</summary><div class="search-more-fields">
+<details class="search-more" @if(collect($filters)->only(['agency','direction','payment_method','category','subcategory','consultant','document_type','recipient','kind','payment_frequency',...($isCollections ? ['month'] : ['from','to'])])->filter()->isNotEmpty()) open @endif>
+<summary class="btn btn-g">Altri filtri</summary><div class="search-more-fields">
+<x-form-group label="Agenzia" name="agency"><select class="form-sel" name="agency"><option value="">Tutte</option>@foreach($agencies as $agency)<option value="{{ $agency->id }}" @selected(($filters['agency']??'')==$agency->id)>{{ $agency->name }}</option>@endforeach</select></x-form-group>
+<x-form-group label="Movimento" name="direction"><select class="form-sel" name="direction"><option value="">Incassi e rimborsi</option><option value="receipt" @selected(($filters['direction']??'')==='receipt')>Incassi</option><option value="refund" @selected(($filters['direction']??'')==='refund')>Rimborsi</option></select></x-form-group>
 @if($isCollections)
 <x-form-group label="Oppure scegli un mese" name="month"><input class="form-in" type="month" name="month" x-model="month" @change="from='';to=''" value="{{ $filters['month']??'' }}"></x-form-group>
 @else

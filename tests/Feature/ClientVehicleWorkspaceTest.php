@@ -57,6 +57,8 @@ class ClientVehicleWorkspaceTest extends TestCase
             $client->policies()->create(['vehicle_id' => $vehicle->id, 'category' => 'RC auto', 'company' => $insurer->name, 'supplier_company_id' => $insurer->id, 'supplier_agency_id' => $intermediary->id, 'number' => $number, 'starts_on' => '2026-01-01', 'expires_on' => $end, 'status' => 'active']);
         }
         $this->get(route('vehicles.index'))->assertOk()->assertViewHas('vehicles', fn ($rows) => $rows->total() === 2)->assertSee($uninsured->plate);
+        $this->get(route('vehicles.index', ['search'=>'aa 111']))->assertOk()->assertViewHas('vehicles', fn ($rows) => $rows->modelKeys() === [$vehicle->id]);
+        $this->get(route('vehicles.index', ['search'=>'aLFa']))->assertOk()->assertViewHas('vehicles', fn ($rows) => $rows->total() === 2);
         $filters = ['client' => 'alfa', 'plate' => 'aa 111', 'merit_class_cu' => 14, 'company_id' => $company->id, 'agency_id' => $agency->id, 'expires_from' => '2026-11-15', 'expires_to' => '2026-11-15'];
         $this->get(route('vehicles.index', $filters))->assertOk()->assertViewHas('vehicles', fn ($rows) => $rows->total() === 1)->assertSee('AA111AA')->assertSee('POL-DEMO-A')->assertDontSee('POL-DEMO-B')->assertDontSee('BB222BB');
         $this->get(route('vehicles.index', ['company_id' => $company->id, 'agency_id' => $otherAgency->id]))->assertOk()->assertViewHas('vehicles', fn ($rows) => $rows->isEmpty());

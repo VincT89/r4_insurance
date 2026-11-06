@@ -243,18 +243,18 @@ class InsuranceDocumentationFlowTest extends TestCase
         $this->get(route('clients.document-requests.edit', [$client, $request]))->assertOk()->assertSee('Documento scaduto');
     }
 
-    public function test_templates_cannot_be_forged_for_another_client_type_or_branch_and_company_signer_has_a_role(): void
+    public function test_template_classification_guides_selection_and_company_signer_has_a_role(): void
     {
         $client = Client::factory()->create(['client_type'=>'company']);
         $policy = $this->policy($client);
         $person = $this->template('person', 'policy');
         $company = $this->template('company', 'policy');
-        $this->assertSame([$company->id], app(InsuranceForms::class)->available($policy, $client)->modelKeys());
-        $this->post(route('clients.forms.store', $client), $this->packageData($client, $person, $policy))->assertSessionHasErrors('forms');
+        $this->assertEqualsCanonicalizing([$person->id,$company->id], app(InsuranceForms::class)->available($policy, $client)->modelKeys());
+        $this->post(route('clients.forms.store', $client), $this->packageData($client, $person, $policy))->assertSessionHasNoErrors();
         $data = $this->packageData($client, $company, $policy);
         $data['signer_role'] = null;
         $this->post(route('clients.forms.store', $client), $data)->assertSessionHasErrors('signer_role');
-        $this->assertDatabaseCount('insurance_form_packages', 0);
+        $this->assertDatabaseCount('insurance_form_packages', 1);
         $this->get(route('form-templates.index', ['client_type'=>'company']))->assertOk()->assertSee($company->title)->assertDontSee($person->title);
         $otherBranch = InsuranceBranch::create(['name'=>'Abitazione', 'name_key'=>hash('sha256', 'ABITAZIONE'), 'status'=>'active']);
         $this->post(route('clients.document-requests.apply', $client), ['insurance_branch_id'=>$otherBranch->id, 'insurance_policy_id'=>$policy->id])->assertSessionHasErrors('insurance_policy_id');

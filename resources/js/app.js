@@ -5,6 +5,8 @@ import './ui-helpers.js';
 import './detail-navigation.js';
 import './policy-sections.js';
 import './document-preview-loader.js';
+import './tablet-signing-loader.js';
+import './template-editor-loader.js';
 import './shared-checklist.js';
 import './appearance.js';
 import './table-tools.js';
@@ -19,7 +21,8 @@ import './quote-vehicle.js';
 import './quote-recipients.js';
 import './client-fiscal-check.js';
 import { initShell } from './app-shell.js';
-import { createIcons, icons } from 'lucide';
+import { createIcons } from 'lucide';
+import { appIcons } from './app-icons.js';
 
 import { initBgCanvas } from './bg-canvas.js';
 
@@ -34,13 +37,13 @@ document.addEventListener('livewire:navigated', () => {
     
     initBgCanvas('bg-canvas');
     initShell();
-    createIcons({ icons });
+    createIcons({ icons: appIcons });
 });
 
 // Fallback per non livewire pages
 document.addEventListener('DOMContentLoaded', () => {
     initShell();
-    createIcons({ icons });
+    createIcons({ icons: appIcons });
     if (typeof window.Livewire === 'undefined') {
         initBgCanvas('bg-canvas');
     }
@@ -50,7 +53,7 @@ document.addEventListener('livewire:initialized', () => {
     Livewire.hook('commit', ({ succeed }) => {
         succeed(() => {
             queueMicrotask(() => {
-                createIcons({ icons });
+                createIcons({ icons: appIcons });
             })
         })
     });

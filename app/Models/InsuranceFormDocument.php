@@ -12,6 +12,21 @@ class InsuranceFormDocument extends Model
     public function generated() { return $this->hasOne(Attachment::class)->whereNull('insurance_form_submission_id'); }
     public function submissions() { return $this->hasMany(InsuranceFormSubmission::class)->orderByDesc('version'); }
     public function latestSubmission() { return $this->hasOne(InsuranceFormSubmission::class)->ofMany('version','max'); }
+    public function signatureActionLabel(): string
+    {
+        return match ($this->latestSubmission?->status) {
+            'received' => 'Controlla copia ricevuta',
+            'rejected' => 'Carica copia corretta',
+            default => 'Carica copia firmata',
+        };
+    }
+    public function signatureActionUrl(): string
+    {
+        $package = $this->package;
+        return $package->insurance_policy_id
+            ? route('clients.policies.show',[$package->client_id,$package->insurance_policy_id,'tab'=>'forms']).'#policy-signature-'.$this->id
+            : route('clients.forms.show',[$package->client_id,$package]).'#form-document-'.$this->id;
+    }
     public function getStateLabelAttribute(): string
     {
         if (!$this->signature_required) return 'Non richiede firma';

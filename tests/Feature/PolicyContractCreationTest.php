@@ -62,7 +62,8 @@ class PolicyContractCreationTest extends TestCase
         $document = $policy->contracts()->sole();
         Storage::disk('attachments')->assertExists($document->path);
         $this->assertEquals($this->client->id, $document->attachable_id);
-        $this->get($response->json('url'))->assertOk()->assertSee($policy->number);
+        $this->assertSame(\App\Services\PolicyFormReminder::url($policy), $response->json('url'));
+        $this->get($response->json('url'))->assertOk()->assertSee($policy->number)->assertSee('Moduli della nuova polizza')->assertSee('Più tardi');
         $this->postJson(route('policies.store'), $input)->assertUnprocessable()->assertJsonValidationErrors('number');
         $this->assertDatabaseCount('insurance_policies', 1);
     }

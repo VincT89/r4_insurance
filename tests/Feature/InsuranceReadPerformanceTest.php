@@ -53,6 +53,15 @@ class InsuranceReadPerformanceTest extends TestCase
         $this->get(route('deadlines.index',['period'=>'custom','from'=>'2026-11-06','to'=>'2026-11-06']))->assertViewHas('deadlines',fn($rows)=>$rows->total()===1);
     }
 
+    public function test_overdue_refunds_are_distinct_from_uncollected_premiums_in_deadlines(): void
+    {
+        $client = Client::factory()->create();
+        $policy = $client->policies()->create(['number'=>'PROVA-RIMBORSO','category'=>'RC auto','company'=>'Compagnia prova','starts_on'=>'2026-01-01','expires_on'=>'2027-01-01','status'=>'active']);
+        $policy->titles()->create(['kind'=>'adjustment','direction'=>'refund','due_on'=>'2026-10-20','coverage_from'=>'2026-10-20','coverage_to'=>'2026-12-31','amount_cents'=>8000,'payment_method'=>'Bonifico','payment_frequency'=>'Unico']);
+        $this->get(route('deadlines.index', ['kind'=>'title','period'=>'overdue']))->assertOk()
+            ->assertSee('Rimborso da effettuare')->assertSee('Rimborso scaduto')->assertDontSee('Sospeso di cassa');
+    }
+
     public function test_dashboard_does_not_request_documents_already_linked_to_the_checklist(): void
     {
         $client = Client::factory()->create();

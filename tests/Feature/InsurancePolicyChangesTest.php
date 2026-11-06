@@ -149,12 +149,9 @@ class InsurancePolicyChangesTest extends TestCase
         $this->assertDatabaseCount('insurance_policies',1);
     }
 
-    public function test_stale_preview_changed_proof_duplicate_confirmation_and_future_replacement_are_rejected(): void
+    public function test_stale_preview_and_changed_proof_are_rejected_and_confirmation_is_idempotent(): void
     {
-        $quote=$this->approve('replacement',['starts_on'=>'2026-10-21']);
-        $input=$this->input($quote);
-        $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors();
-        $quote->update(['starts_on'=>'2026-10-20']);
+        $quote=$this->approve('replacement');
         $input=$this->input($quote->fresh());
         $this->policy->update(['insured_subject'=>'Bene aggiornato']);
         $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasErrors();
@@ -165,6 +162,20 @@ class InsurancePolicyChangesTest extends TestCase
         $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasNoErrors();
         $this->post(route('clients.policies.changes.store',[$this->client,$this->policy]),$input)->assertSessionHasNoErrors();
         $this->assertDatabaseCount('insurance_policy_changes',1);
+    }
+
+    public function test_future_approved_quote_is_scheduled_from_its_contract_without_closing_the_source(): void
+    {
+        $quote=$this->approve('replacement',['starts_on'=>'2026-10-21','expires_on'=>'2027-10-21']);
+        $change=$this->record($quote);
+        $this->assertSame('active',$this->policy->fresh()->status);
+        $this->assertSame('Decorrenza futura',$change->resultPolicy->status_label);
+        $this->assertSame('pending',$change->replacementSchedule->state);
+        $this->assertSame('closed',$quote->quoteCase->fresh()->status);
+        $this->travelTo(today()->addDay()->startOfDay());
+        $this->artisan('insurance:activate-replacements')->assertSuccessful();
+        $this->assertSame('replaced',$this->policy->fresh()->status);
+        $this->assertSame('In vigore',$change->resultPolicy->fresh()->status_label);
     }
 
     public function test_next_day_work_lock_blocks_operator_but_admin_can_register_with_history(): void

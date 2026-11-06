@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Models\{Attachment, Client, InsuranceBranch, InsuranceCoverageCheck, InsuranceFormPackage, InsuranceFormTemplate, InsurancePolicy, SupplierCompany, User};
-use App\Services\InsuranceForms;
+use App\Services\{InsuranceForms, PolicyFormReminder};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\{DB, Storage};
@@ -88,6 +88,55 @@ class InsuranceSigningTest extends TestCase
         $legacy=$this->template(['status'=>'draft','category'=>'annex_3']);$this->post(route('form-templates.approve',$legacy),['confirmed'=>1])->assertSessionHasErrors('forms');
         $this->assertSame('draft',$legacy->fresh()->status);
     }
+    public function test_formatted_model_preview_revision_and_generated_pdf_keep_the_same_fields_and_layout(): void
+    {
+        $template = $this->template();
+        $old = $this->package($template);
+        $originalPdf = $old->documents()->sole()->pdf_hash;
+        $delta = json_encode(['ops'=>[
+            ['insert'=>'Dati del contratto','attributes'=>['bold'=>true]], ['insert'=>"\n",'attributes'=>['header'=>2,'align'=>'center']],
+            ['insert'=>['field'=>'numero_polizza']], ['insert'=>"\n",'attributes'=>['list'=>'bullet']],
+            ['insert'=>'Cliente'], ['insert'=>"\n",'attributes'=>['table'=>'row-a']],
+            ['insert'=>['field'=>'contraente']], ['insert'=>"\n",'attributes'=>['table'=>'row-a']],
+        ]]);
+        $payload = ['title'=>'Scheda revisionata','category'=>'consistency','scope'=>'policy','insurance_branch_id'=>$this->branch->id,'client_type'=>'person',
+            'editor_content'=>$delta,'signature_required'=>0,'required'=>1,'revise'=>1,'revision_reason'=>'Aggiornate tabella e condizioni.','edit_key'=>$template->fresh()->editKey()];
+        $this->post(route('form-templates.draft-preview'),$payload)->assertOk()->assertSee('data-document-preview',false);
+        $response = $this->post(route('form-templates.draft-preview'),$payload,['Accept'=>'application/pdf'])->assertOk()->assertHeader('Content-Type','application/pdf');
+        $this->assertStringStartsWith('%PDF-', $response->getContent());
+        $this->assertDatabaseCount('insurance_form_templates',1);
+        $this->patch(route('form-templates.update',$template),$payload)->assertSessionHasNoErrors();
+        $draft = $template->next()->sole();
+        $this->assertTrue($draft->required);
+        $this->assertFalse($draft->signature_required);
+        $this->get(route('form-templates.edit',[$draft]))->assertOk()->assertSee('Inserisci campo automatico');
+        $this->post(route('form-templates.approve',$draft),['confirmed'=>1,'edit_key'=>str_repeat('0',64)])->assertSessionHasErrors('forms');
+        $this->post(route('form-templates.approve',$draft),['confirmed'=>1,'edit_key'=>$draft->editKey()])->assertSessionHasNoErrors();
+        $docs = $this->package($draft)->documents()->sole();
+        $this->assertStringContainsString('SA-2026-501',$docs->body);
+        $this->assertStringContainsString('Paolo Ferri',$docs->body);
+        $this->assertSame($originalPdf,$old->documents()->sole()->pdf_hash);
+        $html = \App\Support\FormTemplateContent::html($draft->body,['{{contraente}}'=>'<img src=x>','{{numero_polizza}}'=>'P-1']);
+        $this->assertStringContainsString('<h2 style="text-align:center"><strong>Dati del contratto</strong></h2>',$html);
+        $this->assertStringContainsString('<ul><li>P-1</li></ul>',$html);
+        $this->assertStringContainsString('<td>Cliente</td><td>&lt;img src=x&gt;</td>',$html);
+    }
+    public function test_editor_rejects_unsafe_content_and_stale_draft_edits(): void
+    {
+        $data = ['title'=>'Scheda','category'=>'other','scope'=>'policy','signature_required'=>0,'required'=>0];
+        foreach ([[['insert'=>['image'=>'https://example.test/a']]], [['insert'=>'Testo','attributes'=>['color'=>'url(https://example.test)']]],
+            [['insert'=>['field'=>'sconosciuto']]], [['insert'=>'{{numero_'],['insert'=>'polizza}}','attributes'=>['bold'=>true]]]] as $ops) {
+            $this->post(route('form-templates.store'), $data+['editor_content'=>json_encode(['ops'=>$ops])])->assertSessionHasErrors('body');
+        }
+        $this->assertDatabaseCount('insurance_form_templates',0);
+        $draft = $this->template(['status'=>'draft']);
+        $stale = $draft->editKey();
+        $draft->update(['title'=>'Aggiornamento da un’altra scheda']);
+        $this->patch(route('form-templates.update',$draft),$data+['edit_key'=>$stale,'body'=>'Testo valido'])->assertSessionHasErrors('forms');
+        $this->assertSame('Aggiornamento da un’altra scheda',$draft->fresh()->title);
+        $this->actingAs(User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']));
+        $this->post(route('form-templates.draft-preview'),$data+['body'=>'Testo valido'])->assertOk();
+    }
     public function test_generated_pdf_is_private_frozen_encrypted_and_linked_to_client_and_policy(): void
     {
         $template=$this->template();$package=$this->package($template);$document=$package->documents()->sole();$attachment=$document->generated;
@@ -96,20 +145,60 @@ class InsuranceSigningTest extends TestCase
         $this->assertStringNotContainsString('Paolo Ferri',DB::table('insurance_form_documents')->value('body'));$this->assertStringNotContainsString('Paolo Ferri',DB::table('insurance_form_packages')->value('snapshot'));
         $this->assertSame($this->policy->id,$attachment->insurance_policy_id);$this->assertSame($this->client->id,$attachment->attachable_id);$this->assertSame('generated',$attachment->review_status);
         $this->get($attachment->downloadUrl())->assertOk();$this->get(route('clients.forms.show',[$this->client,$package]))->assertOk()->assertSee('Firma mancante');
-        $this->get(route('clients.show',[$this->client,'tab'=>'documents']))->assertOk()->assertSee('Fascicolo moduli e firme');
+        $this->get(route('clients.show',[$this->client,'tab'=>'documents']))->assertOk()->assertSee('Apri modulo nello storico')->assertSee('#form-document-'.$document->id);
         $this->assertDatabaseCount('client_consents',0);$this->assertDatabaseCount('insurance_collections',0);
         $template->update(['body'=>'Testo successivo']);$this->assertStringContainsString('Paolo Ferri',$document->fresh()->body);
     }
-    public function test_stale_duplicate_required_and_incompatible_requests_do_not_create_pdfs(): void
+    public function test_stale_duplicate_and_unavailable_templates_do_not_create_pdfs(): void
     {
-        $t=$this->template();$required=$this->template(['required'=>true]);
-        $this->post(route('clients.forms.store',$this->client),$this->data($t))->assertSessionHasErrors('forms');$required->update(['required'=>false]);
+        $t=$this->template();
         $data=$this->data($t);$this->client->update(['name'=>'Paolo Ferri aggiornato']);
         $this->post(route('clients.forms.store',$this->client),$data)->assertSessionHasErrors('forms');
-        $t->update(['scope'=>'client']);$this->post(route('clients.forms.store',$this->client),$this->data($t))->assertSessionHasErrors('forms');$t->update(['scope'=>'policy']);
+        $t->update(['status'=>'retired']);$this->post(route('clients.forms.store',$this->client),$this->data($t))->assertSessionHasErrors('forms');$t->update(['status'=>'active']);
         $this->assertDatabaseCount('insurance_form_packages',0);$this->assertCount(0,Storage::disk('attachments')->allFiles());
         $data=$this->data($t);$this->post(route('clients.forms.store',$this->client),$data)->assertSessionHasNoErrors();$this->post(route('clients.forms.store',$this->client),$data)->assertSessionHasErrors('forms');
         $this->assertDatabaseCount('insurance_form_packages',1);$this->assertCount(1,Storage::disk('attachments')->allFiles());
+    }
+    public function test_reminder_generates_only_the_chosen_templates_and_can_include_more_than_twelve(): void
+    {
+        $default = $this->template(['title'=>'Preselezionato','required'=>true]);
+        $selected = collect(range(1,13))->map(fn ($i) => $this->template(['title'=>'Scheda '.$i,'signature_required'=>false,'body'=>'Polizza {{numero_polizza}}.']));
+        PolicyFormReminder::record($this->policy);
+        $key = PolicyFormReminder::key($this->policy, null);
+        $reminder = PolicyFormReminder::find($this->policy);
+        $this->get(PolicyFormReminder::url($this->policy))->assertOk()->assertSee('Preselezionato')->assertSee('Scheda 13');
+        $this->get(route('clients.policies.show', [$this->client,$this->policy]))->assertOk()->assertSee('Scegli i moduli');
+        $reminder->markAsRead();
+        $this->assertNotNull(PolicyFormReminder::find($this->policy));
+        $data = $this->data($default, extra:['reminder'=>$key,'templates'=>$selected->pluck('id')->all(),'signer_name'=>null,'place'=>null]);
+        $this->post(route('clients.forms.store',$this->client), $data)->assertSessionHasNoErrors();
+        $package = InsuranceFormPackage::sole();
+        $this->assertEqualsCanonicalizing($selected->pluck('id')->all(), $package->documents()->pluck('insurance_form_template_id')->all());
+        $this->assertNull(PolicyFormReminder::find($this->policy));
+        $this->get(PolicyFormReminder::url($this->policy))->assertRedirect(route('clients.forms.show', [$this->client,$package]));
+        $this->post(route('clients.forms.store',$this->client), $data)->assertSessionHasErrors('forms');
+        $this->assertCount(13, Storage::disk('attachments')->allFiles());
+    }
+    public function test_operator_can_skip_all_modules_without_generating_documents_or_consuming_a_stale_reminder(): void
+    {
+        $operator = User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']);
+        $this->actingAs($operator);
+        $default = $this->template(['required'=>true]);
+        PolicyFormReminder::record($this->policy);
+        $key = PolicyFormReminder::key($this->policy, null);
+        $input = ['policy'=>$this->policy->id,'reminder'=>$key,'context_hash'=>app(InsuranceForms::class)->contextHash($this->client,$this->policy)];
+        $url = route('clients.forms.reminder-decision',[$this->client,'none']);
+        $this->post(route('clients.forms.reminder-decision',[$this->client,'later']),$input)->assertSessionHasNoErrors();
+        $this->assertSame([], PolicyFormReminder::find($this->policy)->data['selected_templates']);
+        $this->post($url,$input+['templates'=>[$default->id]])->assertSessionHasErrors('templates');
+        $this->post($url,array_replace($input,['reminder'=>(string)Str::uuid()]))->assertSessionHasErrors('forms');
+        $this->post($url,array_replace($input,['context_hash'=>str_repeat('0',64)]))->assertSessionHasErrors('forms');
+        $this->assertNotNull(PolicyFormReminder::find($this->policy));
+        $this->post($url,$input)->assertSessionHasNoErrors()->assertRedirect(route('clients.policies.show',[$this->client,$this->policy,'tab'=>'forms']));
+        $this->assertNull(PolicyFormReminder::find($this->policy));
+        $this->assertDatabaseCount('insurance_form_packages',0);
+        $this->assertDatabaseHas('audit_logs',['action'=>'forms_skipped','user_id'=>$operator->id]);
+        $this->assertCount(0, Storage::disk('attachments')->allFiles());
     }
     public function test_client_scope_company_signer_and_stale_contract_warning_are_distinct_from_receipts(): void
     {
@@ -143,6 +232,106 @@ class InsuranceSigningTest extends TestCase
         }
         $this->delete(route('clients.policies.destroy',[$this->client,$this->policy]))->assertSessionHasErrors();$this->delete(route('clients.destroy',$this->client))->assertSessionHasErrors();
     }
+    public function test_policy_shows_each_pending_document_and_receives_and_reviews_the_correct_copy_in_place(): void
+    {
+        $package = $this->package($this->template(['title'=>'Modulo da sottoscrivere']));
+        $document = $package->documents()->sole();
+        $this->package($this->template(['title'=>'Informazioni senza firma','signature_required'=>false]));
+        $url = route('clients.policies.show',[$this->client,$this->policy]);
+        $return = route('clients.policies.show',[$this->client,$this->policy,'tab'=>'forms']).'#policy-signatures';
+        $this->get($url)->assertOk()->assertSee('Carica copia firmata')->assertSee('Modulo da sottoscrivere')
+            ->assertViewHas('signatures',fn ($groups) => $groups['toSign']->modelKeys() === [$document->id] && $groups['toReview']->isEmpty());
+        $this->actingAs(User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']));
+        $this->policy->forceFill(['work_closed_at'=>now()->subDays(2)])->save();
+        $payload = ['signature_origin'=>'policy','previous_submission'=>0,'signature_document'=>$document->id,'signature_action'=>'upload',
+            'request_key'=>(string)Str::uuid(),'signer_name'=>'Firmatario dichiarato','signed_on'=>today()->subDay()->toDateString(),
+            'files'=>[UploadedFile::fake()->createWithContent('copia.pdf',Storage::disk('attachments')->get($document->generated->path))]];
+        $upload = route('clients.forms.submit',[$this->client,$package,$document]);
+        $this->post($upload,$payload)->assertSessionHasNoErrors()->assertRedirect($return);
+        $first = $document->submissions()->sole();
+        $this->assertSame('received',$first->status);
+        $this->get($url)->assertOk()->assertSee('Firmatario dichiarato')->assertSee('Apri copia ricevuta')
+            ->assertViewHas('signatures',fn ($groups) => $groups['toSign']->isEmpty() && $groups['toReview']->modelKeys() === [$document->id]);
+        $this->post($upload,array_replace($payload,['request_key'=>(string)Str::uuid(),'note'=>'Nuova copia da una scheda ormai superata.']))->assertSessionHasErrors('forms');
+        $this->assertCount(1,$document->submissions()->get());
+        $this->review($package,$first,['signature_origin'=>'policy','outcome'=>'rejected','review_note'=>'Occorre la seconda pagina.'])->assertRedirect($return);
+        $this->get($url)->assertOk()->assertSee('Carica copia corretta')->assertSee('Occorre la seconda pagina.');
+        $this->post($upload,array_replace($payload,['request_key'=>(string)Str::uuid(),'previous_submission'=>$first->id,'note'=>'Aggiunta la pagina richiesta.']))->assertSessionHasNoErrors()->assertRedirect($return);
+        $second = $document->submissions()->first();
+        $this->assertSame(2,$second->version);
+        $this->review($package,$second,['signature_origin'=>'policy'])->assertRedirect($return);
+        $this->get($url)->assertOk()->assertViewHas('signatures',fn ($groups) => $groups['toSign']->isEmpty() && $groups['toReview']->isEmpty() && $groups['completed']->modelKeys() === [$document->id]);
+        $this->assertSame('rejected',$first->fresh()->status);
+        $otherClient = Client::factory()->create();
+        $this->post(route('clients.forms.submit',[$otherClient,$package,$document]),$payload)->assertNotFound();
+    }
+    public function test_renewal_keeps_only_unfinished_older_signatures_in_the_policy_queue(): void
+    {
+        $old = $this->package($this->template(['title'=>'Modulo periodo precedente']));
+        $closed = $this->package($this->template(['title'=>'Modulo storico controllato']));
+        $this->review($closed,$this->signed($closed))->assertSessionHasNoErrors();
+        $before = app(InsuranceForms::class)->context($this->client,$this->policy);
+        $after = $before;
+        $after['policy']['starts_on'] = '2027-10-18';
+        $after['policy']['expires_on'] = '2028-10-18';
+        $renewal = $this->policy->incomingChanges()->create([
+            'source_policy_id'=>$this->policy->id,'kind'=>'renewal','effective_on'=>'2027-10-18','expires_on'=>'2028-10-18',
+            'reference'=>$this->policy->number,'description'=>'Rinnovo di collaudo','premium_cents'=>100001,'snapshot'=>['before'=>$before,'after'=>$after],
+            'request_key'=>(string)Str::uuid(),'created_by'=>$this->admin->id,
+        ]);
+        $this->policy->update(['starts_on'=>$renewal->effective_on,'expires_on'=>$renewal->expires_on]);
+        $current = $this->package($this->template(['title'=>'Modulo periodo corrente']),['change'=>$renewal->id,'reason'=>'renewal','note'=>$renewal->description]);
+        $otherPolicy = $this->client->policies()->create(['number'=>'ALTRA-POLIZZA','category'=>'RC auto','company'=>'Altra compagnia','starts_on'=>today(),'expires_on'=>today()->addYear(),'status'=>'active']);
+        $url = route('clients.policies.show',[$this->client,$this->policy]);
+        $groups = $this->get($url)->assertOk()->assertSee('Firme da completare dei periodi precedenti')->viewData('signatures');
+        $this->assertSame([$old->documents()->sole()->id], $groups['previous']->values()->modelKeys());
+        $this->assertSame([$current->documents()->sole()->id], $groups['toSign']->values()->modelKeys());
+        $this->assertTrue($groups['completed']->isEmpty());
+        $this->get(route('clients.policies.show',[$this->client,$otherPolicy]))->assertOk()->assertViewHas('signatures',fn ($groups) => collect($groups)->every(fn ($group) => $group->isEmpty()));
+        $this->review($old,$this->signed($old),['signature_origin'=>'policy'])->assertSessionHasNoErrors();
+        $this->get($url)->assertOk()->assertViewHas('signatures',fn ($groups) => $groups['previous']->isEmpty() && $groups['toSign']->count()===1);
+        $this->get(route('clients.forms.show',[$this->client,$old]))->assertOk()->assertSee('Firma controllata');
+    }
+    public function test_client_and_upload_screens_point_to_the_exact_open_module_and_respect_its_scope(): void
+    {
+        $policyPackage = $this->package($this->template(['title'=>'Modulo legato al contratto']));
+        $policyDocument = $policyPackage->documents()->sole();
+        $registryPackage = $this->package($this->template(['scope'=>'client','title'=>'Modulo anagrafica']),[
+            'policy'=>null,'reason'=>'client','context_hash'=>app(InsuranceForms::class)->contextHash($this->client->fresh(),null),
+        ]);
+        $registryDocument = $registryPackage->documents()->sole();
+        $policyAction = route('clients.policies.show',[$this->client,$this->policy,'tab'=>'forms']).'#policy-signature-'.$policyDocument->id;
+        $registryAction = route('clients.forms.show',[$this->client,$registryPackage]).'#form-document-'.$registryDocument->id;
+        $this->get(route('clients.show',$this->client))->assertOk()->assertSee($policyAction)->assertDontSee($registryAction);
+        foreach ([route('clients.show',[$this->client,'tab'=>'documents']),route('clients.documents.create',$this->client),route('clients.forms.index',$this->client)] as $url) {
+            $this->get($url)->assertOk()->assertSee($policyAction)->assertSee($registryAction)->assertSee('Carica copia firmata');
+        }
+        $this->get(route('clients.documents.create',[$this->client,'policy'=>$this->policy->id]))->assertOk()->assertSee($policyAction)->assertDontSee($registryAction);
+        $this->get(route('clients.forms.index',[$this->client,'reason'=>'client']))->assertOk()->assertSee($registryAction)->assertDontSee($policyAction);
+        $registryCopy = $this->signed($registryPackage);
+        $this->get(route('clients.forms.show',[$this->client,$registryPackage]))->assertOk()
+            ->assertSeeInOrder(['Controlla copia ricevuta',$registryCopy->files->first()->openUrl(),'Conferma controllo','Copie firmate']);
+        $another = Client::factory()->create();
+        $this->get(route('clients.show',[$another,'tab'=>'documents']))->assertOk()->assertDontSee($policyAction)->assertDontSee($registryAction);
+    }
+    public function test_current_documents_show_all_files_of_the_latest_signed_copy_and_keep_older_ones_in_history(): void
+    {
+        $package = $this->package();
+        $first = $this->signed($package);
+        $this->review($package,$first,['outcome'=>'rejected','review_note'=>'Manca una pagina.'])->assertSessionHasNoErrors();
+        $latest = $this->signed($package,['note'=>'Nuova copia con la seconda pagina.']);
+        $current = $this->get(route('clients.show',[$this->client,'tab'=>'documents']))->assertOk()->assertSee('Controlla copia ricevuta');
+        $currentIds = $current->viewData('documents')->modelKeys();
+        $this->assertSame([], array_values(array_intersect($currentIds,$first->files->modelKeys())));
+        $this->assertSame([], array_values(array_diff($latest->files->modelKeys(),$currentIds)));
+        $this->assertContains($package->documents()->sole()->generated->id,$currentIds);
+        $policyIds = $this->get(route('clients.policies.show',[$this->client,$this->policy,'tab'=>'documents']))->assertOk()->viewData('policy')->documents->modelKeys();
+        $this->assertEqualsCanonicalizing($currentIds,$policyIds);
+        $history = $this->get(route('clients.show',[$this->client,'tab'=>'documents','document_view'=>'history']))->assertOk()->assertSee('Copia 1 / storica')->viewData('documents');
+        $this->assertSame([], array_values(array_diff($first->files->modelKeys(),$history->modelKeys())));
+        $this->review($package,$latest)->assertSessionHasNoErrors();
+        $this->get(route('clients.show',[$this->client,'tab'=>'documents']))->assertOk()->assertSee('Firma controllata')->assertViewHas('openSignatures',fn ($docs) => $docs->isEmpty());
+    }
     public function test_invalid_uploads_cannot_be_used_as_signed_documents(): void
     {
         $package=$this->package();$doc=$package->documents()->sole();$base=['request_key'=>(string)Str::uuid(),'signer_name'=>'Paolo Ferri','signed_on'=>'2026-10-18'];
@@ -153,7 +342,7 @@ class InsuranceSigningTest extends TestCase
     public function test_authorization_and_next_day_lock_protect_generation_but_allow_receiving_signatures(): void
     {
         $package=$this->package();$operator=User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']);$this->actingAs($operator);
-        $this->get(route('clients.forms.show',[$this->client,$package]))->assertOk();$this->get(route('form-templates.index'))->assertForbidden();
+        $this->get(route('clients.forms.show',[$this->client,$package]))->assertOk();$this->get(route('form-templates.index'))->assertOk();
         $this->get($package->documents()->sole()->generated->downloadUrl())->assertOk();
         $this->client->update(['commercial_user_id'=>$operator->id]);$this->get(route('clients.forms.show',[$this->client,$package]))->assertOk();
         $this->policy->forceFill(['work_closed_at'=>now()->subDay(),'work_closed_by'=>$operator->id])->save();
@@ -173,13 +362,110 @@ class InsuranceSigningTest extends TestCase
         $this->get(route('clients.policies.coverage',[$this->client,$this->policy]))->assertOk()->assertSee('AB123CD')->assertSee('Dati della polizza cambiati');
         $this->delete(route('attachments.destroy',$check->files->first()))->assertSessionHasErrors();$this->assertDatabaseCount('insurance_coverage_checks',1);
     }
-    public function test_operators_must_supply_proof_and_cannot_configure_form_templates(): void
+    public function test_operators_must_supply_proof_and_can_configure_form_templates(): void
     {
         $package=$this->package();$reader=User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']);$this->actingAs($reader);
-        $this->get(route('clients.forms.show',[$this->client,$package]))->assertOk()->assertSee('Registra file firmati');
+        $this->get(route('clients.forms.show',[$this->client,$package]))->assertOk()->assertSee('Salva copia firmata');
         $this->post(route('clients.forms.submit',[$this->client,$package,$package->documents()->sole()]),[])->assertSessionHasErrors();
         $this->post(route('clients.policies.coverage.store',[$this->client,$this->policy]),[])->assertSessionHasErrors();
-        $this->post(route('form-templates.store'),[])->assertForbidden();$this->assertDatabaseCount('insurance_coverage_checks',0);
+        $this->post(route('form-templates.store'),[])->assertSessionHasErrors('title');$this->assertDatabaseCount('insurance_coverage_checks',0);
+    }
+    public function test_operator_edits_complete_documents_with_images_layout_and_preserved_versions(): void
+    {
+        $operator = User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']);
+        $this->actingAs($operator);
+        $image = ['data'=>'data:image/png;base64,'.base64_encode(UploadedFile::fake()->image('logo-dimostrativo.png',80,40)->get()),
+            'alt'=>'Logo dimostrativo','width'=>25,'align'=>'left'];
+        $delta = ['ops'=>[['insert'=>'Documento dimostrativo per '],['insert'=>['field'=>'contraente']],['insert'=>"\n"],
+                ['insert'=>['page_break'=>true]],['insert'=>"Seconda pagina\n"]],
+            'header'=>[['insert'=>['image'=>$image]],['insert'=>"\n"],['insert'=>['field'=>'titolo_modello']],['insert'=>"\n"]],
+            'footer'=>[['insert'=>'Riferimento '],['insert'=>['field'=>'riferimento_documento']],['insert'=>"\n"]],
+            'layout'=>array_replace(\App\Support\FormTemplateContent::defaultLayout(),['orientation'=>'landscape','margin_left'=>20])];
+        $data = ['title'=>'Modello completo dimostrativo','category'=>'other','scope'=>'policy','client_type'=>'all',
+            'signature_required'=>0,'required'=>0,'editor_content'=>json_encode($delta)];
+        $this->get(route('form-templates.create'))->assertOk()->assertSee('Intestazione')->assertSee('Impostazioni della pagina');
+        $this->post(route('form-templates.store'),$data)->assertSessionHasNoErrors();
+        $template = InsuranceFormTemplate::sole();
+        $this->assertSame($operator->id,$template->created_by);
+        $this->assertTrue(\App\Support\FormTemplateContent::isDocument($template->body));
+        $this->assertSame($delta,\App\Support\FormTemplateContent::editorDocument($template->body));
+        $this->get(route('form-templates.preview',$template))->assertOk()->assertHeader('Content-Type','application/pdf');
+        $this->post(route('form-templates.approve',$template),['confirmed'=>1,'edit_key'=>$template->editKey()])->assertSessionHasNoErrors();
+        $package = $this->package($template);
+        $document = $package->documents()->sole();
+        $bytes = Storage::disk('attachments')->get($document->generated->path);
+        $this->assertStringContainsString('/Subtype /Image',$bytes);
+        $this->assertSame(1,preg_match('~/MediaBox\s*\[\s*([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\s*\]~',$bytes,$box));
+        $this->assertGreaterThan((float)$box[4],(float)$box[3]);
+        $this->assertStringContainsString('Paolo Ferri',$document->body);
+        $this->assertStringContainsString('Modello completo dimostrativo',$document->body);
+        $oldHash = $document->pdf_hash;
+        $delta['ops'] = [['insert'=>"Versione aggiornata\n"]];
+        $this->patch(route('form-templates.update',$template),array_replace($data,['editor_content'=>json_encode($delta),'edit_key'=>$template->fresh()->editKey(),'revise'=>1,'revision_reason'=>'Aggiornamento dimostrativo completo']))->assertSessionHasNoErrors();
+        $revision = $template->next()->sole();
+        $this->post(route('form-templates.approve',$revision),['confirmed'=>1,'edit_key'=>$revision->editKey()])->assertSessionHasNoErrors();
+        $this->assertSame('retired',$template->fresh()->status);
+        $this->assertSame($oldHash,hash('sha256',Storage::disk('attachments')->get($document->generated->path)));
+        $this->assertTrue($operator->hasRetainedHistory());
+        $this->get(route('users.index'))->assertForbidden();
+        $operator->update(['status'=>'inactive']);
+        $this->assertTrue(\Illuminate\Support\Facades\Gate::forUser($operator->fresh())->denies('forms.manage'));
+    }
+
+    public function test_complete_document_rejects_remote_images_unsafe_headers_and_invalid_layout(): void
+    {
+        $valid = ['ops'=>[['insert'=>"Testo dimostrativo\n"]],'header'=>[],'footer'=>[],'layout'=>\App\Support\FormTemplateContent::defaultLayout()];
+        $invalid = [];
+        $invalid[] = array_replace($valid,['header'=>[['insert'=>'<script>alert(1)</script>']]]);
+        $invalid[] = array_replace($valid,['header'=>[['insert'=>['page_break'=>true]]]]);
+        $invalid[] = array_replace($valid,['footer'=>[['insert'=>['field'=>'campo_non_consentito']]]]);
+        $invalid[] = array_replace($valid,['layout'=>array_replace($valid['layout'],['margin_left'=>-10])]);
+        $invalid[] = array_replace($valid,['layout'=>array_replace($valid['layout'],['orientation'=>'url(https://example.test)'])]);
+        foreach (['https://example.test/logo.png','data:image/svg+xml;base64,'.base64_encode('<svg onload="alert(1)"/>'),'data:image/png;base64,'.base64_encode('contenuto dimostrativo non immagine')] as $source) {
+            $invalid[] = array_replace($valid,['header'=>[['insert'=>['image'=>['data'=>$source,'alt'=>'Logo dimostrativo','width'=>25,'align'=>'left']]]]]);
+        }
+        $invalid[] = array_replace($valid,['ops'=>array_merge($valid['ops'],array_fill(0,41,['insert'=>['page_break'=>true]]))]);
+        $image = ['data'=>'data:image/png;base64,'.base64_encode(UploadedFile::fake()->image('logo-dimostrativo.png',80,40)->get()),'alt'=>'Logo dimostrativo','width'=>25,'align'=>'left'];
+        $invalid[] = array_replace($valid,['header'=>array_fill(0,21,['insert'=>['image'=>$image]])]);
+        foreach ($invalid as $delta) {
+            $this->post(route('form-templates.store'),['title'=>'Modello dimostrativo','category'=>'other','scope'=>'policy','signature_required'=>0,'required'=>0,
+                'editor_content'=>json_encode($delta)])->assertSessionHasErrors('body');
+        }
+        $this->assertDatabaseCount('insurance_form_templates',0);
+    }
+
+    public function test_repeated_header_cannot_leave_the_printed_document_without_room_for_text(): void
+    {
+        $document = ['ops'=>[['insert'=>"Testo dimostrativo\n"]],'header'=>[['insert'=>str_repeat("Intestazione dimostrativa\n",45)]],
+            'footer'=>[],'layout'=>array_replace(\App\Support\FormTemplateContent::defaultLayout(),['repeat_header'=>true,'orientation'=>'landscape'])];
+        $template = $this->template(['status'=>'draft','body'=>\App\Support\FormTemplateContent::encode(json_encode($document))]);
+        $this->get(route('form-templates.preview',$template))->assertSessionHasErrors('body');
+        $this->assertDatabaseCount('attachments',0);
+    }
+
+    public function test_policy_reminder_lists_all_active_models_and_keeps_the_operator_selection(): void
+    {
+        $operator = User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']);
+        $this->actingAs($operator);
+        $policyTemplate = $this->template(['title'=>'Modulo polizza dimostrativo']);
+        $clientTemplate = $this->template(['title'=>'Modulo generico cliente','scope'=>'client','client_type'=>'company','required'=>true]);
+        $branch = InsuranceBranch::create(['name'=>'Abitazione dimostrativa','name_key'=>hash('sha256','ABITAZIONE DIMOSTRATIVA'),'status'=>'active']);
+        $otherBranch = $this->template(['title'=>'Modulo altro ramo','insurance_branch_id'=>$branch->id]);
+        $this->template(['title'=>'Ritirato dimostrativo','status'=>'retired']);
+        $this->template(['title'=>'Bozza dimostrativa','status'=>'draft']);
+        PolicyFormReminder::record($this->policy);
+        $key = PolicyFormReminder::key($this->policy,null);
+        $url = route('clients.forms.create',[$this->client,'policy'=>$this->policy->id,'reminder'=>$key]);
+        $response = $this->get($url)->assertOk()->assertSee($policyTemplate->title)->assertSee($clientTemplate->title)->assertSee($otherBranch->title)
+            ->assertDontSee('Ritirato dimostrativo')->assertDontSee('Bozza dimostrativa');
+        $this->assertEqualsCanonicalizing([$policyTemplate->id,$clientTemplate->id,$otherBranch->id],$response->viewData('templates')->modelKeys());
+        $selection = [$policyTemplate->id,$clientTemplate->id];
+        $this->post(route('clients.forms.reminder-decision',[$this->client,'later']),['policy'=>$this->policy->id,'reminder'=>$key,
+            'context_hash'=>app(InsuranceForms::class)->contextHash($this->client,$this->policy),'templates'=>$selection])->assertSessionHasNoErrors();
+        $this->assertSame($selection,PolicyFormReminder::find($this->policy)->data['selected_templates']);
+        $this->post(route('clients.forms.store',$this->client),$this->data($policyTemplate,extra:['templates'=>$selection,'reminder'=>$key]))->assertSessionHasNoErrors();
+        $this->assertSame($selection,InsuranceFormPackage::sole()->documents()->orderBy('insurance_form_template_id')->pluck('insurance_form_template_id')->all());
+        $this->assertNull(PolicyFormReminder::find($this->policy));
     }
     public function test_admin_pdf_preview_has_draft_marking_and_does_not_create_client_files(): void
     {

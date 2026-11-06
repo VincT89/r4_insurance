@@ -58,6 +58,18 @@ class InsuranceCommissionLedgerTest extends TestCase
         return array_replace(['version'=>$title->commission()->sole()->version, 'amount'=>$amount, 'effective_on'=>'2026-10-19', 'reference'=>'REND-001', 'reason'=>'Rendiconto del mandato controllato', 'idempotency_key'=>(string)Str::uuid(), 'confirmed'=>1], $data);
     }
 
+    public function test_allowance_does_not_create_a_receipt_or_extra_collection_based_commission(): void
+    {
+        $this->conditions();
+        $title=$this->title();
+        app(\App\Services\InsuranceAllowances::class)->record($title,['amount_cents'=>10000,'effective_on'=>'2026-10-19','borne_by'=>'our_agency','supplier_agency_id'=>null,'reason'=>'Abbuono concordato e verificato','reference'=>null,'expected_balance_cents'=>100000,'idempotency_key'=>(string)Str::uuid()]);
+        $this->assertSame(0,$title->fresh()->commission->accrued_cents);
+        $this->assertDatabaseCount('insurance_collections',0);
+        $this->collect($title->fresh(),90000);
+        $this->assertSame(9000,$title->fresh()->commission->accrued_cents);
+        $this->assertSame(0,$title->fresh()->balance_cents);
+    }
+
     public function test_predictions_use_each_installment_and_quietance_rate_without_counting_the_year_twice(): void
     {
         $schedule = $this->conditions();

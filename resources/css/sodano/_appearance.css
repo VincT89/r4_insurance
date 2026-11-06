@@ -259,6 +259,7 @@ body.app-body {
   --blue-title: var(--ap-login-panel-heading);
   --accent-text: var(--ap-login-panel-accent);
   --link-hover: var(--ap-login-panel-link-hover);
+  --red-text: var(--ap-login-panel-red);
   color: var(--text);
   background: var(--ap-login-panel);
 }

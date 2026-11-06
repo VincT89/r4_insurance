@@ -1,3 +1,5 @@
+import {policyContractPageText} from './policy-contract-text.js';
+
 export async function readPolicyContract(file, base, progress, signal) {
     const origin = new URL(base, location.href);
     if (origin.origin !== location.origin) throw new Error('Lettura locale non disponibile.');
@@ -18,13 +20,7 @@ export async function readPolicyContract(file, base, progress, signal) {
             for (let index = 1; index <= pages; index++) {
                 check(); progress(`Lettura del contratto: pagina ${index} di ${pdf.numPages}…`);
                 const page = await pdf.getPage(index), content = await page.getTextContent();
-                let text = '', previousY;
-                for (const item of content.items) {
-                    if (!('str' in item)) continue;
-                    const y = item.transform?.[5];
-                    if (previousY !== undefined && Math.abs(y - previousY) > 3) text += '\n';
-                    text += item.str + (item.hasEOL ? '\n' : ' '); previousY = y;
-                }
+                let text = policyContractPageText(content.items);
                 if (text.replace(/\s/g, '').length < 60) {
                     if (scanned >= 8) { skipped++; parts.push(text); continue; }
                     if (!worker) {

@@ -25,8 +25,8 @@ class DeadlineReminders
         /** Resolve current sources as a set; paid deadlines disappear immediately without scanning JSON per notification. */
         $clients = Client::current()->visibleTo($user)->select('id');
         $sources = [
-            'title' => InsuranceTitle::visibleTo($user)->whereNull('cancelled_at')->whereColumn('collected_cents', '<', 'amount_cents'),
-            'policy' => InsurancePolicy::whereIn('client_id', clone $clients)->whereIn('status', ['active', 'renewed', 'expired']),
+            'title' => InsuranceTitle::visibleTo($user)->outstanding(),
+            'policy' => InsurancePolicy::whereIn('client_id', clone $clients)->withoutContractSuccessor()->whereIn('status', ['active', 'renewed', 'expired']),
             'document' => Attachment::whereIn('attachable_id', clone $clients)->where('attachable_type', (new Client)->getMorphClass())->whereNotNull('document_category')->whereDoesntHave('newerVersion'),
             'request' => ClientDocumentRequest::whereIn('client_id', clone $clients)->whereDoesntHave('documents')->whereDoesntHave('linkedDocuments'),
         ];
@@ -65,11 +65,11 @@ class DeadlineReminders
     {
         if ($user->status !== 'active' || !$user->can('viewAny', Client::class)) return 0;
         $visible = Client::current()->visibleTo($user)->select('id');
-        $policies = InsurancePolicy::whereIn('client_id', clone $visible)->where(fn ($query) => $query->whereIn('status', ['active', 'renewed'])
+        $policies = InsurancePolicy::whereIn('client_id', clone $visible)->withoutContractSuccessor()->where(fn ($query) => $query->whereIn('status', ['active', 'renewed'])
             ->orWhere(fn ($query) => $query->where('status', 'expired')->whereDate('expires_on', '<=', today())))->with('client:id,name');
         $documents = Attachment::where('attachable_type', (new Client)->getMorphClass())->whereIn('attachable_id', clone $visible)->whereNotNull('document_category')->whereDoesntHave('newerVersion');
         $requests = ClientDocumentRequest::whereIn('client_id', clone $visible)->whereDoesntHave('documents')->whereDoesntHave('linkedDocuments')->with('client:id,name');
-        $titles = InsuranceTitle::visibleTo($user)->whereNull('cancelled_at')->whereColumn('collected_cents', '<', 'amount_cents')->with('policy.client');
+        $titles = InsuranceTitle::visibleTo($user)->outstanding()->with('policy.client');
         $created = 0;
         foreach (['policy'=>$policies, 'document'=>$documents, 'request'=>$requests, 'title'=>$titles] as $kind => $query) {
             $table = $query->getModel()->getTable();

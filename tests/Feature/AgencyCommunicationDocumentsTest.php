@@ -153,7 +153,7 @@ class AgencyCommunicationDocumentsTest extends TestCase
         $this->post(route('agency-communications.send',$message),['reviewed'=>1,'attachment_revision'=>1])->assertSessionHasErrors('documents');
     }
 
-    public function test_authorization_and_nested_download_prevent_foreign_changes_and_operator_access(): void
+    public function test_authorization_and_nested_download_prevent_changes_to_another_users_review(): void
     {
         $message=$this->review();
         $this->update($message,['files'=>[$this->pdf()]])->assertSessionHasNoErrors();
@@ -165,10 +165,31 @@ class AgencyCommunicationDocumentsTest extends TestCase
         $this->update($message)->assertForbidden();
         $this->actingAs(User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']));
         $this->update($message)->assertForbidden();
-        $this->get(route('agency-communications.documents.download',[$message,$copy]))->assertForbidden();
+        $this->get(route('agency-communications.documents.download',[$message,$copy]))->assertOk();
         $this->actingAs($this->admin);
         $this->travel(31)->minutes();
         $this->update($message)->assertSessionHasErrors('documents');
+    }
+
+    public function test_operator_can_choose_private_documents_and_send_only_the_reviewed_copies(): void
+    {
+        $source=$this->document('contratto.pdf',['insurance_policy_id'=>$this->policy->id]);
+        $operator=User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']);
+        $this->actingAs($operator);
+        $message=$this->review();
+        $this->get(route('agency-communications.show',$message))->assertOk()->assertSee('Modifica allegati')->assertSee('contratto.pdf');
+        $this->update($message,['document_ids'=>[$source->id]])->assertSessionHasNoErrors();
+        $copy=$message->documents()->firstOrFail();
+        $this->get(route('agency-communications.documents.download',[$message,$copy]))->assertOk();
+        $this->mock(AgencyEmailTransport::class)->shouldReceive('send')->once()->withArgs(function($payload) use($copy) {
+            $files=$payload['_attachments'];
+            $this->assertCount(1,$files);
+            $this->assertSame('contratto.pdf',$files[0]['name']);
+            $this->assertSame($copy->sha256,hash('sha256',$files[0]['bytes']));
+            return true;
+        })->andReturn('operator-attachment@example.test');
+        $this->post(route('agency-communications.send',$message),['reviewed'=>1,'attachment_revision'=>1])->assertSessionHasNoErrors();
+        $this->assertSame('sent',$message->fresh()->status);
     }
 
     public function test_upload_validation_limits_mime_size_count_and_repeated_source_ids(): void

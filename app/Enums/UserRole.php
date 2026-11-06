@@ -26,8 +26,8 @@ enum UserRole: string
     public function description(): string
     {
         return match ($this) {
-            self::Admin => 'Gestisce utenti, configurazioni, provvigioni, correzioni e registro attività. Può eliminare dati quando i vincoli di storico lo consentono.',
-            self::Operator => 'Gestisce tutti i clienti, preventivi, polizze, documenti, sinistri, rate e incassi. Può annullare rate e stornare incassi con motivazione. Non può eliminare dati. Le operazioni sono registrate; le polizze si bloccano dal giorno dopo la fine lavorazione.',
+            self::Admin => 'Gestisce utenti, posta, impostazioni, provvigioni e registro attività. Può correggere o eliminare dati quando lo storico lo consente.',
+            self::Operator => 'Gestisce tutti i clienti, preventivi, polizze, documenti, sinistri, titoli, incassi, comunicazioni e modelli. Può annullare titoli e stornare incassi con motivazione. Non può eliminare dati. Le polizze si bloccano dal giorno dopo la fine lavorazione.',
         };
     }
 }

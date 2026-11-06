@@ -279,6 +279,34 @@ class InsuranceOperationsTest extends TestCase
         $this->post(route('quotes.change',[$quote,'approve']),['confirmed'=>1,'approved_on'=>'2026-10-16'])->assertSessionHasErrorsIn('proposal_'.$quote->id.'_approve', 'files');
         $this->assertSame('requested',$quote->fresh()->status);$this->assertSame(0,$quote->documents()->count());
     }
+    public function test_quote_comparison_keeps_the_selected_response_and_contract_with_their_own_case(): void
+    {
+        $case = $this->case();
+        $workflow = app(InsuranceQuoteWorkflow::class);
+        $chosen = $workflow->request($case, $this->company->id, '2026-10-15');
+        $otherCompany = SupplierCompany::create(['name'=>'Altra compagnia del confronto','status'=>'active']);
+        $waiting = $workflow->request($case, $otherCompany->id, '2026-10-15');
+        $foreign = $workflow->request($this->case(), $this->company->id, '2026-10-15');
+        $this->get(route('quotes.show', [$case,'proposal'=>$foreign->id]))->assertNotFound();
+        $data = ['reference'=>'CONFRONTO-01','product'=>'Auto completa','received_on'=>'2026-10-16','valid_until'=>'2026-10-31',
+            'starts_on'=>'2026-10-16','expires_on'=>'2027-10-16','premium'=>'800.00','payment_frequency'=>'Semestrale'];
+        $this->post(route('quotes.change', [$chosen,'receive']), $data)->assertSessionHasErrorsIn('proposal_'.$chosen->id.'_receive', 'files');
+        $this->get(route('quotes.show', $case))->assertOk()->assertViewHas('activeQuote', fn ($proposal) => $proposal->is($chosen))
+            ->assertSee($data['reference'])->assertDontSee(route('quotes.change', [$waiting,'receive']));
+        $this->post(route('quotes.change', [$chosen,'receive']), $data + ['files'=>[$this->pdf()]])->assertSessionHasNoErrors();
+        $this->get(route('quotes.index'))->assertOk()->assertSee('1 risposta su 2 richieste');
+        $this->get(route('quotes.show', $case))->assertOk()->assertSee('Confronto proposte')->assertSee('800,00 €')->assertSee('Risposte attese')
+            ->assertSee(route('attachments.preview', $chosen->documents()->sole()))->assertDontSee(route('policies.create', ['quote_id'=>$chosen->id]));
+        $this->get(route('attachments.preview', $chosen->documents()->sole()))->assertOk()->assertSee('Torna al confronto')
+            ->assertSee(route('quotes.show', $case).'#confronto-proposte');
+        $this->post(route('quotes.change', [$chosen,'submit']), ['confirmed'=>1])->assertSessionHasNoErrors();
+        $this->post(route('quotes.change', [$chosen,'approve']), ['approved_on'=>'2026-10-16','confirmed'=>1,'files'=>[$this->pdf('approvazione.pdf')]])->assertSessionHasNoErrors();
+        $this->get(route('quotes.show', $case))->assertOk()->assertSee('Proposta approvata dal cliente')->assertSee('Carica contratto')
+            ->assertSee(route('policies.create', ['quote_id'=>$chosen->id]))->assertDontSee(route('quotes.change', [$waiting,'receive']));
+        $this->assertSame('requested', $waiting->fresh()->status);
+        $chosen->update(['valid_until'=>'2026-10-15']);
+        $this->get(route('quotes.show', $case))->assertOk()->assertSee('Proposta scaduta')->assertDontSee(route('policies.create', ['quote_id'=>$chosen->id]));
+    }
     public function test_conversion_uses_approved_premium_links_all_documents_and_cannot_be_duplicated(): void
     {
         $quote=$this->approve();$data=$this->contractInput($this->policyInput()+['client_id'=>$this->client->id,'entry_mode'=>'new','insurance_quote_id'=>$quote->id,'number'=>'SA-2026-502']);
@@ -346,7 +374,8 @@ class InsuranceOperationsTest extends TestCase
         $this->assertSame('1.000,01 €',$first->payload['policies'][0]['premium']);
         $this->assertStringContainsString('Premio della polizza: 1.000,01 €.', $first->payload['body']);
         $this->mock(\App\Services\AgencyEmailTransport::class)->shouldReceive('send')->once()->withArgs(function($payload){$this->assertSame('collections',$payload['kind']);$this->assertCount(2,$payload['collections']);$this->assertStringContainsString('100,00 €',$payload['body']);$this->assertStringContainsString('Bonifico a Compagnia',$payload['body']);$this->assertStringContainsString('residuo del titolo: 350,00 €',$payload['body']);return true;})->andReturn('accepted@example.test');
-        $this->get(route('agency-communications.collections'))->assertOk()->assertSee('Rate e incassi');$this->get(route('agency-communications.show',$first))->assertOk()->assertSee('100,00 €');
+        $this->get(route('agency-communications.collections'))->assertOk()->assertSee('Incassi')->assertDontSee('Rate e incassi');$this->get(route('agency-communications.show',$first))->assertOk()->assertSee('100,00 €')->assertSee('Incassi selezionati')->assertDontSee('Polizze selezionate');
+        $this->get(route('agency-communications.history'))->assertOk()->assertSee('2 incassi');
         $this->post(route('agency-communications.send',$first),['reviewed'=>1])->assertSessionHasNoErrors();$this->post(route('agency-communications.send',$first),['reviewed'=>1])->assertSessionHasNoErrors();
         $this->post(route('agency-communications.send',$second),['reviewed'=>1])->assertSessionHasErrors('email');$this->assertSame('sent',$first->fresh()->status);
         $this->assertSame(2,\Illuminate\Support\Facades\DB::table('agency_communication_collections')->whereNotNull('delivery_key')->count());
@@ -360,6 +389,46 @@ class InsuranceOperationsTest extends TestCase
         $this->post(route('collections.void',$payments->first()),['reason'=>'Incasso registrato per errore'])->assertSessionHasNoErrors();
         $this->post(route('agency-communications.send',$message),['reviewed'=>1])->assertSessionHasErrors('email');
         $this->assertSame(0,\Illuminate\Support\Facades\DB::table('agency_communication_collections')->whereNotNull('delivery_key')->count());
-        $this->actingAs(User::factory()->create(['role'=>UserRole::Operator]))->get(route('agency-communications.collections'))->assertForbidden();
+        $this->actingAs(User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']))->get(route('agency-communications.collections'))->assertOk();
+    }
+
+    public function test_operator_can_prepare_and_send_collections_and_duplicates_remain_blocked(): void
+    {
+        [$agency,$title,$payments]=$this->mailFixture();
+        $operator=User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']);
+        $this->actingAs($operator);
+        $this->get(route('agency-communications.collections'))->assertOk();
+        $first=$this->reviewCollections($agency,$payments->modelKeys());
+        $second=$this->reviewCollections($agency,$payments->modelKeys());
+        $this->mock(\App\Services\AgencyEmailTransport::class)->shouldReceive('send')->once()->andReturn('operator-collections@example.test');
+        $this->post(route('agency-communications.send',$first),['reviewed'=>1])->assertSessionHasNoErrors();
+        $this->post(route('agency-communications.send',$first),['reviewed'=>1])->assertSessionHasNoErrors();
+        $this->post(route('agency-communications.send',$second),['reviewed'=>1])->assertSessionHasErrors('email');
+        $this->assertSame('sent',$first->fresh()->status);
+        $this->assertSame($operator->id,$first->user_id);
+        $this->assertSame(2,\Illuminate\Support\Facades\DB::table('agency_communication_collections')->whereNotNull('delivery_key')->count());
+    }
+
+    public function test_collection_workspace_presets_keep_review_dates_and_agency_scope_explicit(): void
+    {
+        [$agency,$title,$payments]=$this->mailFixture();
+        $payments->last()->update(['received_on'=>'2026-10-01']);
+        foreach (['today'=>1,'yesterday'=>0,'last15'=>1,'month'=>2,'pending'=>2] as $view=>$count) {
+            $response=$this->get(route('agency-communications.collections',['view'=>$view,'agency'=>$agency->id]))->assertOk()->assertViewHas('payments',fn($rows)=>$rows->total()===$count);
+            $this->assertArrayNotHasKey('view',$response->viewData('filters'));
+        }
+        $response=$this->get(route('agency-communications.collections',['view'=>'today','from'=>'2026-10-01','to'=>'2026-10-01','agency'=>$agency->id]))->assertOk()->assertViewHas('payments',fn($rows)=>$rows->total()===1);
+        $filters=$response->viewData('filters');
+        $this->assertSame('2026-10-16',$filters['from']);
+        $this->assertSame('2026-10-16',$filters['to']);
+        $this->post(route('agency-communications.collections-review',$agency),$filters+['collections'=>[$payments->first()->id]])->assertSessionHasNoErrors();
+        $message=\App\Models\AgencyCommunication::latest('id')->firstOrFail();
+        $this->assertSame('2026-10-16',$message->payload['filters']['from']);
+        $this->assertCount(1,$message->payload['collections']);
+        $this->get(route('agency-communications.collections',['view'=>'custom','from'=>'2026-10-01','to'=>'2026-10-01']))->assertOk()->assertViewHas('payments',fn($rows)=>$rows->total()===1);
+        $this->get(route('agency-communications.collections',['view'=>'custom']))->assertSessionHasErrors(['from','to']);
+        $this->get(route('agency-communications.collections',['view'=>'custom','from'=>'2026-10-16','to'=>'2026-10-01']))->assertSessionHasErrors('to');
+        $this->get(route('agency-communications.collections',['view'=>'unknown']))->assertSessionHasErrors('view');
+        $this->get(route('agency-communications.collections',['view'=>['today']]))->assertSessionHasErrors('view');
     }
 }

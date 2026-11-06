@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SaveInsurancePolicyRequest;
 use App\Models\{Client, InsurancePolicy};
+use App\Services\{InsuranceDocumentation, PolicyFormReminder};
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +46,7 @@ class InsurancePolicyController extends Controller
                         if (!hash_equals(app(\App\Services\PolicyContractSchedule::class)->fingerprint($rows), (string) $request->input('schedule_fingerprint'))) throw ValidationException::withMessages(['schedule_fingerprint'=>'I dati dei titoli sono cambiati. Ricontrolla l’anteprima prima di confermare.']);
                         $ledger->generate($policy, $ledger->previewFingerprint($policy, $rows));
                     } else $ledger->log($policy, 'titles_pending', 'L’operatore ha scelto l’inserimento manuale dei titoli.');
+                    PolicyFormReminder::record($policy);
                 }
                 foreach ($request->file('documents', []) as $file) $stored[] = app(\App\Services\ClientDocumentRegistry::class)->upload($client, $file, ['document_category'=>'policy', 'insurance_policy_id'=>$policy->id]);
                 return $policy;
@@ -53,8 +55,8 @@ class InsurancePolicyController extends Controller
             foreach ($stored as $document) \Illuminate\Support\Facades\Storage::disk($document->disk)->delete($document->path);
             throw $e;
         }
-        $message = $request->isContractCreation() ? ($request->input('titles_mode') === 'automatic' ? 'Contratto salvato, polizza e titoli creati. Puoi generare i moduli dalla sezione Moduli e firme.' : 'Contratto e polizza salvati. Completa i titoli dalla sezione Titoli e pagamenti.') : 'Polizza aggiunta al cliente.';
-        $url = route('clients.policies.show', [$client, $policy, 'tab' => $request->isContractCreation() ? 'payments' : 'overview']);
+        $message = $request->isContractCreation() ? ($request->input('titles_mode') === 'automatic' ? 'Contratto salvato, polizza e titoli creati.' : 'Contratto e polizza salvati. I titoli sono da inserire manualmente.') : 'Polizza aggiunta al cliente.';
+        $url = $request->isContractCreation() ? PolicyFormReminder::url($policy) : route('clients.policies.show', [$client, $policy, 'tab'=>'overview']);
         if ($request->expectsJson()) { session()->flash('success', $message); return response()->json(['url'=>$url]); }
         return redirect($url)->with('success', $message);
     }
@@ -67,26 +69,38 @@ class InsurancePolicyController extends Controller
         $policyTab = $navigation['tab'] ?? 'overview';
         if ($policyTab === 'commissions') $this->authorize('system.admin');
         if ($request->filled('title')) abort_unless($policy->titles()->whereKey($navigation['title'])->exists(), 404);
-        if (session()->hasOldInput('title_id')) $policyTab = 'payments';
+        if (session()->hasOldInput('title_id') || session()->hasOldInput('allowance_key') || session()->hasOldInput('coverage_fingerprint')) $policyTab = 'payments';
         /** Keep display aggregates outside the persisted attributes checked by the work fingerprint. */
-        $policyTitles = $policy->titles()->with('supplierAgency')->orderBy('due_on')->orderBy('id')->get();
+        $policyTitles = $policy->titles()->with(['supplierAgency','coverageConfirmedBy'])->orderBy('due_on')->orderBy('id')->get();
         $policyTitles->each(fn ($title) => $title->setRelation('policy', $policy));
         $hasTitles = $policyTitles->isNotEmpty();
         $canCollect = auth()->user()->can('ledger.manage') && auth()->user()->can('updateRegistry', $client);
         $payableTitles = $canCollect ? $policyTitles->filter(fn ($title) => !$title->cancelled_at && $title->balance_cents > 0)->values() : collect();
+        $selectedPaymentTitle = $navigation['title'] ?? null;
+        if ($selectedPaymentTitle === null && (int)session('recorded_payment.policy_id') === (int)$policy->id) $selectedPaymentTitle = session('recorded_payment.title_id');
+        if ($selectedPaymentTitle === null && $payableTitles->count() === 1 && $payableTitles->first()->due_on->gt(today())) $selectedPaymentTitle = '';
+        $settledAllowanceTitles = $policyTitles->filter(fn($row) => $row->allowance_cents > 0 && $row->affects_coverage && !$row->cancelled_at && $row->balance_cents === 0);
         $consultants = $canCollect && auth()->user()->canManageSystem() ? \App\Models\User::where('status','active')->orderBy('name')->get(['id','name']) : collect();
         $commissionSummary = auth()->user()->can('system.admin')
             ? app(\App\Domain\Core\Queries\InsuranceCommissionQuery::class)->summary($client, $policy)
             : null;
-        $policy->load(['workClosedBy', 'vehicle', 'asset', 'supplierCompany', 'supplierAgency', 'importEntry', 'documents' => fn ($q) => $q->whereDoesntHave('newerVersion')->with(['uploader', 'newerVersion', 'validator'])->withExists('checklistRequests')]);
+        $policy->load(['companyChangeFrom.sourcePolicy','companyChangeTo.resultPolicy','workClosedBy', 'vehicle', 'asset', 'supplierCompany', 'supplierAgency', 'importEntry', 'documents' => fn ($q) => $q->currentDocumentVersion()->with(['uploader', 'newerVersion', 'validator','formDocument.latestSubmission'])->withExists('checklistRequests')]);
         $corrections = $policy->corrections()->with(['requester', 'resolver'])->latest()->paginate(10, ['*'], 'corrections_page')->withQueryString();
-        $policy->setRelation('contracts', $policy->documents->where('document_category', 'policy')->values());
+        $policy->load(['replacementFrom.sourcePolicy','replacementFrom.replacementSchedule','replacementTo.resultPolicy','replacementTo.replacementSchedule']);
+        $contractFiles = $policy->documents->where('document_category', 'policy');
+        $signedIds = \App\Models\DocumentSignature::whereIn('signed_attachment_id', $contractFiles->modelKeys())->pluck('signed_attachment_id');
+        $contractFiles = $contractFiles->reject(fn ($file) => $signedIds->contains($file->id))->values();
+        $contractFiles->load('latestTabletSignature.signedFile');
+        $policy->setRelation('contracts', $contractFiles);
         $changes = \App\Models\InsurancePolicyChange::where(fn($q)=>$q->where('source_policy_id',$policy->id)->orWhere('result_policy_id',$policy->id))->with(['sourcePolicy','resultPolicy','author'])->latest('id')->paginate(\App\Support\TableListing::perPage(10),['*'],'changes_page')->withQueryString();
         $accountingReview = in_array($policy->status, InsurancePolicy::CLOSED_STATUSES, true)
-            ? $policy->titles()->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents')
-                ->selectRaw('COUNT(*) as open_titles, COALESCE(SUM(amount_cents-collected_cents),0) as balance_cents')->toBase()->first()
+            ? $policy->titles()->outstanding()
+                ->selectRaw('COUNT(*) as open_titles, COALESCE(SUM('.\App\Models\InsuranceTitle::balanceSql().'),0) as balance_cents')->toBase()->first()
             : null;
-        return view('clients.policies.show', compact('client', 'policy', 'policyTab', 'policyTitles', 'corrections', 'accountingReview', 'commissionSummary', 'changes', 'hasTitles', 'payableTitles', 'consultants'));
+        $formReminder = $policy->editableBy($request->user()) ? PolicyFormReminder::find($policy) : null;
+        $signatures = app(InsuranceDocumentation::class)->policySignatures($client,$policy);
+        $allowanceAgencies = $canCollect ? \App\Models\SupplierAgency::where('status','active')->orderBy('name')->get(['id','name']) : collect();
+        return view('clients.policies.show', compact('settledAllowanceTitles', 'selectedPaymentTitle', 'allowanceAgencies', 'signatures', 'client', 'policy', 'policyTab', 'policyTitles', 'corrections', 'accountingReview', 'commissionSummary', 'changes', 'hasTitles', 'payableTitles', 'consultants', 'formReminder'));
     }
 
     public function edit(Client $client, InsurancePolicy $policy): View
@@ -124,6 +138,7 @@ class InsurancePolicyController extends Controller
                 foreach(['starts_on','expires_on','premium','payment_frequency','installment_premium','supplier_company_id','supplier_agency_id','insurance_branch_id','insurance_subbranch_id','category','subcategory'] as $field) if($candidate->isDirty($field)) throw ValidationException::withMessages([$field=>'La polizza ha titoli o un preventivo approvato: conserva i dati contrattuali. Per il periodo successivo usa Rinnova.']);
             }
             $locked->fill($data);
+            if ($locked->hasPendingReplacement() && $locked->isDirty('status')) throw ValidationException::withMessages(['status'=>'La polizza ha una sostituzione programmata. Per interromperla usa Annulla programmazione dal cambio collegato.']);
             if (($locked->changes()->exists() || $locked->incomingChanges()->exists()) && $locked->isDirty('number')) throw ValidationException::withMessages(['number'=>'Il numero è collegato allo storico contrattuale. Per cambiarlo usa Sostituisci polizza.']);
             if ($locked->getOriginal('status')==='replaced' && $locked->changes()->where('kind','replacement')->exists() && $locked->isDirty('status')) throw ValidationException::withMessages(['status'=>'La polizza ha una sostitutiva collegata. Conserva lo stato Sostituita.']);
             if(in_array($locked->status,InsurancePolicy::CLOSED_STATUSES,true) && !$locked->closed_at)$locked->closed_at=now();

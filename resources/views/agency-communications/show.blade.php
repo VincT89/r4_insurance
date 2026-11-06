@@ -1,6 +1,6 @@
 <x-app-layout title="Riepilogo email">
     @php($recipientReady = (bool) filter_var($payload['recipient']['address'] ?? null, FILTER_VALIDATE_EMAIL))
-    <div x-data="{attachmentsDirty:false}">
+    <div class="communication-workspace" x-data="{attachmentsDirty:false}">
     @if(in_array($communication->status,['sending','sent','uncertain']))
         <span hidden data-communication-claimed data-selection-user="{{ auth()->id() }}" data-selection-path="{{ route(($payload['kind']??null)==='collections' ? 'agency-communications.collections' : 'agency-communications.index',[],false) }}" data-claimed-ids="{{ json_encode($payload['selection_keys'] ?? array_column($payload[($payload['kind']??null)==='collections' ? 'collections' : 'policies'],'id')) }}"></span>
     @endif
@@ -15,24 +15,25 @@
         <dl class="email-envelope"><div><dt>Mittente</dt><dd>{{ $payload['from']['name'] }}<br>{{ $payload['from']['address'] ?: 'Da configurare' }}</dd></div><div><dt>Destinatario</dt><dd>{{ $payload['recipient']['name'] }}<br>{{ $payload['recipient']['address'] ?: 'Email da indicare prima dell’invio' }}</dd></div><div><dt>Oggetto</dt><dd>{{ $payload['subject'] }}</dd></div><div><dt>Esito</dt><dd>{{ $communication->status_label }}@if($communication->sent_at)<br>{{ $communication->sent_at->format('d/m/Y H:i') }}@endif</dd></div></dl>
         @if($communication->status==='sent')<p class="u-mt-md">Il messaggio è stato accettato dal server di posta. La consegna finale alla casella dell’agenzia dipende dal servizio destinatario.</p>@endif
     </x-panel>
-    @php($baseRows = array_filter($payload['policies'], fn ($row) => !isset($payload['policy_ids']) || in_array($row['id'], $payload['policy_ids'], true)))
+    @php($baseRows = ($payload['kind']??null)==='collections' ? [] : array_filter($payload['policies'], fn ($row) => !isset($payload['policy_ids']) || in_array($row['id'], $payload['policy_ids'], true)))
     @if(count($baseRows))
-        <x-panel title="Polizze selezionate" padded><div class="client-table-scroll" role="region" aria-label="Polizze incluse nell’email" tabindex="0"><table class="t-table"><thead><tr><th>Polizza</th><th>Contraente</th><th>Compagnia</th><th>Decorrenza</th><th>Scadenza</th><th>Premio polizza</th><th>Frazionamento</th><th>Comunicazione</th></tr></thead><tbody>
-            @foreach($baseRows as $row)<tr><td>{{ $row['number'] }}</td><td>{{ $row['client'] }}</td><td>{{ $row['company'] }}</td><td>{{ $row['starts_on'] }}</td><td>{{ $row['expires_on'] }}</td><td>{{ $row['premium'] ?? 'Non riportato' }}</td><td>{{ $row['frequency'] }}</td><td>{{ $row['ad_horas'] ? 'Ad horas' : 'Ordinaria' }}</td></tr>@endforeach
-        </tbody></table></div></x-panel>
+        <x-panel><details class="communication-selected-records" @if(count($baseRows)<=5) open @endif><summary>Polizze selezionate ({{ count($baseRows) }})</summary><div class="client-table-scroll" role="region" aria-label="Polizze incluse nell’email" tabindex="0"><table class="t-table" data-list-details data-table-tools="none"><thead><tr><th>Polizza</th><th>Contraente</th><th data-list-detail>Compagnia</th><th data-list-detail>Decorrenza</th><th data-list-detail>Scadenza</th><th>Premio polizza</th><th data-list-detail>Frazionamento</th><th>Comunicazione</th></tr></thead><tbody>
+            @foreach($baseRows as $row)<tr data-list-label="{{ $row['number'] }} / {{ $row['client'] }}"><td>{{ $row['number'] }}</td><td>{{ $row['client'] }}</td><td>{{ $row['company'] }}</td><td>{{ $row['starts_on'] }}</td><td>{{ $row['expires_on'] }}</td><td>{{ $row['premium'] ?? 'Non riportato' }}</td><td>{{ $row['frequency'] }}</td><td>{{ $row['ad_horas'] ? 'Ad horas' : 'Ordinaria' }}</td></tr>@endforeach
+        </tbody></table></div></details></x-panel>
     @endif
     @if(!empty($payload['changes']))
-        <x-panel title="Aggiunte di coperture selezionate" padded>
+        <x-panel><details class="communication-selected-records" @if(count($payload['changes'])<=5) open @endif><summary>Aggiunte di coperture selezionate ({{ count($payload['changes']) }})</summary><div class="communication-selected-content">
             <p class="form-help u-mb-md">Gli importi sono i premi aggiuntivi delle appendici. Non comprendono il premio del contratto di base e non attestano un incasso.</p>
-            <div class="client-table-scroll" role="region" aria-label="Appendici incluse nell’email" tabindex="0"><table class="t-table"><thead><tr><th>Polizza</th><th>Appendice</th><th>Contraente</th><th>Compagnia</th><th>Registrata il</th><th>Decorrenza</th><th>Scadenza</th><th>Premio aggiuntivo</th><th>Coperture concordate</th></tr></thead><tbody>
-                @foreach($payload['changes'] as $row)<tr><td>{{ $row['number'] }}</td><td>{{ $row['reference'] }}</td><td>{{ $row['client'] }}</td><td>{{ $row['company'] }}</td><td>{{ $row['recorded_at'] }}</td><td>{{ $row['starts_on'] }}</td><td>{{ $row['expires_on'] }}</td><td>{{ $row['premium'] }}</td><td>{{ $row['description'] }}</td></tr>@endforeach
+            <div class="client-table-scroll" role="region" aria-label="Appendici incluse nell’email" tabindex="0"><table class="t-table" data-list-details data-table-tools="none"><thead><tr><th>Polizza</th><th>Appendice</th><th>Contraente</th><th data-list-detail>Compagnia</th><th data-list-detail>Registrata il</th><th data-list-detail>Decorrenza</th><th data-list-detail>Scadenza</th><th>Premio aggiuntivo</th><th>Coperture concordate</th></tr></thead><tbody>
+                @foreach($payload['changes'] as $row)<tr data-list-label="{{ $row['reference'] }} / {{ $row['number'] }}"><td>{{ $row['number'] }}</td><td>{{ $row['reference'] }}</td><td>{{ $row['client'] }}</td><td>{{ $row['company'] }}</td><td>{{ $row['recorded_at'] }}</td><td>{{ $row['starts_on'] }}</td><td>{{ $row['expires_on'] }}</td><td>{{ $row['premium'] }}</td><td>{{ $row['description'] }}</td></tr>@endforeach
             </tbody></table></div>
-        </x-panel>
+        </div></details></x-panel>
     @endif
-    @if(($payload['kind']??null)==='collections')<x-panel title="Titoli e incassi selezionati"><div class="client-table-scroll" role="region" aria-label="Incassi inclusi nell’email" tabindex="0"><table class="t-table"><thead><tr><th>Data incasso</th><th>Polizza / titolo</th><th>Tipo titolo</th><th>Importo</th><th>Metodo pagamento</th><th>Destinatario pagamento</th><th>Residuo titolo</th></tr></thead><tbody>@foreach($payload['collections'] as $row)<tr><td>{{ $row['date'] }}</td><td>{{ $row['number'] }} / #{{ $row['title_id'] }}</td><td>{{ $row['kind'] }}</td><td>{{ $row['amount'] }}</td><td>{{ $row['payment_method'] }}</td><td>{{ $row['recipient'] }}</td><td><x-status-text :alert="$row['balance'] !== \App\Support\Money::format(0)">{{ $row['balance'] }}</x-status-text></td></tr>@endforeach</tbody></table></div></x-panel>@endif
+    @if(($payload['kind']??null)==='collections')<x-panel><details class="communication-selected-records" @if(count($payload['collections'])<=5) open @endif><summary>Incassi selezionati ({{ count($payload['collections']) }})</summary><div class="client-table-scroll" role="region" aria-label="Incassi inclusi nell’email" tabindex="0"><table class="t-table" data-list-details data-table-tools="none"><thead><tr><th>Data incasso</th><th>Polizza / titolo</th><th data-list-detail>Tipo titolo</th><th>Importo</th><th>Metodo pagamento</th><th>Destinatario pagamento</th><th data-list-detail>Residuo titolo</th><th data-list-detail>Premio polizza</th></tr></thead><tbody>@foreach($payload['collections'] as $row)<tr data-list-label="{{ $row['number'] }} / {{ $row['date'] }}"><td>{{ $row['date'] }}</td><td>{{ $row['number'] }} / #{{ $row['title_id'] }}</td><td>{{ $row['kind'] }}</td><td>{{ $row['amount'] }}</td><td>{{ $row['payment_method'] }}</td><td>{{ $row['recipient'] }}</td><td><x-status-text :alert="$row['balance'] !== \App\Support\Money::format(0)">{{ $row['balance'] }}</x-status-text></td><td>{{ $row['policy_premium']??'Non indicato' }}</td></tr>@endforeach</tbody></table></div></details></x-panel>@endif
     <x-panel title="Allegati dell’email" padded>
-        <p class="u-mb-md">Allegati inclusi: {{ $includedDocuments->count() }}. @if($canEditAttachments)I documenti disponibili vengono recuperati dalle polizze selezionate e dai clienti associati. Scegli quelli pertinenti per {{ $payload['recipient']['name'] }}.@else Le copie conservate corrispondono ai file inclusi nel riepilogo.@endif</p>
+        <p class="u-mb-md">Allegati inclusi: {{ $includedDocuments->count() }}.</p>
         @if($canEditAttachments)
+            <details class="communication-attachment-edit" @if($errors->any()) open @endif><summary>Modifica allegati</summary>
             <form method="POST" action="{{ route('agency-communications.documents',$communication) }}" enctype="multipart/form-data" class="form-stack" @change="attachmentsDirty=true">
                 @csrf
                 <input type="hidden" name="attachment_revision" value="{{ $communication->attachment_revision }}">
@@ -63,15 +64,26 @@
                 </x-form-group>
                 <div class="insurance-form-actions"><span class="form-help">Salva la selezione per aggiornare il riepilogo. Nessuna email viene inviata.</span><button class="btn btn-p" type="submit">Aggiorna allegati</button></div>
             </form>
+            </details>
+            <div class="communication-included-overview">@include('agency-communications.documents',['editable'=>false])</div>
         @else
             @include('agency-communications.documents',['editable'=>false])
         @endif
     </x-panel>
-    <x-panel title="Testo dell’email" padded><pre class="email-message-body">{{ $payload['body'] }}</pre></x-panel>
+    <details class="communication-message-preview"><summary>Testo completo dell’email</summary><pre class="email-message-body">{{ $payload['body'] }}</pre></details>
     @if($communication->status==='review')
-        <x-panel padded>
+        <x-panel padded :class="$mailReady && $recipientReady ? 'communication-send-panel' : ''">
             @if(!$recipientReady)<p class="u-mb-md">Puoi controllare polizze e allegati. Per inviare, completa l’email nella <a href="{{ route('suppliers.edit',$communication->supplier_agency_id) }}">scheda dell’agenzia</a>, poi prepara un nuovo riepilogo.</p>@endif
-            @if(!$mailReady)<p class="u-mb-md">Completa la casella in <a href="{{ route('email-settings.edit') }}">Impostazioni email</a>, poi prepara un nuovo riepilogo con il mittente configurato.</p>@endif
+            @if(!$mailReady)
+                <p class="u-mb-md">
+                    @can('system.admin')
+                        Completa la casella in <a href="{{ route('email-settings.edit') }}">Impostazioni email</a>.
+                    @else
+                        Chiedi a un amministratore di configurare la casella di posta.
+                    @endcan
+                    Poi prepara un nuovo riepilogo con il mittente configurato.
+                </p>
+            @endif
             @if($voidedCollections->isNotEmpty())<p>Prepara una nuova selezione con gli incassi aggiornati.</p>
             @elseif($communication->review_expires_at->isPast())<p>Il riepilogo è scaduto. Torna alla selezione per controllare i dati aggiornati.</p>
             @elseif((int)$communication->user_id !== auth()->id())<p>Questo riepilogo deve essere confermato dall’utente che lo ha preparato. Puoi creare una nuova selezione.</p>
@@ -82,7 +94,7 @@
                 <div class="insurance-form-actions"><span class="form-help">Verrà inviata una sola email a questa agenzia. Allegati inclusi: {{ $includedDocuments->count() }}.</span><button type="submit" class="btn btn-p" @disabled(!$mailReady || !$recipientReady) :disabled="!reviewed || busy || attachmentsDirty || {{ $mailReady && $recipientReady ? 'false' : 'true' }}" x-text="busy ? 'Invio in corso…' : 'Conferma e invia email'">Conferma e invia email</button></div>
             </form>@endif
         </x-panel>
-    @elseif($communication->canResolve())
+    @elseif($communication->canResolve() && auth()->user()->can('system.admin'))
         <x-panel title="Verifica dell’esito" padded>
             <p class="u-mb-md">La connessione non ha confermato l’esito. Il messaggio potrebbe essere stato accettato: verifica con il servizio di posta prima di riprovare.</p>
             <form method="POST" action="{{ route('agency-communications.resolve',$communication) }}" class="form-stack">@csrf<div class="form-row">
@@ -90,6 +102,7 @@
                 <x-form-group name="note" label="Come hai verificato"><input id="field-note" class="form-in" name="note" minlength="5" maxlength="500" required></x-form-group>
             </div><label class="email-review-confirm"><input type="checkbox" name="checked" value="1" required> Ho verificato l’esito con il servizio di posta</label><div class="insurance-form-actions"><button class="btn btn-p">Registra esito</button></div></form>
         </x-panel>
+    @elseif($communication->canResolve())<x-panel padded><p>Esito da verificare con il servizio di posta. Chiedi a un amministratore di registrare l’esito prima di riprovare.</p></x-panel>
     @elseif($communication->status==='sending')<x-panel padded><p>Invio in corso. Aggiorna questa pagina per verificarne l’esito; non ripetere l’operazione.</p></x-panel>
     @elseif($communication->status==='failed')<x-panel padded><p>Mancato invio confermato. Per riprovare torna alla selezione e controlla un nuovo riepilogo.</p></x-panel>@endif
     </div>

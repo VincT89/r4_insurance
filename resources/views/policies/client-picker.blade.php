@@ -1,6 +1,6 @@
 <section class="policy-client-picker" data-policy-client-picker @if($deferredClient ?? false) data-deferred-client @endif data-search-url="{{ route('api.clients.search') }}" data-create-url="{{ route('api.clients.quick-store') }}" data-context-url="{{ url('/clients') }}">
     <h2 class="workspace-section-title">Contraente</h2>
-    <input type="hidden" name="client_id" value="{{ old('client_id', $client->id) }}">
+    <input type="hidden" name="client_id" value="{{ is_scalar(old('client_id', $client->id)) ? old('client_id', $client->id) : '' }}">
     <div class="form-row">
         <x-form-group label="Cerca cliente" name="client_id" required><input id="field-client-search" type="search" class="form-in" autocomplete="off" placeholder="Nome, codice fiscale, partita IVA o targa" value="{{ $client->name }}" data-client-search><div data-client-results class="client-picker-results" aria-label="Risultati ricerca cliente"></div></x-form-group>
         <div class="insurance-form-actions">@can('quickCreate', \App\Models\Client::class)<button type="button" class="btn btn-g" data-new-client aria-expanded="false">Nuovo cliente</button>@endcan</div>

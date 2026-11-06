@@ -31,6 +31,7 @@
             <file>tests/Feature/SupplierAgencyTest.php</file>
             <file>tests/Feature/SupplierRegistryDetailsTest.php</file>
             <file>tests/Feature/InsuranceImportPreparationTest.php</file>
+            <file>tests/Feature/InsuranceImportReconciliationTest.php</file>
             <file>tests/Feature/RegistryExcelImporterTest.php</file>
             <file>tests/Feature/RegistryImportTest.php</file>
             <file>tests/Feature/HeldRegistryResolutionTest.php</file>
@@ -50,13 +51,16 @@
             <file>tests/Feature/PolicyContractTransitionsTest.php</file>
             <file>tests/Feature/InsurancePaymentSummaryTest.php</file>
             <file>tests/Feature/InsuranceAccountingWorkspaceTest.php</file>
+            <file>tests/Feature/InsuranceAllowanceTest.php</file>
             <file>tests/Feature/OperationalReminderFlowTest.php</file>
+            <file>tests/Feature/NotificationInboxTest.php</file>
             <file>tests/Feature/InsuranceReadPerformanceTest.php</file>
             <file>tests/Feature/InsurancePolicyWorkflowTest.php</file>
             <file>tests/Feature/QuoteRequestEmailTest.php</file>
             <file>tests/Feature/AgencyCommissionTest.php</file>
             <file>tests/Feature/InsuranceCommissionLedgerTest.php</file>
             <file>tests/Feature/InsuranceSigningTest.php</file>
+            <file>tests/Feature/TabletDocumentSigningTest.php</file>
             <file>tests/Feature/InsuranceDocumentationFlowTest.php</file>
             <file>tests/Feature/InsuranceLifecycleFlowTest.php</file>
             <file>tests/Feature/InsurancePolicyChangesTest.php</file>

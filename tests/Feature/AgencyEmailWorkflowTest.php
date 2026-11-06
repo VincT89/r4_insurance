@@ -119,14 +119,40 @@ class AgencyEmailWorkflowTest extends TestCase
         $this->post(route('agency-communications.send',$review),['reviewed'=>1])->assertForbidden();
     }
 
-    public function test_employee_cannot_read_or_change_mail_settings_or_send(): void
+    public function test_operator_can_prepare_and_send_own_reviews_without_access_to_mail_settings(): void
     {
-        $review=$this->review([$this->policy()]);
-        $this->actingAs(User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']));
-        foreach (['email-settings.edit','agency-communications.index','agency-communications.history'] as $route) $this->get(route($route))->assertForbidden();
-        $this->get(route('agency-communications.show',$review))->assertForbidden();
+        $policy=$this->policy();
+        $foreignReview=$this->review([$policy]);
+        $operator=User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']);
+        $this->actingAs($operator);
+        foreach (['agency-communications.index','agency-communications.collections','agency-communications.history'] as $route) $this->get(route($route))->assertOk()->assertDontSee($this->smtp['password']);
+        $this->get(route('agency-communications.show',$foreignReview))->assertOk();
+        $this->get(route('email-settings.edit'))->assertForbidden();
         $this->patch(route('email-settings.update'),[])->assertForbidden();
-        $this->post(route('agency-communications.send',$review),['reviewed'=>1])->assertForbidden();
+        $this->post(route('agency-communications.send',$foreignReview),['reviewed'=>1])->assertForbidden();
+        $this->mock(AgencyEmailTransport::class)->shouldReceive('send')->once()->andReturn('operator@example.test');
+        $review=$this->review([$policy]);
+        $this->assertSame($operator->id,$review->user_id);
+        $this->post(route('agency-communications.send',$review),['reviewed'=>1])->assertSessionHasNoErrors();
+        $this->post(route('agency-communications.send',$review),['reviewed'=>1])->assertSessionHasNoErrors();
+        $this->assertSame('sent',$review->fresh()->status);
+        $this->assertDatabaseHas('audit_logs',['action'=>'agency_email_sent','user_id'=>$operator->id]);
+        $this->post(route('agency-communications.resolve',$review),[])->assertForbidden();
+    }
+
+    public function test_inactive_operator_cannot_prepare_read_or_send_communications(): void
+    {
+        $policy=$this->policy();
+        $review=$this->review([$policy]);
+        $operator=User::factory()->create(['role'=>UserRole::Operator,'status'=>'inactive']);
+        $this->mock(AgencyEmailTransport::class)->shouldNotReceive('send');
+        foreach (['agency-communications.index','agency-communications.collections','agency-communications.history'] as $route) {
+            $this->actingAs($operator)->getJson(route($route))->assertForbidden();
+        }
+        $this->actingAs($operator)->getJson(route('agency-communications.show',$review))->assertForbidden();
+        $this->actingAs($operator)->postJson(route('agency-communications.review',$this->agency),['policies'=>[$policy->id]])->assertForbidden();
+        $this->actingAs($operator)->postJson(route('agency-communications.send',$review),['reviewed'=>1])->assertForbidden();
+        $this->assertSame('review',$review->fresh()->status);
     }
 
     public function test_smtp_password_stays_encrypted_and_is_never_rendered_or_flashed(): void

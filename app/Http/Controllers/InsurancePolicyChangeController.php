@@ -48,7 +48,7 @@ class InsurancePolicyChangeController extends Controller
     {
         $this->authorize('view',$client);
         abort_unless($change->sourcePolicy->client_id===$client->id && $change->resultPolicy->client_id===$client->id,404);
-        $change->load(['sourcePolicy','resultPolicy','author','quote.quoteCase','documents.uploader','formPackages.documents.latestSubmission']);
+        $change->load(['replacementSchedule','sourcePolicy','resultPolicy','author','quote.quoteCase','documents.uploader','formPackages.documents.latestSubmission']);
         return view('policy-changes.show',compact('client','change'));
     }
 

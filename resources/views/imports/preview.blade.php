@@ -15,7 +15,9 @@
             @foreach($sections as $value => $label)<a href="{{ route('insurance-import.index', ['section' => $value]) }}" @if($section === $value) aria-current="page" @endif>{{ $label }}</a>@endforeach
         </nav>
         <x-panel padded>
-        @if($section === 'registry')
+        @if($section === 'reconciliation')
+            @include('imports.reconciliation')
+        @elseif($section === 'registry')
             <h2 class="workspace-section-title">Esito importazione anagrafiche</h2>
             <p class="u-text-meta">Clienti in sospeso: {{ $registryCounts['client']['held'] ?? 0 }}. Voci collegate a schede esistenti: {{ $registryCounts['client']['linked'] ?? 0 }}. Apri «Confronta dati» per vedere i valori e le righe originali. Le schede incomplete restano segnalate tra i clienti da verificare.</p>
             <form method="GET" action="{{ route('insurance-import.index') }}" class="client-search-form u-mt-md">

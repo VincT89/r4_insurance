@@ -1,15 +1,17 @@
-<x-app-layout :title="$kind === 'renewal' ? 'Rinnova polizza' : 'Sostituisci polizza'">
-    <x-page-header><x-slot:title>{{ $kind === 'renewal' ? 'Rinnova' : 'Sostituisci' }} {{ $source->number }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route('clients.policies.show',[$client,$source]) }}">Torna alla polizza</a></x-slot:actions></x-page-header>
+<x-app-layout :title="$kind === 'renewal' ? 'Rinnovo alla scadenza' : 'Sostituisci polizza'">
+    <x-page-header><x-slot:title>{{ $kind === 'renewal' ? 'Rinnovo alla scadenza' : 'Sostituisci polizza' }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route('clients.policies.show',[$client,$source]) }}">Torna alla polizza</a></x-slot:actions></x-page-header>
     <x-panel padded>
-        <p class="u-mb-md">{{ $client->name }} / {{ $source->company }} / {{ $source->supplierAgency?->name ?: 'Rapporto diretto' }}. Contratto attuale: {{ $source->starts_on->format('d/m/Y') }} – {{ $source->expires_on->format('d/m/Y') }}.</p>
+        <p class="u-mb-md">{{ $client->name }} / {{ $source->number }} / {{ $source->company }} / {{ $source->supplierAgency?->name ?: 'Rapporto diretto' }}. Contratto attuale: {{ $source->starts_on->format('d/m/Y') }} – {{ $source->expires_on->format('d/m/Y') }}.</p>
         <form method="POST" enctype="multipart/form-data" action="{{ route('policy-transitions.store',[$source,$kind]) }}" data-policy-contract data-policy-transition data-ocr-base="{{ asset('vendor/ocr') }}/" data-schedule-url="{{ route('policy-transitions.preview',[$source,$kind]) }}" data-restore="{{ session()->hasOldInput() ? 'true' : 'false' }}" x-data="{ company: @js(old('company',$policy->company) ?? ''), agency: @js((string)old('supplier_agency_id',$policy->supplier_agency_id)), agencies: @js($agenciesByCompany), branch: @js(old('category',$policy->category)), subbranch: @js(old('subcategory',$policy->subcategory) ?? ''), subbranches: @js($subcategories), adjustment: @js(old('adjustment','none')), chargeMode: @js(old('charge_mode','')) }">
             @csrf
+            @if($kind==='renewal')<span hidden data-renewal-source data-company="{{ $source->company }}" data-number="{{ $source->number }}" data-product="{{ $source->product }}"></span>@endif
             <input type="hidden" name="request_key" value="{{ old('request_key',$requestKey) }}">
             <input type="hidden" name="source_revision" value="{{ old('source_revision',$sourceRevision) }}">
             <input type="hidden" name="status" value="{{ $kind === 'renewal' ? 'renewed' : 'active' }}">
             @if($selectedQuote)<input type="hidden" name="quote_id" value="{{ $selectedQuote->id }}">@endif
             @include('policies.contract-upload')
             <div data-contract-fields hidden>
+                @if($kind==='renewal')<p class="policy-contract-notice" data-contract-company-change hidden>La compagnia è cambiata: verrà creata una nuova polizza dal {{ $source->expires_on->format('d/m/Y') }}, collegata alla precedente. Indica il nuovo numero di contratto. Documenti, titoli e pagamenti precedenti restano nella vecchia scheda.</p>@endif
                 <x-form-section title="Dati del nuovo contratto"><div class="form-row">
                     <x-form-group label="Compagnia" name="company" required><select class="form-sel" name="company" id="field-company" x-model="company" @change="agency = ''; $refs.internalClass.value = ''" required><option value="">Seleziona</option>@foreach($companies as $companyOption)<option value="{{ $companyOption->name }}">{{ $companyOption->name }}</option>@endforeach</select></x-form-group>
                     <x-form-group label="Agenzia" name="supplier_agency_id"><select class="form-sel" name="supplier_agency_id" id="field-supplier-agency-id" x-model="agency"><option value="">Rapporto diretto con la compagnia</option><template x-for="item in (agencies[company.trim().toUpperCase().replace(/\s+/g,' ')] || [])" :key="item.id"><option :value="String(item.id)" x-text="item.name" :selected="String(item.id) === agency"></option></template></select></x-form-group>
@@ -33,7 +35,7 @@
                 </div><x-form-group label="Nota sull’operazione" name="description"><textarea class="form-ta" name="description" rows="2" maxlength="2000">{{ old('description') }}</textarea></x-form-group></details>
                 @if($kind === 'replacement')
                     <x-form-section title="Titoli della vecchia polizza">
-                        <p class="u-mb-md">Gli incassi ricevuti restano nello storico. Seleziona soltanto i residui che la compagnia ha annullato; gli altri resteranno da incassare.</p>
+                        <p class="u-mb-md">Gli incassi ricevuti restano nello storico. Seleziona soltanto i residui che la compagnia ha annullato; gli altri resteranno da incassare. Per una decorrenza futura l’annullamento avverrà al cambio, sul residuo ancora aperto.</p>
                         @forelse($openTitles as $title)<label class="contract-confirm"><input type="checkbox" name="cancel_titles[]" value="{{ $title->id }}" @checked(in_array($title->id,(array)old('cancel_titles',[])))> Annulla residuo {{ \App\Support\Money::format($title->balance_cents) }} del {{ $title->due_on->format('d/m/Y') }} — titolo #{{ $title->id }}@if($title->collected_cents), già incassati {{ \App\Support\Money::format($title->collected_cents) }}@endif</label>@empty<p>Nessun residuo da incassare.</p>@endforelse
                         @if($openTitles->isNotEmpty())<x-form-group label="Motivo dell’annullamento, se selezioni un residuo" name="cancellation_reason"><input class="form-in" name="cancellation_reason" minlength="5" maxlength="1000" value="{{ old('cancellation_reason') }}"></x-form-group>@endif
                     </x-form-section>
@@ -48,7 +50,7 @@
                         <p>Il pagamento verrà registrato quando avviene, indicando data effettiva e modalità.</p></div>
                     </x-form-section>
                 @else<input type="hidden" name="adjustment" value="none">@endif
-                <p class="u-mb-md">{{ $kind === 'renewal' ? 'Il rinnovo apre una nuova lavorazione. I vecchi documenti e titoli conservano i riferimenti del contratto precedente.' : 'La vecchia polizza diventerà Sostituita dalla decorrenza indicata; la nuova sarà In vigore. Documenti, incassi e storico saranno conservati.' }}</p>
+                <p class="u-mb-md" @if($kind==='renewal') data-contract-renewal-note @endif>{{ $kind === 'renewal' ? 'Con la stessa compagnia il rinnovo aggiorna la polizza e apre una nuova lavorazione. Cambiando compagnia viene creata una nuova scheda collegata.' : 'La vecchia polizza diventerà Sostituita dalla decorrenza indicata; la nuova sarà In vigore. Documenti, incassi e storico saranno conservati.' }}</p>
                 @include('policies.contract-review',['transition'=>true])
                 <div class="insurance-form-actions"><a class="btn btn-g" href="{{ route('clients.policies.show',[$client,$source]) }}">Annulla</a><button class="btn btn-p" data-contract-save disabled>{{ $kind === 'renewal' ? 'Conferma rinnovo' : 'Conferma sostituzione' }}</button></div>
             </div>

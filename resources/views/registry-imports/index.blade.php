@@ -1,5 +1,5 @@
 <x-app-layout title="Importazioni CSV ed Excel">
-    <x-page-header><x-slot:title>Importazioni CSV ed Excel</x-slot:title></x-page-header>
+    <x-page-header><x-slot:title>Importazioni CSV ed Excel</x-slot:title><x-slot:actions>@can('system.admin')<a class="btn btn-g" href="{{ route('insurance-import.index',['section'=>'reconciliation']) }}">Riconciliazione Excel</a>@endcan</x-slot:actions></x-page-header>
     @include('profile.partials.settings-navigation')
     <div class="deadline-notice"><p>Carica compagnie, agenzie, rami o sottorami. Prima del salvataggio vedrai l’anteprima con i duplicati e le righe da correggere. Le schede esistenti non vengono sovrascritte.</p></div>
     <x-panel padded>

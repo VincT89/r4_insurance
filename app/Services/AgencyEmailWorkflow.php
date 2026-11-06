@@ -163,7 +163,7 @@ class AgencyEmailWorkflow
         try {
             $claimed = DB::transaction(function () use ($communication, $user, $attachmentRevision, &$files, &$deliveryPayload) {
                 $message = AgencyCommunication::whereKey($communication->id)->lockForUpdate()->firstOrFail();
-                abort_unless((int)$message->user_id === $user->id && $user->status === 'active' && $user->canManageSystem(), 403);
+                abort_unless((int)$message->user_id === $user->id && $user->canManageAgencyCommunications(), 403);
                 if ($message->status === 'sent') return false;
                 if ($message->status !== 'review') throw ValidationException::withMessages(['email'=>'Questo riepilogo è già stato confermato. Controlla il suo esito nello storico.']);
                 if ($message->review_expires_at->isPast()) throw ValidationException::withMessages(['email'=>'Il controllo è scaduto: seleziona nuovamente le polizze e riapri il riepilogo.']);

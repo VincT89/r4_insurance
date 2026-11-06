@@ -1,14 +1,66 @@
 <x-app-layout title="Fascicolo moduli">
 @if($package->insurance_policy_change_id)<div class="page-back-row"><a class="btn btn-g" href="{{ route('clients.policy-changes.show',[$client,$package->insurance_policy_change_id]) }}">Variazione contrattuale collegata</a></div>@endif
-<x-page-header><x-slot:title>Fascicolo #{{ $package->id }} · {{ $client->name }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route('clients.forms.index',[$client,'policy'=>$package->insurance_policy_id]) }}">Storico fascicoli</a>@if($package->policy)<a class="btn btn-g" href="{{ route('clients.policies.show',[$client,$package->policy,'tab'=>'forms']) }}">Scheda polizza</a>@else<a class="btn btn-g" href="{{ route('clients.show',$client) }}">Scheda cliente</a>@endif</x-slot:actions></x-page-header>
-<x-panel title="Riferimenti" padded><dl class="client-registry-details"><div><dt>Stato</dt><dd>{{ $package->state_label }}</dd></div><div><dt>Motivo</dt><dd>{{ \App\Models\InsuranceFormPackage::REASONS[$package->reason] }}</dd></div><div><dt>Polizza</dt><dd>{{ $package->policy?->number??'Documenti del cliente' }}</dd></div><div><dt>Preparato da</dt><dd>{{ $package->author?->name }} · {{ $package->created_at->format('d/m/Y H:i') }}</dd></div></dl>@if($package->note)<p class="form-template-text">{{ $package->note }}</p>@endif @if(!$package->currentData())<p>I dati attuali differiscono da quelli usati per questi moduli. Questo fascicolo rimane nello storico.</p>@endif</x-panel>
+<x-page-header>
+    <x-slot:title>Fascicolo #{{ $package->id }} · {{ $client->name }}</x-slot:title>
+    <x-slot:actions><a class="btn btn-g" href="{{ route('clients.forms.index',[$client,'policy'=>$package->insurance_policy_id]) }}">Storico fascicoli</a>
+        @if($package->policy)
+            <a class="btn btn-g" href="{{ route('clients.policies.show',[$client,$package->policy,'tab'=>'forms']).'#policy-signatures' }}">{{ $package->documents->contains('signature_required',true) ? 'Firme della polizza' : 'Scheda polizza' }}</a>
+        @else<a class="btn btn-g" href="{{ route('clients.show',$client) }}">Scheda cliente</a>@endif
+    </x-slot:actions>
+</x-page-header>
+<x-panel title="Riferimenti" padded>
+    <dl class="client-registry-details">
+        <div><dt>Stato</dt><dd>{{ $package->state_label }}</dd></div>
+        <div><dt>Motivo</dt><dd>{{ \App\Models\InsuranceFormPackage::REASONS[$package->reason] }}</dd></div>
+        <div><dt>Polizza</dt><dd>{{ $package->policy_number ?? 'Documenti del cliente' }}</dd></div>
+        @if($period = $package->policy_period)<div><dt>Periodo del contratto</dt><dd>{{ $period }}</dd></div>@endif
+        <div><dt>Preparato da</dt><dd>{{ $package->author?->name }} · {{ $package->created_at->format('d/m/Y H:i') }}</dd></div>
+    </dl>
+    @if($package->note)<p class="form-template-text">{{ $package->note }}</p>@endif
+    @if(!$package->currentData())<p>I dati attuali differiscono da quelli usati per questi moduli. Questo fascicolo rimane nello storico.</p>@endif
+</x-panel>
 @foreach($package->documents as $document)
-<x-panel :title="$document->title.' · modello v'.$document->template_version" padded>
+<x-panel :id="'form-document-'.$document->id" :title="$document->title.' · modello v'.$document->template_version" data-signature-destination padded>
 <div class="form-document-actions"><p>{{ $document->state_label }}</p>@if($document->generated)@if($document->generated->canPreview())<a class="btn btn-g" href="{{ $document->generated->openUrl() }}" target="_blank" rel="noopener">Apri modulo PDF</a>@endif<a class="btn btn-g" href="{{ $document->generated->downloadUrl() }}">Scarica modulo PDF</a>@endif</div>
 @if($document->signature_required)
-@can('updateRegistry',$client)<details class="form-signing-upload"><summary>{{ $document->submissions->isEmpty()?'Carica documenti firmati':'Carica nuova versione firmata' }}</summary><form method="POST" enctype="multipart/form-data" action="{{ route('clients.forms.submit',[$client,$package,$document]) }}">@csrf<input type="hidden" name="request_key" value="{{ Str::uuid() }}"><x-form-section title="File firmati"><x-form-group label="Documenti firmati" :name="'files-'.$document->id" required><input class="form-in" type="file" name="files[]" accept=".pdf,.jpg,.jpeg,.png" multiple required><p class="u-text-meta">Puoi selezionare più file: PDF, JPG o PNG. Massimo 10 file, 10 MB ciascuno e 50 MB complessivi.</p></x-form-group><div class="form-row"><x-form-group label="Firmatario" :name="'signer-'.$document->id" required><input class="form-in" name="signer_name" maxlength="150" required></x-form-group><x-form-group label="Qualifica" :name="'role-'.$document->id" :required="$client->client_type==='company'"><input class="form-in" name="signer_role" maxlength="150" @required($client->client_type==='company')></x-form-group><x-form-group label="Data della firma" :name="'signed-'.$document->id" required><input class="form-in" name="signed_on" type="date" max="{{ today()->toDateString() }}" required></x-form-group></div><x-form-group label="Note o motivo della nuova versione" :name="'note-'.$document->id"><textarea class="form-ta" name="note" maxlength="2000" rows="2" @required($document->submissions->isNotEmpty())></textarea></x-form-group></x-form-section><div class="insurance-form-actions"><button class="btn btn-p">Registra file firmati</button></div></form></details>@endcan
-<div class="client-table-scroll"><table class="t-table"><thead><tr><th>Versione</th><th>File</th><th>Firmatario</th><th>Data firma</th><th>Esito</th><th>Operatore</th></tr></thead><tbody>@forelse($document->submissions as $submission)<tr><td>{{ $submission->version }}@if($document->latestSubmission?->id!==$submission->id) / storica @endif</td><td>@foreach($submission->files as $file)<div><a href="{{ $file->openUrl() }}" @if($file->canPreview()) target="_blank" rel="noopener" @endif>{{ $file->original_name }}</a></div>@endforeach @if($submission->note)<div class="u-text-meta">{{ $submission->note }}</div>@endif</td><td>{{ $submission->signer_name }}<div>{{ $submission->signer_role }}</div></td><td>{{ $submission->signed_on->format('d/m/Y') }}</td><td>{{ ['received'=>'Da controllare','validated'=>'Firma controllata','rejected'=>'Da correggere'][$submission->status] }}@if($submission->reviewed_at)<div class="u-text-meta">{{ $submission->reviewed_at->format('d/m/Y H:i') }} / {{ $submission->reviewer?->name }}</div>@endif @if($submission->review_note)<div>{{ $submission->review_note }}</div>@endif</td><td>{{ $submission->author?->name }}<div class="u-text-meta">{{ $submission->created_at->format('d/m/Y H:i') }}</div></td></tr>@empty<tr><td colspan="6">Nessuna firma ricevuta.</td></tr>@endforelse</tbody></table></div>
-@if(($latest=$document->latestSubmission) && $latest->status==='received')@can('updateRegistry',$client)<form class="u-mt-md" method="POST" action="{{ route('clients.forms.review',[$client,$package,$latest]) }}">@csrf<x-form-section title="Controlla le firme"><div class="form-row"><x-form-group label="Esito del controllo" :name="'outcome-'.$document->id" required><select name="outcome" class="form-sel" required><option value="">Seleziona l’esito</option><option value="validated">Firme controllate</option><option value="rejected">Da correggere</option></select></x-form-group><x-form-group label="Note del controllo" :name="'review-'.$document->id"><textarea class="form-ta" name="review_note" maxlength="2000" rows="2"></textarea></x-form-group></div><label class="insurance-checkbox"><input type="checkbox" name="confirmed" value="1" required> Ho aperto gli allegati e controllato firmatario, date e firme richieste.</label><p class="u-text-meta">Si registra il controllo dell’operatore. Il gestionale non autentica firme autografe o digitali e non registra automaticamente consensi.</p></x-form-section><div class="insurance-form-actions"><button class="btn btn-p">Salva controllo</button></div></form>@endcan @endif
+@can('updateRegistry',$client)
+    @if($document->generated && (!$document->latestSubmission || $document->latestSubmission->status==='rejected'))
+        <div class="form-document-actions"><a class="btn btn-p" href="{{ route('attachments.sign',$document->generated) }}">Firma sul tablet</a></div>
+    @endif
+    @if(($latest=$document->submissions->firstWhere('id',$document->latestSubmission?->id)) && $latest->status==='received')
+        <h3 class="signature-history-title">Controlla copia ricevuta</h3>
+        <p>{{ $latest->signer_name }} · Firma del {{ $latest->signed_on->format('d/m/Y') }} · Copia {{ $latest->version }}</p>
+        <div class="signature-links">
+            @foreach($latest->files as $file)
+                <a href="{{ $file->openUrl() }}" @if($file->canPreview()) target="_blank" rel="noopener" @endif>{{ $latest->files->count()===1 ? 'Apri copia ricevuta' : $file->original_name }}</a>
+            @endforeach
+        </div>
+        @include('insurance-forms.signature-review',['origin'=>'package'])
+    @endif
+    <details class="form-signing-upload" @if(!$document->latestSubmission || $document->latestSubmission->status==='rejected') data-signature-next @endif @if((int)old('signature_document')===$document->id && old('signature_action')==='upload') open @endif>
+        <summary>{{ !$document->latestSubmission || $document->latestSubmission->status==='rejected' ? $document->signatureActionLabel() : 'Carica nuova versione firmata' }}</summary>
+        @include('insurance-forms.signature-upload',['origin'=>'package'])
+    </details>
+@endcan
+@if($document->submissions->isEmpty())<p>Nessuna firma ricevuta.</p>
+@else
+    <h3 class="signature-history-title">Copie firmate</h3>
+    <div class="client-table-scroll policy-list-scroll"><table class="t-table policy-documents-table form-package-history signature-history">
+        <thead><tr><th>Copia e file</th><th>Firmatario e data</th><th>Controllo</th><th>Registrazione</th></tr></thead>
+        <tbody>@foreach($document->submissions as $submission)<tr>
+            <td data-label="Copia e file"><strong>Copia {{ $submission->version }}{{ $document->latestSubmission?->id !== $submission->id ? ' / storica' : '' }}</strong>
+                @foreach($submission->files as $file)<div><a href="{{ $file->openUrl() }}" @if($file->canPreview()) target="_blank" rel="noopener" @endif>{{ $file->original_name }}</a></div>@endforeach
+                @if($submission->note)<div class="u-text-meta">{{ $submission->note }}</div>@endif
+            </td>
+            <td data-label="Firmatario e data">{{ $submission->signer_name }}@if($submission->signer_role)<div>{{ $submission->signer_role }}</div>@endif<div>{{ $submission->signed_on->format('d/m/Y') }}</div></td>
+            <td data-label="Controllo">{{ ['received'=>'Da controllare','validated'=>'Firma controllata','rejected'=>$document->latestSubmission?->id === $submission->id ? 'Da correggere' : 'Correzione richiesta'][$submission->status] }}
+                @if($submission->reviewed_at)<div class="u-text-meta">{{ $submission->reviewed_at->format('d/m/Y H:i') }} · {{ $submission->reviewer?->name }}</div>@endif
+                @if($submission->review_note)<div>{{ $submission->review_note }}</div>@endif
+            </td>
+            <td data-label="Registrazione">{{ $submission->author?->name }}<div class="u-text-meta">{{ $submission->created_at->format('d/m/Y H:i') }}</div></td>
+        </tr>@endforeach</tbody>
+    </table></div>
+@endif
 @endif
 </x-panel>
 @endforeach

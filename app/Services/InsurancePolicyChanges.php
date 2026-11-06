@@ -16,7 +16,8 @@ class InsurancePolicyChanges
         if ($kind === 'addition') abort_unless($policy->editableBy(auth()->user()), 403);
         $allowed = $kind === 'addition' ? ['active','renewed'] : ['active','renewed','expired','suspended','ceased'];
         if (!in_array($policy->status, $allowed, true)) $this->fail('Lo stato di questa polizza non consente la variazione selezionata.');
-        if ($kind === 'replacement' && $policy->changes()->where('kind','replacement')->exists()) $this->fail('Questa polizza ha già una sostitutiva collegata.');
+        if ($kind === 'replacement' && $policy->companyChangeTo()->exists()) $this->fail('È già presente una nuova polizza collegata alla scadenza. Apri la polizza successiva.');
+        if ($policy->replacementTo()->exists() || $policy->hasPendingReplacement()) $this->fail('Questa polizza ha già una sostitutiva collegata. Apri il cambio programmato dalla sua scheda.');
     }
 
     public function fingerprint(InsurancePolicy $policy, InsuranceQuote $quote): string
@@ -47,14 +48,15 @@ class InsurancePolicyChanges
                 if ($quote->starts_on->lt($source->starts_on)) $this->fail('La variazione non può precedere la decorrenza della polizza attuale.');
                 $before = app(InsuranceForms::class)->context($client, $source);
                 if ($data['kind'] === 'replacement') {
-                    if ($quote->starts_on->gt(today())) $this->fail('Puoi confermare la sostituzione dalla data di decorrenza del nuovo contratto. Il preventivo resta disponibile.');
+                    if ($quote->starts_on->gte($source->expires_on)) $this->fail('La sostituzione deve precedere la scadenza della polizza attuale. Alla scadenza usa Rinnova o cambia compagnia.');
+                    if ($quote->starts_on->gt(today()) && !in_array($source->status,['active','renewed'],true)) $this->fail('Puoi programmare una sostituzione futura soltanto per una polizza attiva o rinnovata.');
                     $number = trim($data['number']);
                     if (mb_strtoupper($number) === mb_strtoupper(trim($source->number))) $this->fail('La sostitutiva deve avere un numero diverso dalla polizza precedente.');
                     if ($client->policies()->where('company',$quote->company->name)->where('number',$number)->exists()) $this->fail('Il numero è già presente per questo cliente e compagnia.');
                     $values = array_replace($source->only(['vehicle_id','client_asset_id','insured_subject','merit_class_cu','merit_class_internal','payment_method','tacit_renewal','ad_horas']), $workflow->policyValues($quote), ['number'=>$number,'status'=>'active']);
                     $result = $client->policies()->create(app(PolicyProviders::class)->values(app(InsuranceCatalog::class)->policyValues($values)));
                     $result->forceFill(['insurance_quote_id'=>$quote->id])->save();
-                    $source->forceFill(['status'=>'replaced','closed_at'=>$quote->starts_on])->save();
+                    if (!$quote->starts_on->gt(today())) $source->forceFill(['status'=>'replaced','closed_at'=>$quote->starts_on])->save();
                 } else {
                     if ((int)$source->supplier_company_id !== (int)$quote->supplier_company_id || (int)$source->supplier_agency_id !== (int)$quote->supplier_agency_id) $this->fail('L’aggiunta mantiene compagnia e agenzia della polizza.');
                     if ((int)$source->insurance_branch_id !== (int)$case->insurance_branch_id || (int)$source->insurance_subbranch_id !== (int)$case->insurance_subbranch_id) $this->fail('Per un altro ramo o sottoramo occorre una nuova polizza.');
@@ -73,6 +75,7 @@ class InsurancePolicyChanges
                         'requested_coverages'=>$case->additional_coverages],
                     'request_key'=>$data['request_key'], 'created_by'=>auth()->id(),
                 ]);
+                app(ScheduledPolicyReplacements::class)->record($change);
                 $context = ['insurance_policy_id'=>$result->id, 'insurance_policy_change_id'=>$change->id];
                 $quote->documents()->update($context);
                 $case->documents()->update($context);
@@ -81,6 +84,7 @@ class InsurancePolicyChanges
                 $case->update(['status'=>'closed']);
                 app(InsuranceLedger::class)->log($source, 'policy_contract_changed', InsurancePolicyChange::KINDS[$change->kind].' #'.$change->id.', polizza '.$source->number.', contratto risultante '.$result->number.'. '.$change->description, ['policy_change_id'=>$change->id,'result_policy_id'=>$result->id]);
                 if ($result->id !== $source->id) app(InsuranceLedger::class)->log($result, 'policy_contract_changed', 'Nuova sostitutiva della polizza '.$source->number.'. Storico variazione #'.$change->id.'.');
+                PolicyFormReminder::clear($source);
                 return $change;
             });
         } catch (\Throwable $exception) {

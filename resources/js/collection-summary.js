@@ -14,9 +14,9 @@ document.addEventListener('table:filtered', event => {
         const row = node('tr'), title = node('th',group.company); title.scope='row'; title.append(node('small',group.agency)); row.append(title);
         for (const [amount,count,label] of [[group.receipts,group.receiptCount,'incassi'],[group.refunds,group.refundCount,'rimborsi']]) {
             const noun = count === 1 ? (label === 'incassi' ? 'incasso' : 'rimborso') : label;
-            const cell = node('td',collectionMoney(amount)); cell.append(node('small',`${count} ${noun}`)); row.append(cell);
+            const cell = node('td',collectionMoney(amount)); cell.dataset.label = label === 'incassi' ? 'Incassi' : 'Rimborsi'; cell.append(node('small',`${count} ${noun}`)); row.append(cell);
         }
-        row.append(node('td',collectionMoney(group.total)));
+        const balance = node('td',collectionMoney(group.total)); balance.dataset.label = 'Saldo'; row.append(balance);
         const cell=node('td'), button=node('button','Stampa / PDF'); button.type='button'; button.className='btn btn-g btn-sm'; button.dataset.collectionExport='pdf'; button.dataset.collectionGroup=group.key;
         button.setAttribute('aria-label',`Stampa ${group.company} / ${group.agency}`); cell.append(button); row.append(cell); return row;
     });

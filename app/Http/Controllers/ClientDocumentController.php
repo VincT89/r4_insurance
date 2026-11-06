@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SaveClientDocumentRequest;
 use App\Models\{Attachment, Client, InsurancePolicy};
+use App\Services\InsuranceDocumentation;
 use Illuminate\Http\{RedirectResponse, Request};
 use Illuminate\View\View;
 
@@ -64,7 +65,9 @@ class ClientDocumentController extends Controller
         $vehicles = $client->vehicles()->orderBy('plate')->get();
         $returnPolicy = $this->returnPolicy($client);
         $returnUrl = $this->destination($client, $returnPolicy);
-        return view('clients.documents.form', compact('client', 'document', 'policies', 'vehicles', 'returnPolicy', 'returnUrl'));
+        $openSignatures = !$document->exists && !$document->previous_version_id && !$document->document_request_id && !$document->document_category
+            ? app(InsuranceDocumentation::class)->openSignatures($client,$document->insurance_policy_id) : collect();
+        return view('clients.documents.form', compact('client', 'document', 'policies', 'vehicles', 'returnPolicy', 'returnUrl','openSignatures'));
     }
 
     private function returnPolicy(Client $client): ?InsurancePolicy

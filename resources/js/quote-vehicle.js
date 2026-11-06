@@ -5,10 +5,14 @@ function initQuoteVehicles() {
         const form = root.closest('form'), vehicle = form.elements.vehicle_id, cu = form.elements.merit_class_cu;
         const internal = form.elements.merit_class_internal, group = form.elements.quote_recipient_group_id;
         const purpose = form.elements.purpose, currentPolicy = form.elements.current_policy_id;
-        const branch = form.elements.insurance_branch_id, subbranch = form.elements.insurance_subbranch_id;
+        const branch = form.querySelector('select[name="insurance_branch_id"]'), subbranch = form.querySelector('select[name="insurance_subbranch_id"]');
         const description = root.querySelector('[data-quote-group-description]');
         const choices = [...group.options].filter(option => option.value).map(option => option.cloneNode(true));
         const quick = root.querySelector('[data-quick-vehicle]'), save = root.querySelector('[data-save-vehicle]');
+        const vehicleSection = root.querySelector('[data-vehicle-section]');
+        const routingSection = root.querySelector('[data-routing-section]');
+        const registration = form.querySelector('[data-registration-section]');
+        let lastContext = null;
         function refreshGroups() {
             const previous = group.value, addition = purpose.value === 'addition';
             const matching = choices.filter(option => branch.value && option.dataset.branch === branch.value && (!option.dataset.subbranch || option.dataset.subbranch === subbranch.value) && (!option.dataset.from || (cu.value && +cu.value >= +option.dataset.from && +cu.value <= +option.dataset.to)));
@@ -19,10 +23,22 @@ function initQuoteVehicles() {
             group.required = false;
             vehicle.disabled = addition;
             quick.hidden = addition;
+            const context = [branch.value, subbranch.value, purpose.value, currentPolicy.value, vehicle.value].join('/');
+            if (context !== lastContext) {
+                const branchOption = branch.selectedOptions[0];
+                const vehicleRelevant = branchOption?.dataset.vehicle === '1' || subbranch.selectedOptions[0]?.dataset.vehicle === '1'
+                    || (!subbranch.value && branchOption?.dataset.subVehicles === '1');
+                const editingVehicle = [...quick.querySelectorAll('input')].some(field => field.value);
+                vehicleSection.open = Boolean(vehicleRelevant || vehicle.value || cu.value || internal.value || editingVehicle || vehicleSection.hasAttribute('data-keep-open'));
+                if (registration) registration.open = Boolean(vehicleRelevant || vehicle.value || registration.querySelector('input[type="file"]')?.files.length || registration.hasAttribute('data-keep-open'));
+                lastContext = context;
+            }
+            routingSection.hidden = addition || (!matching.length && !routingSection.hasAttribute('data-keep-open') && !routingSection.querySelector('[data-manage-groups]'));
+            if (group.value || matching.length || routingSection.hasAttribute('data-keep-open')) routingSection.open = true;
             if (addition) { group.value = ''; description.textContent = 'Le coperture aggiuntive si richiedono alla compagnia della polizza attuale.'; }
             else if (group.value) description.textContent = 'Il gruppo suggerisce compagnie e agenzie. Prima dell’invio potrai modificare liberamente i destinatari.';
             else if (matching.length > 0) description.textContent = 'Puoi usare uno dei gruppi compatibili oppure scegliere direttamente i destinatari prima dell’invio.';
-            else description.textContent = branch.value ? 'Sceglierai compagnie e agenzie prima dell’invio. Il gruppo è facoltativo.' : 'Scegli prima il ramo assicurativo. La classe CU serve soltanto per i gruppi che la richiedono.';
+            else description.textContent = branch.value ? 'Nessun gruppo disponibile per questa selezione. Puoi scegliere compagnie e agenzie prima dell’invio.' : 'Scegli prima il ramo assicurativo.';
         }
         function selectVehicle() {
             const option = vehicle.selectedOptions[0];

@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Support\FormTemplateContent;
 
 class InsuranceFormTemplate extends Model
 {
@@ -15,6 +16,17 @@ class InsuranceFormTemplate extends Model
     public function previous() { return $this->belongsTo(self::class,'previous_id'); }
     public function next() { return $this->hasOne(self::class,'previous_id'); }
     public function approver() { return $this->belongsTo(User::class,'approved_by'); }
+    public function getPlainBodyAttribute(): string { return FormTemplateContent::plain((string)$this->body); }
+    public function editKey(): string { return hash('sha256', json_encode($this->getRawOriginal(), JSON_THROW_ON_ERROR)); }
+    public function needsSigner(): bool
+    {
+        $text = FormTemplateContent::allText((string)$this->body);
+        return $this->signature_required || str_contains($text, '{{firmatario}}') || str_contains($text, '{{qualifica_firmatario}}');
+    }
+    public function needsPlace(): bool
+    {
+        return str_contains(FormTemplateContent::allText((string)$this->body), '{{luogo}}');
+    }
     public function applies(?InsurancePolicy $policy, ?Client $client = null): bool
     {
         $client ??= $policy?->client;

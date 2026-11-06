@@ -9,7 +9,7 @@ class ClientDeadlineQuery
 {
     public function forClient(Client $client, array $filters): Collection
     {
-        $policies = $client->policies()->whereNotIn('status', \App\Models\InsurancePolicy::CLOSED_STATUSES)->with(['vehicle', 'asset'])->get()
+        $policies = $client->policies()->withoutContractSuccessor()->whereNotIn('status', \App\Models\InsurancePolicy::CLOSED_STATUSES)->with(['vehicle', 'asset'])->get()
             ->map(fn ($policy) => [
                 'date' => $policy->expires_on, 'kind' => 'Polizza',
                 'title' => implode(' / ', array_filter([$policy->category, $policy->subcategory, $policy->company, $policy->number], fn ($value) => filled($value))),
@@ -28,7 +28,7 @@ class ClientDeadlineQuery
             'url' => route('clients.show', [$client, 'tab' => 'documents']).'#document-request-'.$item->id,
         ]);
         $period = $filters['period'] ?? 'all';
-        $titles=\App\Models\InsuranceTitle::whereIn('insurance_policy_id',$client->policies()->select('id'))->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents')->with('policy')->get()->map(fn($t)=>[
+        $titles=\App\Models\InsuranceTitle::whereIn('insurance_policy_id',$client->policies()->select('id'))->outstanding()->with('policy')->get()->map(fn($t)=>[
             'date'=>$t->due_on,'kind'=>'Titolo','title'=>$t->policy->number.' / '.\App\Models\InsuranceTitle::KINDS[$t->kind],'detail'=>'Residuo '.\App\Support\Money::format($t->balance_cents),'frequency'=>$t->payment_frequency,'url'=>route('titles.show',$t)]);
         return $policies->concat($documents)->concat($requests)->concat($titles)->filter(function (array $item) use ($filters, $period) {
             $date = $item['date'];

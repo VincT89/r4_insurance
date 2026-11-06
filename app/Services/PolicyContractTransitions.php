@@ -13,6 +13,12 @@ class PolicyContractTransitions
 {
     private function fail(string $message, string $field = 'transition'): never { throw ValidationException::withMessages([$field=>$message]); }
 
+    private function changesCompany(InsurancePolicy $source, array $values): bool
+    {
+        return $source->supplier_company_id ? (int)$source->supplier_company_id !== (int)$values['supplier_company_id']
+            : InsuranceCatalog::normalize($source->company) !== InsuranceCatalog::normalize($values['company']);
+    }
+
     public function authorize(InsurancePolicy $policy, string $kind): void
     {
         abort_unless(in_array($kind, ['renewal','replacement'], true), 404);
@@ -73,6 +79,10 @@ class PolicyContractTransitions
         if (!empty($values['vehicle_id']) && !empty($values['client_asset_id'])) $this->fail('Seleziona il veicolo oppure il bene assicurato.', 'client_asset_id');
         $values = app(PolicyProviders::class)->values(app(InsuranceCatalog::class)->policyValues($values, $source), $source);
         if (!$values['supplier_company_id']) $this->fail('Seleziona una compagnia presente nell’anagrafica.', 'company');
+        if($this->changesCompany($source,$values)) {
+            $values['status']='active';
+            $values['merit_class_internal']=$data['merit_class_internal']??null;
+        }
         return $values;
     }
 
@@ -81,12 +91,18 @@ class PolicyContractTransitions
         $this->authorize($source, $kind);
         $allowed = $kind === 'renewal' ? ['active','renewed','expired'] : ['active','renewed','expired','suspended','ceased'];
         if (!in_array($source->status, $allowed, true)) $this->fail('Lo stato della polizza non consente questa operazione.');
+        if($source->companyChangeTo()->exists())$this->fail('È già presente una nuova polizza collegata alla scadenza. Aprila dalla scheda della polizza precedente.');
+        if ($source->replacementTo()->exists() || $source->hasPendingReplacement()) $this->fail('È già presente una sostituzione collegata. Apri il cambio programmato dalla scheda della polizza.');
         if (!hash_equals($this->revision($source, $quote), $data['source_revision'])) $this->fail('La polizza o i suoi pagamenti sono cambiati. Riapri il modulo per controllare i dati aggiornati.', 'source_revision');
         if ($kind === 'renewal' && $data['starts_on'] !== $source->expires_on->toDateString()) $this->fail('Il rinnovo deve iniziare alla scadenza della polizza attuale.', 'starts_on');
-        if ($kind === 'replacement' && ($data['starts_on'] < $source->starts_on->toDateString() || $data['starts_on'] >= $source->expires_on->toDateString() || $data['starts_on'] > today()->toDateString())) $this->fail('La sostituzione deve decorrere nel periodo della vecchia polizza, entro oggi.', 'starts_on');
+        if ($kind === 'replacement' && ($data['starts_on'] < $source->starts_on->toDateString() || $data['starts_on'] >= $source->expires_on->toDateString())) $this->fail('La sostituzione deve decorrere prima della scadenza e nel periodo della vecchia polizza. Alla scadenza usa Rinnova o cambia compagnia.', 'starts_on');
+        $scheduled = $kind === 'replacement' && $data['starts_on'] > today()->toDateString();
+        if ($scheduled && !in_array($source->status,['active','renewed'],true)) $this->fail('Puoi programmare una sostituzione futura soltanto per una polizza attiva o rinnovata.');
         $values = $this->values($source, $kind, $data);
+        $companyChanged=$kind==='renewal' && $this->changesCompany($source,$values);
+        if($companyChanged && mb_strtoupper($values['number'])===mb_strtoupper(trim($source->number)))$this->fail('Indica il numero del nuovo contratto della compagnia scelta.', 'number');
         $duplicates = $source->client->policies()->where('company', $values['company'])->whereRaw('UPPER(number) = ?', [mb_strtoupper($values['number'])]);
-        if ($kind === 'renewal') $duplicates->where('id','!=',$source->id);
+        if ($kind === 'renewal' && !$companyChanged) $duplicates->where('id','!=',$source->id);
         if ($duplicates->exists()) $this->fail('Questo numero è già presente per il cliente e la compagnia. Controlla il contratto.', 'number');
         $next = new InsurancePolicy($values);
         $rows = ($data['titles_mode'] ?? 'automatic') === 'manual' ? [] : app(InsuranceLedger::class)->plan($next);
@@ -107,7 +123,7 @@ class PolicyContractTransitions
                 'coverage_from'=>$data['starts_on'], 'coverage_to'=>$data['expires_on'], 'payment_frequency'=>'Unico', 'payment_method'=>$data['payment_method'],
                 'notes'=>'Conguaglio comunicato: '.$data['adjustment_reference'], 'source_contract'=>($data['adjustment_policy'] ?? 'new') === 'previous'];
         }
-        $result = ['rows'=>$rows, 'values'=>$values, 'cancel_titles'=>$cancel, 'cancelled_cents'=>$oldTitles->sum('balance_cents')];
+        $result = ['rows'=>$rows, 'values'=>$values, 'cancel_titles'=>$cancel, 'cancelled_cents'=>$oldTitles->sum('balance_cents'), 'company_changed'=>$companyChanged, 'scheduled'=>$scheduled];
         $result['fingerprint'] = hash_hmac('sha256', json_encode([auth()->id(),$kind,$data['source_revision'],$result,Arr::only($data,['cancellation_reason','adjustment','charge_mode','adjustment_reference','quote_id'])], JSON_THROW_ON_ERROR), config('app.key'));
         return $result;
     }
@@ -142,16 +158,19 @@ class PolicyContractTransitions
                 }
                 $before = app(InsuranceForms::class)->context($client,$source);
                 $work = $source->only(['work_closed_at','work_closed_by']);
-                if ($kind === 'renewal') {
+                $companyChanged=$preview['company_changed'];
+                $scheduled=$preview['scheduled'];
+                /** A different insurer starts a linked contract; the original contract and its financial state remain untouched. */
+                if ($kind === 'renewal' && !$companyChanged) {
                     if (!$source->coverage_origin_on) $source->forceFill(['coverage_origin_on'=>$source->starts_on]);
                     $source->fill($preview['values'])->forceFill(['closed_at'=>null,'work_closed_at'=>null,'work_closed_by'=>null,'last_renewed_at'=>now()])->save();
                     $result = $source;
                 } else {
                     $result = $client->policies()->create($preview['values']);
                     if ($quote) $result->forceFill(['insurance_quote_id'=>$quote->id])->save();
-                    $source->forceFill(['status'=>'replaced','closed_at'=>$data['starts_on']])->save();
+                    if(!$companyChanged && !$scheduled)$source->forceFill(['status'=>'replaced','closed_at'=>$data['starts_on']])->save();
                 }
-                $description = trim($data['description'] ?? '') ?: ($kind === 'renewal' ? 'Rinnovo dal contratto verificato dall’operatore.' : 'Sostituzione dal contratto verificato dall’operatore.');
+                $description = trim($data['description'] ?? '') ?: ($companyChanged ? 'Cambio compagnia alla scadenza: nuova polizza dal contratto verificato dall’operatore.' : ($kind === 'renewal' ? 'Rinnovo dal contratto verificato dall’operatore.' : 'Sostituzione dal contratto verificato dall’operatore.'));
                 $change = InsurancePolicyChange::create([
                     'source_policy_id'=>$source->id,'result_policy_id'=>$result->id,'insurance_quote_id'=>$quote?->id,'kind'=>$kind,
                     'effective_on'=>$data['starts_on'],'expires_on'=>$data['expires_on'],'reference'=>$result->number,'description'=>$description,
@@ -162,7 +181,8 @@ class PolicyContractTransitions
                         'titles'=>$preview['rows'],'titles_mode'=>$data['titles_mode'] ?? 'automatic','request_digest'=>$digest],
                 ]);
                 $ledger = app(InsuranceLedger::class);
-                foreach ($preview['cancel_titles'] as $id) $ledger->cancelResidual($source->titles()->findOrFail($id),$data['cancellation_reason']);
+                app(ScheduledPolicyReplacements::class)->record($change);
+                if (!$scheduled) foreach ($preview['cancel_titles'] as $id) $ledger->cancelResidual($source->titles()->findOrFail($id),$data['cancellation_reason']);
                 $result->refresh();
                 foreach ($preview['rows'] as $row) {
                     $titlePolicy = !empty($row['source_contract']) ? $source : $result;
@@ -170,7 +190,7 @@ class PolicyContractTransitions
                     $ledger->transitionTitle($titlePolicy,$row+['insurance_policy_change_id'=>$change->id,'affects_coverage'=>true]);
                 }
                 $ledger->refresh($result);
-                if ($result->id !== $source->id) $ledger->refresh($source);
+                if ($result->id !== $source->id && !$companyChanged && !$scheduled) $ledger->refresh($source);
                 $context = ['insurance_policy_id'=>$result->id,'insurance_policy_change_id'=>$change->id];
                 $stored = app(PrivateAttachmentBatch::class)->upload($client,[$contract],$context+['document_category'=>'policy']);
                 if ($quote) {
@@ -178,7 +198,9 @@ class PolicyContractTransitions
                     $quote->update(['status'=>'converted']); $quote->quoteCase->update(['status'=>'closed']);
                 }
                 $ledger->log($source,$kind === 'renewal' ? 'policy_renewed' : 'policy_contract_changed',$description,['policy_change_id'=>$change->id,'result_policy_id'=>$result->id],$before['policy'] ?? []);
-                if ($result->id !== $source->id) $ledger->log($result,'policy_contract_changed','Sostituisce la polizza '.$source->number.'.',['policy_change_id'=>$change->id]);
+                if ($result->id !== $source->id) $ledger->log($result,'policy_contract_changed',($companyChanged ? 'Prosegue alla scadenza della polizza ' : 'Sostituisce la polizza ').$source->number.'.',['policy_change_id'=>$change->id]);
+                if ($kind === 'renewal') PolicyFormReminder::record($result, $change);
+                else PolicyFormReminder::clear($source);
                 return $change;
             });
         } catch (\Throwable $exception) {

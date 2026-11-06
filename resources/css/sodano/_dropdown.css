@@ -40,6 +40,26 @@
   overflow-y: auto;
 }
 
+.notification-paging {
+  display: grid;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.notification-paging > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.notification-paging .btn {
+  flex: 1 1 auto;
+  min-height: 44px;
+}
+
 .dropdown-item {
   display: block;
   padding: 9px 14px;

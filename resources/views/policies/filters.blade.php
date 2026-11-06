@@ -1,4 +1,4 @@
-<form method="GET" action="{{ $action }}" class="client-search-form portfolio-filters">
+<form method="GET" action="{{ $action }}" class="client-search-form portfolio-filters" @isset($filterFormId) id="{{ $filterFormId }}" data-list-filters aria-label="Filtra polizze" @endisset>
     @if(isset($group))<input type="hidden" name="group" value="{{ $group }}">@endif
     @isset($reportMonth)
         <div class="report-period">
@@ -24,6 +24,7 @@
             <x-form-group label="Scadenza dal" name="from"><input id="field-from" class="form-in" type="date" name="from" value="{{ request('from') }}"></x-form-group>
             <x-form-group label="Scadenza al" name="to"><input id="field-to" class="form-in" type="date" name="to" value="{{ request('to') }}"></x-form-group>
         </div>
+        @isset($filterFormId)<div data-column-filters></div>@endisset
     </details>
     <div class="search-form-actions"><button type="submit" class="btn btn-p">Applica filtri</button>@if(request()->except(['page','group','_table_all']))<a href="{{ $action }}{{ isset($group) ? '?group='.$group : '' }}" class="btn btn-g">Azzera</a>@endif</div>
 </form>

@@ -3,11 +3,13 @@ function revealDetails() {
     try { anchor = decodeURIComponent(location.hash.slice(1)); } catch { return; }
     const target = document.getElementById(anchor);
     if (!target) return;
-    let details = target.closest('details');
+    const signatureAction = target.matches('[data-signature-destination]') && target.querySelector('details[data-signature-next]');
+    let details = (signatureAction || target).closest('details');
     while (details) {
         details.open = true;
         details = details.parentElement?.closest('details');
     }
+    if (signatureAction) target.scrollIntoView({block:'start'});
 }
 
 document.addEventListener('DOMContentLoaded', revealDetails);

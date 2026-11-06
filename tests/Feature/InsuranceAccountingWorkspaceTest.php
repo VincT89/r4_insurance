@@ -100,6 +100,9 @@ class InsuranceAccountingWorkspaceTest extends TestCase
         $title=$this->title();
         $url=route('policies.collect',$this->policy);
         $this->post($url,$this->payment($this->title(['amount_cents'=>1000]),1000,['received_on'=>'2026-10-30']))->assertSessionHasNoErrors();
+        $dayLedger = route('collections.index', ['policy'=>$this->policy->id, 'from'=>'2026-10-30', 'to'=>'2026-10-30']);
+        $this->get($this->page().'?tab=payments')->assertOk()->assertSee(e($dayLedger).'#movimenti', false);
+        $this->get($dayLedger)->assertOk()->assertViewHas('collections', fn($rows) => $rows->total() === 1 && $rows->first()->payment_method === 'Bonifico a Intermediario');
         $this->post($url,$this->payment($this->title(['amount_cents'=>2000]),2000))->assertSessionHasNoErrors();
         $this->post($url,$this->payment($this->title(['amount_cents'=>3000]),3000,['payment_method'=>'Bonifico a Compagnia','recipient'=>'company']))->assertSessionHasNoErrors();
         $this->post($url,$this->payment($this->title(['amount_cents'=>4000]),4000))->assertSessionHasNoErrors();

@@ -9,10 +9,11 @@ class InsurancePaymentSummary
     public function forQuery(Builder $query): array
     {
         $withinContract = \App\Models\InsuranceTitle::query()->withinContract()->select('insurance_titles.id');
+        $balance = \App\Models\InsuranceTitle::balanceSql();
         /** Mutually exclusive due-date groups match the operational filters and retain unpaid history. */
         $rows = (clone $query)->where('direction','receipt')->inPaymentState('open')->reorder()->selectRaw(
             "CASE WHEN due_on < ? THEN 'overdue' WHEN insurance_titles.id NOT IN (".$withinContract->toSql().") THEN 'beyond_contract' WHEN due_on < ? THEN 'due_soon' ELSE 'future' END AS payment_group,
-            COUNT(*) AS quantity, SUM(amount_cents - collected_cents) AS residual_cents",
+            COUNT(*) AS quantity, SUM($balance) AS residual_cents",
             [today()->toDateString(), ...$withinContract->getBindings(), today()->addDays(16)->toDateString()]
         )->groupBy('payment_group')->get()->keyBy('payment_group');
 

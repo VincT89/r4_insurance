@@ -1,5 +1,5 @@
-<div @class(['client-table-scroll', 'policy-list-scroll'=>isset($documentContextPolicy)]) role="region" aria-label="{{ isset($documentContextPolicy) ? 'Documenti della polizza' : 'Documenti del cliente' }}" tabindex="0">
-    <table @class(['t-table', 'policy-documents-table'=>isset($documentContextPolicy)])>
+<div class="client-table-scroll policy-list-scroll" role="region" aria-label="{{ isset($documentContextPolicy) ? 'Documenti della polizza' : 'Documenti del cliente' }}" tabindex="0">
+    <table class="t-table policy-documents-table client-document-table">
         <thead><tr><th>Documento</th><th>Categoria</th><th>Collegamento</th><th>Scadenza</th><th>Verifica e versione</th><th>Azioni</th></tr></thead>
         <tbody>
             @forelse($documents as $document)
@@ -11,7 +11,7 @@
                         @elseif($document->vehicle)Veicolo {{ $document->vehicle->plate }}
                         @else Anagrafica cliente @endif
                         @if($document->insurance_title_id)<div><a href="{{ route('titles.show',$document->insurance_title_id) }}">Titolo #{{ $document->insurance_title_id }}</a></div>@endif
-                        @if($document->insurance_form_document_id)<div><a href="{{ route('clients.forms.show',[$client,$document->formDocument->insurance_form_package_id]) }}">Fascicolo moduli e firme</a></div>@endif
+                        @if($document->insurance_form_document_id)<div><a href="{{ route('clients.forms.show',[$client,$document->formDocument->insurance_form_package_id]).'#form-document-'.$document->insurance_form_document_id }}">Apri modulo nello storico</a></div>@endif
                         @if($document->insurance_coverage_check_id)<div><a href="{{ route('clients.policies.coverage',[$client,$document->insurance_policy_id]) }}">Controllo RCA</a></div>@endif
                         @if($document->insurance_claim_id)<div><a href="{{ route('claims.show',$document->insurance_claim_id) }}">Sinistro #{{ $document->insurance_claim_id }}</a></div>@endif
                         @if($document->insurance_quote_email_id)<div><a href="{{ route('quote-emails.show',$document->insurance_quote_email_id) }}">Richiesta preventivo</a></div>@endif
@@ -19,7 +19,15 @@
                         @if($document->insurance_quote_id)<div><a href="{{ route('quotes.show',\App\Models\InsuranceQuote::find($document->insurance_quote_id)->insurance_quote_case_id) }}">Preventivo e approvazione</a></div>@endif
                     </td>
                     <td data-label="Scadenza"><x-status-text :alert="$document->expires_on?->lt(today())">{{ $document->expires_on?->format('d/m/Y') ?? 'Non indicata' }}</x-status-text>@if($document->document_category === 'identity' || $document->expires_on)<div @class(['client-overdue' => $document->expires_on?->lt(today())])>{{ $document->validity_label }}</div>@endif</td>
-                    <td data-label="Verifica e versione">Versione {{ $document->version_number }}{{ $document->newerVersion ? ' / storica' : '' }}<div>{{ ['generated'=>'Modulo predisposto','validated'=>'Validato','rejected'=>'Da correggere'][$document->review_status] ?? ($document->insurance_claim_id?'Conservato nel fascicolo sinistro':($document->insurance_coverage_check_id?'Prova del controllo RCA':'Ricevuto, da validare')) }}</div>@if($document->validated_at)<div class="u-text-meta">{{ $document->validated_at->format('d/m/Y H:i') }} / {{ $document->validator?->name ?? 'Utente non disponibile' }}</div>@endif</td>
+                    <td data-label="Verifica e versione">
+                        {{ $document->insurance_form_submission_id ? 'Copia' : 'Versione' }} {{ $document->version_number }}{{ $document->isHistoricalDocument() ? ' / storica' : '' }}
+                        @if($document->insurance_form_submission_id)
+                            <div>{{ ['received'=>'Copia da controllare','validated'=>'Firma controllata','rejected'=>'Correzione richiesta'][$document->review_status] ?? 'Copia ricevuta' }}</div>
+                        @else
+                            <div>{{ ['generated'=>'Originale del modulo','validated'=>'Validato','rejected'=>'Da correggere'][$document->review_status] ?? ($document->insurance_claim_id ? 'Conservato nel fascicolo sinistro' : ($document->insurance_coverage_check_id ? 'Prova del controllo RCA' : 'Ricevuto, da validare')) }}</div>
+                        @endif
+                        @if($document->validated_at)<div class="u-text-meta">{{ $document->validated_at->format('d/m/Y H:i') }} / {{ $document->validator?->name ?? 'Utente non disponibile' }}</div>@endif
+                    </td>
                     <td data-label="Azioni"><div class="commercial-actions">
                         @if($document->canPreview())<a class="btn btn-g btn-sm" href="{{ $document->downloadUrl() }}" aria-label="Scarica {{ $document->original_name }}">Scarica</a>@endif
                         @if($document->document_category && !$document->newerVersion && !$document->insurance_quote_case_id && !$document->insurance_quote_id && !$document->insurance_title_id && !$document->insurance_collection_id && !$document->insurance_quote_email_id && !$document->insurance_form_document_id && !$document->insurance_coverage_check_id && !$document->insurance_claim_id)

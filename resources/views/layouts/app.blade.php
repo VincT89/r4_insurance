@@ -167,7 +167,8 @@
           <x-nav-item href="{{ route('collections.index') }}" icon="wallet" label="Contabilità" :active="request()->routeIs('collections.*')" />
           <x-nav-item href="{{ route('policies.index') }}" icon="files" label="Polizze" :active="request()->routeIs('policies.index', 'clients.policies.show', 'clients.policies.edit')" />
           <x-nav-item href="{{ route('deadlines.index') }}" icon="clock" label="Scadenze" :active="request()->routeIs('deadlines.*')" />
-          @can('system.admin')<x-nav-item href="{{ route('agency-communications.index') }}" icon="mail" label="Comunicazioni" :active="request()->routeIs('agency-communications.*')" /><x-nav-item href="{{ route('reports.index') }}" icon="chart-no-axes-combined" label="Report" :active="request()->routeIs('reports.*','commissions.*')" />@endcan
+          @can('communications.manage')<x-nav-item href="{{ route('agency-communications.index') }}" icon="mail" label="Comunicazioni" :active="request()->routeIs('agency-communications.*')" />@endcan
+          @can('system.admin')<x-nav-item href="{{ route('reports.index') }}" icon="chart-no-axes-combined" label="Report" :active="request()->routeIs('reports.*','commissions.*')" />@endcan
         </div>
       @endcan
       @can('system.admin')

@@ -5,7 +5,8 @@ export async function mount(root) {
     const status = root.querySelector('[data-preview-status]');
     const source = new URL(root.dataset.source, location.href);
     const assets = new URL(root.dataset.assets, location.href);
-    if (source.origin !== location.origin || assets.origin !== location.origin) throw new Error('Documento non locale.');
+    const embedded = source.href.startsWith('data:application/pdf;base64,');
+    if ((!embedded && source.origin !== location.origin) || assets.origin !== location.origin) throw new Error('Documento non locale.');
     const pdfjs = await import('pdfjs-dist/build/pdf.mjs');
     const { default: workerUrl } = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
     const { PDFViewer, EventBus, PDFLinkService, PDFFindController, GenericL10n } = await import('pdfjs-dist/web/pdf_viewer.mjs');
@@ -30,7 +31,8 @@ export async function mount(root) {
     const on = (element, event, handler) => element.addEventListener(event, handler, { signal: abort.signal });
     let documentPdf, timer, disposed = false;
     /** Non viene attivato alcun gestore degli script del PDF; il file resta di sola lettura. */
-    const loadingTask = pdfjs.getDocument({ url: source.href, isEvalSupported: false, enableXfa: false,
+    const documentSource = embedded ? {data:Uint8Array.from(atob(source.pathname.split(',')[1]),char=>char.charCodeAt(0))} : {url:source.href};
+    const loadingTask = pdfjs.getDocument({ ...documentSource, isEvalSupported: false, enableXfa: false,
         cMapUrl: new URL('cmaps/', assets).href, cMapPacked: true, standardFontDataUrl: new URL('standard_fonts/', assets).href,
         wasmUrl: new URL('wasm/', assets).href, useSystemFonts: true });
     const fail = message => {
@@ -44,6 +46,7 @@ export async function mount(root) {
     on(window, 'pagehide', cleanup);
     const syncPage = () => { pageNumber.value = viewer.currentPageNumber; previous.disabled = viewer.currentPageNumber <= 1; next.disabled = viewer.currentPageNumber >= viewer.pagesCount; };
     eventBus.on('pagesinit', () => {
+        root.dispatchEvent(new CustomEvent('document:ready', {detail:{pages:documentPdf.numPages}}));
         viewer.currentScaleValue = zoom.value;
         pageNumber.max = documentPdf.numPages;
         root.querySelector('[data-page-count]').textContent = `di ${documentPdf.numPages}`;
@@ -53,6 +56,7 @@ export async function mount(root) {
     eventBus.on('pagechanging', syncPage);
     eventBus.on('pagerendered', event => {
         if (event.error) return fail('Una pagina non è leggibile nel lettore. Usa Scarica PDF per consultare il file originale.');
+        root.dispatchEvent(new CustomEvent('document:page-rendered', {detail:{page:event.pageNumber}}));
         if (root.dataset.state === 'loading') { clearTimeout(timer); root.dataset.state = 'ready'; status.textContent = ''; }
     });
     eventBus.on('updatefindmatchescount', ({ matchesCount }) => { searchStatus.textContent = matchesCount.total ? `${matchesCount.current} di ${matchesCount.total} risultati` : 'Nessun risultato nel testo. Il documento potrebbe essere una scansione.'; });

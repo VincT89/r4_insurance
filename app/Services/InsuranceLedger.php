@@ -104,6 +104,7 @@ class InsuranceLedger
             $policy=InsurancePolicy::whereKey($title->insurance_policy_id)->lockForUpdate()->firstOrFail(); $title=InsuranceTitle::whereKey($title->id)->lockForUpdate()->firstOrFail();
             if($title->cancelled_at) return;
             if($title->collected_cents>0) $this->fail('Il titolo ha incassi: storna prima i movimenti errati, senza cancellarli.');
+            if($title->allowance_cents>0) $this->fail('Il titolo ha abbuoni registrati. Storna prima quelli errati, conservando lo storico.');
             $before=$title->only(['cancelled_at','cancellation_reason']);
             $title->update(['cancelled_at'=>now(),'cancellation_reason'=>$reason]);
             app(InsuranceCommissionLedger::class)->sync($title);
@@ -128,7 +129,7 @@ class InsuranceLedger
             $before=['collected_cents'=>$title->collected_cents];
             $data['direction'] = $title->direction;
             $payment=$title->collections()->create($data+['created_by'=>auth()->id(),'request_fingerprint'=>$fingerprint]);
-            $title->update(['collected_cents'=>$title->collected_cents+$data['amount_cents']]);
+            $title->update(['collected_cents'=>$title->collected_cents+$data['amount_cents'],'settlement_revision'=>$title->settlement_revision+1]);
             app(InsuranceCommissionLedger::class)->sync($title, $payment->received_on->toDateString(), 'Maturazione sull’incasso #'.$payment->id.'.');
             $this->refresh($policy);$this->log($policy,$title->direction === 'refund' ? 'refund_recorded' : 'collection_recorded','registrato '.($title->direction === 'refund' ? 'rimborso' : 'incasso').' #'.$payment->id.' di '.Money::format($payment->amount_cents).' sul titolo #'.$title->id.'.',['insurance_collection_id'=>$payment->id,'insurance_title_id'=>$title->id,'collected_cents'=>$title->collected_cents]+$data,$before);return $payment;
         });
@@ -142,11 +143,17 @@ class InsuranceLedger
             if($payment->voided_at) return;
             $before=['collected_cents'=>$title->collected_cents]+$payment->only(['voided_at','void_reason']);
             $payment->update(['voided_at'=>now(),'voided_by'=>auth()->id(),'void_reason'=>$reason]);
-            $title->update(['collected_cents'=>$title->collected_cents-$payment->amount_cents]);
-            app(InsuranceCommissionLedger::class)->sync($title, today()->toDateString(), 'Rettifica sullo storno dell’incasso #'.$payment->id.': '.$reason);
+            $title->update(['collected_cents'=>$title->collected_cents-$payment->amount_cents,'settlement_revision'=>$title->settlement_revision+1]);
+            $refund = $payment->direction === 'refund';
+            $movement = $refund ? 'rimborso' : 'incasso';
+            app(InsuranceCommissionLedger::class)->sync($title, today()->toDateString(), 'Rettifica sullo storno del movimento #'.$payment->id.': '.$reason);
             app(DeadlineReminders::class)->reopenTitle($title);
             app(CollectionCommunicationReminders::class)->recordReversal($payment);
-            $this->refresh($policy);$this->log($policy,'collection_voided','stornato incasso #'.$payment->id.' sul titolo #'.$title->id.' di '.Money::format($payment->amount_cents).': '.$reason,['insurance_collection_id'=>$payment->id,'insurance_title_id'=>$title->id,'collected_cents'=>$title->collected_cents]+$payment->only(['amount_cents','payment_method','recipient','received_on','voided_at','void_reason']),$before);
+            $this->refresh($policy);
+            $this->log($policy, $refund ? 'refund_voided' : 'collection_voided',
+                'stornato '.$movement.' #'.$payment->id.' sul titolo #'.$title->id.' di '.Money::format($payment->amount_cents).': '.$reason,
+                ['insurance_collection_id'=>$payment->id,'insurance_title_id'=>$title->id,'collected_cents'=>$title->collected_cents]
+                    + $payment->only(['direction','amount_cents','payment_method','recipient','received_on','voided_at','void_reason']), $before);
         });
     }
     public function renewalPlan(InsurancePolicy $policy,array $data): array
@@ -177,7 +184,7 @@ class InsuranceLedger
         $titles=$policy->titles()->whereNull('cancelled_at')->orderBy('coverage_from')->orderBy('id')->get();
         $covered=null; $cursor=$policy->coverage_origin_on ?? $policy->starts_on;
         /** A later paid instalment never bridges a gap left by an unpaid earlier title. */
-        foreach($titles->where('affects_coverage',true) as $title){if($title->balance_cents>0 || !$title->coverage_from->equalTo($cursor))break; $covered=$title->coverage_to; $cursor=$covered;}
+        foreach($titles->where('affects_coverage',true) as $title){if(!$title->coverage_satisfied || !$title->coverage_from->equalTo($cursor))break; $covered=$title->coverage_to; $cursor=$covered;}
         $receipts=$titles->where('direction','!=','refund');
         $policy->forceFill(['coverage_until'=>$covered,'payment_status'=>$receipts->isEmpty() ? null : ($receipts->every(fn($t)=>$t->balance_cents===0) ? 'paid' : 'unpaid')])->save();
     }

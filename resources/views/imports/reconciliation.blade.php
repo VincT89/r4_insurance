@@ -1,0 +1,24 @@
+<h2 class="workspace-section-title">Confronto con il lotto Excel conservato</h2>
+<p class="u-mb-md">{{ $reconciliation['source_file'] }}. Il confronto riguarda numero, compagnia, agenzia, date, premio e rate con data e importo leggibili. Le differenze possono derivare da aggiornamenti successivi: apri lo storico prima di correggere una scheda.</p>
+<p class="u-text-meta u-mb-md">Gruppi nel lotto: {{ number_format($reconciliation['rows']->count(),0,',','.') }}. Dati polizza coincidenti: {{ number_format($reconciliation['counts']['matching'],0,',','.') }}. Altri gruppi da verificare: {{ number_format($reconciliation['rows']->count()-$reconciliation['counts']['matching'],0,',','.') }}.</p>
+@if($reconciliation['policies_without_import'])<p class="u-mb-md">Polizze senza collegamento al lotto Excel: {{ $reconciliation['policies_without_import'] }}. Non vengono associate automaticamente soltanto per numero o nome.</p>@endif
+@if($reconciliation['entries_without_source'])<p class="u-mb-md">Registrazioni d’importazione non presenti nel lotto attuale: {{ $reconciliation['entries_without_source'] }}. Verifica il file di provenienza prima di considerare completo il confronto.</p>@endif
+@if($reconciliation['compared_premiums'])<p class="u-mb-md">Premi confrontabili su {{ $reconciliation['compared_premiums'] }} schede collegate univocamente: Excel {{ \App\Support\Money::format($reconciliation['source_premium_cents']) }}, gestionale {{ \App\Support\Money::format($reconciliation['current_premium_cents']) }}. Scostamento {{ \App\Support\Money::format($reconciliation['current_premium_cents']-$reconciliation['source_premium_cents']) }}.@if($reconciliation['unavailable_premiums']) Premi incompleti esclusi dal totale: {{ $reconciliation['unavailable_premiums'] }}.@endif</p>@endif
+@if(!$reconciliation['compared_premiums'] && $reconciliation['unavailable_premiums'])<p class="u-mb-md">Premi non confrontabili per dati incompleti: {{ $reconciliation['unavailable_premiums'] }}.</p>@endif
+<p class="u-text-meta u-mb-md">{{ $reconciliation['cash_note'] }}</p>
+<form method="GET" action="{{ route('insurance-import.index') }}" class="client-search-form u-mt-md">
+    <input type="hidden" name="section" value="reconciliation">
+    <x-form-group label="Cerca numero, cliente o compagnia" name="search"><input class="form-in" type="search" name="search" maxlength="255" value="{{ request('search') }}"></x-form-group>
+    <x-form-group label="Confronto" name="comparison"><select class="form-sel" name="comparison"><option value="attention">Da verificare</option>@foreach(\App\Services\InsuranceImportReconciliation::STATES as $code=>$label)<option value="{{ $code }}" @selected(request('comparison')===$code)>{{ $label }} ({{ $reconciliation['counts'][$code] }})</option>@endforeach</select></x-form-group>
+    <button class="btn btn-p">Mostra confronto</button><a class="btn btn-g" href="{{ route('insurance-import.index',['section'=>'reconciliation']) }}">Azzera filtri</a>
+</form>
+<div class="client-table-scroll" role="region" aria-label="Riconciliazione Excel" tabindex="0"><table class="t-table"><thead><tr><th>Polizza Excel</th><th>Esito</th><th>Differenze e rate</th><th>Pagamenti nel gestionale</th><th>Azioni</th></tr></thead><tbody>
+@forelse($comparisonRows as $row)
+    <tr><td>{{ $row['number'] }}<div class="u-text-meta">{{ $row['company'] }} / {{ $row['client_name'] }}</div><div class="u-text-meta">Righe Excel: {{ implode(', ',$row['source_rows']) }}</div></td><td>{{ $row['label'] }}</td>
+        <td>@foreach($row['differences'] as $difference)<p class="u-mb-sm"><strong>{{ $difference['field'] }}</strong><br>Excel: {{ $difference['source'] ?: 'Non indicato' }}<br>Gestionale: {{ $difference['current'] ?: 'Non indicato' }}</p>@endforeach @foreach($row['rate_issues'] as $issue)<p class="u-mb-sm">{{ $issue }}</p>@endforeach @if(!$row['differences'] && !$row['rate_issues']){{ $row['state']==='matching' ? 'I dati confrontati coincidono.' : 'Il gruppo non è confrontabile con una polizza collegata.' }}@endif @if(!$row['has_rate_data'])<p>Dati rata non presenti nel lotto.</p>@endif</td>
+        <td>@if($row['receipt_cents']!==null)Incassi: {{ \App\Support\Money::format($row['receipt_cents']) }}<br>Rimborsi: {{ \App\Support\Money::format($row['refund_cents']) }}@else Nessuna polizza collegata @endif</td>
+        <td><div class="policy-row-actions">@if($row['policy_id'])<a class="btn btn-g btn-sm" href="{{ route('clients.policies.show',[$row['client_id'],$row['policy_id']]) }}">Apri polizza</a>@endif @if($row['entry_id'])<a class="btn btn-g btn-sm" href="{{ route('insurance-import.policy-source',$row['entry_id']) }}">Dati originali</a>@endif</div></td>
+    </tr>
+@empty<tr><td colspan="5">Nessun gruppo per questi filtri.</td></tr>@endforelse
+</tbody></table></div>
+{{ $comparisonRows->links() }}

@@ -2,6 +2,8 @@ function selectSection(workspace, key) {
     const sections = [...workspace.querySelectorAll('[data-policy-section]')];
     if (!sections.some(section => section.dataset.policySection === key)) return false;
     for (const section of sections) section.hidden = section.dataset.policySection !== key;
+    const signatures = workspace.querySelector('[data-policy-signatures]');
+    if (signatures) signatures.hidden = key !== 'forms' && (key !== 'overview' || signatures.dataset.hasDocuments !== '1');
     for (const link of workspace.querySelectorAll('nav [data-policy-section-link]')) {
         if (new URL(link.href).searchParams.get('tab') === key) link.setAttribute('aria-current', 'page');
         else link.removeAttribute('aria-current');
@@ -16,7 +18,7 @@ function restoreSection() {
     try { target = document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch { return; }
     const anchoredSection = target?.closest('[data-policy-section]');
     const key = anchoredSection?.dataset.policySection || new URL(location.href).searchParams.get('tab');
-    if (key && selectSection(workspace, key) && anchoredSection) target.scrollIntoView({ block: 'start' });
+    if (key && selectSection(workspace, key) && (anchoredSection || target?.closest('[data-policy-signatures]'))) target.scrollIntoView({ block: 'start' });
 }
 
 document.addEventListener('click', event => {

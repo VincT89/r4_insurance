@@ -6,6 +6,7 @@ use App\Http\Requests\{QuickStoreClientRequest, StoreClientRequest, UpdateClient
 use App\Enums\UserRole;
 use App\Models\Client;
 use App\Models\User;
+use App\Services\InsuranceDocumentation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
@@ -64,7 +65,7 @@ class ClientController extends Controller
             : null;
         $client->load('commercialUser:id,name');
         $policies = $tab === 'policies' ? $client->policies()->with(['vehicle', 'asset', 'supplierAgency', 'contracts'])
-            ->withExists(['titles as has_payable_titles' => fn ($q) => $q->whereNull('cancelled_at')->whereColumn('collected_cents', '<', 'amount_cents')])
+            ->withExists(['titles as has_payable_titles' => fn ($q) => $q->outstanding()])
             ->orderBy('category')->orderBy('expires_on')->get() : collect();
         $policyCategories = (\App\Models\InsuranceBranch::exists() ? collect() : collect(\App\Models\InsurancePolicy::CATEGORY_SUGGESTIONS))->merge($policies->pluck('category'))->unique()->values();
         if (filled($filters['category'] ?? null)) {
@@ -74,8 +75,10 @@ class ClientController extends Controller
         if (filled($filters['subcategory'] ?? null)) $policies = $policies->where('subcategory', $filters['subcategory']);
         $vehicles = $tab === 'vehicles' ? $client->vehicles()->withCount('policies')->with(['meritClassCompany','policies'=>fn($q)=>$q->orderByDesc('starts_on')->orderByDesc('id')])->orderBy('plate')->get() : collect();
         $documents = $tab === 'documents' ? $client->attachments()->whereNull('client_material_category')
-            ->when(($filters['document_view'] ?? 'current') === 'current', fn ($q) => $q->whereDoesntHave('newerVersion'))
-            ->with(['uploader', 'insurancePolicy.vehicle', 'vehicle', 'newerVersion', 'validator'])->withExists('checklistRequests')->latest()->get() : collect();
+            ->when(($filters['document_view'] ?? 'current') === 'current', fn ($q) => $q->currentDocumentVersion())
+            ->with(['uploader', 'insurancePolicy.vehicle', 'vehicle', 'newerVersion', 'validator','formDocument.latestSubmission'])->withExists('checklistRequests')->latest()->get() : collect();
+        $openSignatures = in_array($tab,['policies','documents'],true) && $request->user()->can('updateRegistry',$client)
+            ? app(InsuranceDocumentation::class)->openSignatures($client) : collect();
         $documentRequests = $tab === 'documents' ? $client->documentRequests()->with(['documents.newerVersion', 'linkedDocuments.newerVersion', 'insurancePolicy', 'branch', 'requester'])->orderBy('due_on')->get() : collect();
         $deadlines = $tab === 'deadlines' ? $deadlineQuery->forClient($client, $filters) : collect();
         $contacts = $tab === 'network' ? $client->contacts()->orderBy('name')->get() : collect();
@@ -86,7 +89,7 @@ class ClientController extends Controller
         $assets = $tab === 'assets' ? $client->assets()->with('policies')->orderBy('name')->get() : collect();
         $interactions = $tab === 'history' ? $client->interactions()->with('author')->orderByDesc('event_at')->orderByDesc('id')->paginate(\App\Support\TableListing::perPage(15))->withQueryString() : collect();
         $consents = $tab === 'consents' ? $client->consents()->with(['author', 'attachment', 'insurancePolicy'])->orderByDesc('event_at')->orderByDesc('id')->paginate(\App\Support\TableListing::perPage(15))->withQueryString() : collect();
-        return view('clients.show', compact('client', 'tab', 'policies', 'policyCategories', 'policySubcategories', 'vehicles', 'documents', 'documentRequests', 'deadlines', 'contacts', 'relationships', 'households', 'assets', 'interactions', 'consents', 'commissionSummary'));
+        return view('clients.show', compact('client', 'tab', 'policies', 'policyCategories', 'policySubcategories', 'vehicles', 'documents', 'openSignatures', 'documentRequests', 'deadlines', 'contacts', 'relationships', 'households', 'assets', 'interactions', 'consents', 'commissionSummary'));
     }
 
     public function destroy(Client $client, \App\Domain\Core\Actions\DeleteClientAction $action): RedirectResponse

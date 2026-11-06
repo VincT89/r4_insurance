@@ -9,10 +9,14 @@ class AuditChanges
 {
     private const LABELS = [
         'name'=>'Nome', 'email'=>'Email', 'role'=>'Ruolo', 'status'=>'Stato', 'number'=>'Numero polizza',
-        'insurance_policy_id'=>'Polizza', 'insurance_title_id'=>'Rata', 'insurance_collection_id'=>'Incasso',
-        'amount_cents'=>'Importo', 'collected_cents'=>'Totale incassato sulla rata', 'premium'=>'Premio',
+        'insurance_policy_id'=>'Polizza', 'insurance_title_id'=>'Titolo', 'insurance_collection_id'=>'Movimento',
+        'insurance_allowance_id'=>'Abbuono', 'allowance_cents'=>'Totale abbuoni del titolo',
+        'insurance_allowance_recovery_id'=>'Rientro dell’abbuono', 'recovered_cents'=>'Recuperato dall’agenzia', 'recoverable_cents'=>'Da recuperare dall’agenzia', 'recovery_method'=>'Modalità del rientro',
+        'borne_by'=>'Abbuono a carico di', 'bearer_name'=>'Chi sostiene l’abbuono', 'effective_on'=>'Data dell’abbuono', 'reason'=>'Motivo',
+        'coverage_confirmed_at'=>'Copertura confermata il', 'coverage_confirmed_by'=>'Operatore della conferma', 'coverage_confirmation_note'=>'Riferimento della conferma copertura',
+        'amount_cents'=>'Importo', 'collected_cents'=>'Importo regolato sul titolo', 'premium'=>'Premio',
         'due_on'=>'Scadenza', 'coverage_from'=>'Copertura dal', 'coverage_to'=>'Copertura al',
-        'starts_on'=>'Decorrenza', 'expires_on'=>'Scadenza contratto', 'received_on'=>'Data incasso',
+        'starts_on'=>'Decorrenza', 'expires_on'=>'Scadenza contratto', 'received_on'=>'Data effettiva del pagamento',
         'payment_method'=>'Metodo di pagamento', 'payment_frequency'=>'Frazionamento', 'recipient'=>'Destinatario',
         'document_type'=>'Tipo documento', 'reference'=>'Riferimento', 'notes'=>'Note',
         'cancelled_at'=>'Annullata il', 'cancellation_reason'=>'Motivo annullamento',
@@ -43,7 +47,9 @@ class AuditChanges
     {
         if ($value === null || $value === '') return 'Non presente';
         if (is_array($value) || is_object($value)) return 'Vedi dettaglio operazione';
-        if (in_array($key, ['amount_cents', 'collected_cents'], true) && is_numeric($value)) return Money::format((int) $value);
+        if (in_array($key, ['amount_cents', 'collected_cents', 'allowance_cents', 'recovered_cents', 'recoverable_cents'], true) && is_numeric($value)) return Money::format((int) $value);
+        if ($key === 'recovery_method') return \App\Models\InsuranceAllowanceRecovery::METHODS[$value] ?? (string)$value;
+        if ($key === 'borne_by') return \App\Models\InsuranceAllowance::BEARERS[$value] ?? (string)$value;
         if ($key === 'premium' && is_numeric($value)) return number_format((float) $value, 2, ',', '.').' €';
         if ($key === 'role') return UserRole::tryFrom((string) $value)?->label() ?? (string) $value;
         if ($key === 'recipient') return InsuranceCollection::RECIPIENTS[$value] ?? (string) $value;

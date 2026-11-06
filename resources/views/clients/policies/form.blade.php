@@ -1,6 +1,7 @@
 <x-app-layout :title="$policy->exists ? 'Modifica polizza' : 'Nuova polizza'">
     @php($fromContract = !$policy->exists && !$existingEntry)
-    <x-page-header><x-slot:title>{{ $policy->exists ? 'Modifica polizza' : 'Nuova polizza' }}</x-slot:title><x-slot:actions>@if($client->exists)<a href="{{ route('clients.show', $client) }}" class="btn btn-g">{{ $client->name }}</a>@else<a href="{{ route('policies.index') }}" class="btn btn-g">Polizze</a>@endif</x-slot:actions></x-page-header>
+    @php($policyReturnUrl = $policy->exists ? route('clients.policies.show', [$client, $policy]) : ($selectedQuote ? route('quotes.show', $selectedQuote->quoteCase) : ($client->exists ? route('clients.show', $client) : route('policies.index'))))
+    <x-page-header><x-slot:title>{{ $policy->exists ? 'Modifica polizza' : 'Nuova polizza' }}</x-slot:title><x-slot:actions>@if($client->exists)<a href="{{ route('clients.show', $client) }}" class="btn btn-g">{{ $client->name }}</a>@if(!$policy->exists)<a class="btn btn-g" href="{{ $selectedQuote ? route('quotes.show', $selectedQuote->quoteCase) : route('quotes.index', ['client'=>$client->id]) }}">{{ $selectedQuote ? 'Preventivo di origine' : 'Preventivi del cliente' }}</a>@endif @else<a href="{{ route('policies.index') }}" class="btn btn-g">Polizze</a>@endif</x-slot:actions></x-page-header>
     <x-panel padded>
         <form method="POST" enctype="multipart/form-data" action="{{ $policy->exists ? route('clients.policies.update', [$client, $policy]) : ($globalCreate ? route('policies.store') : route('clients.policies.store', $client)) }}" @if($fromContract) data-policy-contract data-ocr-base="{{ asset('vendor/ocr') }}/" data-schedule-url="{{ route('policies.contract-schedule') }}" data-restore="{{ session()->hasOldInput() ? 'true' : 'false' }}" @endif x-data="{ branch: @js(old('category', $policy->category) ?? ''), subbranch: @js(old('subcategory', $policy->subcategory) ?? ''), subbranches: @js($subcategories), company: @js(old('company', $policy->company) ?? ''), agency: @js((string)(old('supplier_agency_id', $policy->supplier_agency_id) ?? '')), agencies: @js($agenciesByCompany) }">
             @csrf
@@ -22,7 +23,7 @@
             <p class="u-text-meta u-mb-md">I campi con * sono obbligatori.</p>
             @if(!$policy->exists)
             <x-form-section title="Origine della polizza">
-                @if($selectedQuote)<input type="hidden" name="entry_mode" value="new"><input type="hidden" name="insurance_quote_id" value="{{ $selectedQuote->id }}"><p>Proposta {{ $selectedQuote->reference }} approvata da {{ $client->name }}. Premio: {{ \App\Support\Money::format($selectedQuote->premium_cents) }}.</p><a href="{{ route('quotes.show',$selectedQuote->insurance_quote_case_id) }}">Consulta preventivo e prova di approvazione</a>
+                @if($selectedQuote)<input type="hidden" name="entry_mode" value="new"><input type="hidden" name="insurance_quote_id" value="{{ $selectedQuote->id }}"><p>Proposta {{ $selectedQuote->reference }} approvata da {{ $client->name }}. Premio {{ \App\Support\Money::format($selectedQuote->premium_cents) }}.</p><a href="{{ route('quotes.show',[$selectedQuote->insurance_quote_case_id,'proposal'=>$selectedQuote->id]) }}#proposal-{{ $selectedQuote->id }}" target="_blank" rel="noopener">Consulta preventivo e prova di approvazione</a>
                 @elseif($existingEntry)
                 <input type="hidden" name="entry_mode" value="existing">
                 <p class="u-mb-md">Stai registrando una polizza già stipulata. Per una nuova stipula, <a href="{{ route('policies.create', $client->exists ? ['client_id'=>$client->id] : []) }}">carica il contratto</a>.</p>
@@ -108,7 +109,7 @@
             </x-form-section>@endunless
             @if($fromContract)</details>@endif
             @if($fromContract) @include('policies.contract-review') @endif
-            <div class="insurance-form-actions"><a href="{{ $policy->exists ? route('clients.policies.show', [$client, $policy]) : ($client->exists ? route('clients.show', $client) : route('policies.index')) }}" class="btn btn-g">Annulla</a><button type="submit" class="btn btn-p" @if($fromContract) data-contract-save disabled @endif>{{ $fromContract ? 'Conferma e crea polizza' : 'Salva polizza' }}</button></div>
+            <div class="insurance-form-actions"><a href="{{ $policyReturnUrl }}" class="btn btn-g">Annulla</a><button type="submit" class="btn btn-p" @if($fromContract) data-contract-save disabled @endif>{{ $fromContract ? 'Conferma e crea polizza' : 'Salva polizza' }}</button></div>
             @if($fromContract) </div> @endif
         </form>
     </x-panel>

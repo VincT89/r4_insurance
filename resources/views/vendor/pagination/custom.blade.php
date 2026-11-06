@@ -2,7 +2,7 @@
     <nav class="pagination" role="navigation" aria-label="Paginazione" data-page-name="{{ $paginator->getPageName() }}">
         {{-- Previous --}}
         @if ($paginator->onFirstPage())
-            <span class="page-item disabled">
+            <span class="page-item disabled" aria-disabled="true" aria-label="Pagina precedente">
                 <span class="page-link">←</span>
             </span>
         @else
@@ -21,7 +21,7 @@
                     @if ($page == $paginator->currentPage())
                         <span class="page-item active" aria-current="page"><span class="page-link">{{ $page }}</span></span>
                     @else
-                        <a class="page-item" href="{{ $url }}"><span class="page-link">{{ $page }}</span></a>
+                        <a class="page-item" href="{{ $url }}" aria-label="Vai alla pagina {{ $page }}"><span class="page-link">{{ $page }}</span></a>
                     @endif
                 @endforeach
             @endif
@@ -33,7 +33,7 @@
                 <span class="page-link">→</span>
             </a>
         @else
-            <span class="page-item disabled">
+            <span class="page-item disabled" aria-disabled="true" aria-label="Pagina successiva">
                 <span class="page-link">→</span>
             </span>
         @endif

@@ -1,6 +1,7 @@
 <x-app-layout :title="$document->exists ? 'Modifica dati documento' : 'Carica documenti'">
     @php($linksLocked = $document->document_request_id || $document->previous_version_id || ($document->exists && $document->checklistRequests()->exists()))
     <x-page-header><x-slot:title>{{ $document->exists ? 'Modifica dati documento' : 'Carica documenti' }}</x-slot:title><x-slot:actions><a href="{{ $returnUrl }}" class="btn btn-g">{{ $returnPolicy ? 'Torna alla polizza '.$returnPolicy->number : $client->name }}</a></x-slot:actions></x-page-header>
+    @include('insurance-forms.open-signatures')
     <x-panel padded>
         <form method="POST" enctype="multipart/form-data" data-document-expiry data-today="{{ today()->toDateString() }}" data-ocr-base="{{ asset('vendor/ocr').'/' }}" action="{{ $document->exists ? route('clients.documents.update', [$client, $document]) : route('clients.documents.store', $client) }}">
             @csrf

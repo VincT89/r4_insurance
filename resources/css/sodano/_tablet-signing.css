@@ -1,0 +1,37 @@
+.signing-body { background:var(--ap-bg,#f5f7fa); }
+.tablet-signing { max-width:1600px; margin:0 auto; padding:20px; color:var(--ap-text,#172033); }
+.tablet-signing-header { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:18px; }
+.tablet-signing-header h1 { margin:0 0 8px; font-size:25px; line-height:1.25; color:var(--ap-primary,#0b498c); }
+.tablet-signing-header p { margin:3px 0; font-size:14px; }
+.signing-filename { overflow-wrap:anywhere; color:var(--ap-text-muted,#536170); }
+.tablet-signing-layout { display:grid; grid-template-columns:minmax(0,1fr) 350px; gap:20px; align-items:start; }
+.signing-document,.signing-controls { min-width:0; }
+.signing-placement-tools { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.signing-placement-tools [role=status] { font-size:13px; }
+.signing-instruction { margin:10px 0; font-size:13px; line-height:1.5; }
+.signing-document .document-preview { height:calc(100dvh - 260px); min-height:520px; }
+.signing-controls { padding:18px; border:1px solid var(--ap-panel-line,#cdd5de); background:var(--ap-panel,#fff); border-radius:10px; }
+.signing-controls h2 { font-size:17px; margin:0 0 12px; }
+.signing-controls h2:not(:first-child) { margin-top:20px; }
+.signing-controls>label:not(.signing-confirm) { display:block; font-size:13px; font-weight:600; margin:12px 0 6px; }
+.signing-controls>p { font-size:13px; line-height:1.5; margin:8px 0; }
+.signing-pad { display:block; width:100%; height:auto; aspect-ratio:2; background:#fff; border:1px solid #8997a6; border-radius:4px; touch-action:none; cursor:crosshair; }
+.signing-pad:focus-visible { outline:3px solid var(--ap-primary,#0b498c); outline-offset:3px; }
+.signing-ink-actions { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+.signing-keyboard { font-size:12px; margin:8px 0 16px; }
+.signing-keyboard summary { cursor:pointer; }
+.signing-confirm { display:flex; align-items:flex-start; gap:10px; font-size:13px; line-height:1.55; padding:12px 0; cursor:pointer; }
+.signing-confirm input { flex:0 0 18px; width:18px; height:18px; margin:2px 0; }
+.signing-controls .signing-save { display:flex; width:100%; min-height:48px; margin-top:10px; }
+.signing-controls .signing-disclosure { font-size:12px; margin-top:16px; color:var(--ap-text-muted,#536170); }
+.signing-error { color:var(--ap-danger,#9c1c21); padding:12px; border:1px solid currentColor; border-radius:4px; }
+.tablet-signing .btn { min-height:44px; white-space:normal; text-align:center; }
+.signing-placement-list { display:flex; flex-wrap:wrap; gap:10px 20px; margin-top:12px; }
+.signing-placement-list>div { display:flex; flex-wrap:wrap; align-items:center; gap:10px; font-size:13px; }
+.signing-page-marker { position:absolute; z-index:8; border:1.5px dashed #0b498c; background:rgba(255,255,255,.72); pointer-events:none; box-sizing:border-box; }
+.signing-page-marker>span { position:absolute; bottom:100%; left:0; font:12px sans-serif; color:#0b498c; background:#fff; padding:2px 5px; white-space:nowrap; }
+.signing-page-marker svg { width:100%; height:100%; display:block; }
+.signing-document .is-placing .page { cursor:crosshair; }
+.signing-document .is-placing .textLayer { user-select:none; }
+@media(max-width:1000px) { .tablet-signing-layout { grid-template-columns:minmax(0,1fr); } .signing-controls { max-width:760px; width:100%; box-sizing:border-box; margin:0 auto; } .signing-document .document-preview { height:65dvh; min-height:530px; } }
+@media(max-width:520px) { .tablet-signing { padding:12px; } .tablet-signing-header { flex-direction:column; gap:12px; } .tablet-signing-header h1 { font-size:22px; } .signing-placement-tools { align-items:stretch; } .signing-placement-tools .btn { flex:1 1 140px; } .signing-placement-tools [role=status] { flex-basis:100%; } .signing-controls { padding:14px; } .signing-document .document-preview { min-height:530px; } .signing-ink-actions .btn { flex:1 1 130px; } }

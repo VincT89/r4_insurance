@@ -122,6 +122,22 @@ class AgencyPolicyChangeCommunicationTest extends TestCase
         $this->assertStringNotContainsString($change->description,DB::table('agency_communications')->value('payload'));
     }
 
+    public function test_direct_preparation_skips_claimed_policy_and_appendix_without_sending_automatically(): void
+    {
+        $this->policy->forceFill(['created_at'=>now()])->save();
+        $first=$this->change();
+        $second=$this->change(12000);
+        $sent=$this->review([(string)$this->policy->id,'change-'.$first->id]);
+        $this->mock(AgencyEmailTransport::class)->shouldReceive('send')->once()->andReturn('accepted@example.test');
+        $this->post(route('agency-communications.send',$sent),['reviewed'=>1])->assertSessionHasNoErrors();
+        $this->get(route('agency-communications.index'))->assertOk()->assertViewHas('batches',fn($batches)=>$batches->count()===1 && $batches->first()['count']===1);
+        $this->post(route('agency-communications.review',$this->agency),['all_matching'=>1,'date'=>'2026-10-20'])->assertSessionHasNoErrors()->assertRedirect();
+        $review=AgencyCommunication::latest('id')->firstOrFail();
+        $this->assertSame([],$review->payload['policy_ids']);
+        $this->assertSame([$second->id],array_column($review->payload['changes'],'id'));
+        $this->assertSame('review',$review->status);
+    }
+
     public function test_each_appendix_is_independent_from_the_base_policy_and_cannot_be_resent_after_a_contact_change(): void
     {
         $this->policy->forceFill(['created_at'=>now()])->save();
@@ -149,13 +165,14 @@ class AgencyPolicyChangeCommunicationTest extends TestCase
         $general=$this->document('anagrafica.pdf'); $foreign=$this->document('estraneo.pdf',client:Client::factory()->create());
         $message=$this->review(['change-'.$one->id]);
         $this->get(route('agency-communications.show',$message))->assertOk()->assertSee('selezionata.pdf')->assertSee('anagrafica.pdf')->assertDontSee('non-selezionata.pdf')->assertDontSee('estraneo.pdf');
-        $this->get(route('agency-communications.history'))->assertOk()->assertSee('<td>0</td><td>1</td>', false);
+        $this->get(route('agency-communications.history'))->assertOk()->assertSee('1 appendice')
+            ->assertViewHas('messages',fn($rows)=>$rows->count()===1 && $rows->first()->payload['policy_ids']===[] && count($rows->first()->payload['changes'])===1);
         $this->assertSame([$selected->id,$general->id],app(AgencyCommunicationDocuments::class)->available($message,$this->admin)->pluck('id')->all());
         foreach ([$unselected,$foreign] as $file) $this->post(route('agency-communications.documents',$message),['attachment_revision'=>0,'document_ids'=>[$file->id]])->assertSessionHasErrors('documents');
         $this->assertSame(0,$message->documents()->count());
     }
 
-    public function test_review_rejects_foreign_agency_wrong_date_duplicate_keys_inactive_contract_and_operator_access(): void
+    public function test_review_rejects_foreign_agency_wrong_date_duplicates_and_inactive_contract_but_allows_operator(): void
     {
         $change=$this->change();
         $url=route('agency-communications.review',$this->agency);
@@ -169,10 +186,10 @@ class AgencyPolicyChangeCommunicationTest extends TestCase
         $this->post($url,['operations'=>['change-'.$change->id]])->assertSessionHasErrors('policies');
         $this->policy->update(['status'=>'active']);
         $message=$this->review(['change-'.$change->id]);
-        $this->actingAs(User::factory()->create(['role'=>UserRole::Operator]));
-        $this->get(route('agency-communications.index'))->assertForbidden();
-        $this->post($url,['operations'=>['change-'.$change->id]])->assertForbidden();
-        $this->get(route('agency-communications.show',$message))->assertForbidden();
+        $this->actingAs(User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']));
+        $this->get(route('agency-communications.index'))->assertOk();
+        $this->post($url,['operations'=>['change-'.$change->id]])->assertSessionHasNoErrors()->assertRedirect();
+        $this->get(route('agency-communications.show',$message))->assertOk();
         $this->post(route('agency-communications.send',$message),['reviewed'=>1])->assertForbidden();
     }
 

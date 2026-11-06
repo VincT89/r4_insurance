@@ -56,7 +56,8 @@ class RolePermissionsTest extends TestCase
         $this->assertSame('Contatto aggiornato', $other->fresh()->notes);
         $this->patch(route('profile.update'), ['name'=>$this->operator->name, 'email'=>$this->operator->email, 'role'=>'admin', 'status'=>'active'])->assertSessionHasErrors(['role','status']);
         $this->assertSame(UserRole::Operator, $this->operator->fresh()->role);
-        foreach (['users.index','users.create','audit-logs.index','email-settings.edit','form-templates.index','insurance-import.index'] as $route) $this->get(route($route))->assertForbidden();
+        $this->get(route('form-templates.index'))->assertOk();
+        foreach (['users.index','users.create','audit-logs.index','email-settings.edit','insurance-import.index'] as $route) $this->get(route($route))->assertForbidden();
         $this->patch(route('users.update',$this->operator), ['role'=>'admin'])->assertForbidden();
         $this->post(route('users.store'), ['role'=>'admin'])->assertForbidden();
     }

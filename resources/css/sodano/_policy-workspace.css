@@ -1,7 +1,8 @@
 [data-policy-section][hidden] { display: none !important; }
 .policy-context { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -6px 0 18px; color: var(--text2); font-size: 14px; }
 .policy-section-nav { gap: 4px 20px; padding-bottom: 0; }
-.policy-section-nav a { padding: 8px 0; border-bottom: 3px solid transparent; text-decoration: none; }
+.policy-section-nav a { padding: 8px 0; border-bottom: 3px solid transparent; text-decoration: none; color: var(--ap-page-heading); }
+.policy-section-nav a:hover { color: var(--ap-page-link-hover); }
 .policy-section-nav a[aria-current="page"] { border-color: var(--ap-primary); font-weight: 600; color: var(--accent-text); }
 .policy-section-nav a:focus-visible { outline: 2px solid var(--ap-primary); outline-offset: 3px; }
 .policy-section-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 18px; }
@@ -18,9 +19,14 @@
 .policy-contract-files { list-style: none; margin: 0; padding: 0; }
 .policy-contract-files li + li { margin-top: 12px; }
 .policy-contract-files a { overflow-wrap: anywhere; }
+.allowance-entry { margin: 16px 0; }
+.allowance-entry > form { border-left: 2px solid var(--ap-section-line); padding: 0 0 0 16px; }
+.allowance-coverage { padding: 16px 0; margin: 16px 0; border-top: 1px solid var(--ap-section-line); overflow-wrap: anywhere; }
+.allowance-coverage > h3 { margin: 0 0 8px; font-size: 16px; line-height: 1.4; }
+.allowance-coverage > p + p { margin-top: 8px; }
 @media (max-width: 760px) {
     .policy-list-scroll { overflow-x: visible; }
-    .client-table-scroll :is(.client-policy-table,.policy-titles-table,.policy-documents-table) { min-width: 0; }
+    .client-table-scroll > :is(.client-policy-table,.policy-titles-table,.policy-documents-table) { display: block; width: 100%; min-width: 0; max-width: 100%; }
     :is(.client-policy-table,.policy-titles-table,.policy-documents-table) thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
     :is(.client-policy-table,.policy-titles-table,.policy-documents-table) tbody { display: block; }
     :is(.client-policy-table,.policy-titles-table,.policy-documents-table) tbody tr { display: block; padding: 14px 16px; border-bottom: 1px solid var(--line); }
@@ -30,3 +36,10 @@
     .policy-row-actions { gap: 8px 20px; }
     .policy-row-actions a { min-height: 36px; padding: 8px 0; }
 }
+.policy-contract-lineage { display:flex; align-items:center; justify-content:space-between; gap:12px 20px; margin:0 0 16px; padding:12px 16px; border:1px solid var(--ap-section-line); border-radius:var(--r2); background:var(--ap-panel); }
+.policy-contract-lineage > div { min-width:0; overflow-wrap:anywhere; }
+.policy-contract-lineage p { margin:4px 0 0; }
+.policy-contract-lineage .btn { flex-shrink:0; min-height:44px; }
+.policy-contract-lineage .insurance-form-actions { margin:0; padding:0; gap:8px; }
+.policy-contract-notice { margin:0 0 16px; padding:12px; background:var(--ap-panel-soft); border-left:3px solid var(--ap-primary); overflow-wrap:anywhere; }
+@media(max-width:600px) { .policy-contract-lineage { flex-direction:column; align-items:stretch; gap:10px; } }

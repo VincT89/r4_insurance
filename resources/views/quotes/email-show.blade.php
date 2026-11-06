@@ -1,8 +1,18 @@
 <x-app-layout title="Richiesta di preventivo">
-<x-page-header><x-slot:title>{{ $message->status==='review' ? 'Controlla la richiesta prima di inviarla' : 'Richiesta di preventivo' }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route('quotes.show',$message->quoteCase) }}">Torna alla pratica</a>
-@if($message->quoteCase->status==='open')
-@can('updateRegistry',$message->quoteCase->client)<a class="btn btn-g" href="{{ route('quotes.emails.create',$message->quoteCase) }}">Prepara un’altra richiesta</a>@endcan
+@php
+    $singleSendLabel = $message->review_batch_id ? 'Invia solo a questo destinatario' : 'Conferma e invia richiesta';
+@endphp
+<x-page-header><x-slot:title>Email per {{ $payload['recipient']['name'] }}</x-slot:title><x-slot:actions>
+@if($message->review_batch_id)
+    <a class="btn btn-g" href="{{ route('quote-email-batches.show',$message->review_batch_id) }}">Torna al riepilogo</a>
+@elseif($message->quoteCase->status==='open')
+    @can('updateRegistry',$message->quoteCase->client)
+        @if($message->status==='review' && (int)$message->user_id === auth()->id())
+            <a class="btn btn-g" href="{{ route('quotes.emails.create',[$message->quoteCase,'draft'=>$message->id]) }}">Modifica richiesta</a>
+        @else<a class="btn btn-g" href="{{ route('quotes.emails.create',$message->quoteCase) }}">Prepara un’altra richiesta</a>@endif
+    @endcan
 @endif
+<a class="btn btn-g" href="{{ route('quotes.show',$message->quoteCase) }}">Torna alla pratica</a>
 </x-slot:actions></x-page-header>
 <x-panel title="Destinatario e invio" padded><dl class="email-envelope">
 <div><dt>Cliente</dt><dd>{{ $message->quoteCase->client->name }}</dd></div><div><dt>Mittente</dt><dd>{{ $payload['from']['name'] }}<br>{{ $payload['from']['address'] ?: 'Da configurare' }}</dd></div>
@@ -14,15 +24,13 @@
 @if(isset($file['category']))<div class="u-text-meta">{{ \App\Models\Attachment::DOCUMENT_CATEGORIES[$file['category']] ?? 'Documento' }}</div>@endif
 @if($file['validity']??null)<div><x-status-text :alert="$file['expired']??false">{{ $file['validity'] }}</x-status-text></div>@endif</div>@empty<p>Nessun allegato incluso.</p>@endforelse</x-panel>
 @if($message->status==='review')<x-panel padded>
-@if((int)$message->user_id === auth()->id() && $message->quoteCase->status==='open')
-@can('updateRegistry',$message->quoteCase->client)<div class="u-mb-md"><a class="btn btn-g" href="{{ $message->review_batch_id ? route('quote-email-batches.show',$message->review_batch_id) : route('quotes.emails.create',[$message->quoteCase,'draft'=>$message->id]) }}">{{ $message->review_batch_id ? 'Riepilogo e modifica richiesta' : 'Modifica richiesta' }}</a></div>@endcan
-@endif
 @if(!$mailReady)<p class="u-mb-md">La casella di invio deve essere configurata dall’admin.@can('system.admin') <a href="{{ route('email-settings.edit') }}">Apri Impostazioni email</a>.@endcan Dopo la configurazione prepara una nuova richiesta con il mittente corretto.</p>@endif
 @if($message->review_expires_at->isPast())<p>Il controllo è scaduto. Prepara una nuova richiesta per verificare i dati aggiornati.</p>
 @elseif((int)$message->user_id !== auth()->id())<p>La conferma è riservata all’operatore che ha preparato questa richiesta.</p>
+@elseif($message->quoteCase->status!=='open')<p>La pratica è chiusa. Questa richiesta resta consultabile nello storico.</p>
 @else @can('updateRegistry',$message->quoteCase->client)<form method="POST" action="{{ route('quote-emails.send',$message) }}" x-data="{reviewed:false,busy:false}" @submit="busy=true">@csrf
 <label class="email-review-confirm"><input name="reviewed" type="checkbox" value="1" x-model="reviewed" required> Ho controllato destinatario, compagnia, indirizzo email, testo e tutti gli allegati da inviare.</label>
-<div class="insurance-form-actions"><span class="form-help">Un solo messaggio al destinatario indicato, senza copie ad altri destinatari.</span><button class="btn btn-p" @disabled(!$mailReady) :disabled="!reviewed || busy || {{ $mailReady ? 'false' : 'true' }}" x-text="busy ? 'Invio in corso…' : 'Conferma e invia richiesta'">Conferma e invia richiesta</button></div></form>@endcan @endif
+<div class="insurance-form-actions"><span class="form-help">Un messaggio a {{ $payload['recipient']['address'] }}.</span><button class="btn btn-p" @disabled(!$mailReady) :disabled="!reviewed || busy || {{ $mailReady ? 'false' : 'true' }}" x-text="busy ? 'Invio in corso…' : @js($singleSendLabel)">{{ $singleSendLabel }}</button></div></form>@endcan @endif
 </x-panel>
 @elseif($message->canResolve())<x-panel title="Verifica dell’esito" padded><p class="u-mb-md">Il server non ha confermato l’esito. La richiesta potrebbe essere già arrivata: l’admin deve verificarlo con il servizio di posta prima di riprovare.</p>
 @can('system.admin')<form method="POST" action="{{ route('quote-emails.resolve',$message) }}">@csrf<div class="form-row">

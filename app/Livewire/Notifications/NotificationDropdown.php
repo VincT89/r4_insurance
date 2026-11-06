@@ -3,9 +3,26 @@
 namespace App\Livewire\Notifications;
 
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 
 class NotificationDropdown extends Component
 {
+    #[Locked]
+    public int $notificationPage = 1;
+
+    #[Locked]
+    public int $notificationPages = 1;
+
+    public function nextNotificationsPage(): void
+    {
+        if ($this->notificationPage < $this->notificationPages) $this->notificationPage++;
+    }
+
+    public function previousNotificationsPage(): void
+    {
+        $this->notificationPage = max(1, $this->notificationPage - 1);
+    }
+
     public function placeholder()
     {
         /** The current inbox loads in its own authenticated request without holding up the page's tables. */
@@ -15,6 +32,7 @@ class NotificationDropdown extends Component
     public function markAllAsRead()
     {
         auth()->user()->visibleNotifications()->whereNull('read_at')->update(['read_at'=>now()]);
+        $this->notificationPage = 1;
     }
 
     public function markAsRead($id)
@@ -43,7 +61,7 @@ class NotificationDropdown extends Component
     {
         \Illuminate\Support\Facades\Gate::authorize('system.admin');
         $notification = auth()->user()->visibleNotifications()->where('id', $id)->first();
-        if ($notification) {
+        if ($notification && $notification->type !== \App\Services\PolicyFormReminder::TYPE) {
             $notification->delete();
         }
     }
@@ -58,17 +76,30 @@ class NotificationDropdown extends Component
         $visible = $user->visibleNotifications()->reorder()->select(['id', 'read_at', 'type', 'updated_at', 'data->due_on as due_date'])->toBase();
         $inbox = \Illuminate\Support\Facades\DB::query()->fromSub($visible, 'visible')->select('visible.*')
             ->selectRaw('SUM(CASE WHEN read_at IS NULL THEN 1 ELSE 0 END) OVER () AS inbox_unread_count')
+            ->selectRaw('COUNT(*) OVER () AS inbox_total_count')
             ->orderByRaw('CASE WHEN read_at IS NULL THEN 0 ELSE 1 END')
             ->orderByRaw('CASE WHEN type = ? THEN 0 WHEN type = ? THEN 1 ELSE 2 END', [\App\Services\CollectionCommunicationReminders::REVERSAL_TYPE, \App\Services\CollectionCommunicationReminders::TYPE])
-            ->orderBy('due_date')->orderByDesc('updated_at')->orderByDesc('id')->limit(10);
+            ->orderBy('due_date')->orderByDesc('updated_at')->orderByDesc('id')->offset(($this->notificationPage - 1) * 10)->limit(10);
         /** One statement retains the same visibility snapshot for the unread count and the displayed records. */
-        $notifications = $user->notifications()->joinSub($inbox, 'inbox', fn ($join) => $join->on('inbox.id', '=', 'notifications.id'))
-            ->select('notifications.*', 'inbox.inbox_unread_count')->reorder()->orderByRaw('CASE WHEN inbox.read_at IS NULL THEN 0 ELSE 1 END')
+        $loadNotifications = fn () => $user->notifications()->joinSub($inbox, 'inbox', fn ($join) => $join->on('inbox.id', '=', 'notifications.id'))
+            ->select('notifications.*', 'inbox.inbox_unread_count', 'inbox.inbox_total_count')->reorder()->orderByRaw('CASE WHEN inbox.read_at IS NULL THEN 0 ELSE 1 END')
             ->orderByRaw('CASE WHEN inbox.type = ? THEN 0 WHEN inbox.type = ? THEN 1 ELSE 2 END', [\App\Services\CollectionCommunicationReminders::REVERSAL_TYPE, \App\Services\CollectionCommunicationReminders::TYPE])
             ->orderBy('inbox.due_date')->orderByDesc('inbox.updated_at')->orderByDesc('inbox.id')->get();
+        $notifications = $loadNotifications();
+        /** Completed activities and removed alerts can empty the current page between two polls. */
+        if ($notifications->isEmpty() && $this->notificationPage > 1) {
+            $this->notificationPage = 1;
+            $inbox->offset(0);
+            $notifications = $loadNotifications();
+        }
+        $total = (int) ($notifications->first()?->inbox_total_count ?? 0);
+        $this->notificationPages = max(1, (int) ceil($total / 10));
         return view('livewire.notifications.notification-dropdown', [
             'unreadNotificationsCount' => (int) ($notifications->first()?->inbox_unread_count ?? 0),
             'latestNotifications' => $notifications,
+            'notificationPage' => $this->notificationPage,
+            'notificationPages' => $this->notificationPages,
+            'notificationsTotal' => $total,
             'notificationDetails' => app(\App\Services\DeadlineReminders::class)->details($notifications, $user),
         ]);
     }

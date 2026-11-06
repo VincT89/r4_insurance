@@ -18,6 +18,7 @@ class DeadlineController extends Controller
         $visible = Client::current()->visibleTo($request->user())->select('clients.id');
         $policies = DB::table('insurance_policies as p')->join('clients as c', 'c.id', '=', 'p.client_id')->leftJoin('users as u', 'u.id', '=', 'c.commercial_user_id')
             ->whereIn('c.id', clone $visible)->whereNotIn('p.status', \App\Models\InsurancePolicy::CLOSED_STATUSES)
+            ->whereIn('p.id',\App\Models\InsurancePolicy::withoutContractSuccessor()->select('id'))
             ->selectRaw("p.id as source_id, c.id as client_id, p.expires_on as due_date, 'policy' as kind, p.number as title, p.category, p.company, c.name as client_name, c.commercial_user_id as responsible_id, u.name as responsible_name, p.status as review_status, p.payment_frequency");
         $documents = DB::table('attachments as a')->join('clients as c', 'c.id', '=', 'a.attachable_id')->leftJoin('users as u', 'u.id', '=', 'c.commercial_user_id')
             ->leftJoin('insurance_policies as p', fn ($join) => $join->on('p.id', '=', 'a.insurance_policy_id')->on('p.client_id', '=', 'c.id'))
@@ -31,13 +32,13 @@ class DeadlineController extends Controller
             ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('client_document_request_files as linked')->whereColumn('linked.client_document_request_id', 'r.id'))
             ->selectRaw("r.id as source_id, c.id as client_id, r.due_on as due_date, 'request' as kind, r.label as title, COALESCE(p.category, b.name) as category, p.company, c.name as client_name, c.commercial_user_id as responsible_id, u.name as responsible_name, NULL as review_status, p.payment_frequency");
         $titles=DB::table('insurance_titles as t')->join('insurance_policies as p','p.id','=','t.insurance_policy_id')->join('clients as c','c.id','=','p.client_id')->leftJoin('users as u','u.id','=','c.commercial_user_id')
-            ->whereIn('c.id',clone $visible)->whereNull('t.cancelled_at')->whereColumn('t.collected_cents','<','t.amount_cents')
+            ->whereIn('c.id',clone $visible)->whereNull('t.cancelled_at')->whereRaw(\App\Models\InsuranceTitle::balanceSql('t').' > 0')
             ->selectRaw("t.id as source_id, c.id as client_id, t.due_on as due_date, 'title' as kind, p.number as title, p.category, p.company, c.name as client_name, c.commercial_user_id as responsible_id, u.name as responsible_name, NULL as review_status, t.payment_frequency");
         foreach ([$policies,$documents,$requests,$titles] as $source) {
             $source->leftJoin('supplier_agencies as agency','agency.id','=','p.supplier_agency_id')->addSelect('p.supplier_agency_id as agency_id','agency.name as agency_name');
         }
-        foreach ([$policies,$documents,$requests] as $source) $source->selectRaw('NULL as balance_cents');
-        $titles->selectRaw('t.amount_cents - t.collected_cents as balance_cents');
+        foreach ([$policies,$documents,$requests] as $source) $source->selectRaw('NULL as balance_cents, NULL as direction');
+        $titles->selectRaw(\App\Models\InsuranceTitle::balanceSql('t').' as balance_cents, t.direction as direction');
         $sources = ['policy'=>$policies, 'document'=>$documents, 'request'=>$requests, 'title'=>$titles];
         [$categories, $companies] = $this->options($visible);
         $responsibles = User::whereIn('id', Client::current()->visibleTo($request->user())->select('commercial_user_id')->whereNotNull('commercial_user_id'))->orderBy('name')->get(['id', 'name']);
@@ -80,9 +81,10 @@ class DeadlineController extends Controller
             ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('attachments as received')->whereColumn('received.document_request_id', 'r.id'))
             ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('client_document_request_files as linked')->whereColumn('linked.client_document_request_id', 'r.id'));
         $eligible = DB::table('insurance_policies as p')->whereIn('p.client_id', clone $visible)->where(function ($q) use ($outstandingRequests) {
-            $q->whereNotIn('p.status', \App\Models\InsurancePolicy::CLOSED_STATUSES)
+            $q->where(fn($contracts)=>$contracts->whereNotIn('p.status', \App\Models\InsurancePolicy::CLOSED_STATUSES)
+                ->whereIn('p.id',\App\Models\InsurancePolicy::withoutContractSuccessor()->select('id')))
                 ->orWhereExists(fn ($q) => $q->selectRaw('1')->from('insurance_titles as t')->whereColumn('t.insurance_policy_id', 'p.id')
-                    ->whereNull('t.cancelled_at')->whereColumn('t.collected_cents', '<', 't.amount_cents'))
+                    ->whereNull('t.cancelled_at')->whereRaw(\App\Models\InsuranceTitle::balanceSql('t').' > 0'))
                 ->orWhereExists(fn ($q) => $q->selectRaw('1')->from('attachments as a')->whereColumn('a.insurance_policy_id', 'p.id')->whereColumn('a.attachable_id', 'p.client_id')
                     ->where('a.attachable_type', (new Client)->getMorphClass())->whereNotNull('a.document_category')->whereNotNull('a.expires_on')
                     ->whereNotExists(fn ($newer) => $newer->selectRaw('1')->from('attachments as newer')->whereColumn('newer.previous_version_id', 'a.id')))

@@ -32,6 +32,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'force.password.change'])->group(function () {
+    Route::get('/attachments/{attachment}/sign', [\App\Http\Controllers\DocumentSigningController::class, 'show'])->name('attachments.sign');
+    Route::post('/attachments/{attachment}/sign', [\App\Http\Controllers\DocumentSigningController::class, 'store'])->middleware('throttle:20,1')->name('attachments.sign.store');
     Route::prefix('settings/registry-imports')->name('registry-imports.')->middleware('can:system.admin')->group(function () {
         Route::get('/', [\App\Http\Controllers\RegistryImportController::class, 'index'])->name('index');
         Route::post('/', [\App\Http\Controllers\RegistryImportController::class, 'upload'])->middleware('throttle:10,1')->name('upload');
@@ -53,10 +55,11 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
         Route::post('/{claim}/activities/{activity}',[\App\Http\Controllers\InsuranceClaimController::class,'updateActivity'])->name('activity.update');
         Route::post('/{claim}/{action}',[\App\Http\Controllers\InsuranceClaimController::class,'change'])->where('action','updated|status|note|activity_added|activity_completed|activity_rescheduled|activity_cancelled')->middleware('throttle:60,1')->name('change');
     });
-    Route::prefix('settings/forms')->name('form-templates.')->middleware('can:system.admin')->group(function () {
+    Route::prefix('settings/forms')->name('form-templates.')->middleware('can:forms.manage')->group(function () {
         Route::get('/', [\App\Http\Controllers\InsuranceFormController::class,'templates'])->name('index');
         Route::get('/create', [\App\Http\Controllers\InsuranceFormController::class,'templateForm'])->name('create');
         Route::post('/', [\App\Http\Controllers\InsuranceFormController::class,'templateSave'])->name('store');
+        Route::post('/preview', [\App\Http\Controllers\InsuranceFormController::class,'previewDraft'])->middleware('throttle:20,1')->name('draft-preview');
         Route::get('/{template}', [\App\Http\Controllers\InsuranceFormController::class,'templateForm'])->name('edit');
         Route::patch('/{template}', [\App\Http\Controllers\InsuranceFormController::class,'templateSave'])->name('update');
         Route::post('/{template}/approve', [\App\Http\Controllers\InsuranceFormController::class,'activate'])->name('approve');
@@ -67,6 +70,7 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
         Route::get('/', [\App\Http\Controllers\InsuranceFormController::class,'index'])->name('index');
         Route::get('/create', [\App\Http\Controllers\InsuranceFormController::class,'create'])->name('create');
         Route::post('/', [\App\Http\Controllers\InsuranceFormController::class,'store'])->middleware('throttle:20,1')->name('store');
+        Route::post('/reminder/{decision}', [\App\Http\Controllers\InsuranceFormController::class,'decideReminder'])->whereIn('decision',['later','none'])->middleware('throttle:20,1')->name('reminder-decision');
         Route::get('/{package}', [\App\Http\Controllers\InsuranceFormController::class,'show'])->name('show');
         Route::post('/{package}/documents/{document}/signatures', [\App\Http\Controllers\InsuranceFormController::class,'submit'])->name('submit');
         Route::post('/{package}/signatures/{submission}/review', [\App\Http\Controllers\InsuranceFormController::class,'review'])->name('review');
@@ -99,6 +103,14 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::post('/titles/{title}/cancel',[\App\Http\Controllers\InsuranceLedgerController::class,'cancel'])->middleware('can:ledger.manage')->name('titles.cancel');
     Route::get('/collections',[\App\Http\Controllers\InsuranceLedgerController::class,'collections'])->name('collections.index');
     Route::post('/collections/{collection}/void',[\App\Http\Controllers\InsuranceLedgerController::class,'void'])->middleware('can:ledger.manage')->name('collections.void');
+    Route::get('/allowances',[\App\Http\Controllers\InsuranceLedgerController::class,'allowances'])->name('allowances.index');
+    Route::get('/allowances/{allowance}',[\App\Http\Controllers\InsuranceAllowanceRecoveryController::class,'show'])->name('allowances.show');
+    Route::post('/allowances/{allowance}/recoveries',[\App\Http\Controllers\InsuranceAllowanceRecoveryController::class,'store'])->middleware('can:ledger.manage')->name('allowances.recoveries.store');
+    Route::post('/allowances/{allowance}/recoveries/{recovery}/void',[\App\Http\Controllers\InsuranceAllowanceRecoveryController::class,'void'])->middleware('can:ledger.manage')->name('allowances.recoveries.void');
+    Route::post('/titles/{title}/allowances',[\App\Http\Controllers\InsuranceLedgerController::class,'allowance'])->middleware('can:ledger.manage')->name('titles.allowances');
+    Route::post('/policies/{policy}/allowances',[\App\Http\Controllers\InsuranceLedgerController::class,'allowanceForPolicy'])->middleware('can:ledger.manage')->name('policies.allowances');
+    Route::post('/allowances/{allowance}/void',[\App\Http\Controllers\InsuranceLedgerController::class,'voidAllowance'])->middleware('can:ledger.manage')->name('allowances.void');
+    Route::post('/titles/{title}/allowance-coverage',[\App\Http\Controllers\InsuranceLedgerController::class,'confirmAllowanceCoverage'])->middleware('can:ledger.manage')->name('titles.allowance-coverage');
     Route::prefix('/policies/{policy}/titles')->middleware('can:ledger.manage')->group(function(){
         Route::get('/schedule',[\App\Http\Controllers\InsuranceLedgerController::class,'schedule'])->name('titles.schedule');
         Route::post('/schedule',[\App\Http\Controllers\InsuranceLedgerController::class,'generate'])->name('titles.generate');
@@ -123,16 +135,16 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
         Route::post('/titles/{title}/commission/movements/{kind}', [\App\Http\Controllers\InsuranceCommissionController::class, 'record'])->where('kind', 'accrual|settlement')->name('commissions.record');
         Route::post('/titles/{title}/commission/reverse/{movement}', [\App\Http\Controllers\InsuranceCommissionController::class, 'reverse'])->name('commissions.reverse');
     });
-    Route::get('/agency-communications', [\App\Http\Controllers\AgencyCommunicationController::class, 'index'])->middleware('can:system.admin')->name('agency-communications.index');
-    Route::get('/agency-communications/collections',[\App\Http\Controllers\AgencyCollectionCommunicationController::class,'index'])->middleware('can:system.admin')->name('agency-communications.collections');
-    Route::post('/agency-communications/{agency}/collections-review',[\App\Http\Controllers\AgencyCollectionCommunicationController::class,'review'])->middleware(['can:system.admin','throttle:30,1'])->name('agency-communications.collections-review');
-    Route::post('/agency-communications/{agency}/draft', [\App\Http\Controllers\AgencyCommunicationController::class, 'draft'])->middleware('can:system.admin')->name('agency-communications.draft');
-    Route::get('/agency-communications/history', [\App\Http\Controllers\AgencyCommunicationController::class, 'history'])->middleware('can:system.admin')->name('agency-communications.history');
-    Route::post('/agency-communications/{agency}/review', [\App\Http\Controllers\AgencyCommunicationController::class, 'review'])->middleware(['can:system.admin','throttle:30,1'])->name('agency-communications.review');
-    Route::get('/agency-communications/messages/{communication}', [\App\Http\Controllers\AgencyCommunicationController::class, 'show'])->middleware('can:system.admin')->name('agency-communications.show');
-    Route::post('/agency-communications/messages/{communication}/documents', [\App\Http\Controllers\AgencyCommunicationController::class, 'documents'])->middleware(['can:system.admin','throttle:10,1'])->name('agency-communications.documents');
-    Route::get('/agency-communications/messages/{communication}/documents/{document}', [\App\Http\Controllers\AgencyCommunicationController::class, 'download'])->middleware('can:system.admin')->name('agency-communications.documents.download');
-    Route::post('/agency-communications/messages/{communication}/send', [\App\Http\Controllers\AgencyCommunicationController::class, 'send'])->middleware(['can:system.admin','throttle:10,1'])->name('agency-communications.send');
+    Route::get('/agency-communications', [\App\Http\Controllers\AgencyCommunicationController::class, 'index'])->middleware('can:communications.manage')->name('agency-communications.index');
+    Route::get('/agency-communications/collections',[\App\Http\Controllers\AgencyCollectionCommunicationController::class,'index'])->middleware('can:communications.manage')->name('agency-communications.collections');
+    Route::post('/agency-communications/{agency}/collections-review',[\App\Http\Controllers\AgencyCollectionCommunicationController::class,'review'])->middleware(['can:communications.manage','throttle:30,1'])->name('agency-communications.collections-review');
+    Route::post('/agency-communications/{agency}/draft', [\App\Http\Controllers\AgencyCommunicationController::class, 'draft'])->middleware('can:communications.manage')->name('agency-communications.draft');
+    Route::get('/agency-communications/history', [\App\Http\Controllers\AgencyCommunicationController::class, 'history'])->middleware('can:communications.manage')->name('agency-communications.history');
+    Route::post('/agency-communications/{agency}/review', [\App\Http\Controllers\AgencyCommunicationController::class, 'review'])->middleware(['can:communications.manage','throttle:30,1'])->name('agency-communications.review');
+    Route::get('/agency-communications/messages/{communication}', [\App\Http\Controllers\AgencyCommunicationController::class, 'show'])->middleware('can:communications.manage')->name('agency-communications.show');
+    Route::post('/agency-communications/messages/{communication}/documents', [\App\Http\Controllers\AgencyCommunicationController::class, 'documents'])->middleware(['can:communications.manage','throttle:10,1'])->name('agency-communications.documents');
+    Route::get('/agency-communications/messages/{communication}/documents/{document}', [\App\Http\Controllers\AgencyCommunicationController::class, 'download'])->middleware('can:communications.manage')->name('agency-communications.documents.download');
+    Route::post('/agency-communications/messages/{communication}/send', [\App\Http\Controllers\AgencyCommunicationController::class, 'send'])->middleware(['can:communications.manage','throttle:10,1'])->name('agency-communications.send');
     Route::post('/agency-communications/messages/{communication}/resolve', [\App\Http\Controllers\AgencyCommunicationController::class, 'resolve'])->middleware(['can:system.admin','throttle:10,1'])->name('agency-communications.resolve');
     Route::resource('/settings/quote-groups', \App\Http\Controllers\QuoteRecipientGroupController::class)->except(['show','destroy'])->parameters(['quote-groups'=>'quoteGroup'])->middleware('can:system.admin');
     Route::get('/settings/email', [\App\Http\Controllers\EmailSettingsController::class, 'edit'])->middleware('can:system.admin')->name('email-settings.edit');
@@ -177,6 +189,7 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('clients/{client}/policies/{policy}/changes/create', [\App\Http\Controllers\InsurancePolicyChangeController::class,'create'])->name('clients.policies.changes.create');
     Route::post('clients/{client}/policies/{policy}/changes', [\App\Http\Controllers\InsurancePolicyChangeController::class,'store'])->name('clients.policies.changes.store');
     Route::get('clients/{client}/policy-changes/{change}', [\App\Http\Controllers\InsurancePolicyChangeController::class,'show'])->name('clients.policy-changes.show');
+    Route::post('clients/{client}/policy-changes/{change}/cancel-schedule', [\App\Http\Controllers\PolicyTransitionController::class,'cancelSchedule'])->name('clients.policy-changes.cancel-schedule');
     Route::post('clients/{client}/policy-changes/{change}/documents', [\App\Http\Controllers\InsurancePolicyChangeController::class,'documents'])->middleware('throttle:10,1')->name('clients.policy-changes.documents');
     Route::post('clients/{client}/policies/{policy}/close-work', [\App\Http\Controllers\InsurancePolicyWorkflowController::class, 'close'])->name('clients.policies.close-work');
     Route::post('clients/{client}/policies/{policy}/corrections', [\App\Http\Controllers\InsurancePolicyWorkflowController::class, 'report'])->middleware('throttle:20,1')->name('clients.policies.corrections.store');

@@ -91,7 +91,7 @@ test('table column semantics distinguish counters and dates from policy identifi
     for (const header of ['Polizza', 'Numero polizza', 'Codice fiscale', 'Partita IVA', 'Telefono', 'Periodo']) assert.equal(exportColumnType(header), 'text');
     for (const header of ['Data', 'Scadenza', 'Data incasso', 'Inserita il', 'Registrata il', 'Ultimo rinnovo', 'Dal']) assert.equal(exportColumnType(header), 'date');
     assert.equal(exportColumnType('Appendici'), 'integer');
-    for (const header of ['Premio di polizza', 'Premi di polizza', 'Importo', 'Residuo']) assert.equal(exportColumnType(header), 'currency');
+    for (const header of ['Premio di polizza', 'Premi di polizza', 'Importo', 'Residuo', 'Abbuoni', 'Abbuono']) assert.equal(exportColumnType(header), 'currency');
     for (const header of ['Polizze', 'Clienti distinti', 'Premio non indicato', 'Non pagate']) assert.equal(exportColumnType(header), 'integer');
     assert.equal(excelCell('17,25 %').value, 0.1725);
 });

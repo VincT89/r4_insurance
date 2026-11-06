@@ -70,9 +70,9 @@
     @endif
     <x-panel :title="$filters['mode']==='positions' ? 'Situazione provvigioni' : 'Movimenti provvigionali'">
         <div class="client-table-scroll" role="region" aria-label="Report provvigioni" tabindex="0">
-            <table class="t-table">
+            <table class="t-table" data-list-details="commissions" data-details-label="Altri dati">
                 @if($filters['group']!=='detail')
-                    <thead><tr><th>{{ ['agency'=>'Agenzia', 'company'=>'Compagnia', 'branch'=>'Ramo'][$filters['group']] }}</th><th data-export-type="integer">{{ $filters['mode']==='positions' ? 'Rate' : 'Movimenti' }}</th><th data-export-type="currency">Previste</th><th data-export-type="currency">Maturate</th><th data-export-type="currency">Liquidate</th>@if($filters['mode']==='positions')<th data-export-type="currency">Da liquidare</th><th data-export-type="currency">Da riconciliare</th><th data-export-type="integer">Da completare</th>@endif</tr></thead>
+                    <thead><tr><th>{{ ['agency'=>'Agenzia', 'company'=>'Compagnia', 'branch'=>'Ramo'][$filters['group']] }}</th><th data-list-detail data-export-type="integer">{{ $filters['mode']==='positions' ? 'Rate' : 'Movimenti' }}</th><th data-export-type="currency">Previste</th><th data-export-type="currency">Maturate</th><th data-export-type="currency">Liquidate</th>@if($filters['mode']==='positions')<th data-export-type="currency">Da liquidare</th><th data-list-detail data-export-type="currency">Da riconciliare</th><th data-export-type="integer">Da completare</th>@endif</tr></thead>
                     <tbody>
                         @forelse($rows as $row)
                             <tr><td>{{ $row->label }}</td><td>{{ $row->rows_count }}</td><td>{{ \App\Support\Money::format((int)$row->expected) }}</td><td>{{ \App\Support\Money::format((int)$row->accrued) }}</td><td>{{ \App\Support\Money::format((int)$row->settled) }}</td>@if($filters['mode']==='positions')<td><x-status-text :alert="$row->payable > 0">{{ \App\Support\Money::format((int)$row->payable) }}</x-status-text></td><td><x-status-text :alert="$row->reconcile > 0">{{ \App\Support\Money::format((int)$row->reconcile) }}</x-status-text></td><td>{{ (int)$row->incomplete }}</td>@endif</tr>
@@ -81,13 +81,13 @@
                         @endforelse
                     </tbody>
                 @else
-                    <thead><tr><th data-export-type="date">{{ $filters['mode']==='positions' ? 'Inizio copertura rata' : 'Data movimento' }}</th><th>Contraente</th><th>Polizza</th><th>Titolo</th><th>Agenzia</th><th>Compagnia</th><th>Ramo</th><th>Sottoramo</th>
-                        @if($filters['mode']==='positions')<th data-export-type="currency">Prevista</th><th data-export-type="currency">Maturata</th><th data-export-type="currency">Liquidata</th><th>Stato provvigione</th>
-                        @else<th>Movimento</th><th data-export-type="currency">Importo</th><th>Riferimento</th><th>Causale</th>@endif
+                    <thead><tr><th @if($filters['mode']==='positions') data-list-detail @endif data-export-type="date">{{ $filters['mode']==='positions' ? 'Inizio copertura rata' : 'Data movimento' }}</th><th>Contraente</th><th>Polizza</th><th data-list-detail>Titolo</th><th data-list-detail>Agenzia</th><th data-list-detail>Compagnia</th><th data-list-detail>Ramo</th><th data-list-detail>Sottoramo</th>
+                        @if($filters['mode']==='positions')<th data-export-type="currency">Prevista</th><th data-export-type="currency">Maturata</th><th data-list-detail data-export-type="currency">Liquidata</th><th>Stato provvigione</th>
+                        @else<th>Movimento</th><th data-export-type="currency">Importo</th><th data-list-detail>Riferimento</th><th data-list-detail>Causale</th>@endif
                         <th>Azioni</th></tr></thead>
                     <tbody>
                         @forelse($rows as $row)
-                            <tr>
+                            <tr data-list-label="{{ $row->client_name }} · {{ $row->number }} · Titolo #{{ $row->title_id }}">
                                 <td>{{ \Illuminate\Support\Carbon::parse($filters['mode']==='positions' ? $row->coverage_from : $row->effective_on)->format('d/m/Y') }}</td><td>{{ $row->client_name }}</td><td>{{ $row->number }}</td><td>{{ \App\Models\InsuranceTitle::KINDS[$row->title_kind] }} #{{ $row->title_id }}</td><td>{{ $row->agency_name ?: 'Non assegnata' }}</td><td>{{ $row->company }}</td><td>{{ $row->category }}</td><td>{{ $row->subcategory ?: 'Non specificato' }}</td>
                                 @if($filters['mode']==='positions')
                                     <td>{{ $row->expected_cents === null ? 'Da completare' : \App\Support\Money::format((int)$row->expected_cents) }}</td><td>{{ \App\Support\Money::format((int)$row->accrued_cents) }}</td><td>{{ \App\Support\Money::format((int)$row->settled_cents) }}</td><td><x-status-text :alert="in_array($row->state,['reconcile','partial','accrued']) && $row->accrued_cents != $row->settled_cents">{{ \App\Models\InsuranceCommission::STATES[$row->state] }}</x-status-text></td>

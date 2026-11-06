@@ -264,7 +264,7 @@ class QuoteRequestEmailTest extends TestCase
 
     public function test_compose_review_history_filters_and_exports_render_and_escape_content(): void
     {
-        $this->get(route('quotes.emails.create',$this->case))->assertOk()->assertSee('Controlla richiesta')->assertDontSee('Nota interna riservata');
+        $this->get(route('quotes.emails.create',$this->case))->assertOk()->assertSee('Vai all’anteprima')->assertDontSee('Nota interna riservata');
         $email = $this->review();
         $this->case->update(['subject'=>'<script>alert(1)</script>']);
         $this->get(route('quotes.show',$this->case))->assertOk()->assertDontSee('<script>alert(1)</script>',false)->assertSee('Storico richieste email');

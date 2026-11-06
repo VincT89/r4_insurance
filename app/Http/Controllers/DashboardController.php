@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $period = $filters['period'] ?? '15';
         $titlesDates = \Illuminate\Support\Arr::only($filters,['titles_from','titles_to']);
         $all = $query->forUser($request->user());
-        $upcoming = $query->forUser($request->user(), ['period' => $period])->whereIn('status', ['active', 'renewed']);
+        $upcoming = $query->forUser($request->user(), ['period' => $period])->withoutContractSuccessor()->whereIn('status', ['active', 'renewed']);
         $documentRequests = ClientDocumentRequest::whereIn('client_id', Client::current()->visibleTo($request->user())->select('id'))->whereDoesntHave('documents')->whereDoesntHave('linkedDocuments');
         $totals = (clone $all)->selectRaw("COUNT(*) AS policies,
             COALESCE(SUM(CASE WHEN status IN ('active','renewed') AND
@@ -39,7 +39,7 @@ class DashboardController extends Controller
         $todayPolicies = $query->forUser($request->user())->whereDoesntHave('importEntry')->where('created_at', '>=', today())->where('created_at', '<', today()->addDay())
             ->whereIn('status', ['active', 'renewed'])->where('expires_on', '>=', today()->toDateString())
             ->with(['client', 'supplierAgency'])->orderByDesc('created_at')->orderByDesc('id')->paginate(\App\Support\TableListing::perPage(8), ['*'], 'today_policies_page')->withQueryString()->fragment('today-policies');
-        $titleQuery=\App\Models\InsuranceTitle::visibleTo($request->user())->where('direction','receipt')->whereNull('cancelled_at')->whereColumn('collected_cents','<','amount_cents');
+        $titleQuery=\App\Models\InsuranceTitle::visibleTo($request->user())->where('direction','receipt')->outstanding();
         if(array_filter($titlesDates)) {
             if($titlesDates['titles_from']??null)$titleQuery->where('due_on','>=',$titlesDates['titles_from']);
             if($titlesDates['titles_to']??null)$titleQuery->where('due_on','<',\Illuminate\Support\Carbon::parse($titlesDates['titles_to'])->addDay()->toDateString());

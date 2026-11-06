@@ -53,8 +53,10 @@ class AgencyCommunicationController extends Controller
 
     public function index(Request $request, PolicyPortfolioQuery $query, AgencyEmailWorkflow $workflow, AgencyMailConfiguration $configuration)
     {
-        $this->authorize('system.admin');
+        $this->authorize('communications.manage');
         [$filters, $range, $policies, $changes] = $this->selection($request, $query);
+        $batchCounts = app(AgencyCommunicationOperations::class)->readyAgencyCounts($policies,$changes,$workflow);
+        $batchLimited = $batchCounts===null;
         $policies = app(AgencyCommunicationOperations::class)->page($policies, $changes);
         $options = $query->options($request->user());
         $deliveries = $workflow->existingDeliveries($policies->getCollection()->filter(fn ($policy) => !$policy->communicationChange));
@@ -62,32 +64,51 @@ class AgencyCommunicationController extends Controller
         $mailReady = $configuration->ready();
         $reviewAgencies = SupplierAgency::whereIn('id', $options['agencies']->pluck('id'))->orderBy('name')->get(['id','name','email','status']);
         $selectionScope = CommunicationSelectionScope::forFilters($filters, $range);
-        return view('agency-communications.index', compact('filters','range','policies','options','deliveries','changeDeliveries','mailReady','selectionScope','reviewAgencies'));
+        $batches = $reviewAgencies->where('status','active')->whereIn('id',($batchCounts??collect())->keys())->map(fn($agency)=>['agency'=>$agency,'count'=>(int)$batchCounts[$agency->id]]);
+        return view('agency-communications.index', compact('filters','range','policies','options','deliveries','changeDeliveries','mailReady','selectionScope','reviewAgencies','batches','batchLimited'));
     }
 
     public function review(Request $request, SupplierAgency $agency, PolicyPortfolioQuery $query, AgencyEmailWorkflow $workflow)
     {
-        $this->authorize('system.admin');
+        $this->authorize('communications.manage');
+        $all=$request->boolean('all_matching');
+        if($all && $request->filled('_table_filters'))throw ValidationException::withMessages(['policies'=>'Con un filtro sulle singole righe, prepara la selezione dall’elenco.']);
         $data = $request->validate([
-            'policies'=>['required_without:operations',Rule::prohibitedIf($request->has('operations')),'array','list','min:1','max:500'],
+            'all_matching'=>['sometimes','accepted'],
+            'policies'=>[Rule::requiredIf(!$all && !$request->has('operations')),Rule::prohibitedIf($all || $request->has('operations')),'array','list','min:1','max:500'],
             'policies.*'=>['required','integer','min:1','distinct'],
-            'operations'=>['required_without:policies',Rule::prohibitedIf($request->has('policies')),'array','list','min:1','max:500'],
+            'operations'=>[Rule::requiredIf(!$all && !$request->has('policies')),Rule::prohibitedIf($all || $request->has('policies')),'array','list','min:1','max:500'],
             'operations.*'=>['required','string','regex:/\A(?:[1-9]\d*|change-[1-9]\d*)\z/','distinct'],
         ]);
-        $keys = collect($data['operations'] ?? $data['policies'])->map(fn ($key) => (string) $key);
+        $keys = collect($data['operations'] ?? $data['policies'] ?? [])->map(fn ($key) => (string) $key);
         $policyIds = $keys->filter(fn ($key) => ctype_digit($key))->values();
         $changeIds = $keys->filter(fn ($key) => str_starts_with($key, 'change-'))->map(fn ($key) => substr($key, 7))->values();
         [$filters, $range, $policies, $changes] = $this->selection($request,$query);
-        $selected = $policies->where('supplier_agency_id',$agency->id)->whereIn('id',$policyIds)->with('client')->orderBy('id')->get();
-        $selectedChanges = $changes->whereKey($changeIds)->whereHas('resultPolicy', fn ($q) => $q->where('supplier_agency_id', $agency->id))
-            ->with(['resultPolicy.client','resultPolicy.supplierAgency'])->orderBy('id')->get();
-        if ($selected->count() + $selectedChanges->count() !== $keys->count()) throw ValidationException::withMessages(['policies'=>'La selezione contiene operazioni fuori dal periodo o dall’agenzia scelta.']);
+        $policies->where('supplier_agency_id',$agency->id);
+        $changes->whereHas('resultPolicy', fn ($q) => $q->where('supplier_agency_id', $agency->id));
+        if($all) {
+            $policies->whereIn('status',['active','renewed'])->where('expires_on','>=',today()->toDateString());
+            $changes->where('expires_on','>=',today()->toDateString())->whereHas('resultPolicy',fn($q)=>$q->whereIn('status',['active','renewed'])->where('expires_on','>=',today()->toDateString()));
+        } else {
+            $policies->whereIn('id',$policyIds);
+            $changes->whereKey($changeIds);
+        }
+        $selected = $policies->with(['client','supplierAgency'])->orderBy('id')->limit(501)->get();
+        $selectedChanges = $changes->with(['resultPolicy.client','resultPolicy.supplierAgency'])->orderBy('id')->limit(501)->get();
+        if($selected->count()+$selectedChanges->count()>500)throw ValidationException::withMessages(['policies'=>'Ci sono più di 500 operazioni: restringi il periodo o scegli le singole righe.']);
+        if($all) {
+            $claimed=$workflow->existingDeliveries($selected)->keys();
+            $claimedChanges=$workflow->existingChangeDeliveries($selectedChanges)->keys();
+            $selected=$selected->reject(fn($policy)=>$claimed->contains($policy->id))->values();
+            $selectedChanges=$selectedChanges->reject(fn($change)=>$claimedChanges->contains($change->id))->values();
+            if($selected->isEmpty() && $selectedChanges->isEmpty())throw ValidationException::withMessages(['policies'=>'Non ci sono nuove operazioni da comunicare per questa agenzia. Controlla lo storico o cambia il periodo.']);
+        } elseif ($selected->count() + $selectedChanges->count() !== $keys->count()) throw ValidationException::withMessages(['policies'=>'La selezione contiene operazioni fuori dal periodo o dall’agenzia scelta.']);
         return to_route('agency-communications.show',$workflow->prepare($request->user(),$agency,$selected,$filters,$range,$selectedChanges));
     }
 
     public function show(AgencyCommunication $communication, AgencyMailConfiguration $configuration)
     {
-        $this->authorize('system.admin');
+        $this->authorize('communications.manage');
         $payload = $communication->deliveryPayload();
         $voidedCollections = ($payload['kind'] ?? null) === 'collections'
             ? \App\Models\InsuranceCollection::whereIn('id', array_column($payload['collections'], 'id'))->whereNotNull('voided_at')->get(['id','insurance_title_id','voided_at','void_reason'])
@@ -101,7 +122,7 @@ class AgencyCommunicationController extends Controller
 
     public function documents(Request $request, AgencyCommunication $communication, AgencyCommunicationDocuments $documents)
     {
-        $this->authorize('system.admin');
+        $this->authorize('communications.manage');
         $data = $request->validate(AgencyCommunicationDocuments::rules());
         $documents->update($communication,$request->user(),$data,$request->file('files',[]));
         return to_route('agency-communications.show',$communication)->with('success','Allegati aggiornati. Controlla il riepilogo prima di confermare l’invio.');
@@ -109,7 +130,7 @@ class AgencyCommunicationController extends Controller
 
     public function download(AgencyCommunication $communication, \App\Models\AgencyCommunicationAttachment $document)
     {
-        $this->authorize('system.admin');
+        $this->authorize('communications.manage');
         abort_unless($document->agency_communication_id === $communication->id && $document->included,404);
         $disk = \Illuminate\Support\Facades\Storage::disk('attachments');
         abort_unless($disk->exists($document->path),404);
@@ -119,7 +140,7 @@ class AgencyCommunicationController extends Controller
 
     public function send(Request $request, AgencyCommunication $communication, AgencyEmailWorkflow $workflow)
     {
-        $this->authorize('system.admin');
+        $this->authorize('communications.manage');
         $data = $request->validate(['reviewed'=>['accepted'],'attachment_revision'=>['nullable','integer','min:0']]);
         $message = $workflow->send($communication,$request->user(),isset($data['attachment_revision']) ? (int)$data['attachment_revision'] : null);
         return to_route('agency-communications.show',$message)->with($message->status === 'sent' ? 'success' : 'warning',
@@ -136,7 +157,7 @@ class AgencyCommunicationController extends Controller
 
     public function history(Request $request)
     {
-        $this->authorize('system.admin');
+        $this->authorize('communications.manage');
         $filters = $request->validate(['month'=>['nullable','date_format:Y-m'],'agency'=>['nullable','integer','exists:supplier_agencies,id'],'state'=>['nullable','in:'.implode(',',array_keys(AgencyCommunication::STATUSES))]]);
         $filters += ['month'=>today()->format('Y-m')];
         $start = \Illuminate\Support\Carbon::createFromFormat('!Y-m',$filters['month']);
@@ -148,7 +169,7 @@ class AgencyCommunicationController extends Controller
 
     public function draft(Request $request, SupplierAgency $agency, PolicyPortfolioQuery $query)
     {
-        $this->authorize('system.admin');
+        $this->authorize('communications.manage');
         $data = $request->validate(['policies'=>['required','array','min:1','max:500'], 'policies.*'=>['required','integer','distinct'], 'reviewed'=>['accepted']]);
         [$filters, $range, $policies] = $this->selection($request, $query);
         $policies = $policies->where('supplier_agency_id', $agency->id)->whereIn('id', $data['policies'])->with('client')->orderByDesc('ad_horas')->orderBy('number')->get();
