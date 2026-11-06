@@ -16,8 +16,8 @@ class InsuranceFormDocument extends Model
     {
         return match ($this->latestSubmission?->status) {
             'received' => 'Controlla copia ricevuta',
-            'rejected' => 'Carica copia corretta',
-            default => 'Carica copia firmata',
+            'rejected' => 'Correggi la firma',
+            default => 'Firma o carica copia',
         };
     }
     public function signatureActionUrl(): string

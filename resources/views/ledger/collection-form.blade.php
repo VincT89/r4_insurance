@@ -13,7 +13,8 @@
     if (!\Illuminate\Support\Str::isUuid($paymentKey)) $paymentKey = (string) \Illuminate\Support\Str::uuid();
 @endphp
 <form method="POST" enctype="multipart/form-data" action="{{ $collectionAction }}"
-    x-data="{receiptMethods:@js(\App\Models\InsurancePolicy::PAYMENT_METHODS),refundMethods:@js(\App\Models\InsuranceCollection::REFUND_METHODS),titles:@js($titleOptions),title:@js($selectedTitle),amount:@js($initialAmount),method:@js($initialMethod),recipient:@js($initialRecipient),
+    @submit="busy=true" :aria-busy="busy.toString()"
+    x-data="{busy:false,receiptMethods:@js(\App\Models\InsurancePolicy::PAYMENT_METHODS),refundMethods:@js(\App\Models\InsuranceCollection::REFUND_METHODS),titles:@js($titleOptions),title:@js($selectedTitle),amount:@js($initialAmount),method:@js($initialMethod),recipient:@js($initialRecipient),
         selectTitle(){this.amount=this.titles[this.title]?.amount||'';this.method=this.titles[this.title]?.method||'';if(this.titles[this.title]?.direction==='refund' &amp;&amp; !this.refundMethods.includes(this.method))this.method='';this.selectMethod()},
         selectMethod(){if(this.method.includes('a Compagnia'))this.recipient='company';else if(this.method.includes('a Intermediario') &amp;&amp; this.recipient==='company')this.recipient='our_agency'}}">
     @csrf
@@ -49,7 +50,7 @@
             </select>
         </div>
     </div>
-    <p class="u-text-meta" id="payment-amount-help">L’importo salda il titolo selezionato. Un rimborso registra un’uscita verso il cliente e resta separato dagli incassi. Indica la data effettiva del pagamento, anche se lo registri oggi.</p>
+    <p class="u-text-meta" id="payment-amount-help"><span x-text="titles[title]?.direction === 'refund' ? 'Stai registrando l’intero rimborso al cliente.' : 'L’importo è compilato automaticamente e salda tutto il residuo del titolo scelto.'">L’importo è compilato automaticamente e salda tutto il residuo del titolo scelto.</span> Indica il giorno in cui è avvenuto il pagamento.</p>
     <details class="u-mt-md" @if(collect(['document_type','reference','notes','consultant_id','files'])->contains(fn($field) => $errors->has($field) || $errors->has($field.'.*'))) open @endif>
         <summary>Riferimenti e documenti facoltativi</summary>
         <div class="form-row u-mt-md">
@@ -66,5 +67,5 @@
             <x-form-group label="Note" name="notes"><textarea class="form-ta" name="notes" rows="2" maxlength="5000">{{ $paymentOld('notes') }}</textarea></x-form-group>
         </div>
     </details>
-    <div class="insurance-form-actions"><button class="btn btn-p" x-text="titles[title]?.direction === 'refund' ? 'Registra rimborso al cliente' : 'Registra pagamento'">Registra pagamento</button></div>
+    <div class="insurance-form-actions"><button class="btn btn-p" :disabled="busy" x-text="busy ? 'Registrazione…' : (titles[title]?.direction === 'refund' ? 'Registra rimborso al cliente' : 'Registra pagamento')">Registra pagamento</button></div>
 </form>

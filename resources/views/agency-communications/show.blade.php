@@ -4,7 +4,7 @@
     @if(in_array($communication->status,['sending','sent','uncertain']))
         <span hidden data-communication-claimed data-selection-user="{{ auth()->id() }}" data-selection-path="{{ route(($payload['kind']??null)==='collections' ? 'agency-communications.collections' : 'agency-communications.index',[],false) }}" data-claimed-ids="{{ json_encode($payload['selection_keys'] ?? array_column($payload[($payload['kind']??null)==='collections' ? 'collections' : 'policies'],'id')) }}"></span>
     @endif
-    <x-page-header><x-slot:title>{{ $communication->status === 'review' ? 'Controlla l’email prima di inviarla' : 'Dettaglio comunicazione' }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route(($payload['kind']??null)==='collections' ? 'agency-communications.collections' : 'agency-communications.index',$payload['filters']) }}">Torna alla selezione</a><a class="btn btn-g" href="{{ route('agency-communications.history') }}">Storico invii</a></x-slot:actions></x-page-header>
+    <x-page-header><x-slot:title>{{ $communication->status === 'review' ? 'Controlla l’email' : 'Dettaglio comunicazione' }}</x-slot:title><x-slot:actions><a class="btn btn-g" href="{{ route(($payload['kind']??null)==='collections' ? 'agency-communications.collections' : 'agency-communications.index',$payload['filters']) }}">Torna alla selezione</a><a class="btn btn-g" href="{{ route('agency-communications.history') }}">Storico invii</a></x-slot:actions></x-page-header>
     @if($voidedCollections->isNotEmpty())
         <x-panel title="Incassi stornati dopo la preparazione" padded>
             <p class="client-overdue">Questo riepilogo contiene incassi ora stornati. Se l’email è già partita o ha un esito incerto, verifica con l’agenzia la rettifica necessaria.</p>

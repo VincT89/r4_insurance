@@ -21,7 +21,9 @@
                 @enderror
             @endif
             <p class="u-text-meta u-mb-md">I campi con * sono obbligatori.</p>
-            @if(!$policy->exists)
+            @if(!$policy->exists && !$selectedQuote && !$existingEntry)
+                <input type="hidden" name="entry_mode" value="contract">
+            @elseif(!$policy->exists)
             <x-form-section title="Origine della polizza">
                 @if($selectedQuote)<input type="hidden" name="entry_mode" value="new"><input type="hidden" name="insurance_quote_id" value="{{ $selectedQuote->id }}"><p>Proposta {{ $selectedQuote->reference }} approvata da {{ $client->name }}. Premio {{ \App\Support\Money::format($selectedQuote->premium_cents) }}.</p><a href="{{ route('quotes.show',[$selectedQuote->insurance_quote_case_id,'proposal'=>$selectedQuote->id]) }}#proposal-{{ $selectedQuote->id }}" target="_blank" rel="noopener">Consulta preventivo e prova di approvazione</a>
                 @elseif($existingEntry)

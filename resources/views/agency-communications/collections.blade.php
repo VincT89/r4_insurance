@@ -11,8 +11,8 @@
     <x-page-header><x-slot:title>Comunicazioni alle agenzie</x-slot:title></x-page-header>
     <div class="communication-workspace">
         @include('agency-communications.navigation')
-        <details class="communication-search" @if($errors->any()) open @endif><summary>Filtra elenco</summary>
-        <form id="communication-collection-filters" method="GET" class="client-search-form communication-filters" data-compact-filter-results aria-label="Filtra incassi da comunicare" x-data="{view:@js($selectedView)}">
+        <details class="communication-search" id="communication-search" @if($errors->any()) open @endif><summary>Filtra elenco</summary>
+        <form id="communication-collection-filters" method="GET" action="{{ route('agency-communications.collections') }}" class="client-search-form communication-filters" data-compact-filter-results aria-label="Filtra incassi da comunicare" x-data="{view:@js($selectedView)}">
             <div class="communication-filter-primary">
                 <x-form-group label="Agenzia" name="agency"><select name="agency" class="form-sel"><option value="">Tutte le agenzie</option>@foreach($agencies as $agency)<option value="{{ $agency->id }}" @selected(($filters['agency']??'')==$agency->id)>{{ $agency->name }}</option>@endforeach</select></x-form-group>
                 <x-form-group label="Mostra" name="view"><select name="view" class="form-sel" x-model="view">@foreach(['today'=>'Oggi','yesterday'=>'Ieri','last15'=>'Ultimi 15 giorni','month'=>'Questo mese','custom'=>'Intervallo personalizzato','pending'=>'Da completare / tutte le date','attention'=>'Esiti da verificare / tutte le date'] as $value=>$label)<option value="{{ $value }}" @selected($selectedView===$value)>{{ $label }}</option>@endforeach</select></x-form-group>

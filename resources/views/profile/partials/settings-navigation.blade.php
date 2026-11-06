@@ -5,5 +5,5 @@
     @can('viewAny', \App\Models\SupplierCompany::class)<a href="{{ route('insurance-catalog.index') }}" @if(request()->routeIs('insurance-catalog.*')) aria-current="page" @endif>Rami e sottorami</a>@endcan
     @can('system.admin')<a href="{{ route('registry-imports.index') }}" @if(request()->routeIs('registry-imports.*', 'insurance-import.*')) aria-current="page" @endif>Importazioni CSV/Excel</a>@endcan
     @can('system.admin')<a href="{{ route('email-settings.edit') }}" @if(request()->routeIs('email-settings.*')) aria-current="page" @endif>Email</a>@endcan
-    @can('forms.manage')<a href="{{ route('form-templates.index') }}" @if(request()->routeIs('form-templates.*')) aria-current="page" @endif>Modelli documentali</a>@endcan
+    @can('forms.manage')<a href="{{ route('form-templates.index') }}" @if(request()->routeIs('form-templates.*')) aria-current="page" @endif>Modelli dei documenti</a>@endcan
 </nav>

@@ -38,7 +38,7 @@
         @include('insurance-forms.signature-review',['origin'=>'package'])
     @endif
     <details class="form-signing-upload" @if(!$document->latestSubmission || $document->latestSubmission->status==='rejected') data-signature-next @endif @if((int)old('signature_document')===$document->id && old('signature_action')==='upload') open @endif>
-        <summary>{{ !$document->latestSubmission || $document->latestSubmission->status==='rejected' ? $document->signatureActionLabel() : 'Carica nuova versione firmata' }}</summary>
+        <summary>{{ !$document->latestSubmission ? 'Carica copia firmata' : ($document->latestSubmission->status==='rejected' ? 'Carica copia corretta' : 'Carica nuova versione firmata') }}</summary>
         @include('insurance-forms.signature-upload',['origin'=>'package'])
     </details>
 @endcan

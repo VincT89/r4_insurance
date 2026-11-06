@@ -73,7 +73,7 @@ class InsuranceQuoteController extends Controller
                 return $case;
             });
         } catch (\Throwable $exception) { foreach ($stored as $document) Storage::disk($document->disk)->delete($document->path); throw $exception; }
-        return $this->savedDocuments($case,$stored,'Pratica preventivi aperta.');
+        return $this->savedDocuments($case,$stored,'Richiesta di preventivo salvata. Ora puoi preparare l’email e scegliere i destinatari.');
     }
 
     public function documents(Request $request, InsuranceQuoteCase $quoteCase, QuoteRequestDocuments $registry)

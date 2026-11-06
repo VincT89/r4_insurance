@@ -3,9 +3,27 @@
     $highlight = (int)(old('signature_document') ?: session('signature_document'));
     $toSignLabel = $signatures['toSign']->every(fn ($doc) => !$doc->latestSubmission) ? 'Da firmare'
         : ($signatures['toSign']->every(fn ($doc) => $doc->latestSubmission) ? 'Da correggere' : 'Da firmare o correggere');
+    $signatureSummary = [];
+    foreach (['toSign'=>mb_strtolower($toSignLabel),'toReview'=>'da controllare','previous'=>'dei periodi precedenti da completare'] as $group=>$label) {
+        $count = $signatures[$group]->count();
+        if ($count) $signatureSummary[] = $count.' '.($count === 1 ? 'modulo' : 'moduli').' '.$label;
+    }
+    $nextSignature = $signatures['toReview']->first() ?? $signatures['toSign']->first() ?? $signatures['previous']->first();
 @endphp
 <section id="policy-signatures" class="policy-signatures" data-policy-signatures data-has-documents="{{ (int)$hasSignatures }}"
          aria-label="Firme dei moduli" @if($policyTab !== 'forms' && ($policyTab !== 'overview' || !$hasSignatures)) hidden @endif>
+    <div class="policy-forms-reminder signature-overview" data-signature-overview @if($policyTab !== 'overview') hidden @endif>
+        <span><strong>{{ $signatureSummary ? 'Moduli da completare' : 'Moduli e firme' }}</strong><small>{{ $signatureSummary ? implode(' · ',$signatureSummary) : 'Le firme del periodo corrente sono state controllate.' }}</small></span>
+        <div class="signature-overview-actions">
+            @can('updateRegistry',$client)
+                @if($nextSignature && $signatures['toReview']->isEmpty() && $signatures['toSign']->count() === 1 && $signatures['toSign']->contains('id',$nextSignature->id) && $nextSignature->generated)
+                    <a class="btn btn-p" href="{{ route('attachments.sign',$nextSignature->generated) }}">Firma modulo</a>
+                @endif
+            @endcan
+            <a class="btn btn-g" data-policy-section-link href="{{ route('clients.policies.show',[$client,$policy,'tab'=>'forms']).'#policy-signatures' }}">Apri moduli e firme</a>
+        </div>
+    </div>
+    <div data-signature-tasks @if($policyTab !== 'forms') hidden @endif>
     <x-panel title="Firme dei moduli" padded>
         @foreach(['toSign'=>$toSignLabel,'toReview'=>'Copie da controllare'] as $group=>$label)
             @if($signatures[$group]->isNotEmpty())
@@ -28,4 +46,5 @@
             @endif
         @endforeach
     </x-panel>
+    </div>
 </section>

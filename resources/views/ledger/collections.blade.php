@@ -71,7 +71,7 @@
                                 <td>{{ $collection->reference ?: 'Non indicato' }}</td>
                                 <td>@forelse($collection->documents as $document)<a href="{{ $document->openUrl() }}">{{ $document->original_name }}</a><br>@empty<span data-table-export-ignore>Nessun allegato</span>@endforelse</td>
                             </tr>
-                        @empty<tr><td colspan="13">Nessun movimento corrisponde ai filtri.</td></tr>@endforelse
+                        @empty<tr><td colspan="13"><p>Nel periodo scelto non risultano incassi o rimborsi con questi filtri.</p><a class="btn btn-g u-mt-sm" href="{{ route('titles.index',['state'=>'open']) }}">Trova il titolo da incassare</a></td></tr>@endforelse
                     </tbody>
                     <tfoot><tr><td colspan="13"><div class="collection-table-total"><strong>Saldo dei filtri, esclusi storni</strong><strong data-collection-total="total">{{ \App\Support\Money::format((int)$totals->total) }}</strong></div></td></tr></tfoot>
                 </table>

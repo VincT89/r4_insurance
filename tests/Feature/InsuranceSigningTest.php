@@ -62,7 +62,16 @@ class InsuranceSigningTest extends TestCase
         $this->assertSame(0,InsuranceFormTemplate::where('status','active')->count());
         $body=InsuranceFormTemplate::pluck('body')->implode(' ');$this->assertStringNotContainsString('SPADONE IVAN',$body);$this->assertStringNotContainsString('215797176',$body);
         $this->get(route('clients.forms.create',[$this->client,'policy'=>$this->policy->id]))->assertOk()->assertSee('Non ci sono modelli approvati');
-        $this->get(route('form-templates.index'))->assertOk()->assertSee('Modelli documentali');
+        $this->get(route('form-templates.index'))->assertOk()->assertSee('Modelli dei documenti');
+    }
+    public function test_template_search_keeps_the_selected_client_type_and_history_filter(): void
+    {
+        $this->template(['title'=>'Dichiarazione ricerca privati','client_type'=>'person']);
+        $this->template(['title'=>'Dichiarazione ricerca aziende','client_type'=>'company']);
+        $this->template(['title'=>'Altro modulo per privati','client_type'=>'person']);
+        $this->get(route('form-templates.index',['search'=>'RICERCA','client_type'=>'person','history'=>'1']))->assertOk()
+            ->assertSee('Dichiarazione ricerca privati')->assertDontSee('Dichiarazione ricerca aziende')->assertDontSee('Altro modulo per privati');
+        $this->get(route('form-templates.index',['search'=>'nessuna corrispondenza']))->assertOk()->assertSee('Nessun modello corrispondente ai filtri.');
     }
     public function test_template_creation_approval_and_revision_preserve_prior_versions(): void
     {
@@ -304,7 +313,7 @@ class InsuranceSigningTest extends TestCase
         $registryAction = route('clients.forms.show',[$this->client,$registryPackage]).'#form-document-'.$registryDocument->id;
         $this->get(route('clients.show',$this->client))->assertOk()->assertSee($policyAction)->assertDontSee($registryAction);
         foreach ([route('clients.show',[$this->client,'tab'=>'documents']),route('clients.documents.create',$this->client),route('clients.forms.index',$this->client)] as $url) {
-            $this->get($url)->assertOk()->assertSee($policyAction)->assertSee($registryAction)->assertSee('Carica copia firmata');
+            $this->get($url)->assertOk()->assertSee($policyAction)->assertSee($registryAction)->assertSee('Firma o carica copia');
         }
         $this->get(route('clients.documents.create',[$this->client,'policy'=>$this->policy->id]))->assertOk()->assertSee($policyAction)->assertDontSee($registryAction);
         $this->get(route('clients.forms.index',[$this->client,'reason'=>'client']))->assertOk()->assertSee($registryAction)->assertDontSee($policyAction);

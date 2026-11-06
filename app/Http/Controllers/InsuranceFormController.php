@@ -92,8 +92,9 @@ class InsuranceFormController extends Controller
     }
     public function templates(Request $request)
     {
-        $this->authorize('forms.manage'); $data=$request->validate(['status'=>['nullable',Rule::in(array_keys(InsuranceFormTemplate::STATUSES))],'scope'=>['nullable','in:client,policy'],'client_type'=>['nullable',Rule::in(array_keys(InsuranceFormTemplate::CLIENT_TYPES))],'history'=>['nullable','in:1']]);
+        $this->authorize('forms.manage'); $data=$request->validate(['search'=>['nullable','string','max:255'],'status'=>['nullable',Rule::in(array_keys(InsuranceFormTemplate::STATUSES))],'scope'=>['nullable','in:client,policy'],'client_type'=>['nullable',Rule::in(array_keys(InsuranceFormTemplate::CLIENT_TYPES))],'history'=>['nullable','in:1']]);
         $query=InsuranceFormTemplate::with(['branch','subbranch','next']);
+        if (filled($data['search']??null)) $query->whereLike('title','%'.$data['search'].'%');
         foreach (['status','scope','client_type'] as $field) if (!empty($data[$field])) $query->where($field,$data[$field]);
         if (empty($data['history']) && empty($data['status'])) $query->whereDoesntHave('next');
         return view('insurance-forms.templates.index',['templates'=>$query->orderBy('title')->orderByDesc('version')->get(),'filters'=>$data]);

@@ -44,7 +44,7 @@
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <a class="app-brand" href="{{ route('dashboard') }}" aria-label="{{ config('branding.name') }}: dashboard">
+        <a class="app-brand" href="{{ route('dashboard') }}" aria-label="{{ config('branding.name') }}: riepilogo">
           <img class="brand-symbol" src="{{ asset('images/agency-signature.svg') }}" alt="" width="115" height="50">
           <span class="brand-name">{{ config('branding.wordmark') }}</span>
         </a>
@@ -61,7 +61,7 @@
               @endif
             @endforeach
           @else
-            <span class="cur">{{ $title ?? 'Dashboard' }}</span>
+            <span class="cur">{{ $title ?? 'Riepilogo' }}</span>
           @endisset
         </nav>
       </div>
@@ -141,7 +141,7 @@
 
       <div class="nav-group">
         <div class="nav-group-label">Operatività</div>
-        <x-nav-item href="{{ route('dashboard') }}" icon="layout-dashboard" label="Dashboard" :active="request()->routeIs('dashboard')" />
+        <x-nav-item href="{{ route('dashboard') }}" icon="layout-dashboard" label="Riepilogo" :active="request()->routeIs('dashboard')" />
         <x-nav-item href="{{ route('daily-notes.index') }}" wire:navigate icon="book-open" label="Blocco Note" :active="request()->routeIs('daily-notes.*')" />
         @can('create', \App\Models\Client::class)
           <a href="{{ route('policies.create') }}" class="btn btn-p sidebar-policy-button" title="Nuova polizza" @if(request()->routeIs('policies.create','clients.policies.create')) aria-current="page" @endif><i data-lucide="plus" width="16" height="16" aria-hidden="true"></i><span>Nuova polizza</span></a>
@@ -187,10 +187,10 @@
 
       <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form">
         @csrf
-        <button type="submit" class="nav-item logout sidebar-logout-btn" x-bind:title="!sidebarOpen ? 'Logout' : ''">
+        <button type="submit" class="nav-item logout sidebar-logout-btn" x-bind:title="!sidebarOpen ? 'Esci' : ''">
           <div class="nav-icon"><i data-lucide="log-out" width="16" height="16" stroke-width="1.8"></i></div>
-          <span class="nav-label">Logout</span>
-          <div class="nav-tooltip">Logout</div>
+          <span class="nav-label">Esci</span>
+          <div class="nav-tooltip">Esci</div>
         </button>
       </form>
     </nav>

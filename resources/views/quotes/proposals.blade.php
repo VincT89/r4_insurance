@@ -83,7 +83,7 @@
     </x-panel>
 @endif
 @if($waiting->isNotEmpty() || $responses->isEmpty())
-    <x-panel :title="$case->status==='open' ? 'Risposte attese' : 'Richieste senza risposta'" id="risposte-attese" padded>
+    <x-panel :title="$case->quotes->isEmpty() && $mayWork ? 'Richiesta pronta da inviare' : ($case->status==='open' ? 'Risposte attese' : 'Richieste senza risposta')" id="risposte-attese" padded>
         @forelse($waiting as $quote)
             <div class="awaiting-proposal" @if($activeQuote?->id !== $quote->id) id="proposal-{{ $quote->id }}" @endif>
                 <div><strong>{{ $quote->request_recipient['company_name'] ?? $quote->company->name }}</strong> · {{ $quote->request_recipient ? ($quote->request_recipient['agency_name'] ?? 'Rapporto diretto') : ($quote->agency?->name ?: 'Rapporto diretto') }}
@@ -92,7 +92,11 @@
                 @if($mayWork)<a class="btn btn-g" href="{{ $proposalUrl($quote) }}" aria-label="Registra risposta di {{ $quote->company->name }} · {{ $quote->agency?->name ?: 'Rapporto diretto' }}">Registra risposta</a>@endif
             </div>
         @empty
-            <p>Nessuna risposta registrata. Qui ritroverai le richieste inviate alle compagnie e alle agenzie.</p>
+            @if($case->quotes->isEmpty() && $mayWork)
+                <p>Scegli <strong>Prepara email</strong> per selezionare compagnie e agenzie. Potrai controllare il messaggio prima dell’invio.</p>
+            @else
+                <p>Nessuna risposta registrata. Qui ritroverai le richieste inviate alle compagnie e alle agenzie.</p>
+            @endif
         @endforelse
     </x-panel>
 @endif

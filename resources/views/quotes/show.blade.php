@@ -11,7 +11,7 @@
         <x-slot:title>{{ $case->subject }}</x-slot:title>
         <x-slot:meta>{{ $case->client->name }} · {{ $case->branch->name }}{{ $case->subbranch ? ' / '.$case->subbranch->name : '' }}@if($case->vehicle_snapshot['plate'] ?? null) · {{ $case->vehicle_snapshot['plate'] }}@endif</x-slot:meta>
         <x-slot:actions>
-            @if($mayWork)<a @class(['btn', 'btn-p'=>$case->quotes->isEmpty(), 'btn-g'=>$case->quotes->isNotEmpty()]) href="{{ route('quotes.emails.create',$case) }}">Prepara invio</a>@endif
+            @if($mayWork)<a @class(['btn', 'btn-p'=>$case->quotes->isEmpty(), 'btn-g'=>$case->quotes->isNotEmpty()]) href="{{ route('quotes.emails.create',$case) }}">Prepara email</a>@endif
             <a class="btn btn-g" href="{{ route('clients.show',$case->client_id) }}">Cliente</a>
             <a class="btn btn-g" href="{{ route('quotes.index',['client'=>$case->client_id]) }}">Preventivi</a>
         </x-slot:actions>

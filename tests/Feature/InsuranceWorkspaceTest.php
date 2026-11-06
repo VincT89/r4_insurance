@@ -147,6 +147,16 @@ class InsuranceWorkspaceTest extends TestCase
         $this->post(route('policies.store'),(['client_id'=>$client->id,'category'=>'RC auto','company'=>'Demo','number'=>'MIME','status'=>'active','starts_on'=>'2026-10-16','expires_on'=>'2027-10-16','documents'=>[$fake]]) + ['entry_mode'=>'existing','existing_reason'=>'Registrazione da archivio di collaudo'])->assertSessionHasErrors('documents.0');
     }
 
+    public function test_client_deadlines_distinguish_today_nearby_and_future_dates_like_the_global_list(): void
+    {
+        foreach ([0=>'Scade oggi',15=>'In scadenza',16=>'Futura'] as $days=>$label) {
+            $client=Client::factory()->create();
+            $policy=$this->policy($client,['expires_on'=>today()->addDays($days)->toDateString()]);
+            $this->get(route('clients.show',[$client,'tab'=>'deadlines']))->assertOk()->assertSeeText($label);
+            $this->get(route('deadlines.index',['period'=>'all','search'=>$policy->number]))->assertOk()->assertSeeText($label);
+        }
+    }
+
     public function test_source_status_frequency_and_method_do_not_invent_paid_or_resolve_mixed_groups(): void
     {
         $service=app(PolicyOperationalDetails::class);

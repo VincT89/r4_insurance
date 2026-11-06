@@ -88,6 +88,11 @@
 .form-signing-upload > form { margin-top:14px; }
 .policy-signatures { scroll-margin-top:65px; }
 .policy-signatures[hidden] { display:none; }
+.signature-overview[hidden], [data-signature-tasks][hidden] { display:none; }
+.signature-overview-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.app-body .filter-grid > .form-row.model-filter-fields { grid-template-columns:repeat(4,minmax(0,1fr)); }
+@media(max-width:800px) { .app-body .filter-grid > .form-row.model-filter-fields { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:520px) { .app-body .filter-grid > .form-row.model-filter-fields { grid-template-columns:minmax(0,1fr); } }
 .signature-group + .signature-group, .signature-group-more { margin-top:12px; }
 .signature-group h3 { font-size:15px; margin:0 0 6px; color:var(--ap-panel-heading); }
 .signature-row { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:8px 18px; padding:12px 0; border-top:1px solid var(--ap-section-line); }

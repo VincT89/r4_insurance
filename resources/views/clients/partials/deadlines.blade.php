@@ -17,10 +17,19 @@
             <thead><tr><th>Data</th><th>Tipo</th><th>Elemento</th><th>Frazionamento</th><th>Situazione</th></tr></thead>
             <tbody>
                 @forelse($deadlines as $deadline)
+                    @php
+                        $deadlineStatus = match (true) {
+                            $deadline['policy_review'] ?? false => 'Stato polizza da verificare',
+                            $deadline['date']->lt(today()) || ($deadline['expired'] ?? false) => 'Scaduta',
+                            $deadline['date']->isToday() => 'Scade oggi',
+                            $deadline['date']->gt(today()->addDays(15)) => 'Futura',
+                            default => 'In scadenza',
+                        };
+                    @endphp
                     <tr>
                         <td><x-status-text :alert="!($deadline['policy_review'] ?? false) && ($deadline['date']->lt(today()) || ($deadline['expired'] ?? false))">{{ $deadline['date']->format('d/m/Y') }}</x-status-text></td><td>{{ $deadline['kind'] }}</td>
                         <td><a href="{{ $deadline['url'] }}">{{ $deadline['title'] }}</a>@if($deadline['detail'])<div class="u-text-meta">{{ $deadline['detail'] }}</div>@endif</td>
-                        <td>{{ $deadline['frequency'] ?? 'Non indicato' }}</td><td class="{{ !($deadline['policy_review'] ?? false) && ($deadline['date']->lt(today()) || ($deadline['expired'] ?? false)) ? 'client-overdue' : '' }}">{{ ($deadline['policy_review'] ?? false) ? 'Stato polizza da verificare' : (($deadline['date']->lt(today()) || ($deadline['expired'] ?? false)) ? 'Scaduta' : ($deadline['date']->isToday() ? 'Scade oggi' : 'In scadenza')) }}</td>
+                        <td>{{ $deadline['frequency'] ?? 'Non indicato' }}</td><td class="{{ !($deadline['policy_review'] ?? false) && ($deadline['date']->lt(today()) || ($deadline['expired'] ?? false)) ? 'client-overdue' : '' }}">{{ $deadlineStatus }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="5" class="u-empty-state">Nessuna scadenza nel periodo selezionato.</td></tr>

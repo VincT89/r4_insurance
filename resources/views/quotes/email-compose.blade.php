@@ -1,6 +1,6 @@
-<x-app-layout title="Prepara invio">
+<x-app-layout title="Prepara email">
     <x-page-header>
-        <x-slot:title>Prepara invio</x-slot:title>
+        <x-slot:title>Prepara email</x-slot:title>
         <x-slot:meta>{{ $case->client->name }} · {{ $case->subject }}</x-slot:meta>
         <x-slot:actions><a class="btn btn-g" href="{{ route('quotes.show',$case) }}">Torna alla pratica</a></x-slot:actions>
     </x-page-header>

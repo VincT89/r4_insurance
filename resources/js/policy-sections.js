@@ -3,7 +3,11 @@ function selectSection(workspace, key) {
     if (!sections.some(section => section.dataset.policySection === key)) return false;
     for (const section of sections) section.hidden = section.dataset.policySection !== key;
     const signatures = workspace.querySelector('[data-policy-signatures]');
-    if (signatures) signatures.hidden = key !== 'forms' && (key !== 'overview' || signatures.dataset.hasDocuments !== '1');
+    if (signatures) {
+        signatures.hidden = key !== 'forms' && (key !== 'overview' || signatures.dataset.hasDocuments !== '1');
+        signatures.querySelector('[data-signature-overview]').hidden = key !== 'overview';
+        signatures.querySelector('[data-signature-tasks]').hidden = key !== 'forms';
+    }
     for (const link of workspace.querySelectorAll('nav [data-policy-section-link]')) {
         if (new URL(link.href).searchParams.get('tab') === key) link.setAttribute('aria-current', 'page');
         else link.removeAttribute('aria-current');

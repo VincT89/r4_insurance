@@ -1,5 +1,8 @@
-<x-app-layout title="Importazione Excel">
-    <x-page-header><x-slot:title>Importazione Excel</x-slot:title>
+@php
+    $importPageTitle = $section === 'reconciliation' ? 'Riconciliazione Excel' : 'Importazione Excel';
+@endphp
+<x-app-layout :title="$importPageTitle">
+    <x-page-header><x-slot:title>{{ $importPageTitle }}</x-slot:title>
         <x-slot:actions>@if($summary)<a class="btn btn-g" href="{{ route('insurance-import.download') }}">Scarica prospetto di verifica</a>@endif</x-slot:actions>
     </x-page-header>
     @include('profile.partials.settings-navigation')
@@ -7,7 +10,7 @@
         <x-panel padded><p>{{ $error ?? 'Nessun lotto preparato. Caricare i file sorgente nella procedura di preparazione per generare l’anteprima.' }}</p></x-panel>
     @else
         @if($registryCounts ?? [])
-            <p class="u-text-meta u-mb-md">Anagrafiche importate: {{ number_format($registryCounts['client']['imported'] ?? 0, 0, ',', '.') }} clienti, {{ $registryCounts['agency']['imported'] ?? 0 }} agenzie e {{ $registryCounts['company']['imported'] ?? 0 }} compagnie collegate. @if($policyCounts ?? []) Polizze importate: {{ number_format($policyCounts['imported'] ?? 0, 0, ',', '.') }}. Gruppi in sospeso: {{ number_format($policyCounts['held'] ?? 0, 0, ',', '.') }}. @else Le polizze non sono state importate. @endif</p>
+            <p class="u-text-meta u-mb-md">Anagrafiche importate: clienti {{ number_format($registryCounts['client']['imported'] ?? 0, 0, ',', '.') }}, agenzie {{ $registryCounts['agency']['imported'] ?? 0 }}, compagnie collegate {{ $registryCounts['company']['imported'] ?? 0 }}. @if($policyCounts ?? []) Polizze importate: {{ number_format($policyCounts['imported'] ?? 0, 0, ',', '.') }}. Gruppi in sospeso: {{ number_format($policyCounts['held'] ?? 0, 0, ',', '.') }}. @else Le polizze non sono state importate. @endif</p>
         @else
             <p class="u-text-meta u-mb-md">Anteprima di preparazione. I dati Excel non sono ancora stati caricati nelle anagrafiche. Le proposte di accorpamento richiedono verifica.</p>
         @endif

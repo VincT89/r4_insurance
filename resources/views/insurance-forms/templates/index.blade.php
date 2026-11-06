@@ -1,6 +1,7 @@
-<x-app-layout title="Modelli documentali"><x-page-header><x-slot:title>Modelli documentali</x-slot:title><x-slot:actions><a class="btn btn-p" href="{{ route('form-templates.create') }}">Nuovo modello</a></x-slot:actions></x-page-header>@include('profile.partials.settings-navigation')
+<x-app-layout title="Modelli dei documenti"><x-page-header><x-slot:title>Modelli dei documenti</x-slot:title><x-slot:actions><a class="btn btn-p" href="{{ route('form-templates.create') }}">Nuovo modello</a></x-slot:actions></x-page-header>@include('profile.partials.settings-navigation')
 <form class="client-search-form filter-grid" method="GET">
-    <div class="form-row">
+    <div class="form-row model-filter-fields">
+        <x-form-group label="Cerca modello" name="search"><input class="form-in" type="search" name="search" value="{{ $filters['search']??'' }}" placeholder="Nome del modello" maxlength="255"></x-form-group>
         <x-form-group label="Stato" name="status"><select class="form-sel" name="status"><option value="">Tutti</option>@foreach(\App\Models\InsuranceFormTemplate::STATUSES as $key=>$label)<option value="{{ $key }}" @selected(($filters['status']??'')===$key)>{{ $label }}</option>@endforeach</select></x-form-group>
         <x-form-group label="Ambito" name="scope"><select class="form-sel" name="scope"><option value="">Tutti</option>@foreach(\App\Models\InsuranceFormTemplate::SCOPES as $key=>$label)<option value="{{ $key }}" @selected(($filters['scope']??'')===$key)>{{ $label }}</option>@endforeach</select></x-form-group>
         <x-form-group label="Destinatari" name="client_type"><select class="form-sel" name="client_type"><option value="">Tutti i modelli</option>@foreach(\App\Models\InsuranceFormTemplate::CLIENT_TYPES as $key=>$label)<option value="{{ $key }}" @selected(($filters['client_type']??'')===$key)>{{ $label }}</option>@endforeach</select></x-form-group>

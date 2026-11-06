@@ -1,6 +1,6 @@
-<x-app-layout title="Dashboard">
+<x-app-layout title="Riepilogo">
     <x-page-header>
-        <x-slot:title>Dashboard</x-slot:title>
+        <x-slot:title>Riepilogo</x-slot:title>
         <x-slot:actions>@can('create', \App\Models\Client::class)<a href="{{ route('clients.create') }}" class="btn btn-g">Nuovo cliente</a><a href="{{ route('policies.create') }}" class="btn btn-p">Nuova polizza</a>@endcan</x-slot:actions>
     </x-page-header>
     @if($overview)

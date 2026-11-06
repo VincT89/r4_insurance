@@ -3,8 +3,8 @@
     <x-page-header><x-slot:title>Comunicazioni alle agenzie</x-slot:title></x-page-header>
     <div class="communication-workspace">
     @include('agency-communications.navigation')
-    <details class="communication-search" @if($errors->any()) open @endif><summary>Filtra elenco</summary>
-    <form id="communication-operation-filters" method="GET" x-data="{period:@js($filters['period'])}" class="client-search-form communication-filters" data-compact-filter-results aria-label="Filtra operazioni da comunicare">
+    <details class="communication-search" id="communication-search" @if($errors->any()) open @endif><summary>Filtra elenco</summary>
+    <form id="communication-operation-filters" method="GET" action="{{ route('agency-communications.index') }}" x-data="{period:@js($filters['period'])}" class="client-search-form communication-filters" data-compact-filter-results aria-label="Filtra operazioni da comunicare">
         <div class="communication-filter-primary">
             <x-form-group label="Agenzia" name="agency"><select id="field-agency" name="agency" class="form-sel"><option value="">Tutte le agenzie</option>@foreach($options['agencies'] as $agencyOption)<option value="{{ $agencyOption->id }}" @selected((string)($filters['agency']??'')===(string)$agencyOption->id)>{{ $agencyOption->name }}</option>@endforeach</select></x-form-group>
             <x-form-group label="Periodo" name="period"><select id="field-period" name="period" class="form-sel" x-model="period">@foreach(['day'=>'Giornata','15'=>'Ultimi 15 giorni','30'=>'Ultimi 30 giorni','month'=>'Mese','custom'=>'Intervallo personalizzato'] as $key=>$label)<option value="{{ $key }}" @selected($filters['period']===(string)$key)>{{ $label }}</option>@endforeach</select></x-form-group>

@@ -17,7 +17,8 @@
             <button class="btn btn-p" type="submit" aria-label="Prepara email per {{ $batchAgency->name }}" @disabled($batchAgency->status!=='active') :disabled="busy || {{ $batchAgency->status==='active' ? 'false' : 'true' }}" :aria-busy="busy" x-text="busy ? 'Preparo…' : 'Prepara email'">Prepara email</button>
         </form>
     @empty
-        <p>Nessuna comunicazione da preparare con questi filtri.</p>
+        <p>Nessuna comunicazione da preparare nel periodo e con i filtri scelti.</p>
+        <a class="btn btn-g" href="#communication-search">Cambia periodo o filtri</a>
     @endforelse
     @endif
 </div>

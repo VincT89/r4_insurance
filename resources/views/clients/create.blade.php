@@ -1,11 +1,11 @@
 <x-app-layout title="Nuovo cliente">
     <x-page-header>
         <x-slot:title>Nuovo cliente</x-slot:title>
-        <x-slot:actions><a href="{{ route('clients.index') }}" class="btn btn-g">Anagrafica clienti</a></x-slot:actions>
+        <x-slot:actions><a href="{{ route('clients.index') }}" class="btn btn-g">Anagrafica clienti</a><button type="submit" form="client-create-form" class="btn btn-p">Salva cliente</button></x-slot:actions>
     </x-page-header>
 
     <x-panel padded>
-        <form action="{{ route('clients.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="client-create-form" action="{{ route('clients.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <p class="u-text-sm u-text-muted u-mb-md">I campi con * sono obbligatori.</p>
             @include('clients.partials.registry-fields', ['client' => null])
