@@ -20,6 +20,7 @@ function labelTableRows(table) {
     if (head?.rows.length !== 1 || !table.tBodies.length) return;
     const headers = [...head.rows[0].cells];
     if (headers.some(cell => cell.colSpan !== 1)) return;
+    headers.forEach(header => { header.dataset.columnKind = exportColumnType(text(header.textContent)); });
     if (!table.parentElement.classList.contains('client-table-scroll')) {
         const title = text(table.closest('.panel')?.querySelector('.panel-title')?.textContent || document.querySelector('[role="heading"][aria-level="1"], h1')?.textContent || document.title);
         const wrapper = element('div', {class:'client-table-scroll',role:'region','aria-label':title,tabindex:'0'});
@@ -30,6 +31,7 @@ function labelTableRows(table) {
         if (row.cells.length !== headers.length || [...row.cells].some(cell => cell.colSpan !== 1)) continue;
         [...row.cells].forEach((cell, index) => {
             if (!cell.hasAttribute('data-label')) cell.dataset.label = text(headers[index].textContent);
+            cell.dataset.columnKind = headers[index].dataset.columnKind;
         });
     }
     table.setAttribute('data-responsive-table', '');
@@ -175,7 +177,7 @@ function initialize(table, index) {
     else if (!exportOnly) actions.after(filters);
     let anchor = table;
     if (table.parentElement?.classList.contains('client-table-scroll') || table.parentElement?.classList.contains('attachments-table-wrap')) anchor = table.parentElement;
-    const actionsContainer = accountingWorkspace?.querySelector('[data-collection-actions]') || (exportOnly && panel.querySelector('[data-export-controls]'));
+    const actionsContainer = accountingWorkspace?.querySelector('[data-collection-actions]') || panel.querySelector('[data-policy-export-actions]') || (exportOnly && panel.querySelector('[data-export-controls]'));
     if (actionsContainer) actionsContainer.append(toolbar); else anchor.before(toolbar);
     accountingWorkspace?.addEventListener('click',event=> {
         const control = event.target.closest('[data-collection-export]');

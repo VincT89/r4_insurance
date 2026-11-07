@@ -3,7 +3,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Firma · {{ $source->original_name }}</title><x-brand-icons />
 @vite(['resources/css/app.css','resources/js/app.js'])
-</head><body class="app-body signing-body" style="{{ \App\Support\Appearance::style(auth()->user()?->appearance) }}">
+</head><body class="app-body r4-workbench signing-body" style="{{ \App\Support\Appearance::style(auth()->user()?->appearance) }}">
 <main class="tablet-signing" data-tablet-signing data-return="{{ $returnUrl }}">
     <header class="tablet-signing-header">
         <div><h1>Firma il documento</h1><p>{{ $client->name }}@if($policy) · Polizza {{ $policy->number }}@endif</p><p class="signing-filename">{{ $source->original_name }}</p></div>

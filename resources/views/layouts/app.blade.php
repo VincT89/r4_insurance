@@ -11,7 +11,7 @@
   @livewireStyles
 </head>
 
-<body class="app-body" style="{{ \App\Support\Appearance::style(auth()->user()?->appearance) }}">
+<body class="app-body r4-workbench" style="{{ \App\Support\Appearance::style(auth()->user()?->appearance) }}">
 
   <a class="skip-link" href="#content-area">Vai al contenuto principale</a>
 

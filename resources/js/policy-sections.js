@@ -1,7 +1,13 @@
 function selectSection(workspace, key) {
     const sections = [...workspace.querySelectorAll('[data-policy-section]')];
     if (!sections.some(section => section.dataset.policySection === key)) return false;
+    workspace.dataset.currentSection = key;
+    const paymentAction = workspace.closest('[data-policy-record]')?.querySelector('[data-policy-primary-payment]');
+    if (paymentAction) paymentAction.hidden = key === 'payments';
     for (const section of sections) section.hidden = section.dataset.policySection !== key;
+    const workRail = workspace.querySelector('[data-policy-work-rail]');
+    if (workRail) workRail.hidden = key !== 'overview' && key !== 'forms';
+    for (const element of workspace.querySelectorAll('[data-policy-overview-only]')) element.hidden = key !== 'overview';
     const signatures = workspace.querySelector('[data-policy-signatures]');
     if (signatures) {
         signatures.hidden = key !== 'forms' && (key !== 'overview' || signatures.dataset.hasDocuments !== '1');
@@ -31,6 +37,8 @@ document.addEventListener('click', event => {
     if (!link || !workspace || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     const url = new URL(link.href);
     if (url.origin !== location.origin || url.pathname !== location.pathname) return;
+    /** Un titolo diverso richiede i dati aggiornati dal server, evitando di incassare quello aperto prima. */
+    if (url.searchParams.get('title') !== new URL(location.href).searchParams.get('title')) return;
     if (!selectSection(workspace, url.searchParams.get('tab'))) return;
     event.preventDefault();
     history.pushState(null, '', url);

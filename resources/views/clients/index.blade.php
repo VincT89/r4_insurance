@@ -1,68 +1,31 @@
 <x-app-layout title="Anagrafica clienti">
-    <x-page-header
-        
-        
-    >
-    <x-slot:title><strong>Anagrafica clienti</strong></x-slot:title>
-        <x-slot:actions>
-            <a href="{{ route('vehicles.index') }}" class="btn btn-g">Parco veicoli</a>
-            @can('create', App\Models\Client::class)
-                <a href="{{ route('clients.create') }}" class="btn btn-p">Nuovo cliente</a>
-            @endcan
-        </x-slot:actions>
+    <x-page-header>
+        <x-slot:title>Anagrafica clienti</x-slot:title>
+        <x-slot:actions><a href="{{ route('vehicles.index') }}" class="btn btn-g">Parco veicoli</a>@can('create', App\Models\Client::class)<a href="{{ route('clients.create') }}" class="btn btn-p">Nuovo cliente</a>@endcan</x-slot:actions>
     </x-page-header>
-
     <form method="GET" action="{{ route('clients.index') }}" class="client-search-form">
-        <x-form-group label="Cerca cliente" name="search">
-            <input id="field-search" type="search" name="search" value="{{ request('search') }}"
-                   placeholder="Contraente, contatti, CF / P. IVA, targa o polizza" class="form-in" maxlength="255">
-        </x-form-group>
+        <x-form-group label="Cerca cliente" name="search"><input id="field-search" type="search" name="search" value="{{ request('search') }}" placeholder="Nome, contatti, codice fiscale, partita IVA, targa o polizza" class="form-in" maxlength="255"></x-form-group>
         @include('clients.partials.type-filter')
-        <button type="submit" class="btn btn-p btn-sm">Cerca</button>
-        @if(request('search') || request('client_type') || request('import_review'))
-            <a href="{{ route('clients.index') }}" class="btn btn-g btn-sm">Azzera ricerca</a>
-        @endif
+        <button type="submit" class="btn btn-p">Cerca</button>
+        @if(request('search') || request('client_type') || request('import_review'))<a href="{{ route('clients.index') }}" class="btn btn-g">Azzera ricerca</a>@endif
     </form>
-
-    <x-panel>
-        <table class="t-table">
-            <thead>
-                <tr>
-                    <th>Contraente</th>
-                    <th>Email</th>
-                    <th>Telefono</th>
-                    <th>Stato</th>
-                    <th class="t-actions">Azioni</th>
-                </tr>
-            </thead>
+    <x-panel class="client-list">
+        <div class="client-table-scroll" role="region" aria-label="Elenco clienti" tabindex="0">
+        <table class="t-table" data-list-details data-details-label="Altri dati">
+            <thead><tr><th>Contraente</th><th>Contatti</th><th>Polizze</th><th>Azioni</th><th data-list-detail>Stato</th><th data-list-detail>Codice fiscale</th><th data-list-detail>Partita IVA</th><th data-list-detail>Operatore</th></tr></thead>
             <tbody>
-                @forelse($clients as $client)
-                <tr x-data @click="window.Livewire.navigate('{{ route('clients.show', $client) }}')"
-                    @keydown.enter.self.prevent="window.Livewire.navigate('{{ route('clients.show', $client) }}')"
-                    @keydown.space.self.prevent="window.Livewire.navigate('{{ route('clients.show', $client) }}')"
-                    tabindex="0" role="link" aria-label="Apri cliente {{ $client->name }}"
-                    class="u-cursor-pointer hover-bg">
-                    <td class="name-col">
-                        <a href="{{ route('clients.show', $client) }}" @click.stop>{{ $client->name }}</a>
-                        <div class="u-text-meta">{{ $client->client_type_label }} / {{ $client->policies_count }} {{ $client->policies_count === 1 ? 'polizza' : 'polizze' }}</div>
-                        @if($client->company_name && $client->company_name !== $client->name)<div class="u-text-meta">{{ $client->company_name }}</div>@endif
-                        @if($client->vat_number)<div class="u-text-meta">Partita IVA: {{ $client->vat_number }}</div>@endif
-                        <div class="u-text-meta">Operatore: {{ $client->commercialUser?->name ?? 'Non assegnato' }}</div>
-                    </td>
-                    <td>{{ $client->email }}</td>
-                    <td>{{ $client->mobile ?: $client->phone }}</td>
-                    <td><x-badge :status="$client->status" :label="$client->status_label" /></td>
-                    <td class="t-actions">
-                        @can('updateRegistry', $client)
-                            <a href="{{ route('clients.edit', $client) }}" class="btn btn-g btn-sm" aria-label="Modifica anagrafica {{ $client->name }}" @click.stop>Modifica</a>
-                        @endcan
-                    </td>
+            @forelse($clients as $client)
+                <tr data-list-label="{{ $client->name }}">
+                    <td class="name-col"><a href="{{ route('clients.show',$client) }}">{{ $client->name }}</a><div class="u-text-meta">{{ $client->client_type_label }} · {{ $client->status_label }}</div>@if($client->company_name && $client->company_name !== $client->name)<div class="u-text-meta">{{ $client->company_name }}</div>@endif</td>
+                    <td><span class="client-contact-line">{{ $client->email ?: 'Email non indicata' }}</span>@if($client->mobile || $client->phone)<span class="client-contact-line u-text-meta">{{ $client->mobile ?: $client->phone }}</span>@endif</td>
+                    <td>{{ $client->policies_count }}</td>
+                    <td class="t-actions"><a href="{{ route('clients.show',$client) }}" aria-label="Apri cliente {{ $client->name }}">Apri</a>@can('updateRegistry',$client)<a href="{{ route('clients.edit',$client) }}" aria-label="Modifica anagrafica {{ $client->name }}">Modifica</a>@endcan</td>
+                    <td>{{ $client->status_label }}</td><td>{{ $client->tax_code ?: 'Non indicato' }}</td><td>{{ $client->vat_number ?: 'Non indicata' }}</td><td>{{ $client->commercialUser?->name ?? 'Non assegnato' }}</td>
                 </tr>
-                @empty
-                <tr><td colspan="5" class="u-empty-state">Nessun cliente trovato</td></tr>
-                @endforelse
+            @empty<tr><td colspan="8" class="u-empty-state">Nessun cliente trovato. Modifica la ricerca per riprovare.</td></tr>@endforelse
             </tbody>
         </table>
+        </div>
         {{ $clients->links() }}
     </x-panel>
 </x-app-layout>

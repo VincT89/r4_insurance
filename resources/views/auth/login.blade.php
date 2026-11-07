@@ -1,40 +1,5 @@
 <x-guest-layout title="Accedi — R4 Insurance">
-  <div class="login-shell">
-
-    {{-- SINISTRA: brand --}}
-    <div class="login-left">
-      <div class="login-left-top">
-        <div class="login-logo">
-          <img src="{{ asset('images/agency-signature.svg') }}" alt="" width="115" height="50"><span class="login-logo-name">{{ config('branding.wordmark') }}</span>
-        </div>
-        <div class="login-eyebrow">Gestionale interno</div>
-        <div class="login-title">
-          Clienti, polizze<br>e documenti.
-        </div>
-        <p class="login-description">Accedi al gestionale per consultare le anagrafiche e seguire le scadenze assicurative.</p>
-      </div>
-
-      <div class="login-left-bottom">
-        <div class="login-copy">© {{ date('Y') }} R4 Insurance</div>
-      </div>
-    </div>
-
-    {{-- DESTRA: form --}}
-    <div class="login-right">
-      <div class="login-mobile-brand"><img src="{{ asset('images/agency-signature.svg') }}" alt="" width="115" height="50"><span>{{ config('branding.wordmark') }}</span></div>
-
-      <div class="login-form-top">
-        <div class="login-form-eyebrow">Bentornato</div>
-        <div class="login-form-title">Accedi al tuo<br>account</div>
-      </div>
-
-      {{-- Session error (credenziali errate) --}}
-      @if(session('status'))
-        <div class="flash flash-error login-flash">
-          {{ session('status') }}
-        </div>
-      @endif
-
+  <x-auth-shell title="Accedi al gestionale">
       <form method="POST" action="{{ route('login') }}">
         @csrf
 
@@ -88,7 +53,5 @@
           <button type="submit" class="btn btn-p">Entra</button>
         </div>
       </form>
-
-    </div>
-  </div>
+  </x-auth-shell>
 </x-guest-layout>

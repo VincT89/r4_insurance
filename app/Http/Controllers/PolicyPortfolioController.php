@@ -14,6 +14,9 @@ class PolicyPortfolioController extends Controller
         $this->authorize('viewAny', Client::class);
         $filters = $query->filters($request);
         $policies = $query->forUser($request->user(), $filters)->with(['client', 'supplierAgency', 'vehicle', 'asset', 'contracts'])
+            ->withExists('titles')
+            ->withSum(['titles as receipt_due_cents'=>fn ($titles) => $titles->outstanding()->where('direction','receipt')], \Illuminate\Support\Facades\DB::raw(\App\Models\InsuranceTitle::balanceSql('insurance_titles')))
+            ->withSum(['titles as refund_due_cents'=>fn ($titles) => $titles->outstanding()->where('direction','refund')], \Illuminate\Support\Facades\DB::raw(\App\Models\InsuranceTitle::balanceSql('insurance_titles')))
             ->orderBy('expires_on')->orderBy('id')->paginate(TableListing::perPage(25))->withQueryString();
         return view('policies.index', compact('policies', 'filters') + $query->options($request->user()));
     }

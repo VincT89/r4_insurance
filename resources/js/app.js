@@ -4,6 +4,7 @@ import './dialog-accessibility.js';
 import './ui-helpers.js';
 import './detail-navigation.js';
 import './policy-sections.js';
+import './policy-desk.js';
 import './document-preview-loader.js';
 import './tablet-signing-loader.js';
 import './template-editor-loader.js';

@@ -31,5 +31,7 @@
 @import './sodano/_commissions.css';
 @import './sodano/_signing.css';
 @import './sodano/_claims.css';
+@import './sodano/_policy-desk.css';
+@import './sodano/_workbench.css';
 
 @font-face { font-family: 'Ubuntu'; src: url('../fonts/Ubuntu-R.ttf') format('truetype'); font-style: normal; font-weight: 400; font-display: swap; }

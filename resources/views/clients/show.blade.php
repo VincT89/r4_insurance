@@ -22,8 +22,6 @@
         @foreach(['policies' => 'Polizze', 'registry' => 'Anagrafica', 'vehicles' => 'Veicoli', 'documents' => 'Documenti e firme', 'deadlines' => 'Scadenze'] as $key => $label)
             <a href="{{ route('clients.show', [$client, 'tab' => $key]) }}" @if($tab === $key) aria-current="page" @endif>{{ $label }}</a>
         @endforeach
-        <a href="{{ route('quotes.index',['client'=>$client->id]) }}">Preventivi</a>
-        @can('ledger.manage')<a href="{{ route('titles.index',['client'=>$client->id]) }}">Titoli</a><a href="{{ route('collections.index',['client'=>$client->id,'month'=>'']) }}">Contabilità</a>@endcan
         @php
             $secondaryTabs = ['network' => 'Referenti e relazioni', 'assets' => 'Immobili e beni', 'history' => 'Contatti e note', 'consents' => 'Consensi'];
             if (auth()->user()->can('system.admin')) $secondaryTabs['commissions'] = 'Provvigioni';
@@ -38,6 +36,10 @@
                 @endforeach
             </div>
         </details>
+    </nav>
+    <nav class="client-related-views" aria-label="Elenchi del cliente">
+        <span>Per questo cliente:</span><a href="{{ route('quotes.index',['client'=>$client->id]) }}">Preventivi</a>
+        @can('ledger.manage')<a href="{{ route('titles.index',['client'=>$client->id]) }}">Titoli</a><a href="{{ route('collections.index',['client'=>$client->id,'month'=>'']) }}">Contabilità</a>@endcan
     </nav>
     @if($tab === 'commissions')
         @include('commissions.summary', ['commissionPolicy'=>null])

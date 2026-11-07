@@ -5,7 +5,9 @@
 @if($visibleSignatures->isNotEmpty())
     <div class="client-mobile-signatures">@include('insurance-forms.open-signatures',['openSignatures'=>$visibleSignatures])</div>
 @endif
-<nav class="client-section-nav client-policy-nav" aria-label="Tipologie di polizza">
+<x-panel title="Polizze del cliente">
+    <x-slot:headerActions>
+<nav class="client-section-nav client-policy-nav" aria-label="Tipologie di polizza"><span class="branch-filter-label">Ramo:</span>
     <a href="{{ route('clients.show', [$client, 'tab' => 'policies']) }}" @if(!request('category')) aria-current="page" @endif>Tutte le polizze</a>
     @foreach($policyCategories as $policyCategory)
         <a href="{{ route('clients.show', [$client, 'tab' => 'policies', 'category' => $policyCategory]) }}" @if(request('category') === $policyCategory) aria-current="page" @endif>{{ $policyCategory }}</a>
@@ -14,7 +16,7 @@
 @if(request('category') && $policySubcategories->isNotEmpty())
     <nav class="client-section-nav client-policy-nav" aria-label="Sottorami del ramo selezionato"><a href="{{ route('clients.show', [$client, 'tab' => 'policies', 'category' => request('category')]) }}" @if(!request('subcategory')) aria-current="page" @endif>Tutti i sottorami</a>@foreach($policySubcategories as $subcategory)<a href="{{ route('clients.show', [$client, 'tab' => 'policies', 'category' => request('category'), 'subcategory' => $subcategory]) }}" @if(request('subcategory') === $subcategory) aria-current="page" @endif>{{ $subcategory }}</a>@endforeach</nav>
 @endif
-<x-panel title="Polizze del cliente">
+    </x-slot:headerActions>
     @if($policies->isNotEmpty())
         <div class="client-table-scroll policy-list-scroll" role="region" aria-label="Polizze del cliente" tabindex="0">
             <table class="t-table client-policy-table">

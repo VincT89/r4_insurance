@@ -2,12 +2,12 @@
 <div {{ $attributes->merge(['class' => 'panel']) }}>
     @if($title)
         <div class="panel-header">
-            <div class="panel-title" role="heading" aria-level="2">
+            <h2 class="panel-title">
                 @if($dot)
-                    <div class="dot {{ $dot ? 'color-' . str_replace('var(--', '', str_replace(')', '', $dot)) : '' }}"></div>
+                    <span class="dot {{ $dot ? 'color-' . str_replace('var(--', '', str_replace(')', '', $dot)) : '' }}"></span>
                 @endif
                 {{ $title }}
-            </div>
+            </h2>
             @if(isset($headerActions))
                 {{ $headerActions }}
             @endif

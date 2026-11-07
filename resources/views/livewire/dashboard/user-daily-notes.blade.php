@@ -14,7 +14,7 @@
             <label class="form-lbl" for="new-note">Scrivi una nota</label>
             <textarea id="new-note" wire:model="newContent" class="form-ta note-textarea" rows="3" maxlength="10000" required @error('newContent') aria-invalid="true" aria-describedby="new-note-error" @enderror></textarea>
             @error('newContent')<p id="new-note-error" class="invalid-feedback">{{ $message }}</p>@enderror
-            <div class="note-actions"><button type="submit" class="btn btn-p" wire:loading.attr="disabled" wire:target="addEntry">OK</button></div>
+            <div class="note-actions"><button type="submit" class="btn btn-p" wire:loading.attr="disabled" wire:target="addEntry">Salva nota</button></div>
         </form>
         <p class="notes-status" role="status" aria-live="polite">{{ $statusMessage }}</p>
 
@@ -26,7 +26,7 @@
                             <label class="form-lbl" for="edit-note-{{ $entry->id }}">Modifica nota</label>
                             <textarea id="edit-note-{{ $entry->id }}" wire:model="editingContent" class="form-ta note-textarea" rows="4" maxlength="10000" required @error('editingContent') aria-invalid="true" aria-describedby="edit-note-error" @enderror></textarea>
                             @error('editingContent')<p id="edit-note-error" class="invalid-feedback">{{ $message }}</p>@enderror
-                            <div class="note-actions"><button type="button" wire:click="cancelEdit" class="btn btn-g">Annulla</button><button type="submit" class="btn btn-p" wire:loading.attr="disabled" wire:target="saveEntry">OK</button></div>
+                            <div class="note-actions"><button type="button" wire:click="cancelEdit" class="btn btn-g">Annulla</button><button type="submit" class="btn btn-p" wire:loading.attr="disabled" wire:target="saveEntry">Salva modifiche</button></div>
                         </form>
                     @else
                         <p class="note-content">{{ $entry->content ?: 'Nota senza testo' }}</p>

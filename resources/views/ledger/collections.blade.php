@@ -3,7 +3,7 @@
         <x-slot:title>Contabilità{{ $contextPolicy ? ' / '.$contextPolicy->number : ($contextClient ? ' / '.$contextClient->name : '') }}</x-slot:title>
         <x-slot:actions>
             <a class="btn btn-g" href="{{ route('allowances.index',$contextParameters+$ledgerPeriodParameters) }}">Abbuoni</a>
-            @can('system.admin')<a class="btn btn-g" href="{{ route('agency-communications.collections', $contextPolicy ? ['scope'=>'pending','agency'=>$contextPolicy->supplier_agency_id,'search'=>$contextPolicy->number] : []) }}">Comunica alle agenzie</a>@endcan
+            @can('communications.manage')<a class="btn btn-g" href="{{ route('agency-communications.collections', $contextPolicy ? ['scope'=>'pending','agency'=>$contextPolicy->supplier_agency_id,'search'=>$contextPolicy->number] : []) }}">Comunica alle agenzie</a>@endcan
             <a class="btn btn-g" href="{{ route('titles.index',$contextParameters) }}">Titoli</a>
             @if($contextPolicy)<a class="btn btn-g" href="{{ route('clients.policies.show',[$contextClient,$contextPolicy,'tab'=>'payments']) }}">Scheda polizza</a>@elseif($contextClient)<a class="btn btn-g" href="{{ route('clients.show',$contextClient) }}">Scheda cliente</a>@endif
             @if($contextParameters)<a class="btn btn-g" href="{{ route('collections.index') }}">Tutti i movimenti</a>@endif

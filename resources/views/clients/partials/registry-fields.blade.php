@@ -58,6 +58,8 @@
         'Referente' => ['reference_person' => ['Referente', 'text', 255], 'reference_email' => ['E-Mail referente', 'email', 255], 'reference_role' => ['Ruolo referente', 'text', 255], 'reference_phone' => ['Telefono referente', 'tel', 50]],
         'Riferimenti in agenzia' => ['target' => ['Target', 'text', 255], 'office' => ['Ufficio', 'text', 255], 'consultant' => ['Consulente', 'text', 255], 'collaborator' => ['Collaboratore', 'text', 255], 'operator' => ['Operatore', 'text', 255]],
     ] as $section => $fields)
+        @php($additionalRegistryFields = in_array($section,['Referente','Riferimenti in agenzia'],true))
+        @if($additionalRegistryFields)<details class="registry-extra-fields" @if(collect(array_keys($fields))->contains(fn($field) => filled($registryValue($field)) || $errors->has($field))) open @endif><summary>{{ $section }} <span>facoltativo</span></summary>@endif
         <x-form-section :title="$section">
         <div class="form-row">
             @foreach($fields as $field => [$label, $type, $length])
@@ -68,6 +70,7 @@
             @endforeach
         </div>
         </x-form-section>
+        @if($additionalRegistryFields)</details>@endif
     @endforeach
     @include('clients.partials.commercial-field')
     <x-form-section title="Preferenze di contatto">

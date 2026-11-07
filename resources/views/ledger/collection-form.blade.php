@@ -4,7 +4,7 @@
     $selectedTitle = $chooseTitle ? $paymentOld('title_id', $defaultTitle) : $defaultTitle;
     $selected = $collectionTitles->first(fn($row) => (string) $row->id === $selectedTitle);
     $selectedTitle = $selected ? $selectedTitle : '';
-    $titleOptions = $collectionTitles->mapWithKeys(fn($row) => [(string) $row->id => ['amount'=>\App\Support\Money::decimal($row->balance_cents), 'method'=>$row->payment_method, 'direction'=>$row->direction, 'agency'=>(bool)$row->supplier_agency_id]])->all();
+    $titleOptions = $collectionTitles->mapWithKeys(fn($row) => [(string) $row->id => ['amount'=>\App\Support\Money::decimal($row->balance_cents), 'method'=>$row->payment_method, 'direction'=>$row->direction, 'agency'=>(bool)$row->supplier_agency_id,'coverage'=>'Periodo '.$row->coverage_from->format('d/m/Y').' – '.$row->coverage_to->format('d/m/Y')]])->all();
     $initialMethod = $paymentOld('payment_method', $selected?->payment_method ?? '');
     if ($selected?->direction === 'refund' && !in_array($initialMethod, \App\Models\InsuranceCollection::REFUND_METHODS,true)) $initialMethod = '';
     $initialAmount = $selected ? \App\Support\Money::decimal($selected->balance_cents) : '';
@@ -12,15 +12,15 @@
     $paymentKey = $paymentOld('idempotency_key');
     if (!\Illuminate\Support\Str::isUuid($paymentKey)) $paymentKey = (string) \Illuminate\Support\Str::uuid();
 @endphp
-<form method="POST" enctype="multipart/form-data" action="{{ $collectionAction }}"
+<form method="POST" enctype="multipart/form-data" action="{{ $collectionAction }}" class="collection-entry" data-collection-entry
     @submit="busy=true" :aria-busy="busy.toString()"
     x-data="{busy:false,receiptMethods:@js(\App\Models\InsurancePolicy::PAYMENT_METHODS),refundMethods:@js(\App\Models\InsuranceCollection::REFUND_METHODS),titles:@js($titleOptions),title:@js($selectedTitle),amount:@js($initialAmount),method:@js($initialMethod),recipient:@js($initialRecipient),
         selectTitle(){this.amount=this.titles[this.title]?.amount||'';this.method=this.titles[this.title]?.method||'';if(this.titles[this.title]?.direction==='refund' &amp;&amp; !this.refundMethods.includes(this.method))this.method='';this.selectMethod()},
         selectMethod(){if(this.method.includes('a Compagnia'))this.recipient='company';else if(this.method.includes('a Intermediario') &amp;&amp; this.recipient==='company')this.recipient='our_agency'}}">
     @csrf
     <input type="hidden" name="idempotency_key" value="{{ $paymentKey }}">
-    <div class="form-row">
-        @if($chooseTitle)
+    @if($chooseTitle)
+    <div class="form-row full collection-title-row">
             <x-form-group label="Titolo da saldare" name="title_id" required>
                 <select class="form-sel" name="title_id" x-model="title" @change="selectTitle()" required>
                     <option value="">Scegli il titolo</option>
@@ -29,13 +29,19 @@
                     @endforeach
                 </select>
             </x-form-group>
-        @endif
+    </div>
+    @endif
+    @if($compactCollection ?? false)<p class="collection-title-context" x-show="title" x-text="titles[title]?.coverage || ''"></p>@endif
+    <div class="form-row collection-amount-row">
         <x-form-group label="Importo del pagamento (€)" name="amount" required>
-            <input class="form-in" type="number" step="0.01" min="0.01" name="amount" x-model="amount" value="{{ $initialAmount }}" inputmode="decimal" readonly required aria-describedby="payment-amount-help">
+            @if($compactCollection ?? false)<span class="collection-readable-amount" :class="{'is-empty': !amount}" aria-hidden="true" x-text="amount ? Number(amount).toLocaleString('it-IT',{style:'currency',currency:'EUR'}) : 'Scegli il titolo'">{{ $selected ? \App\Support\Money::format($selected->balance_cents) : 'Scegli il titolo' }}</span>@endif
+            <input class="form-in {{ ($compactCollection ?? false) ? 'collection-raw-amount' : '' }}" type="number" step="0.01" min="0.01" name="amount" x-model="amount" value="{{ $initialAmount }}" inputmode="decimal" readonly required @if($compactCollection ?? false) tabindex="-1" @endif aria-describedby="payment-amount-help">
         </x-form-group>
         <x-form-group label="Data effettiva del pagamento" name="received_on" required>
             <input class="form-in" type="date" name="received_on" value="{{ $paymentOld('received_on',today()->toDateString()) }}" max="{{ today()->toDateString() }}" required>
         </x-form-group>
+    </div>
+    <div class="form-row collection-method-row">
         <x-form-group label="Modalità di pagamento" name="payment_method" required>
             <select name="payment_method" class="form-sel" x-model="method" @change="selectMethod()" required>
                 <option value="">Scegli la modalità</option>
@@ -67,5 +73,5 @@
             <x-form-group label="Note" name="notes"><textarea class="form-ta" name="notes" rows="2" maxlength="5000">{{ $paymentOld('notes') }}</textarea></x-form-group>
         </div>
     </details>
-    <div class="insurance-form-actions"><button class="btn btn-p" :disabled="busy" x-text="busy ? 'Registrazione…' : (titles[title]?.direction === 'refund' ? 'Registra rimborso al cliente' : 'Registra pagamento')">Registra pagamento</button></div>
+    <div class="insurance-form-actions"><button class="btn btn-p" :disabled="busy || !title || !amount" x-text="busy ? 'Registrazione…' : (titles[title]?.direction === 'refund' ? @js(($compactCollection ?? false) ? 'Conferma rimborso' : 'Registra rimborso al cliente') : @js(($compactCollection ?? false) ? 'Conferma incasso' : 'Registra pagamento'))">{{ ($compactCollection ?? false) ? 'Conferma incasso' : 'Registra pagamento' }}</button></div>
 </form>

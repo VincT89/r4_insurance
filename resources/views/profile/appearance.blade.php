@@ -3,10 +3,8 @@
         <x-slot:title><strong>Aspetto</strong></x-slot:title>
     </x-page-header>
     @include('profile.partials.settings-navigation')
-    <p class="appearance-intro">Personalizza i colori del tuo account. Le scelte ti seguono su ogni dispositivo e non cambiano l’aspetto degli altri utenti.</p>
-    <p class="appearance-intro">Anche il login usa questi colori: in quel browser conserva l’ultimo tema utilizzato. Su un nuovo browser il tuo tema viene caricato dopo l’accesso.</p>
-    <p class="appearance-intro">L’anteprima aggiorna questa pagina. Il testo si adatta automaticamente quando il colore preferito non è abbastanza leggibile sullo sfondo scelto. I colori degli avvisi mantengono il loro significato.</p>
-    <p class="appearance-intro">I colori dei riquadri valgono anche per sostituzioni, coperture aggiuntive, moduli e riepiloghi. Puoi scegliere le due tonalità delle intestazioni; impostale uguali per uno sfondo uniforme. Se una sfumatura riduce la leggibilità, l’anteprima usa la prima tonalità.</p>
+    <p class="appearance-intro">Scegli i colori del tuo account. L’anteprima cambia questa pagina; salva per applicare le modifiche.</p>
+    <details class="appearance-details"><summary>Come funzionano i colori personali</summary><p>Le scelte ti seguono su ogni dispositivo e riguardano solo il tuo account. Il testo si adatta automaticamente allo sfondo; gli avvisi conservano il loro significato.</p><p>Il login conserva l’ultimo tema utilizzato in questo browser. Su un nuovo browser i tuoi colori vengono caricati dopo l’accesso.</p></details>
     <form method="POST" action="{{ route('appearance.update') }}" data-appearance-editor data-defaults="{{ json_encode($defaults) }}" data-saved="{{ json_encode($colors) }}">
         @csrf
         @method('PATCH')

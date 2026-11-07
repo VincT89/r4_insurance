@@ -8,7 +8,7 @@
   <x-brand-icons />
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="guest-body app-body" style="{{ \App\Support\Appearance::style(\App\Support\Appearance::forRequest(request())) }}">
+<body class="guest-body app-body r4-workbench" style="{{ \App\Support\Appearance::style(\App\Support\Appearance::forRequest(request())) }}">
   {{ $slot }}
 </body>
 </html>

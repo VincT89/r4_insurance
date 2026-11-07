@@ -3,12 +3,12 @@
     'title'   => '',
     'meta'    => '',
 ])
-<div class="page-heading">
+<header class="page-heading">
     <div class="ph-left">
         @if($eyebrow)
             <div class="page-eyebrow">{{ $eyebrow }}</div>
         @endif
-        <div class="page-title" role="heading" aria-level="1">{{ $title ?? '' }}</div>
+        <h1 class="page-title">{{ $title ?? '' }}</h1>
         @if($meta)
             <div class="page-meta">{{ $meta }}</div>
         @endif
@@ -16,4 +16,4 @@
     @if(isset($actions))
         <div class="ph-right">{{ $actions }}</div>
     @endif
-</div>
+</header>

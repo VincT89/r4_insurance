@@ -36,6 +36,6 @@
 </div>
 @else
 @php($quickTitleFilters = \Illuminate\Support\Arr::except($filters,['state','month','from','to']))
-<div class="search-quick-filters"><span>Ricerca rapida</span><a class="btn btn-g btn-sm" data-keep-table-filters href="{{ route('titles.index',$quickTitleFilters+['state'=>'overdue']) }}">Sospese di cassa</a><a class="btn btn-g btn-sm" data-keep-table-filters href="{{ route('titles.index',$quickTitleFilters+['state'=>'due_soon']) }}">Titoli in giacenza · entro 15 giorni</a></div>
+<nav class="search-quick-filters" aria-label="Viste rapide dei titoli"><a class="btn btn-g btn-sm" data-keep-table-filters href="{{ route('titles.index',$quickTitleFilters+['state'=>'overdue']) }}">Sospese di cassa</a><a class="btn btn-g btn-sm" data-keep-table-filters href="{{ route('titles.index',$quickTitleFilters+['state'=>'due_soon']) }}">In giacenza entro 15 giorni</a></nav>
 @endif
 </form>

@@ -16,7 +16,7 @@
 <x-panel><p class="list-results" data-table-page-summary>{{ $cases->total() }} {{ $cases->total() === 1 ? 'preventivo' : 'preventivi' }} · Pagina {{ $cases->currentPage() }} di {{ $cases->lastPage() }}</p><div class="client-table-scroll" role="region" aria-label="Preventivi" tabindex="0"><table class="t-table" data-list-details="quotes" data-details-label="Altri dati" data-filter-form="quotes-filters"><thead><tr><th>Pratica</th><th>Cliente</th><th>Targa</th><th data-list-detail>Classe CU</th><th data-list-detail>Gruppo</th><th data-list-detail>Ramo</th><th data-list-detail>Sottoramo</th><th data-list-detail>Compagnie interpellate</th><th>Data</th><th>Stato</th></tr></thead><tbody>
 @forelse($cases as $case)
     <tr data-list-label="{{ $case->subject }}">
-        <td><a class="quote-entry-link" href="{{ route('quotes.show',$case) }}" aria-label="Apri preventivo {{ $case->subject }}"><strong>{{ $case->subject }}</strong><span data-table-export-ignore>Apri preventivo</span></a>
+        <td><a class="quote-entry-link" href="{{ route('quotes.show',$case) }}" aria-label="Apri preventivo {{ $case->subject }}"><strong>{{ $case->subject }}</strong></a>
             @if($case->status === 'open' && $case->quotes->isNotEmpty())
                 @php($replyCount = $case->quotes->where('status', '!=', 'requested')->count())
                 <small class="quote-reply-count" data-table-export-ignore>{{ $replyCount }} {{ $replyCount === 1 ? 'risposta' : 'risposte' }} su {{ $case->quotes->count() }} {{ $case->quotes->count() === 1 ? 'richiesta' : 'richieste' }}</small>

@@ -44,6 +44,27 @@ class InsuranceAccountingWorkspaceTest extends TestCase
 
     private function page(): string { return route('clients.policies.show',[$this->client,$this->policy]); }
 
+    public function test_policy_register_without_titles_does_not_suggest_a_settled_contract_or_an_incasso(): void
+    {
+        $response=$this->get(route('policies.index',['search'=>$this->policy->number]))->assertOk();
+        $this->assertFalse($response->viewData('policies')->sole()->titles_exists);
+        $response->assertSeeText('Nessun titolo')->assertDontSee('aria-label="Incassa per la polizza '.$this->policy->number.'"',false);
+    }
+
+    public function test_policy_register_keeps_receipts_refunds_and_allowances_separate(): void
+    {
+        $this->title(['collected_cents'=>20000,'allowance_cents'=>3000]);
+        $this->title(['direction'=>'refund','amount_cents'=>12000,'collected_cents'=>2000]);
+        $this->title(['amount_cents'=>90000,'cancelled_at'=>now(),'cancelled_residual_cents'=>90000]);
+        $response=$this->get(route('policies.index',['search'=>$this->policy->number]))->assertOk();
+        $row=$response->viewData('policies')->sole();
+        $this->assertSame(77000,(int)$row->receipt_due_cents);
+        $this->assertSame(10000,(int)$row->refund_due_cents);
+        $response->assertSee('770,00 €')->assertSee('100,00 €')
+            ->assertSee(e(route('clients.policies.show',[$this->client,$this->policy,'tab'=>'payments']).'#payment-entry'),false);
+        $this->assertSame('1000.00',$this->policy->fresh()->premium);
+    }
+
     public function test_policy_payment_updates_residual_state_and_accounting_once(): void
     {
         $title=$this->title();
