@@ -48,7 +48,7 @@
                             <select name="current_policy_id" class="form-sel" x-ref="currentPolicy" x-model="currentPolicy" @change="useCurrentClassification()" :required="purpose !== 'new'">
                                 <option value="">Seleziona una polizza</option>
                                 @foreach($currentPolicies as $policy)
-                                    <option value="{{ $policy->id }}" data-branch="{{ $policy->insurance_branch_id }}" data-subbranch="{{ $policy->insurance_subbranch_id }}" data-vehicle="{{ $policy->vehicle_id }}" data-cu="{{ $policy->merit_class_cu }}" data-internal="{{ $policy->merit_class_internal }}">{{ $policy->number }} / {{ $policy->company }} / {{ $policy->category }}</option>
+                                    <option value="{{ $policy->id }}" data-branch="{{ $policy->insurance_branch_id }}" data-company="{{ $policy->supplier_company_id }}" data-subbranch="{{ $policy->insurance_subbranch_id }}" data-vehicle="{{ $policy->vehicle_id }}" data-cu="{{ $policy->merit_class_cu }}" data-internal="{{ $policy->merit_class_internal }}">{{ $policy->number }} / {{ $policy->company }} / {{ $policy->category }}</option>
                                 @endforeach
                             </select>
                             <p class="u-text-meta" x-show="purpose !== 'new' && !currentPolicy">Seleziona la polizza per riprendere ramo, sottoramo e veicolo.</p>
@@ -99,7 +99,7 @@
                 <summary>Note interne</summary>
                 <x-form-group label="Note per gli operatori" name="notes"><textarea class="form-ta" name="notes" rows="3" maxlength="5000">{{ $oldText('notes') }}</textarea></x-form-group>
             </details>
-            <p class="u-text-meta">Dopo aver creato la richiesta potrai scegliere compagnie, agenzie e allegati per l’invio.</p>
+            <p class="u-text-meta">I destinatari selezionati restano salvati. Prima dell’invio potrai controllare email e allegati.</p>
             <div class="insurance-form-actions"><a class="btn btn-g" href="{{ route('quotes.index', $client->exists ? ['client'=>$client->id] : []) }}">Annulla</a><button class="btn btn-p">Crea richiesta di preventivo</button></div>
         </form>
     </x-panel>

@@ -28,7 +28,10 @@
         <summary>Dati della richiesta</summary>
 <x-panel title="Richiesta del cliente" padded><p>{{ $case->branch->name }}{{ $case->subbranch ? ' / '.$case->subbranch->name : '' }}</p>@if($case->notes)<p class="u-whitespace-pre-wrap">{{ $case->notes }}</p>@endif
 <p>{{ \App\Models\InsuranceQuoteCase::PURPOSES[$case->purpose] }}.</p>
-@if($case->purpose==='addition')<p>La richiesta riguarda la compagnia della polizza attuale e le sue agenzie. Il premio è il solo importo aggiuntivo per il periodo proposto.</p>@elseif($case->recipient_group_snapshot)<p>Gruppo iniziale: <strong>{{ $case->recipient_group_snapshot['name'] }}</strong>@if($case->merit_class_cu) — Classe CU {{ $case->merit_class_cu }}@endif. I destinatari possono essere modificati prima dell’invio.</p>@endif</x-panel>
+@if($case->purpose==='addition')<p>La richiesta riguarda la compagnia della polizza attuale e le sue agenzie. Il premio è il solo importo aggiuntivo per il periodo proposto.</p>@endif
+@if(($case->recipient_group_snapshot['source'] ?? null)==='manual')
+    <p>Destinatari scelti: {{ collect($case->recipient_group_snapshot['recipients'] ?? [])->map(fn($recipient) => $recipient['agency_name'] ? $recipient['company_name'].' tramite '.$recipient['agency_name'] : $recipient['company_name'])->join('; ') ?: 'da scegliere in «Prepara email»' }}. Puoi modificarli prima dell’invio.</p>
+@elseif($case->recipient_group_snapshot)<p>Gruppo iniziale: <strong>{{ $case->recipient_group_snapshot['name'] }}</strong>@if($case->merit_class_cu) — Classe CU {{ $case->merit_class_cu }}@endif. I destinatari possono essere modificati prima dell’invio.</p>@endif</x-panel>
 @if($case->requestContext())
 <x-panel title="Situazione attuale e coperture richieste" padded><div class="email-message-body">{{ $case->requestContext() }}</div>
 @if($case->currentPolicy)<p class="u-mt-md"><a href="{{ route('clients.policies.show',[$case->client_id,$case->currentPolicy]) }}">Apri la polizza attuale</a></p>@endif

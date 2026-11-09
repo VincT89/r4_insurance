@@ -36,7 +36,7 @@ class InsuranceQuoteController extends Controller
         $sourceId = $restoring ? $request->old('current_policy_id') : $request->input('current_policy_id');
         $source = is_scalar($sourceId) && filled($sourceId) ? $currentPolicies->firstWhere('id', $sourceId) : null;
         abort_if(!$restoring && filled($sourceId) && !$source, 404);
-        return view('quotes.create',['client'=>$client,'currentPolicies'=>$currentPolicies,'source'=>$source,'purpose'=>$request->input('purpose','new'),'vehicles'=>$client->exists ? $client->vehicles()->orderBy('plate')->get() : collect(),'recipientGroups'=>\App\Models\QuoteRecipientGroup::where('status','active')->with(['companies'=>fn($q)=>$q->where('supplier_companies.status','active')])->orderBy('cu_from')->orderBy('name')->get(),'branches'=>InsuranceBranch::where('status','active')->with(['subbranches'=>fn($q)=>$q->where('status','active')])->orderBy('name')->get()]);
+        return view('quotes.create',['client'=>$client,'currentPolicies'=>$currentPolicies,'source'=>$source,'purpose'=>$request->input('purpose','new'),'vehicles'=>$client->exists ? $client->vehicles()->orderBy('plate')->get() : collect(),'companies'=>app(\App\Services\QuoteRecipients::class)->catalog(activeOnly:true),'recipientGroups'=>\App\Models\QuoteRecipientGroup::where('status','active')->with(['companies'=>fn($q)=>$q->where('supplier_companies.status','active')])->orderBy('cu_from')->orderBy('name')->get(),'branches'=>InsuranceBranch::where('status','active')->with(['subbranches'=>fn($q)=>$q->where('status','active')])->orderBy('name')->get()]);
     }
     public function store(Request $request)
     {
@@ -67,13 +67,14 @@ class InsuranceQuoteController extends Controller
                 /** Keep the references used for the request without changing the existing contract or its coverage. */
                 $snapshot=$policy ? ['number'=>$policy->number,'company'=>$policy->company,'category'=>$policy->category,'plate'=>$policy->vehicle?->plate,'expires_on'=>$policy->expires_on->toDateString()] : null;
                 $context = app(QuoteVehicleContext::class)->values($client, $values, $policy, $values['purpose'] ?? 'new');
+                $values = \Illuminate\Support\Arr::except($values, ['recipient_keys','recipient_selection_present']);
                 $case=$client->quoteCases()->create(array_replace($values,$context,['created_by'=>$request->user()->id,'current_policy_snapshot'=>$snapshot]));
                 $documents->store($client,$uploads,['insurance_quote_case_id'=>$case->id,'vehicle_id'=>$case->vehicle_id],$stored);
                 $client->auditLogs()->create(['user_id'=>$request->user()->id,'action'=>'quote_updated','description'=>'Aperta pratica preventivi #'.$case->id.': '.$case->subject,'new_values'=>['case_id'=>$case->id,'current_policy_id'=>$policy?->id,'attachments'=>count($stored)],'created_at'=>now()]);
                 return $case;
             });
         } catch (\Throwable $exception) { foreach ($stored as $document) Storage::disk($document->disk)->delete($document->path); throw $exception; }
-        return $this->savedDocuments($case,$stored,'Richiesta di preventivo salvata. Ora puoi preparare l’email e scegliere i destinatari.');
+        return $this->savedDocuments($case,$stored,'Richiesta di preventivo salvata. Ritrovi i destinatari selezionati in «Prepara email».');
     }
 
     public function documents(Request $request, InsuranceQuoteCase $quoteCase, QuoteRequestDocuments $registry)

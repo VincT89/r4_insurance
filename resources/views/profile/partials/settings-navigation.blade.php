@@ -6,4 +6,5 @@
     @can('system.admin')<a href="{{ route('registry-imports.index') }}" @if(request()->routeIs('registry-imports.*', 'insurance-import.*')) aria-current="page" @endif>Importazioni CSV/Excel</a>@endcan
     @can('system.admin')<a href="{{ route('email-settings.edit') }}" @if(request()->routeIs('email-settings.*')) aria-current="page" @endif>Email</a>@endcan
     @can('forms.manage')<a href="{{ route('form-templates.index') }}" @if(request()->routeIs('form-templates.*')) aria-current="page" @endif>Modelli dei documenti</a>@endcan
+    @can('create', \App\Models\Client::class)<a href="{{ route('signing-stations.index') }}" @if(request()->routeIs('signing-stations.*')) aria-current="page" @endif>Postazioni firma</a>@endcan
 </nav>

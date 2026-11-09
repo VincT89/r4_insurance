@@ -107,6 +107,9 @@
 .policy-desk .policy-contract-lineage { background:none; border-radius:0; box-shadow:none; }
 .policy-payment-layout { display:grid; grid-template-columns:minmax(310px,.9fr) minmax(0,1.25fr); gap:32px; align-items:start; }
 .policy-payment-layout.is-settled { grid-template-columns:minmax(0,1fr); gap:12px; }
+.policy-payment-ledger { min-width:0; }
+/** Il riepilogo dei titoli segue la linea del titolo interno al modulo, includendo il bordo da un pixel. */
+.policy-payment-layout:not(.is-settled) > .policy-payment-ledger { padding-top:23px; }
 .policy-entry-column { min-width:0; }
 .policy-money-entry { padding:22px; background:var(--ap-panel); border:1px solid var(--ap-page-line); border-radius:4px; scroll-margin-top:18px; }
 .policy-money-entry h2 { margin-bottom:22px; }
@@ -197,6 +200,7 @@
     .policy-facts { width:100%; }
     .policy-key-facts { gap:18px; }
     .policy-payment-layout { grid-template-columns:minmax(0,1fr); gap:28px; }
+    .policy-payment-layout:not(.is-settled) > .policy-payment-ledger { padding-top:0; }
     .policy-money-entry { padding:18px 16px; }
     .policy-desk .collection-entry .collection-amount-row { grid-template-columns:minmax(0,1fr) minmax(145px,1fr); }
     .policy-desk .policy-titles-table tbody tr { display:grid; grid-template-columns:minmax(0,1fr) 100px; gap:10px 16px; padding:16px 0; }

@@ -9,11 +9,11 @@ use Illuminate\Validation\ValidationException;
 
 class InsuranceForms
 {
-    public const TOKENS = ['contraente','codice_fiscale_piva','indirizzo','nascita','titolo_cliente','email','telefono','firmatario','qualifica_firmatario','luogo','data_documento','compagnia','agenzia','ramo','sottoramo','numero_polizza','decorrenza','scadenza','premio','targa','operazione','riferimento_variazione','coperture_aggiuntive','decorrenza_variazione','scadenza_variazione','premio_variazione','polizza_precedente','titolo_modello','riferimento_documento'];
+    public const TOKENS = ['contraente','codice_fiscale_piva','codice_fiscale','partita_iva','indirizzo','citta','cap','provincia','paese','nascita','luogo_nascita','data_nascita','titolo_cliente','email','telefono','firmatario','qualifica_firmatario','luogo','data_documento','compagnia','agenzia','ramo','sottoramo','numero_polizza','prodotto','bene_assicurato','decorrenza','scadenza','premio','frazionamento','premio_rata','metodo_pagamento','targa','classe_cu','classe_compagnia','operazione','riferimento_variazione','coperture_aggiuntive','decorrenza_variazione','scadenza_variazione','premio_variazione','polizza_precedente','titolo_modello','riferimento_documento'];
     public static function fieldLabels(): array
     {
         $labels = array_combine(self::TOKENS, array_map(fn ($key) => ucfirst(str_replace('_',' ',$key)),self::TOKENS));
-        return array_replace($labels,['contraente'=>'Nome del contraente','codice_fiscale_piva'=>'Codice fiscale o partita IVA','nascita'=>'Luogo e data di nascita','firmatario'=>'Nome del firmatario','numero_polizza'=>'Numero di polizza','data_documento'=>'Data del documento']);
+        return array_replace($labels,['contraente'=>'Nome del contraente','codice_fiscale_piva'=>'Codice fiscale o partita IVA','partita_iva'=>'Partita IVA','citta'=>'Città','cap'=>'CAP','nascita'=>'Luogo e data di nascita','firmatario'=>'Nome del firmatario','numero_polizza'=>'Numero di polizza','data_documento'=>'Data del documento','bene_assicurato'=>'Bene o soggetto assicurato','premio_rata'=>'Premio della rata','classe_cu'=>'Classe universale CU','classe_compagnia'=>'Classe della compagnia']);
     }
     public static function previewFields(): array
     {
@@ -33,7 +33,8 @@ class InsuranceForms
     public function contextHash(Client $client, ?InsurancePolicy $policy): string { return hash('sha256',json_encode($this->context($client,$policy),JSON_THROW_ON_ERROR)); }
     public function available(?InsurancePolicy $policy, ?Client $client = null)
     {
-        return InsuranceFormTemplate::where('status','active')->with(['branch','subbranch'])->orderBy('title')->get();
+        return InsuranceFormTemplate::where('status','active')->with(['branch','subbranch'])->orderBy('title')->get()
+            ->sortBy(fn ($template) => [$template->applies($policy,$client) ? 0 : 1, mb_strtolower($template->title), $template->id])->values();
     }
     private function fail(string $message, string $field='forms'): never { throw ValidationException::withMessages([$field=>$message]); }
     public function validateBody(string $body): void
@@ -89,6 +90,8 @@ class InsuranceForms
     {
         $values = ['contraente'=>$client->name,'codice_fiscale_piva'=>implode(' / ',array_filter([$client->tax_code,$client->vat_number])),'indirizzo'=>implode(', ',array_filter([$client->address,$client->postal_code,$client->city,$client->province,$client->country])), 'nascita'=>trim(($client->birth_place??'').' '.($client->birth_date?->format('d/m/Y')??'')),'titolo_cliente'=>$client->title,'email'=>$client->email,'telefono'=>$client->phone,
             'firmatario'=>$data['signer_name'],'qualifica_firmatario'=>$data['signer_role']??null,'luogo'=>$data['place'],'data_documento'=>\Carbon\Carbon::parse($data['document_date'])->format('d/m/Y'),'compagnia'=>$policy?->company,'agenzia'=>$policy?->supplierAgency?->name,'ramo'=>$policy?->category,'sottoramo'=>$policy?->subcategory,'numero_polizza'=>$policy?->number,'decorrenza'=>$policy?->starts_on?->format('d/m/Y'),'scadenza'=>$policy?->expires_on?->format('d/m/Y'),'premio'=>$policy?->premium === null ? null : number_format((float)$policy->premium,2,',','.').' EUR','targa'=>$policy?->vehicle?->plate];
+        $values += ['codice_fiscale'=>$client->tax_code,'partita_iva'=>$client->vat_number,'citta'=>$client->city,'cap'=>$client->postal_code,'provincia'=>$client->province,'paese'=>$client->country,'luogo_nascita'=>$client->birth_place,'data_nascita'=>$client->birth_date?->format('d/m/Y'),
+            'prodotto'=>$policy?->product,'bene_assicurato'=>$policy?->insured_subject,'frazionamento'=>$policy?->payment_frequency,'premio_rata'=>$policy?->installment_premium === null ? null : number_format((float)$policy->installment_premium,2,',','.').' EUR','metodo_pagamento'=>$policy?->payment_method,'classe_cu'=>$policy?->merit_class_cu,'classe_compagnia'=>$policy?->merit_class_internal];
         $change = !empty($data['change_id']) ? $policy?->incomingChanges()->find($data['change_id']) : null;
         $values += ['operazione'=>$change ? $change->kind_label : null,'riferimento_variazione'=>$change?->reference,'coperture_aggiuntive'=>$change?->description,'decorrenza_variazione'=>$change?->effective_on->format('d/m/Y'),'scadenza_variazione'=>$change?->expires_on->format('d/m/Y'),'premio_variazione'=>$change ? \App\Support\Money::format($change->premium_cents) : null,'polizza_precedente'=>$change?->snapshot['before']['policy']['number']??null];
         $result=[]; foreach($values as $name=>$value) $result['{{'.$name.'}}']=filled($value)?(string)$value:'________________'; return $result;
@@ -206,11 +209,12 @@ class InsuranceForms
         $canvas=$pdf->getCanvas(); $canvas->page_text($canvas->get_width()-70,$canvas->get_height()-22,'{PAGE_NUM} / {PAGE_COUNT}',$pdf->getFontMetrics()->getFont('DejaVu Sans','normal'),8,[0.3,0.3,0.3]);
         return $pdf->output();
     }
-    public function submit(InsuranceFormDocument $document,array $files,array $data): InsuranceFormSubmission
+    public function submit(InsuranceFormDocument $document,array $files,array $data, ?\App\Models\User $operator = null): InsuranceFormSubmission
     {
-        $package=$document->package; Gate::authorize('updateRegistry',$package->client); $stored=[];
-        try { return DB::transaction(function() use ($document,$package,$files,$data,&$stored) {
-            $client=Client::current()->whereKey($package->client_id)->lockForUpdate()->firstOrFail(); Gate::authorize('updateRegistry',$client);
+        $operator ??= auth()->user();
+        $package=$document->package; Gate::forUser($operator)->authorize('updateRegistry',$package->client); $stored=[];
+        try { return DB::transaction(function() use ($document,$package,$files,$data,$operator,&$stored) {
+            $client=Client::current()->whereKey($package->client_id)->lockForUpdate()->firstOrFail(); Gate::forUser($operator)->authorize('updateRegistry',$client);
             $document=InsuranceFormDocument::whereKey($document->id)->lockForUpdate()->firstOrFail();
             if(!$document->signature_required) $this->fail('Questo modulo non richiede una firma.');
             if(InsuranceFormSubmission::where('request_key',$data['request_key'])->exists()) $this->fail('Questo caricamento è già stato registrato.');
@@ -219,10 +223,10 @@ class InsuranceForms
             if($last && mb_strlen(trim($data['note']??''))<10) $this->fail('Motiva la nuova versione dei documenti firmati.','note');
             if($package->client->client_type==='company' && empty($data['signer_role'])) $this->fail('Indica la qualifica del firmatario.','signer_role');
             if(collect($files)->sum(fn($file)=>$file->getSize())>50*1024*1024) $this->fail('Il totale dei file non può superare 50 MB.','files');
-            $submission=$document->submissions()->create(array_intersect_key($data,array_flip(['signer_name','signer_role','signed_on','note','request_key']))+['version'=>($last?->version??0)+1,'created_by'=>auth()->id(),'file_hashes'=>[]]);
-            $stored=app(PrivateAttachmentBatch::class)->upload($package->client,$files,['type'=>'document','document_category'=>$document->template->category,'insurance_policy_id'=>$package->insurance_policy_id,'insurance_policy_change_id'=>$package->insurance_policy_change_id,'insurance_form_document_id'=>$document->id,'insurance_form_submission_id'=>$submission->id,'review_status'=>'received','version_number'=>$submission->version]);
+            $submission=$document->submissions()->create(array_intersect_key($data,array_flip(['signer_name','signer_role','signed_on','note','request_key']))+['version'=>($last?->version??0)+1,'created_by'=>$operator->id,'file_hashes'=>[]]);
+            $stored=app(PrivateAttachmentBatch::class)->upload($package->client,$files,['type'=>'document','document_category'=>$document->template->category,'insurance_policy_id'=>$package->insurance_policy_id,'insurance_policy_change_id'=>$package->insurance_policy_change_id,'insurance_form_document_id'=>$document->id,'insurance_form_submission_id'=>$submission->id,'review_status'=>'received','version_number'=>$submission->version], $operator);
             $hashes=[]; foreach($stored as $file) $hashes[$file->id]=hash('sha256',Storage::disk($file->disk)->get($file->path)); $submission->update(['file_hashes'=>$hashes]);
-            $this->log($package->client,$package->policy,'forms_received','Ricevuti '.count($stored).' file per '.$document->title.', versione firmata '.$submission->version.'.');
+            app(AuditLogService::class)->log('forms_received',$package->policy??$package->client,description:'Ricevuti '.count($stored).' file per '.$document->title.', versione firmata '.$submission->version.'.',userId:$operator->id);
             return $submission;
         }); } catch(\Throwable $e) { foreach($stored as $file) Storage::disk($file->disk)->delete($file->path); throw $e; }
     }

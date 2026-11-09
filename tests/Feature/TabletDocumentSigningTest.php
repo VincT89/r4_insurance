@@ -42,7 +42,7 @@ class TabletDocumentSigningTest extends TestCase
 
     public function test_operator_can_sign_a_contract_without_changing_the_original(): void
     {
-        $this->get(route('attachments.sign',$this->source))->assertOk()->assertSee('Firma il documento')->assertSee('Conferma e salva firma');
+        $this->get(route('attachments.sign',$this->source))->assertOk()->assertSee('Firma il documento')->assertSee('Conferma e salva firma')->assertSee('data-guide-route="attachments.sign"', false);
         $input=$this->input();
         $this->postJson(route('attachments.sign.store',$this->source),$input)->assertOk()->assertJsonPath('url',route('clients.policies.show',[$this->client,$this->policy,'tab'=>'documents']));
         $record=DocumentSignature::sole();

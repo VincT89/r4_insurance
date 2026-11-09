@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{Attachment, Client, DocumentSignature, InsuranceFormDocument, InsurancePolicy};
+use App\Models\{Attachment, Client, DocumentSignature, InsuranceFormDocument, InsurancePolicy, User};
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\{Crypt, DB, Gate, Storage};
@@ -13,11 +13,19 @@ class DocumentSigning
 {
     public const CONSENT = 'Ho letto il documento e confermo di volerlo sottoscrivere con la firma nei punti indicati.';
 
-    public function source(Attachment $source): array
+    private function operator(?User $operator): User
     {
-        Gate::authorize('download', $source);
+        $operator ??= auth()->user();
+        abort_unless($operator && $operator->status === 'active' && $operator->password_changed_at && $operator->can('viewAny',Client::class),403);
+        return $operator;
+    }
+
+    public function source(Attachment $source, ?User $operator = null): array
+    {
+        $operator = $this->operator($operator);
+        Gate::forUser($operator)->authorize('download', $source);
         $client = Client::current()->findOrFail($source->attachable_id);
-        Gate::authorize('updateRegistry', $client);
+        Gate::forUser($operator)->authorize('updateRegistry', $client);
         $document = $source->formDocument;
         if ($document) {
             abort_unless($document->signature_required && !$source->insurance_form_submission_id && (int)$document->package->client_id === $client->id, 404);
@@ -35,9 +43,10 @@ class DocumentSigning
         return compact('client', 'policy', 'document', 'bytes', 'hash');
     }
 
-    public function prepare(Attachment $source): array
+    public function prepare(Attachment $source, ?User $operator = null): array
     {
-        $context = $this->source($source);
+        $operator = $this->operator($operator);
+        $context = $this->source($source, $operator);
         $latest = $context['document']?->latestSubmission;
         $last = $source->latestTabletSignature;
         $tokens = $context['document']?->package->snapshot['tokens'] ?? [];
@@ -45,8 +54,25 @@ class DocumentSigning
         if (!$signer || str_contains($signer, '____')) $signer = $context['client']->client_type === 'company' ? $context['client']->reference_person : $context['client']->name;
         $role = $latest?->signer_role ?: ($tokens['{{qualifica_firmatario}}'] ?? null);
         if (!$role || str_contains($role, '____')) $role = $context['client']->client_type === 'company' ? $context['client']->reference_role : '';
-        $payload = ['source'=>$source->id, 'user'=>auth()->id(), 'request_key'=>(string)Str::uuid(), 'hash'=>$context['hash'], 'state'=>$this->state($source, $context['document']), 'expires'=>now()->addMinutes(config('document_signing.expires_after_minutes'))->timestamp];
+        $payload = ['source'=>$source->id, 'user'=>$operator->id, 'request_key'=>(string)Str::uuid(), 'hash'=>$context['hash'], 'state'=>$this->state($source, $context['document']), 'expires'=>now()->addMinutes(config('document_signing.expires_after_minutes'))->timestamp];
         return $context + ['source'=>$source, 'token'=>Crypt::encryptString(json_encode($payload, JSON_THROW_ON_ERROR)), 'signer'=>$signer, 'role'=>$role, 'needsNote'=>(bool)($latest || $last)];
+    }
+
+    public function preparedSource(Attachment $source, string $token, User $operator): array
+    {
+        $payload = $this->payload($source, $token, $this->operator($operator));
+        if (($payload['expires'] ?? 0) < now()->timestamp) $this->fail('La richiesta di firma è scaduta. Chiedi all’operatore di inviarla di nuovo.');
+        $context = $this->source($source,$operator);
+        if (!hash_equals($payload['hash'],$context['hash']) || !hash_equals($payload['state'],$this->state($source,$context['document']))) $this->fail('Il documento è cambiato. L’operatore deve controllarlo e inviarlo di nuovo.');
+        return $context;
+    }
+
+    private function payload(Attachment $source, string $token, User $operator): array
+    {
+        try { $payload = json_decode(Crypt::decryptString($token), true, flags:JSON_THROW_ON_ERROR); }
+        catch (DecryptException|\JsonException $exception) { $this->fail('La pagina di firma non è valida. Riapri il documento.'); }
+        abort_unless(is_array($payload) && ($payload['source'] ?? null) === $source->id && ($payload['user'] ?? null) === $operator->id,403);
+        return $payload;
     }
 
     private function state(Attachment $source, ?InsuranceFormDocument $document): string
@@ -74,29 +100,31 @@ class DocumentSigning
         if ($total < 5 || $length < 0.12 || max($xs)-min($xs) < 0.03 || max($ys)-min($ys) < 0.02) $this->fail('Il riquadro non contiene una firma completa. Cancella e riprova.');
     }
 
-    public function sign(Attachment $source, array $data): DocumentSignature
+    public function sign(Attachment $source, array $data, ?User $operator = null, ?\Closure $guard = null, ?\Closure $completed = null): DocumentSignature
     {
+        $operator = $this->operator($operator);
         $this->validateInk($data['strokes']);
-        try { $payload = json_decode(Crypt::decryptString($data['token']), true, flags:JSON_THROW_ON_ERROR); }
-        catch (DecryptException|\JsonException $exception) { $this->fail('La pagina di firma non è valida. Riapri il documento.'); }
-        abort_unless(($payload['source'] ?? null) === $source->id && ($payload['user'] ?? null) === auth()->id(), 403);
+        $payload = $this->payload($source, $data['token'], $operator);
         $inputHash = hash('sha256', json_encode(array_intersect_key($data, array_flip(['signer_name','signer_role','strokes','placements','note'])), JSON_THROW_ON_ERROR));
         $stored = []; $temporary = null;
         try {
-            return DB::transaction(function () use ($source, $data, $payload, $inputHash, &$stored, &$temporary) {
+            return DB::transaction(function () use ($source, $data, $payload, $inputHash, $operator, $guard, $completed, &$stored, &$temporary) {
                 $client = Client::current()->whereKey($source->attachable_id)->lockForUpdate()->firstOrFail();
-                Gate::authorize('updateRegistry', $client);
+                Gate::forUser($operator)->authorize('updateRegistry', $client);
                 if ($source->insurance_policy_id) $client->policies()->whereKey($source->insurance_policy_id)->lockForUpdate()->firstOrFail();
                 $source = Attachment::whereKey($source->id)->lockForUpdate()->firstOrFail();
-                Gate::authorize('download', $source);
+                Gate::forUser($operator)->authorize('download', $source);
+                /** La postazione e la richiesta restano bloccate nella stessa transazione che conserva la firma. */
+                $stationContext = $guard ? $guard() : null;
                 $existing = DocumentSignature::where('request_key', $payload['request_key'])->first();
                 if ($existing) {
-                    abort_unless($existing->source_attachment_id === $source->id && $existing->created_by === auth()->id(), 403);
+                    abort_unless($existing->source_attachment_id === $source->id && $existing->created_by === $operator->id, 403);
                     if (!hash_equals($existing->input_hash, $inputHash)) $this->fail('Questa conferma è già stata utilizzata con dati diversi. Riapri la polizza.');
+                    if ($completed) $completed($existing);
                     return $existing;
                 }
                 if (($payload['expires'] ?? 0) < now()->timestamp) $this->fail('La pagina di firma è scaduta. Riapri il documento dalla polizza.');
-                $context = $this->source($source);
+                $context = $this->source($source, $operator);
                 $document = $context['document'];
                 if ($document) $document = InsuranceFormDocument::whereKey($document->id)->lockForUpdate()->firstOrFail();
                 if (!hash_equals($payload['hash'], $context['hash']) || !hash_equals($payload['state'], $this->state($source, $document))) $this->fail('Il documento o le copie firmate sono cambiati. Riapri il documento e controlla la nuova versione.');
@@ -104,9 +132,10 @@ class DocumentSigning
                 if (($latest || $source->tabletSignatures()->exists()) && mb_strlen(trim($data['note'] ?? '')) < 10) $this->fail('Indica il motivo della nuova copia (almeno 10 caratteri).');
                 if ($client->client_type === 'company' && blank($data['signer_role'] ?? null)) $this->fail('Indica la qualifica del firmatario dell’azienda.');
                 $evidence = ['request_key'=>$payload['request_key'], 'document'=>$source->original_name, 'client'=>$client->name, 'policy'=>$context['policy']?->number,
-                    'source_hash'=>$context['hash'], 'signer_name'=>$data['signer_name'], 'signer_role'=>$data['signer_role'] ?? '', 'operator'=>auth()->user()->name,
+                    'source_hash'=>$context['hash'], 'signer_name'=>$data['signer_name'], 'signer_role'=>$data['signer_role'] ?? '', 'operator'=>$operator->name,
                     'signed_at'=>now()->toIso8601String(), 'signed_at_display'=>now()->format('d/m/Y H:i:s').' · '.config('app.timezone'),
                     'consent_text'=>self::CONSENT, 'identity_confirmed'=>true, 'signature_type'=>'simple', 'placements'=>$data['placements'], 'strokes'=>$data['strokes'], 'note'=>$data['note'] ?? ''];
+                if ($stationContext) $evidence['station_request'] = $stationContext;
                 $bytes = app(DocumentSignaturePdf::class)->render($context['bytes'], $data, $evidence);
                 if (!hash_equals($context['hash'], hash('sha256', Storage::disk($source->disk)->get($source->path)))) $this->fail('Il documento è cambiato durante la firma. Riaprilo e controlla la versione.');
                 $directory = storage_path('app/signing-tmp');
@@ -118,19 +147,20 @@ class DocumentSigning
                 $submission = null;
                 if ($document) {
                     $submission = app(InsuranceForms::class)->submit($document, [$upload], ['request_key'=>$payload['request_key'], 'previous_submission'=>$latest?->id ?? 0,
-                        'signer_name'=>$data['signer_name'], 'signer_role'=>$data['signer_role'] ?? null, 'signed_on'=>today()->toDateString(), 'note'=>$data['note'] ?? null]);
+                        'signer_name'=>$data['signer_name'], 'signer_role'=>$data['signer_role'] ?? null, 'signed_on'=>today()->toDateString(), 'note'=>$data['note'] ?? null], $operator);
                     $files = $submission->files()->get();
                 } else {
                     $files = collect(app(PrivateAttachmentBatch::class)->upload($client, [$upload], ['type'=>'document', 'document_category'=>'policy',
-                        'insurance_policy_id'=>$source->insurance_policy_id, 'insurance_policy_change_id'=>$source->insurance_policy_change_id, 'review_status'=>'received', 'description'=>'Copia con firma raccolta sul tablet. Originale: '.$source->original_name]));
+                        'insurance_policy_id'=>$source->insurance_policy_id, 'insurance_policy_change_id'=>$source->insurance_policy_change_id, 'review_status'=>'received', 'description'=>'Copia con firma raccolta sul tablet. Originale: '.$source->original_name], $operator));
                 }
                 $stored = $files->map(fn ($file) => [$file->disk,$file->path])->all();
                 $record = DocumentSignature::create(['request_key'=>$payload['request_key'], 'client_id'=>$client->id, 'insurance_policy_id'=>$source->insurance_policy_id,
                     'source_attachment_id'=>$source->id, 'signed_attachment_id'=>$files->sole()->id, 'insurance_form_submission_id'=>$submission?->id,
-                    'created_by'=>auth()->id(), 'signer_name'=>$data['signer_name'], 'signer_role'=>$data['signer_role'] ?? null, 'source_hash'=>$context['hash'],
+                    'created_by'=>$operator->id, 'signer_name'=>$data['signer_name'], 'signer_role'=>$data['signer_role'] ?? null, 'source_hash'=>$context['hash'],
                     'signed_hash'=>hash('sha256',$bytes), 'input_hash'=>$inputHash, 'evidence'=>$evidence, 'signed_at'=>now()]);
                 app(AuditLogService::class)->log('document_signed', $context['policy'] ?? $client, description:'Firma raccolta sul tablet per '.$source->original_name.'. Originale e copia conservati.',
-                    newValues:['signature_id'=>$record->id, 'source_attachment_id'=>$source->id, 'signed_attachment_id'=>$record->signed_attachment_id, 'source_hash'=>$record->source_hash, 'signed_hash'=>$record->signed_hash]);
+                    newValues:['signature_id'=>$record->id, 'source_attachment_id'=>$source->id, 'signed_attachment_id'=>$record->signed_attachment_id, 'source_hash'=>$record->source_hash, 'signed_hash'=>$record->signed_hash], userId:$operator->id);
+                if ($completed) $completed($record);
                 return $record;
             });
         } catch (\Throwable $exception) {

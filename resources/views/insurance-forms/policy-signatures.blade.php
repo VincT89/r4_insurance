@@ -17,7 +17,7 @@
         <div class="signature-overview-actions">
             @can('updateRegistry',$client)
                 @if($nextSignature && $signatures['toReview']->isEmpty() && $signatures['toSign']->count() === 1 && $signatures['toSign']->contains('id',$nextSignature->id) && $nextSignature->generated)
-                    <a class="btn btn-p" href="{{ route('attachments.sign',$nextSignature->generated) }}">Firma modulo</a>
+                    <a class="btn btn-p" href="{{ route('station-signing.create',$nextSignature->generated) }}">Firma modulo</a>
                 @endif
             @endcan
             <a class="btn btn-g" data-policy-section-link href="{{ route('clients.policies.show',[$client,$policy,'tab'=>'forms']).'#policy-signatures' }}">Apri moduli e firme</a>

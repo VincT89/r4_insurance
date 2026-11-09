@@ -17,6 +17,13 @@ Route::get('/', fn () => redirect()->route(auth()->check() ? 'dashboard' : 'logi
 Route::view('/privacy-policy', 'legal.privacy-policy')->name('legal.privacy-policy');
 Route::view('/terms-of-service', 'legal.terms-of-service')->name('legal.terms-of-service');
 
+Route::get('/firma',[\App\Http\Controllers\SigningTerminalController::class,'index'])->name('signing-terminal.index');
+Route::post('/api/firma/abbinamento',[\App\Http\Controllers\SigningTerminalController::class,'pair'])->middleware('throttle:6,10')->name('signing-terminal.pair');
+Route::get('/api/firma/stato',[\App\Http\Controllers\SigningTerminalController::class,'current'])->middleware('throttle:signing-terminal')->name('signing-terminal.current');
+Route::get('/firma/richieste/{signingRequest}',[\App\Http\Controllers\SigningTerminalController::class,'show'])->whereUuid('signingRequest')->name('signing-terminal.show');
+Route::get('/api/firma/documenti/{item}',[\App\Http\Controllers\SigningTerminalController::class,'document'])->whereUuid('item')->middleware('throttle:signing-terminal')->name('signing-terminal.document');
+Route::post('/api/firma/documenti/{item}/completa',[\App\Http\Controllers\SigningTerminalController::class,'complete'])->whereUuid('item')->middleware('throttle:signing-terminal-write')->name('signing-terminal.complete');
+
 Route::get('/media/{path}', function (string $path) {
     abort_if(str_contains($path, '..') || str_contains($path, '\\'), 404);
     abort_unless(str_starts_with($path, 'clients/logos/'), 404);
@@ -32,6 +39,14 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'force.password.change'])->group(function () {
+    Route::get('/settings/signing-stations',[\App\Http\Controllers\SigningStationController::class,'index'])->name('signing-stations.index');
+    Route::post('/settings/signing-stations',[\App\Http\Controllers\SigningStationController::class,'pair'])->middleware('throttle:10,1')->name('signing-stations.pair');
+    Route::post('/settings/signing-stations/{station}/revoke',[\App\Http\Controllers\SigningStationController::class,'revoke'])->whereUuid('station')->name('signing-stations.revoke');
+    Route::get('/attachments/{attachment}/send-to-tablet',[\App\Http\Controllers\SigningStationController::class,'create'])->name('station-signing.create');
+    Route::post('/attachments/{attachment}/send-to-tablet',[\App\Http\Controllers\SigningStationController::class,'store'])->middleware('throttle:20,1')->name('station-signing.store');
+    Route::get('/signing-requests/{signingRequest}',[\App\Http\Controllers\SigningStationController::class,'show'])->whereUuid('signingRequest')->name('station-signing.show');
+    Route::get('/signing-requests/{signingRequest}/status',[\App\Http\Controllers\SigningStationController::class,'status'])->whereUuid('signingRequest')->name('station-signing.status');
+    Route::post('/signing-requests/{signingRequest}/cancel',[\App\Http\Controllers\SigningStationController::class,'cancel'])->whereUuid('signingRequest')->name('station-signing.cancel');
     Route::get('/attachments/{attachment}/sign', [\App\Http\Controllers\DocumentSigningController::class, 'show'])->name('attachments.sign');
     Route::post('/attachments/{attachment}/sign', [\App\Http\Controllers\DocumentSigningController::class, 'store'])->middleware('throttle:20,1')->name('attachments.sign.store');
     Route::prefix('settings/registry-imports')->name('registry-imports.')->middleware('can:system.admin')->group(function () {

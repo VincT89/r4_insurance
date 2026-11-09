@@ -35,6 +35,7 @@ function initPolicyClientPicker() {
         function hasLinkedData() {
             return ['vehicle_id','client_asset_id','current_policy_id','merit_class_cu','merit_class_internal','quote_recipient_group_id'].some(name => form.elements.namedItem(name)?.value)
                 || [...form.querySelectorAll('input[type="file"]')].some(input => input.files?.length)
+                || [...form.querySelectorAll('input[name="recipient_keys[]"]')].some(input => input.checked)
                 || [...form.querySelectorAll('[data-quick-vehicle-field]')].some(input => input.value);
         }
         function resetLinks() {
@@ -52,7 +53,7 @@ function initPolicyClientPicker() {
             if (replacingClient && (linked || customRequester)) {
                 const changes = [];
                 if (deferred) changes.push('Verifica il contratto caricato e riseleziona il veicolo o il bene collegato.');
-                else if (linked) changes.push('Veicolo, polizza, classe e allegati selezionati verranno rimossi dalla compilazione.');
+                else if (linked) changes.push('Veicolo, polizza, classe, destinatari e allegati selezionati verranno rimossi dalla compilazione.');
                 if (customRequester) changes.push('Il richiedente prenderà il nome del nuovo cliente.');
                 if (!window.confirm(`Cambiare cliente da ${selectedName} a ${client.name}? ${changes.join(' ')}`)) {
                     ++generation; pending?.abort(); loading = false; showSelected(); return false;
@@ -88,6 +89,7 @@ function initPolicyClientPicker() {
                 for (const policy of data.policies || []) {
                     const option = new Option(`${policy.number} / ${policy.company} / ${policy.category}`, policy.id);
                     option.dataset.branch = policy.insurance_branch_id || '';
+                    option.dataset.company = policy.supplier_company_id || '';
                     option.dataset.subbranch = policy.insurance_subbranch_id || '';
                     option.dataset.vehicle = policy.vehicle_id || '';
                     option.dataset.cu = policy.merit_class_cu || '';

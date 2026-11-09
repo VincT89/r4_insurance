@@ -9,6 +9,7 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="guest-body app-body r4-workbench" style="{{ \App\Support\Appearance::style(\App\Support\Appearance::forRequest(request())) }}">
+  <x-page-guide floating />
   {{ $slot }}
 </body>
 </html>

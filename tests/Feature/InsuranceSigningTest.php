@@ -158,6 +158,40 @@ class InsuranceSigningTest extends TestCase
         $this->assertDatabaseCount('client_consents',0);$this->assertDatabaseCount('insurance_collections',0);
         $template->update(['body'=>'Testo successivo']);$this->assertStringContainsString('Paolo Ferri',$document->fresh()->body);
     }
+    public function test_automatic_fields_use_the_selected_contract_and_keep_previous_pdfs_frozen(): void
+    {
+        $this->client->update(['tax_code'=>'FRRPLA80A01H501U','vat_number'=>'12345678901','city'=>'Napoli','postal_code'=>'80100','province'=>'NA','country'=>'Italia','birth_place'=>'Roma','birth_date'=>'1980-01-01']);
+        $this->policy->update(['product'=>'Auto completa di collaudo','insured_subject'=>'Veicolo di collaudo','installment_premium'=>'500.01','merit_class_cu'=>3,'merit_class_internal'=>'A3']);
+        $expected = ['codice_fiscale'=>'FRRPLA80A01H501U','partita_iva'=>'12345678901','citta'=>'Napoli','cap'=>'80100','provincia'=>'NA','paese'=>'Italia','luogo_nascita'=>'Roma','data_nascita'=>'01/01/1980',
+            'numero_polizza'=>'SA-2026-501','prodotto'=>'Auto completa di collaudo','bene_assicurato'=>'Veicolo di collaudo','frazionamento'=>'Semestrale','premio_rata'=>'500,01 EUR','metodo_pagamento'=>'Bonifico a Intermediario','classe_cu'=>'3','classe_compagnia'=>'A3'];
+        $delta = ['ops'=>[]];
+        foreach (array_keys($expected) as $field) { $delta['ops'][]=['insert'=>['field'=>$field]]; $delta['ops'][]=['insert'=>"\n"]; }
+        $template = $this->template(['body'=>\App\Support\FormTemplateContent::encode(json_encode($delta)), 'signature_required'=>false]);
+        $package = $this->package($template, ['product'=>'Valore estraneo da ignorare','numero_polizza'=>'POLIZZA-ERRATA']);
+        $document = $package->documents()->sole();
+        foreach ($expected as $key=>$value) $this->assertSame($value,$package->snapshot['tokens']['{{'.$key.'}}']);
+        $this->assertStringContainsString('Auto completa di collaudo',$document->body);
+        $this->assertStringNotContainsString('Valore estraneo',$document->body);
+        $frozen = Storage::disk('attachments')->get($document->generated->path);
+        $second = $this->policy->replicate(['number']);
+        $second->number='SA-2026-502'; $second->product='Seconda polizza di collaudo'; $second->installment_premium='0.00'; $second->save();
+        $this->post(route('clients.forms.store',$this->client),$this->data($template,$second))->assertSessionHasNoErrors();
+        $latest = InsuranceFormPackage::latest('id')->firstOrFail();
+        $this->assertSame($second->id,$latest->insurance_policy_id);
+        $this->assertSame('SA-2026-502',$latest->snapshot['tokens']['{{numero_polizza}}']);
+        $this->assertSame('Seconda polizza di collaudo',$latest->snapshot['tokens']['{{prodotto}}']);
+        $this->assertSame('0,00 EUR',$latest->snapshot['tokens']['{{premio_rata}}']);
+        $this->policy->update(['product'=>'Prodotto aggiornato']);
+        $this->assertSame('Auto completa di collaudo',$package->fresh()->snapshot['tokens']['{{prodotto}}']);
+        $this->assertSame($frozen,Storage::disk('attachments')->get($document->generated->path));
+        $this->assertSame(hash('sha256',$frozen),$document->fresh()->pdf_hash);
+        $this->assertDatabaseCount('client_consents',0);
+    }
+    public function test_absent_contract_fields_stay_empty_in_client_only_modules(): void
+    {
+        $values = app(InsuranceForms::class)->tokens($this->client,null,['signer_name'=>'Paolo Ferri','place'=>'Napoli','document_date'=>'2026-10-18']);
+        foreach (['numero_polizza','prodotto','bene_assicurato','premio_rata','classe_cu','classe_compagnia'] as $field) $this->assertSame('________________',$values['{{'.$field.'}}']);
+    }
     public function test_stale_duplicate_and_unavailable_templates_do_not_create_pdfs(): void
     {
         $t=$this->template();
@@ -468,6 +502,7 @@ class InsuranceSigningTest extends TestCase
         $response = $this->get($url)->assertOk()->assertSee($policyTemplate->title)->assertSee($clientTemplate->title)->assertSee($otherBranch->title)
             ->assertDontSee('Ritirato dimostrativo')->assertDontSee('Bozza dimostrativa');
         $this->assertEqualsCanonicalizing([$policyTemplate->id,$clientTemplate->id,$otherBranch->id],$response->viewData('templates')->modelKeys());
+        $this->assertSame($policyTemplate->id,$response->viewData('templates')->first()->id);
         $selection = [$policyTemplate->id,$clientTemplate->id];
         $this->post(route('clients.forms.reminder-decision',[$this->client,'later']),['policy'=>$this->policy->id,'reminder'=>$key,
             'context_hash'=>app(InsuranceForms::class)->contextHash($this->client,$this->policy),'templates'=>$selection])->assertSessionHasNoErrors();

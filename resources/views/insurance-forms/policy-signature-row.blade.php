@@ -23,7 +23,7 @@
     </div>
     @can('updateRegistry',$client)
         @if(!$status || $status === 'rejected')
-            @if($document->generated)<a class="btn btn-p" href="{{ route('attachments.sign',$document->generated) }}">Firma sul tablet</a>@endif
+            @if($document->generated)<a class="btn btn-p" href="{{ route('station-signing.create',$document->generated) }}">Firma sul tablet</a>@endif
             <details class="signature-task" data-signature-next @if($editing && old('signature_action')==='upload') open @endif>
                 <summary class="btn btn-g">{{ $status === 'rejected' ? 'Carica copia corretta' : 'Carica copia firmata' }}</summary>
                 @include('insurance-forms.signature-upload',['origin'=>'policy'])

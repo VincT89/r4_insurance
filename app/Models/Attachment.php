@@ -67,11 +67,12 @@ class Attachment extends Model
     {
         static::updating(function (Attachment $attachment) {
             if ($attachment->isDirty(['disk','path','attachable_type','attachable_id','insurance_policy_id','insurance_form_document_id','insurance_form_submission_id','original_name','document_category'])
-                && ($attachment->tabletSignatures()->exists() || $attachment->signatureResult()->exists())) {
+                && ($attachment->tabletSignatures()->exists() || $attachment->signatureResult()->exists() || (\Illuminate\Support\Facades\Schema::hasTable('station_signing_items') && StationSigningItem::where('source_attachment_id',$attachment->id)->exists()))) {
                 throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Il documento appartiene a una firma registrata. Conserva questa copia e aggiungi una nuova versione.']);
             }
         });
         static::deleting(function (Attachment $attachment) {
+            if (\Illuminate\Support\Facades\Schema::hasTable('station_signing_items') && StationSigningItem::where('source_attachment_id',$attachment->id)->exists()) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Il documento appartiene allo storico di una richiesta di firma e deve essere conservato.']);
             if ($attachment->tabletSignatures()->exists() || $attachment->signatureResult()->exists()) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Originale e copia con firma devono restare nello storico.']);
             if ($attachment->insurance_policy_change_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'L’allegato appartiene allo storico di una variazione contrattuale e deve essere conservato.']);
             if ($attachment->insurance_quote_case_id) throw \Illuminate\Validation\ValidationException::withMessages(['document'=>'Il documento appartiene a una pratica preventivi e deve restare nello storico.']);

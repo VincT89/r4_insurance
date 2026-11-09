@@ -44,7 +44,7 @@
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
-        <a class="app-brand" href="{{ route('dashboard') }}" aria-label="{{ config('branding.name') }}: riepilogo">
+        <a class="app-brand" href="{{ route('dashboard') }}" aria-label="{{ config('branding.name') }}: dashboard">
           <img class="brand-symbol" src="{{ asset('images/agency-signature.svg') }}" alt="" width="115" height="50">
           <span class="brand-name">{{ config('branding.wordmark') }}</span>
         </a>
@@ -61,11 +61,12 @@
               @endif
             @endforeach
           @else
-            <span class="cur">{{ $title ?? 'Riepilogo' }}</span>
+            <span class="cur">{{ $title ?? 'Dashboard' }}</span>
           @endisset
         </nav>
       </div>
       <div class="topbar-right">
+        <x-page-guide />
         <span class="tb-date">{{ strtoupper(now()->locale('it')->isoFormat('ddd D MMM YYYY')) }}</span>
         @unless(\App\Support\TableListing::exporting())
           @livewire('notifications.notification-dropdown', ['lazy' => 'on-load'])
@@ -141,10 +142,11 @@
 
       <div class="nav-group">
         <div class="nav-group-label">Operatività</div>
-        <x-nav-item href="{{ route('dashboard') }}" icon="layout-dashboard" label="Riepilogo" :active="request()->routeIs('dashboard')" />
+        <x-nav-item href="{{ route('dashboard') }}" icon="layout-dashboard" label="Dashboard" :active="request()->routeIs('dashboard')" />
         <x-nav-item href="{{ route('daily-notes.index') }}" wire:navigate icon="book-open" label="Blocco Note" :active="request()->routeIs('daily-notes.*')" />
         @can('create', \App\Models\Client::class)
           <a href="{{ route('policies.create') }}" class="btn btn-p sidebar-policy-button" title="Nuova polizza" @if(request()->routeIs('policies.create','clients.policies.create')) aria-current="page" @endif><i data-lucide="plus" width="16" height="16" aria-hidden="true"></i><span>Nuova polizza</span></a>
+          <a href="{{ route('quotes.create') }}" class="btn btn-g sidebar-policy-button" title="Nuovo preventivo" @if(request()->routeIs('quotes.create')) aria-current="page" @endif><i data-lucide="file-text" width="16" height="16" aria-hidden="true"></i><span>Nuovo preventivo</span></a>
         @endcan
       </div>
       @can('viewAny', \App\Models\Client::class)

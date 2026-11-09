@@ -23,5 +23,5 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['smtp_password']);
+        $exceptions->dontFlash(['smtp_password','pairing_code']);
     })->create();

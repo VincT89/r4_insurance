@@ -21,6 +21,8 @@ import './document-expiry.js';
 import './quote-vehicle.js';
 import './quote-recipients.js';
 import './client-fiscal-check.js';
+import './page-guide.js';
+import './signing-stations.js';
 import { initShell } from './app-shell.js';
 import { createIcons } from 'lucide';
 import { appIcons } from './app-icons.js';

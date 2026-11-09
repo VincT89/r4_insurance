@@ -2,7 +2,10 @@
 @if($package->insurance_policy_change_id)<div class="page-back-row"><a class="btn btn-g" href="{{ route('clients.policy-changes.show',[$client,$package->insurance_policy_change_id]) }}">Variazione contrattuale collegata</a></div>@endif
 <x-page-header>
     <x-slot:title>Fascicolo #{{ $package->id }} · {{ $client->name }}</x-slot:title>
-    <x-slot:actions><a class="btn btn-g" href="{{ route('clients.forms.index',[$client,'policy'=>$package->insurance_policy_id]) }}">Storico fascicoli</a>
+    <x-slot:actions>
+        @php($tabletDocument = $package->documents->first(fn($entry)=>$entry->signature_required && $entry->generated && (!$entry->latestSubmission || $entry->latestSubmission->status==='rejected')))
+        @can('updateRegistry',$client)@if($tabletDocument)<a class="btn btn-p" href="{{ route('station-signing.create',[$tabletDocument->generated,'all'=>1]) }}">Invia moduli al tablet</a>@endif@endcan
+        <a class="btn btn-g" href="{{ route('clients.forms.index',[$client,'policy'=>$package->insurance_policy_id]) }}">Storico fascicoli</a>
         @if($package->policy)
             <a class="btn btn-g" href="{{ route('clients.policies.show',[$client,$package->policy,'tab'=>'forms']).'#policy-signatures' }}">{{ $package->documents->contains('signature_required',true) ? 'Firme della polizza' : 'Scheda polizza' }}</a>
         @else<a class="btn btn-g" href="{{ route('clients.show',$client) }}">Scheda cliente</a>@endif
@@ -25,7 +28,7 @@
 @if($document->signature_required)
 @can('updateRegistry',$client)
     @if($document->generated && (!$document->latestSubmission || $document->latestSubmission->status==='rejected'))
-        <div class="form-document-actions"><a class="btn btn-p" href="{{ route('attachments.sign',$document->generated) }}">Firma sul tablet</a></div>
+        <div class="form-document-actions"><a class="btn btn-p" href="{{ route('station-signing.create',$document->generated) }}">Firma sul tablet</a></div>
     @endif
     @if(($latest=$document->submissions->firstWhere('id',$document->latestSubmission?->id)) && $latest->status==='received')
         <h3 class="signature-history-title">Controlla copia ricevuta</h3>

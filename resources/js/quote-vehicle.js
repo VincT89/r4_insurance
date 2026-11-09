@@ -10,13 +10,12 @@ function initQuoteVehicles() {
         const choices = [...group.options].filter(option => option.value).map(option => option.cloneNode(true));
         const quick = root.querySelector('[data-quick-vehicle]'), save = root.querySelector('[data-save-vehicle]');
         const vehicleSection = root.querySelector('[data-vehicle-section]');
-        const routingSection = root.querySelector('[data-routing-section]');
         const registration = form.querySelector('[data-registration-section]');
         let lastContext = null;
         function refreshGroups() {
             const previous = group.value, addition = purpose.value === 'addition';
             const matching = choices.filter(option => branch.value && option.dataset.branch === branch.value && (!option.dataset.subbranch || option.dataset.subbranch === subbranch.value) && (!option.dataset.from || (cu.value && +cu.value >= +option.dataset.from && +cu.value <= +option.dataset.to)));
-            group.replaceChildren(new Option('Scelgo i destinatari senza usare un gruppo',''));
+            group.replaceChildren(new Option('Scelta manuale',''));
             for (const option of matching) group.add(option.cloneNode(true));
             if (matching.some(option => option.value === previous)) group.value = previous;
             group.disabled = addition;
@@ -33,12 +32,11 @@ function initQuoteVehicles() {
                 if (registration) registration.open = Boolean(vehicleRelevant || vehicle.value || registration.querySelector('input[type="file"]')?.files.length || registration.hasAttribute('data-keep-open'));
                 lastContext = context;
             }
-            routingSection.hidden = addition || (!matching.length && !routingSection.hasAttribute('data-keep-open') && !routingSection.querySelector('[data-manage-groups]'));
-            if (group.value || matching.length || routingSection.hasAttribute('data-keep-open')) routingSection.open = true;
             if (addition) { group.value = ''; description.textContent = 'Le coperture aggiuntive si richiedono alla compagnia della polizza attuale.'; }
-            else if (group.value) description.textContent = 'Il gruppo suggerisce compagnie e agenzie. Prima dell’invio potrai modificare liberamente i destinatari.';
-            else if (matching.length > 0) description.textContent = 'Puoi usare uno dei gruppi compatibili oppure scegliere direttamente i destinatari prima dell’invio.';
-            else description.textContent = branch.value ? 'Nessun gruppo disponibile per questa selezione. Puoi scegliere compagnie e agenzie prima dell’invio.' : 'Scegli prima il ramo assicurativo.';
+            else if (group.value) description.textContent = 'Il gruppo spunta i destinatari. Puoi modificare le spunte qui sotto.';
+            else if (matching.length > 0) description.textContent = 'Scegli a mano qui sotto oppure usa un gruppo compatibile.';
+            else description.textContent = branch.value ? 'Nessun gruppo disponibile. Scegli compagnie e agenzie qui sotto.' : 'Puoi già spuntare i destinatari. Per usare un gruppo scegli prima il ramo.';
+            form.dispatchEvent(new CustomEvent('quote-recipients-context'));
         }
         function selectVehicle() {
             const option = vehicle.selectedOptions[0];

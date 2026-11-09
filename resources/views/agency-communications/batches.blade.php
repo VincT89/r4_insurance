@@ -1,4 +1,4 @@
-<div class="communication-batches">
+<div class="communication-batches" data-guide-batches="{{ ($batchLimited??false) ? 'limited' : (filled(request('_table_filters')) ? 'filtered' : (count($batches) ? 'ready' : 'empty')) }}">
     @if($batchLimited??false)
         <p>Più di 500 operazioni nel periodo. Usa «Filtra elenco» per scegliere un’agenzia o restringere le date.</p>
     @elseif(filled(request('_table_filters')))

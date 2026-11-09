@@ -64,6 +64,60 @@ class QuoteVehicleGroupsTest extends TestCase
         $this->patch(route('quote-groups.update',$created),$data)->assertForbidden();
     }
 
+    public function test_manual_recipients_are_available_to_operators_without_a_group_and_carry_to_email(): void
+    {
+        $agency = \App\Models\SupplierAgency::create(['name'=>'Agenzia di collaudo','status'=>'active','supplier_company_id'=>$this->tua->id]);
+        $this->actingAs(User::factory()->create(['role'=>UserRole::Operator,'status'=>'active']));
+        $this->get(route('quotes.create',['client_id'=>$this->client->id]))->assertOk()->assertSee('data-recipient-entry',false)->assertSee('Agenzia di collaudo')->assertSee('Nuovo preventivo');
+        $keys = ['company:'.$this->nobis->id,'agency:'.$this->tua->id.':'.$agency->id];
+        $case = $this->createCase(['recipient_selection_present'=>1,'recipient_keys'=>$keys]);
+        $this->assertSame($keys,$case->suggestedRecipientKeys());
+        $this->assertNull($case->quote_recipient_group_id);
+        $this->assertSame([$this->nobis->id,$this->tua->id],$case->recipient_group_snapshot['company_ids']);
+        $this->get(route('quotes.emails.create',$case))->assertOk()->assertViewHas('selectedKeys',$keys);
+        $this->assertSame(0,$case->quotes()->count());
+        $this->assertDatabaseCount('insurance_quote_emails',0);
+    }
+
+    public function test_manual_checks_override_group_suggestions_and_can_be_explicitly_cleared(): void
+    {
+        $vehicle = $this->vehicle();
+        $case = $this->createCase(['vehicle_id'=>$vehicle->id,'quote_recipient_group_id'=>$this->group->id,'recipient_selection_present'=>1,'recipient_keys'=>['company:'.$this->nobis->id]]);
+        $this->assertSame(['company:'.$this->nobis->id],$case->suggestedRecipientKeys());
+        $this->assertSame(['company:'.$this->allianz->id,'company:'.$this->tua->id],$case->recipient_group_snapshot['group_recipient_keys']);
+        $this->get(route('quotes.emails.create',$case))->assertOk()->assertViewHas('selectedKeys',['company:'.$this->nobis->id]);
+        $empty = $this->createCase(['vehicle_id'=>$vehicle->id,'quote_recipient_group_id'=>$this->group->id,'recipient_selection_present'=>1]);
+        $this->assertSame([],$empty->suggestedRecipientKeys());
+        $this->get(route('quotes.emails.create',$empty))->assertOk()->assertViewHas('selectedKeys',[]);
+    }
+
+    public function test_entry_rejects_invalid_inactive_duplicate_or_excessive_recipients_and_restores_manual_checks(): void
+    {
+        $agency = \App\Models\SupplierAgency::create(['name'=>'Agenzia di collaudo','status'=>'inactive','supplier_company_id'=>$this->tua->id]);
+        $inactive = SupplierCompany::create(['name'=>'Compagnia inattiva di collaudo','status'=>'inactive']);
+        foreach ([['company:'.$inactive->id],['agency:'.$this->tua->id.':'.$agency->id],['agency:'.$this->nobis->id.':'.$agency->id],['company:0001'],['company:'.$this->tua->id,'company:'.$this->tua->id],array_fill(0,51,'company:'.$this->tua->id)] as $keys) {
+            $this->post(route('quotes.store'),$this->input(['recipient_selection_present'=>1,'recipient_keys'=>$keys]))->assertSessionHasErrors();
+        }
+        $this->assertDatabaseCount('insurance_quote_cases',0);
+        $url = route('quotes.create',['client_id'=>$this->client->id]);
+        $keys = ['company:'.$this->nobis->id];
+        $this->from($url)->post(route('quotes.store'),$this->input(['subject'=>'','recipient_selection_present'=>1,'recipient_keys'=>$keys]))->assertSessionHasErrors('subject');
+        $html = $this->get($url)->assertOk()->assertSee('data-recipient-restored',false)->getContent();
+        $this->assertMatchesRegularExpression('/value="'.preg_quote($keys[0],'/').'"\s+checked\b/',$html);
+    }
+
+    public function test_additions_keep_manual_recipients_within_the_current_company(): void
+    {
+        $policy = $this->client->policies()->create(['number'=>'SA-2026-900','category'=>'RC auto','insurance_branch_id'=>$this->branch->id,'company'=>$this->tua->name,'supplier_company_id'=>$this->tua->id,'starts_on'=>'2026-01-01','expires_on'=>'2027-01-01','status'=>'active','premium'=>'500.00']);
+        $agency = \App\Models\SupplierAgency::create(['name'=>'Agenzia di collaudo','status'=>'active','supplier_company_id'=>$this->tua->id]);
+        $values = ['purpose'=>'addition','current_policy_id'=>$policy->id,'additional_coverages'=>'Cristalli di collaudo','recipient_selection_present'=>1];
+        $this->post(route('quotes.store'),$this->input($values+['recipient_keys'=>['company:'.$this->nobis->id]]))->assertSessionHasErrors('recipient_keys');
+        $keys = ['company:'.$this->tua->id,'agency:'.$this->tua->id.':'.$agency->id];
+        $case = $this->createCase($values+['recipient_keys'=>$keys]);
+        $this->assertSame($keys,$case->suggestedRecipientKeys());
+        $this->get(route('quotes.emails.create',$case))->assertOk()->assertViewHas('selectedKeys',$keys);
+    }
+
     public function test_vehicle_and_group_are_checked_server_side_and_snapshot_is_preserved(): void
     {
         $vehicle=$this->vehicle();

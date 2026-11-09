@@ -26,6 +26,7 @@
         <input type="hidden" name="reason" value="{{ $reason }}">
         <input type="hidden" name="confirmed" value="1">
     @endif
+    <p class="module-help">{{ $policy ? 'I dati del cliente e della polizza vengono inseriti automaticamente nei moduli selezionati.' : 'I dati del cliente vengono inseriti automaticamente. Per includere i dati di un contratto, prepara i moduli dalla relativa polizza.' }}</p>
     <fieldset class="module-choices">
         <legend>Moduli da generare</legend>
         @if(count($ids)>1)
@@ -40,7 +41,7 @@
                 <label><input type="checkbox" name="templates[]" value="{{ $template->id }}" x-model="chosen" @checked(in_array((string)$template->id,$selected,true))>
                     <span><strong>{{ $template->title }}</strong><small>{{ $template->signature_required ? 'Firma da raccogliere' : 'Senza firma' }} / {{ $template->applies($policy,$client) ? 'Consigliato per questo fascicolo' : 'Altro modulo disponibile' }}@if($template->branch) / {{ $template->branch->name }}@endif@if($template->client_type && $template->client_type!=='all') / {{ \App\Models\InsuranceFormTemplate::CLIENT_TYPES[$template->client_type] }}@endif</small></span>
                 </label>
-                <a class="module-preview" href="{{ route('form-templates.preview',[$template,'viewer'=>1]) }}" target="_blank" rel="noopener" aria-label="Anteprima del modello {{ $template->title }}">Anteprima</a>
+                <a class="module-preview" href="{{ route('form-templates.preview',[$template,'viewer'=>1]) }}" target="_blank" rel="noopener" aria-label="Anteprima del modello {{ $template->title }}">Anteprima modello</a>
             </div>
         @empty
             <p>Non ci sono modelli utilizzabili. Crea o approva un modello per renderlo disponibile.</p>

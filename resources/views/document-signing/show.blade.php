@@ -1,14 +1,19 @@
+@php($stationMode = isset($stationRequest))
 <!doctype html>
 <html lang="it"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Firma · {{ $source->original_name }}</title><x-brand-icons />
 @vite(['resources/css/app.css','resources/js/app.js'])
 </head><body class="app-body r4-workbench signing-body" style="{{ \App\Support\Appearance::style(auth()->user()?->appearance) }}">
-<main class="tablet-signing" data-tablet-signing data-return="{{ $returnUrl }}">
+@unless($stationMode)<x-page-guide floating />@endunless
+<main class="tablet-signing" data-tablet-signing data-return="{{ $returnUrl }}"
+    @if($stationMode) data-signing-terminal data-current-url="{{ route('signing-terminal.current') }}" data-home="{{ route('signing-terminal.index') }}" data-terminal-state="signing" data-request-id="{{ $stationRequest->id }}" @endif>
     <header class="tablet-signing-header">
         <div><h1>Firma il documento</h1><p>{{ $client->name }}@if($policy) · Polizza {{ $policy->number }}@endif</p><p class="signing-filename">{{ $source->original_name }}</p></div>
-        <a class="btn btn-g" href="{{ $returnUrl }}">Torna alla {{ $policy ? 'polizza' : 'pratica' }}</a>
+        @if($stationMode)<p>Documento {{ $position }} di {{ $total }}</p>
+        @else<div class="signing-header-actions"><a class="btn btn-p" href="{{ route('station-signing.create',$source) }}">Invia al tablet</a><a class="btn btn-g" href="{{ $returnUrl }}">Torna alla {{ $policy ? 'polizza' : 'pratica' }}</a></div>@endif
     </header>
+    @if($stationMode && auth()->check())<p class="station-browser-notice">Questo browser ha anche un accesso operatore. Per il cliente usa il browser del tablet senza accessi operatore al gestionale.</p>@endif
     <div class="tablet-signing-layout">
         <section class="signing-document" aria-label="Documento da leggere e firmare">
             <div class="signing-placement-tools">
@@ -17,19 +22,20 @@
                 <span role="status" data-placement-status>Nessun punto firma indicato.</span>
             </div>
             <p class="signing-instruction" data-placement-help>Leggi il documento. Scegli dove inserire la firma oppure usa lo spazio in fondo all’ultima pagina e controlla che sia libero.</p>
-            <x-pdf-reader :source="$source->downloadUrl()" />
+            <x-pdf-reader :source="$pdfUrl ?? $source->downloadUrl()" />
             <div class="signing-placement-list" data-placement-list aria-label="Punti firma selezionati"></div>
         </section>
-        <form class="signing-controls" method="post" action="{{ route('attachments.sign.store',$source) }}" data-signing-form>
+        <form class="signing-controls" method="post" action="{{ $submitUrl ?? route('attachments.sign.store',$source) }}" data-signing-form>
             @csrf
-            <input type="hidden" name="token" value="{{ $token }}">
+            @isset($token)<input type="hidden" name="token" value="{{ $token }}">@endisset
             <h2>Firmatario</h2>
             <label for="signer-name">Nome e cognome</label>
-            <input class="form-in" id="signer-name" name="signer_name" value="{{ $signer }}" maxlength="150" autocomplete="off" required>
+            <input class="form-in" id="signer-name" name="signer_name" value="{{ $signer }}" maxlength="150" autocomplete="off" required @readonly($stationMode)>
             @if($client->client_type === 'company' || filled($role))
                 <label for="signer-role">Qualifica{{ $client->client_type === 'company' ? '' : ' (facoltativa)' }}</label>
-                <input class="form-in" id="signer-role" name="signer_role" value="{{ $role }}" maxlength="150" @required($client->client_type === 'company')>
+                <input class="form-in" id="signer-role" name="signer_role" value="{{ $role }}" maxlength="150" @required($client->client_type === 'company') @readonly($stationMode)>
             @endif
+            @if($stationMode)<p>Se i dati non sono corretti, chiedi all’operatore di interrompere e preparare una nuova richiesta.</p>@endif
             <h2>Disegna la firma</h2>
             <p>Usa il dito o il pennino nel riquadro. La stessa firma verrà inserita nei punti indicati di questo documento.</p>
             <canvas class="signing-pad" data-signing-pad width="900" height="450" tabindex="0" aria-label="Riquadro firma" aria-describedby="signing-keyboard-help"></canvas>
@@ -38,7 +44,8 @@
             @if($needsNote)
                 <label for="signing-note">Motivo della nuova copia</label><textarea class="form-ta" id="signing-note" name="note" minlength="10" maxlength="2000" required rows="2"></textarea>
             @endif
-            <label class="signing-confirm"><input type="checkbox" name="identity_confirmed" value="1" required><span>L’operatore conferma di aver verificato l’identità del firmatario presente.</span></label>
+            @if($stationMode)<p class="u-text-meta">Identità verificata dall’operatore prima dell’invio.</p>
+            @else<label class="signing-confirm"><input type="checkbox" name="identity_confirmed" value="1" required><span>L’operatore conferma di aver verificato l’identità del firmatario presente.</span></label>@endif
             <label class="signing-confirm"><input type="checkbox" name="consent" value="1" required><span>{{ $consentText }}</span></label>
             <p class="signing-error" role="alert" data-signing-error hidden></p>
             <button class="btn btn-p signing-save" type="submit" data-save-signature>Conferma e salva firma</button>

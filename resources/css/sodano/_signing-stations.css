@@ -1,0 +1,19 @@
+.station-terminal-body { overflow:auto; display:grid; place-items:center; min-height:100dvh; padding:24px; }
+.station-terminal { width:min(640px,100%); padding:24px; text-align:center; color:var(--ap-page-text); }
+.station-terminal h1 { font-size:28px; margin:0 0 28px; color:var(--ap-page-heading); }
+.station-terminal h2 { font-size:21px; margin:0 0 16px; }
+.station-terminal p { margin:14px 0; line-height:1.6; }
+.station-terminal .btn { min-height:48px; margin-top:12px; }
+.station-terminal .station-pairing-code { font-size:42px; font-variant-numeric:tabular-nums; letter-spacing:.08em; color:var(--ap-page-heading); margin:24px 0; }
+.station-browser-notice { padding-block:12px; border-block:1px solid var(--ap-page-line); font-size:13px; text-align:left; }
+.station-document-choices { padding:0; margin:20px 0; border:0; }
+.station-document-choices legend { font-size:16px; margin-bottom:10px; font-weight:600; }
+.station-document-choices label { min-height:44px; }
+.app-body.r4-workbench .signing-confirm { display:flex; align-items:flex-start; gap:10px; padding:10px 0; font-size:13px; line-height:1.55; cursor:pointer; }
+.app-body.r4-workbench .signing-confirm input { flex:0 0 18px; width:18px; height:18px; margin:2px 0; }
+.signing-header-actions { display:flex; gap:8px; flex-wrap:wrap; }
+@media(max-width:600px) {
+    .station-terminal-body { padding:16px; }
+    .station-terminal { padding:12px; }
+    .station-terminal .station-pairing-code { font-size:34px; letter-spacing:.04em; }
+}

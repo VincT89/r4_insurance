@@ -18,7 +18,7 @@
         </span>
         @can('updateRegistry', $client)<a href="{{ route('clients.edit',$client) }}">Modifica anagrafica</a>@endcan
     </p>
-    <nav class="client-section-nav client-main-nav" aria-label="Sezioni della scheda cliente">
+    <nav class="client-section-nav client-main-nav" aria-label="Sezioni della scheda cliente" data-guide-client-section="{{ $tab }}">
         @foreach(['policies' => 'Polizze', 'registry' => 'Anagrafica', 'vehicles' => 'Veicoli', 'documents' => 'Documenti e firme', 'deadlines' => 'Scadenze'] as $key => $label)
             <a href="{{ route('clients.show', [$client, 'tab' => $key]) }}" @if($tab === $key) aria-current="page" @endif>{{ $label }}</a>
         @endforeach

@@ -23,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Pagination\Paginator::defaultView('vendor.pagination.custom');
         Blade::anonymousComponentPath(resource_path('views/layouts'), 'layouts');
         RateLimiter::for('client-media', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
+        RateLimiter::for('signing-terminal', fn (Request $request) => Limit::perMinute(90)->by(hash('sha256',$request->cookie(\App\Services\SigningStations::COOKIE) ?: $request->ip())));
+        RateLimiter::for('signing-terminal-write', fn (Request $request) => Limit::perMinute(20)->by(hash('sha256',$request->cookie(\App\Services\SigningStations::COOKIE) ?: $request->ip())));
 
         Gate::policy(Client::class, ClientPolicy::class);
         Gate::policy(Attachment::class, AttachmentPolicy::class);

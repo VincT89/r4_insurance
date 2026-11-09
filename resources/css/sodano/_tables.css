@@ -103,14 +103,14 @@
 
 .t-table .t-actions {
   min-width: 76px;
-  text-align: center !important;
+  text-align: left;
   white-space: nowrap;
 }
 
 .t-actions-list {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: 6px;
 }

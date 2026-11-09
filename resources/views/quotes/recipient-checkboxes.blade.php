@@ -1,15 +1,19 @@
 @php
     $emailMode = $emailMode ?? false;
+    $entryMode = $entryMode ?? false;
+    $compactMode = $entryMode || $emailMode;
     $restoring = session()->hasOldInput('recipient_selection_present');
     $selectedRecipients = array_filter((array) old('recipient_keys', $restoring ? [] : ($selectedKeys ?? [])), 'is_string');
     $unavailableRecipients = collect($unavailableKeys ?? []);
     $savedGroup = $emailMode ? ($draft ? ($draft->payload['recipient_group'] ?? null) : $case->recipient_group_snapshot) : null;
     $groupId = $restoring ? old('recipient_group_choice') : ($emailMode ? ($draft ? ($savedGroup['id'] ?? null) : $case->quote_recipient_group_id) : null);
-    $initialGroup = $savedGroup && !$restoring ? ($draft ? $savedGroup['recipient_keys'] : $case->suggestedRecipientKeys()) : null;
+    $initialGroup = $savedGroup && !$restoring ? ($draft ? $savedGroup['recipient_keys'] : ($savedGroup['group_recipient_keys'] ?? $case->suggestedRecipientKeys())) : null;
     $showAgencies = $companies->sum(fn ($company) => $company->agencies->count()) <= 8;
     $availableSelections = [];
 @endphp
-<div data-quote-recipients data-max-recipients="{{ \App\Services\QuoteRecipients::MAX_RECIPIENTS }}"
+<div @class(['quote-recipients-compact'=>$compactMode]) data-quote-recipients data-max-recipients="{{ \App\Services\QuoteRecipients::MAX_RECIPIENTS }}"
+     @if($compactMode) data-recipient-compact @endif
+     @if($entryMode) data-recipient-entry data-recipient-optional @if($restoring) data-recipient-restored @endif @endif
      @if($initialGroup !== null) data-initial-recipients="{{ json_encode($initialGroup) }}" @endif>
     <input type="hidden" name="recipient_selection_present" value="1">
     @if($emailMode)
@@ -30,7 +34,7 @@
         @else
             <p class="u-text-meta u-mb-md">Nessun gruppo compatibile con questa richiesta. Puoi scegliere i destinatari qui sotto.</p>
         @endif
-        @if($initialGroup !== null && !$groups->contains('id', $groupId))
+        @if($initialGroup !== null && $groupId && !$groups->contains('id', $groupId))
             <p class="u-text-meta u-mb-md">Spunte riprese dal gruppo iniziale «{{ $savedGroup['name'] }}».</p>
         @endif
         @if($groups->isEmpty())@error('recipient_group_choice')<p class="invalid-feedback">{{ $message }}</p>@enderror @endif
@@ -41,7 +45,7 @@
         </x-form-group>
         <button type="button" class="btn btn-g" data-recipient-selected-only aria-pressed="false">Solo selezionati</button>
     </div>
-    <p class="u-text-meta recipient-selection-help">Spunta la compagnia per l’invio diretto o un’agenzia sotto il suo nome. Puoi scegliere entrambe.</p>
+    <p class="u-text-meta recipient-selection-help">Spunta la compagnia per l’invio diretto o un’agenzia sotto il suo nome. Puoi scegliere entrambe.@if($entryMode) Puoi anche decidere in seguito.@endif</p>
     @error('recipient_keys')<p class="invalid-feedback" role="alert">{{ $message }}</p>@enderror
     @foreach($errors->get('recipient_keys.*') as $messages)@foreach($messages as $message)<p class="invalid-feedback">{{ $message }}</p>@endforeach @endforeach
     <p class="invalid-feedback" role="alert" tabindex="-1" data-recipient-error hidden></p>
@@ -58,15 +62,15 @@
                     $reasons[$key] = $company->status !== 'active' || $target->status !== 'active' ? 'Anagrafica inattiva'
                         : ($unavailableRecipients->contains($key) ? 'Già richiesto o da verificare nello storico'
                         : (!filter_var($target->email, FILTER_VALIDATE_EMAIL) ? 'Email da completare nell’anagrafica' : null));
-                    if (!$emailMode || !$reasons[$key]) $availableSelections[] = $key;
+                    if ((!$emailMode || !$reasons[$key]) && (!$entryMode || $target->status === 'active')) $availableSelections[] = $key;
                 }
             @endphp
-            <fieldset class="quote-recipient-company" data-recipient-company="{{ $company->name }}">
-                <legend>{{ $company->name }}</legend>
+            <fieldset class="quote-recipient-company" data-recipient-company="{{ $company->name }}" data-recipient-company-id="{{ $company->id }}">
+                <legend @class(['sr-only'=>$compactMode])>{{ $company->name }}</legend>
                 @include('quotes.recipient-option', ['key'=>$directKey, 'target'=>$company, 'direct'=>true])
                 @if($company->agencies->isNotEmpty())
-                    <details class="recipient-agencies" @if($expand) open @endif>
-                        <summary>Agenzie collegate ({{ $company->agencies->count() }})</summary>
+                    <details class="recipient-agencies" @if(!$compactMode && $expand) open @endif>
+                        <summary><span @if($compactMode) data-recipient-agencies-label data-total="{{ $company->agencies->count() }}" @endif>@if($compactMode) Agenzie ({{ $company->agencies->count() }}) @else Agenzie collegate ({{ $company->agencies->count() }}) @endif</span></summary>
                         @foreach($company->agencies as $agency)
                             @include('quotes.recipient-option', ['key'=>$agencyKeys[$agency->id], 'target'=>$agency, 'direct'=>false])
                         @endforeach

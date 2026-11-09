@@ -41,6 +41,7 @@
             <file>tests/Feature/EquivalentPolicyImportTest.php</file>
             <file>tests/Feature/DocumentWorkflowTest.php</file>
             <file>tests/Feature/InsuranceWorkspaceTest.php</file>
+            <file>tests/Feature/PageGuideTest.php</file>
             <file>tests/Feature/InsuranceDemoAndUploadsTest.php</file>
             <file>tests/Feature/AgencyEmailWorkflowTest.php</file>
             <file>tests/Feature/AgencyCommunicationDocumentsTest.php</file>
@@ -61,6 +62,7 @@
             <file>tests/Feature/InsuranceCommissionLedgerTest.php</file>
             <file>tests/Feature/InsuranceSigningTest.php</file>
             <file>tests/Feature/TabletDocumentSigningTest.php</file>
+            <file>tests/Feature/SigningStationsTest.php</file>
             <file>tests/Feature/InsuranceDocumentationFlowTest.php</file>
             <file>tests/Feature/InsuranceLifecycleFlowTest.php</file>
             <file>tests/Feature/InsurancePolicyChangesTest.php</file>

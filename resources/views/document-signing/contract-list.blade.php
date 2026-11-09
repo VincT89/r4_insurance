@@ -8,7 +8,7 @@
         </div>
         @if($signature?->signedFile)<a class="btn btn-g" href="{{ $signature->signedFile->openUrl() }}" target="_blank" rel="noopener">Apri copia con firma</a>@endif
         @can('updateRegistry',$client)
-            @if($contract->mime_type === 'application/pdf')<a class="btn {{ $signature ? 'btn-g' : 'btn-p' }}" href="{{ route('attachments.sign',$contract) }}">{{ $signature ? 'Firma nuova copia' : 'Firma sul tablet' }}</a>@endif
+            @if($contract->mime_type === 'application/pdf')<a class="btn {{ $signature ? 'btn-g' : 'btn-p' }}" href="{{ route('station-signing.create',$contract) }}">{{ $signature ? 'Firma nuova copia' : 'Firma sul tablet' }}</a>@endif
         @endcan
         @if($signature)
             <details class="contract-signature-history"><summary>Storico delle firme</summary>

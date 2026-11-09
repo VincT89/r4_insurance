@@ -1,6 +1,6 @@
 <x-app-layout title="Riepilogo email">
     @php($recipientReady = (bool) filter_var($payload['recipient']['address'] ?? null, FILTER_VALIDATE_EMAIL))
-    <div class="communication-workspace" x-data="{attachmentsDirty:false}">
+    <div class="communication-workspace" x-data="{attachmentsDirty:false}" data-guide-mail-ready="{{ $mailReady ? '1' : '0' }}" data-guide-recipient-ready="{{ $recipientReady ? '1' : '0' }}" data-guide-message-state="{{ $communication->status }}" data-guide-review-block="{{ $communication->status === 'review' ? ($voidedCollections->isNotEmpty() ? 'voided' : ($communication->review_expires_at->isPast() ? 'expired' : ((int)$communication->user_id !== auth()->id() ? 'other-user' : ''))) : '' }}">
     @if(in_array($communication->status,['sending','sent','uncertain']))
         <span hidden data-communication-claimed data-selection-user="{{ auth()->id() }}" data-selection-path="{{ route(($payload['kind']??null)==='collections' ? 'agency-communications.collections' : 'agency-communications.index',[],false) }}" data-claimed-ids="{{ json_encode($payload['selection_keys'] ?? array_column($payload[($payload['kind']??null)==='collections' ? 'collections' : 'policies'],'id')) }}"></span>
     @endif

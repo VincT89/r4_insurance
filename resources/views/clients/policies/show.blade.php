@@ -31,12 +31,12 @@
         <span @class(['policy-file-state','is-alert'=>$policy->is_expired])>{{ $policy->status_label }}</span>
         <x-policy-contract-link :policy="$policy" />
         @can('updateRegistry',$client)
-            @if($policy->contracts->count()===1 && $policy->contracts->first()->mime_type==='application/pdf' && !$policy->contracts->first()->latestTabletSignature)<a href="{{ route('attachments.sign',$policy->contracts->first()) }}">Firma contratto sul tablet</a>@endif
+            @if($policy->contracts->count()===1 && $policy->contracts->first()->mime_type==='application/pdf' && !$policy->contracts->first()->latestTabletSignature)<a href="{{ route('station-signing.create',$policy->contracts->first()) }}">Firma contratto sul tablet</a>@endif
             @if($policy->contracts->isEmpty())<a href="{{ route('clients.documents.create',[$client,'policy'=>$policy->id,'category'=>'policy']) }}">Carica contratto</a>@endif
         @endcan
     </div>
     @include('clients.policies.contract-lineage')
-    <div class="policy-desk-workspace" data-policy-workspace data-current-section="{{ $policyTab }}">
+    <div class="policy-desk-workspace" data-policy-workspace data-current-section="{{ $policyTab }}" data-guide-payments="{{ $payableTitles->isNotEmpty() ? 'open' : ($hasTitles ? 'settled' : 'unprepared') }}">
     <nav class="policy-section-nav" aria-label="Sezioni della polizza">
         @foreach($policySections as $key=>$label)<a data-policy-section-link href="{{ route('clients.policies.show',[$client,$policy,'tab'=>$key]) }}" @if($policyTab===$key) aria-current="page" @endif>{{ $label }}</a>@endforeach
     </nav>

@@ -15,11 +15,12 @@
             <button class="btn btn-p btn-sm" type="button" data-save-vehicle>Salva e seleziona veicolo</button>
         </details>
     </details>
-    <details class="quote-disclosure" data-routing-section @if($errors->has('quote_recipient_group_id')) data-keep-open open @endif>
-        <summary>Gruppo di destinatari (facoltativo)</summary>
+    <details class="quote-disclosure" data-routing-section open @if($errors->hasAny(['quote_recipient_group_id','recipient_keys','recipient_keys.*'])) data-keep-open @endif>
+        <summary>Destinatari del preventivo</summary>
         <div class="form-row" data-quote-routing>
-            <x-form-group label="Gruppo di destinatari" name="quote_recipient_group_id"><select id="field-quote-recipient-group" class="form-sel" name="quote_recipient_group_id"><option value="">Scelgo i destinatari senza usare un gruppo</option>@foreach($recipientGroups as $group)<option value="{{ $group->id }}" data-branch="{{ $group->insurance_branch_id }}" data-subbranch="{{ $group->insurance_subbranch_id }}" data-from="{{ $group->cu_from }}" data-to="{{ $group->cu_to }}" data-companies="{{ $group->companies->pluck('name')->join(', ') }}" @selected((string)old('quote_recipient_group_id')===(string)$group->id)>{{ $group->name }}@if($group->cu_from !== null) · {{ $group->class_label }}@endif</option>@endforeach</select><p class="u-text-meta" data-quote-group-description role="status">Scegli il ramo e l’eventuale classe CU per richiamare i gruppi configurati dall’admin.</p></x-form-group>
+            <x-form-group label="Gruppo di destinatari (facoltativo)" name="quote_recipient_group_id"><select id="field-quote-recipient-group" class="form-sel" name="quote_recipient_group_id"><option value="">Scelta manuale</option>@foreach($recipientGroups as $group)<option value="{{ $group->id }}" data-branch="{{ $group->insurance_branch_id }}" data-subbranch="{{ $group->insurance_subbranch_id }}" data-from="{{ $group->cu_from }}" data-to="{{ $group->cu_to }}" data-recipients="{{ json_encode($group->recipientKeys()) }}" @selected((string)old('quote_recipient_group_id')===(string)$group->id)>{{ $group->name }}@if($group->cu_from !== null) · {{ $group->class_label }}@endif</option>@endforeach</select><p class="u-text-meta" data-quote-group-description role="status">Spunta i destinatari qui sotto oppure usa un gruppo.</p></x-form-group>
         </div>
+        @include('quotes.recipient-checkboxes', ['entryMode'=>true])
         @can('system.admin')<a href="{{ route('quote-groups.index') }}" class="btn btn-g btn-sm" data-manage-groups target="_blank" rel="noopener">Configura gruppi</a>@endcan
     </details>
 </div>

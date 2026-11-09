@@ -7,6 +7,7 @@ export function mount(root) {
     const error = root.querySelector('[data-signing-error]'), save = root.querySelector('[data-save-signature]');
     const placeToggle = root.querySelector('[data-place-toggle]');
     let strokes = [], placements = [], current = null, pointer = null, placing = false, busy = false, keyboard = false, cursor = [.12,.6], pages = 0;
+    pages = Number(reader.querySelector('[data-page-number]')?.max || 0);
     const clamp = value => Math.max(0, Math.min(1, value));
     const showError = message => { error.hidden = false; error.textContent = message; };
     const changed = () => { form.elements.consent.checked = false; error.hidden = true; };

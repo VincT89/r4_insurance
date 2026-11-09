@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{Client, InsurancePolicy, QuoteRecipientGroup};
+use App\Models\{Client, InsurancePolicy, InsuranceQuoteCase, QuoteRecipientGroup};
 use Illuminate\Validation\ValidationException;
 
 class QuoteVehicleContext
@@ -14,6 +14,9 @@ class QuoteVehicleContext
             'merit_class_cu' => ['nullable', 'integer', 'between:1,18'],
             'merit_class_internal' => ['nullable', 'string', 'max:30'],
             'quote_recipient_group_id' => ['nullable', 'integer'],
+            'recipient_selection_present' => ['sometimes', 'accepted'],
+            'recipient_keys' => ['sometimes', 'array', 'list', 'max:'.QuoteRecipients::MAX_RECIPIENTS],
+            'recipient_keys.*' => QuoteRecipients::rules()['recipient_keys.*'],
         ];
     }
 
@@ -44,8 +47,20 @@ class QuoteVehicleContext
             $group = QuoteRecipientGroup::forRequest($branchId,$subbranchId,$cu ? (int)$cu : null)->whereKey($groupId)->lockForUpdate()->first();
             if (!$group) throw ValidationException::withMessages(['quote_recipient_group_id' => 'Seleziona un gruppo attivo compatibile con ramo, sottoramo e classe CU della richiesta.']);
             $companies = $group->companies()->orderBy('supplier_companies.id')->get();
-            /** Il gruppo conserva un suggerimento storico; i destinatari effettivi si scelgono prima dell'invio. */
+            /** Il gruppo conserva il suggerimento originale anche quando l'operatore modifica le spunte. */
             $groupSnapshot = ['name' => $group->name, 'branch' => $group->branch?->name, 'subbranch' => $group->subbranch?->name, 'cu_from' => $group->cu_from, 'cu_to' => $group->cu_to, 'company_ids' => $companies->modelKeys(), 'companies' => $companies->map(fn ($company) => $company->only(['id', 'name']))->all(), 'recipient_keys' => $group->recipientKeys()];
+        }
+        if (isset($data['recipient_selection_present']) || array_key_exists('recipient_keys', $data)) {
+            $keys = $data['recipient_keys'] ?? [];
+            $case = (new InsuranceQuoteCase(['purpose'=>$purpose]))->setRelation('currentPolicy', $policy);
+            $targets = $keys ? app(QuoteRecipients::class)->resolve($keys, case:$case) : collect();
+            $companies = $targets->pluck('company')->unique('id')->values();
+            $groupSnapshot = array_replace($groupSnapshot ?? ['name'=>'Scelta manuale'], [
+                'source'=>'manual', 'group_recipient_keys'=>$groupSnapshot['recipient_keys'] ?? [],
+                'recipient_keys'=>$keys, 'company_ids'=>$companies->pluck('id')->all(),
+                'companies'=>$companies->map(fn ($company) => $company->only(['id','name']))->all(),
+                'recipients'=>$targets->map(fn ($target) => app(QuoteRecipients::class)->snapshot($target))->all(),
+            ]);
         }
         return ['vehicle_id' => $vehicle?->id, 'vehicle_plate' => $vehicle?->plate, 'merit_class_cu' => $cu, 'merit_class_internal' => $internal, 'vehicle_snapshot' => $snapshot, 'quote_recipient_group_id' => $groupId, 'recipient_group_snapshot' => $groupSnapshot];
     }

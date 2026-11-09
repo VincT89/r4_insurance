@@ -93,7 +93,7 @@
             </div>
         @empty
             @if($case->quotes->isEmpty() && $mayWork)
-                <p>Scegli <strong>Prepara email</strong> per selezionare compagnie e agenzie. Potrai controllare il messaggio prima dell’invio.</p>
+                <p>Scegli <strong>Prepara email</strong> per controllare destinatari, messaggio e allegati prima dell’invio.</p>
             @else
                 <p>Nessuna risposta registrata. Qui ritroverai le richieste inviate alle compagnie e alle agenzie.</p>
             @endif

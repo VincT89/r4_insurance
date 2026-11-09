@@ -145,6 +145,7 @@ class User extends Authenticatable
             'insurance_claim_events' => ['created_by'],
         ];
 
+        if (\Illuminate\Support\Facades\Schema::hasTable('signing_stations')) $references += ['signing_stations'=>['paired_by'],'station_signing_requests'=>['created_by','cancelled_by']];
         foreach ($references as $table => $columns) {
             if (DB::table($table)->where(function ($query) use ($columns) {
                 foreach ($columns as $column) {
