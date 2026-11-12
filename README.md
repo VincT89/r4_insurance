@@ -8,6 +8,9 @@ La scheda comprende persone fisiche e aziende, polizze suddivise in tab per ramo
 veicoli e targhe, documenti riservati e scadenze ricavate dai dati registrati.
 I ruoli esistenti e l'identità grafica del gestionale sono conservati.
 
+I percorsi dei report storici citati qui sono relativi all’archivio esterno
+`Report R4`, consultabile da `index.html`.
+
 ## Audit per la presentazione: 22 ottobre 2026
 
 Verificati i flussi del gestionale su dati separati da quelli operativi,
@@ -594,13 +597,13 @@ completi per preventivi, approvazione, conversione in polizza, titoli, acconti,
 pagamenti diretti, quietanze multiple, rinnovi, esportazioni Excel/PDF e
 revisione delle email cumulative. Nessun errore JavaScript, richiesta esterna
 o campo visibile privo di etichetta nel controllo. Il precedente audit di
-61 viste resta documentato in work/insurance-ui/audit-ui-report.json.
+61 viste resta documentato in insurance-ui/audit-ui-report.json.
 Le migrazioni aggiuntive sono applicate al database locale; il confronto dei
 dati conferma 50 clienti e 50 polizze invariati e le 10 pagine coinvolte
 rispondono correttamente. Nessun preventivo, titolo o incasso di prova inserito
 nel database dell'utente; nessun invio email reale. Evidenze aggiornate:
-work/insurance-operations-suite.xml, work/insurance-ui/operations-report.json
-e work/insurance-operations-live-report.json.
+insurance-operations-suite.xml, insurance-ui/operations-report.json
+e insurance-operations-live-report.json.
 
 Il controllo aggiuntivo della fine lavorazione comprende il passaggio alla
 mezzanotte successiva, una polizza ancora attiva, permessi, richieste ripetute,
@@ -609,8 +612,8 @@ segnalazioni e correzioni motivate. Nel browser sono state verificate altre
 errori JavaScript o campi visibili senza etichetta. La migrazione dedicata
 è applicata al database locale; i dati preesistenti sono invariati e nessuna
 lavorazione è stata chiusa automaticamente. Evidenze:
-work/policy-workflow-suite.xml, work/insurance-ui/workflow-report.json e
-work/policy-workflow-live-report.json.
+policy-workflow-suite.xml, insurance-ui/workflow-report.json e
+policy-workflow-live-report.json.
 
 Il nuovo invio dei preventivi aggiunge 20 viste desktop/mobile e tre flussi:
 ordine delle compagnie con revisione e allegati multipli, storico filtrabile
@@ -620,8 +623,8 @@ Il trasporto di prova costruisce il messaggio reale senza connessioni SMTP.
 La migrazione dedicata è applicata a r4_insurance; cinque pagine rispondono
 correttamente e clienti, polizze, cataloghi e documenti preesistenti risultano
 invariati. Le registrazioni temporanee sono state annullate. Evidenze:
-work/quote-email-suite.xml, work/insurance-ui/quote-email-report.json e
-work/quote-email-live-report.json. Nessuna email reale è stata inviata.
+quote-email-suite.xml, insurance-ui/quote-email-report.json e
+quote-email-live-report.json. Nessuna email reale è stata inviata.
 
 Moduli e firme è disponibile nelle schede cliente e polizza. L'admin gestisce
 i modelli in Impostazioni → Modelli documentali: bozze, anteprima PDF,
@@ -660,9 +663,9 @@ titoli, incassi, provvigioni e allegati preesistenti sono invariati.
 Il database locale conserva sette modelli (cinque precedenti e due bozze),
 zero fascicoli fittizi e zero controlli RCA simulati. Audit PHP del 18 ottobre:
 nessun avviso o pacchetto abbandonato; restano le segnalazioni frontend
-descritte nel precedente audit. Evidenze: work/signing-suite.xml,
-work/signing-tests.xml, work/signing-live-report.json,
-work/insurance-ui/signing-report.json e work/insurance-ui/signing-pdf-report.json.
+descritte nel precedente audit. Evidenze: signing-suite.xml,
+signing-tests.xml, signing-live-report.json,
+insurance-ui/signing-report.json e insurance-ui/signing-pdf-report.json.
 
 Le condizioni provvigionali aggiungono 12 test su permessi, collegamenti,
 precisione delle percentuali, campi mancanti, date, sovrapposizioni, revisioni,
@@ -674,8 +677,8 @@ orizzontali della pagina. La migrazione è applicata a r4_insurance: cinque
 pagine rispondono correttamente, i dati preesistenti sono invariati e le
 configurazioni temporanee del controllo sono state annullate. Tabelle delle
 provvigioni vuote, in attesa delle condizioni reali. Evidenze:
-work/agency-commission-suite.xml, work/insurance-ui/commission-report.json e
-work/agency-commission-live-report.json.
+agency-commission-suite.xml, insurance-ui/commission-report.json e
+agency-commission-live-report.json.
 
 Sicurezza: controllati autorizzazioni, collegamenti fra clienti, validazione
 degli upload, conservazione privata e risposte di download protette. Una
@@ -693,12 +696,12 @@ esaurimento di risorse su pattern/selector costruiti appositamente e un problema
 di controllo dei buffer in particolari funzioni UUID. Servono aggiornamenti
 con verifica di compatibilità; non è stata applicata una migrazione forzata
 a una nuova versione principale di Tailwind. Dettagli in
-work/agency-email-npm-audit.json e work/agency-email-composer-audit-final.json.
+agency-email-npm-audit.json e agency-email-composer-audit-final.json.
 Questi controlli non costituiscono una
 certificazione dell'assenza di vulnerabilità.
 
 Il recap delle task, i risultati dell'audit e le decisioni mancanti sono in
-work/recap-audit-2026-10-16.html. La modifica dal giorno successivo alla
+recap-audit-2026-10-16.html. La modifica dal giorno successivo alla
 fine lavorazione è bloccata per gli operatori anche se il contratto è attivo.
 L'azione esplicita Chiudi lavorazione registra data e autore; il blocco scatta
 alla mezzanotte successiva, nel fuso Europe/Rome. Nel giorno della chiusura
@@ -849,14 +852,13 @@ menu mobile con Escape e chiusura dopo il cambio pagina, tab e scorrimento delle
 tabelle, raggiungibilità dei pulsanti nei moduli lunghi e conferme di eliminazione
 con focus da tastiera, Escape e annullamento senza perdita di dati.
 
-Le evidenze aggiornate sono salvate in work/registry-full-suite.xml,
-work/registry-live-report.json e work/insurance-ui/full-report.json;
+Le evidenze aggiornate sono salvate in registry-full-suite.xml,
+registry-live-report.json e insurance-ui/full-report.json;
 il controllo aggiuntivo di navigazione è documentato in
-work/insurance-ui/navigation-report.json. Gli script e i dati dimostrativi del
-browser sono sotto work/insurance-ui.
+insurance-ui/navigation-report.json.
 
 Il collaudo specifico delle nuove funzioni è documentato in
-work/insurance-ui/registry-report.json: sette scenari, 30 combinazioni di pagina e schermo,
+insurance-ui/registry-report.json: sette scenari, 30 combinazioni di pagina e schermo,
 39 collegamenti, prove di registrazione, modifica, relazione reciproca,
 consenso e revoca, filtro ramo/sottoramo e unificazione con scelta dei dati.
 Su smartphone sono stati provati anche cambio sottoramo, campi condizionali
@@ -1032,8 +1034,8 @@ xlrd in lettura tollerante, mantenendo l'originale invariato. Prima del
 caricamento è stato confrontato ogni valore con un secondo lettore indipendente,
 python-calamine: 112.700 celle Anagrafica e 400.248 celle Gestionale, nessuna
 differenza. I riferimenti alle fonti e le impronte SHA-256 sono conservati.
-L'analisi iniziale aggregata resta in work/policy-export-analysis.json;
-il confronto indipendente è in work/source-reader-verification.json.
+L'analisi iniziale aggregata resta in policy-export-analysis.json;
+il confronto indipendente è in source-reader-verification.json.
 
 ## Importazione clienti e agenzie eseguita
 
@@ -1067,13 +1069,28 @@ caricato; modifiche alle fonti già importate richiedono confronto. Gli utenti,
 la password admin e le polizze sono stati confrontati prima e dopo: invariati.
 La copia preventiva è nell'area privata storage/app/private/registry-import-backup-*.
 
-La preparazione riutilizzabile è scripts/prepare_insurance_import.py,
-con dipendenze in scripts/requirements-import.txt. Il lotto completo si trova
-in storage/app/private/insurance-import e non viene servito pubblicamente.
-work/import-registries.php esegue la sola anteprima; l'opzione --apply esegue
-il caricamento e la migrazione prevista, con guardia sul database locale,
-backup, verifica delle fonti e registro. Il prospetto generato con artifact-tool
-è outputs/01a13a0a-2993-7ac0-944b-064563a2c934/Preparazione-importazione-R4.xlsx.
+Il caricamento iniziale sul database locale è stato preceduto dall’anteprima,
+dal backup e dalla verifica delle fonti. Gli esiti sono stati registrati.
+Il lotto elaborato è nell’area privata
+`storage/app/private/insurance-import`. Il prospetto si scarica da
+Impostazioni → Importazione Excel.
+
+Per i file CSV e `.xlsx` si usa **Impostazioni → Importazioni CSV/Excel**.
+
+### Riprodurre l’anteprima storica XLS
+
+Per la coppia di file storici `.xls`, la preparazione legge il foglio `Dati`
+con intestazioni alla riga 7. Dalla radice del progetto, installare la
+dipendenza con lo stesso Python che eseguirà lo script.
+
+```powershell
+python -m pip install -r scripts/requirements-import.txt
+python scripts/prepare_insurance_import.py --registry "Anagrafica.xls" --policies "Gestionale.xls" --output "storage/app/private/insurance-import-anteprima"
+```
+
+Sostituire i nomi di esempio con i percorsi dei due file. Usare un nuovo
+percorso sotto `storage/app/private` per conservare il lotto già consultabile
+nel gestionale. Il comando genera l’anteprima e il manifesto delle impronte.
 
 ## Filtri, esportazioni e favicon
 
@@ -1101,8 +1118,8 @@ filtri Tutti/Almeno uno, rimozione e azzeramento, 520/260 righe esportate su
 più pagine, Excel senza formule involontarie, PDF, fornitori plurimandatari,
 anteprima e smartphone. Nessun errore JavaScript o risposta 500. Undici pagine
 reali e i collegamenti importati sono stati controllati in sola lettura.
-Evidenze: work/registry-import-suite.xml, work/registry-import-report.json,
-work/import-live-report.json e work/insurance-ui/import-tables-report.json.
+Evidenze: registry-import-suite.xml, registry-import-report.json,
+import-live-report.json e insurance-ui/import-tables-report.json.
 
 ## Catalogo rami, agenzie, documenti e scadenze
 
@@ -1175,22 +1192,21 @@ risposta 500. Sedici pagine reali e i collegamenti del catalogo sono stati
 verificati in transazione di sola lettura. Superati anche i quattro test dei
 filtri e la compilazione Vite; controllato visivamente il PDF esportato.
 Evidenze:
-work/catalog-documents-suite.xml, work/catalog-apply-report.json,
-work/document-workflow-apply-report.json, work/catalog-documents-live-report.json
-e work/insurance-ui/catalog-report.json.
+catalog-documents-suite.xml, catalog-apply-report.json,
+document-workflow-apply-report.json, catalog-documents-live-report.json
+e insurance-ui/catalog-report.json.
 
-Accorpamenti applicati con work/apply-approved-catalog-merges.php --apply,
-copia preventiva privata catalog-merges-backup-*, controllo delle fonti e
-confronto di utenti, clienti, registro importazioni, agenzie, compagnie,
+Accorpamenti applicati con copia preventiva privata catalog-merges-backup-*,
+controllo delle fonti e confronto di utenti, clienti, registro importazioni, agenzie, compagnie,
 documenti e richieste: invariati. Gli accorpamenti non hanno importato polizze e non hanno lasciato migrazioni
 pendente. Provata anche la ripetizione dell'importazione del catalogo in un
 savepoint poi annullato: zero rami e zero sottorami ricreati.
 Verifica aggiornata: 127 test PHP, 2.702 asserzioni; browser isolato con otto
 controlli desktop/mobile, selezione ramo/sottoramo, prodotto indipendente,
 tab, filtro prodotto, Excel letto e PDF scaricato; nessun errore JavaScript.
-Evidenze: work/approved-catalog-merges-suite.xml,
-work/approved-catalog-merges-report.json,
-work/insurance-ui/catalog-merges-ui-report.json.
+Evidenze: approved-catalog-merges-suite.xml,
+approved-catalog-merges-report.json,
+insurance-ui/catalog-merges-ui-report.json.
 
 ## Prima importazione polizze eseguita
 
@@ -1237,18 +1253,17 @@ Applicata la migrazione 2026_10_15_230000_add_policy_imports. PolicyExcelImporte
 verifica impronte dei file e riferimenti, registra le fonti e lavora in
 transazione. Un secondo passaggio non duplica le polizze e non sovrascrive
 correzioni degli operatori. Fonti modificate dopo l'importazione o riferimenti
-mancanti interrompono il caricamento. work/import-policies.php produce una
-verifica; --apply esegue il caricamento sul solo database locale previsto,
-con copia preventiva privata policy-import-backup-* e confronto dei dati
-fuori ambito. Il controllo finale conferma zero duplicati, riferimenti validi
+mancanti interrompono il caricamento. Il caricamento iniziale è stato preceduto
+dalla verifica e dalla copia preventiva privata policy-import-backup-*, con
+confronto dei dati fuori ambito. Il controllo finale conferma zero duplicati, riferimenti validi
 e nessuna migrazione pendente.
 
 Verifica: 135 test PHP superati, più verifica mirata dello stato aggiornato nell’esito importazione; browser isolato con otto
 controlli desktop/mobile, modifica polizza, collegamenti ai fornitori, gruppi
 sospesi, scadenze con stato incerto, Excel con zeri iniziali conservati e PDF
 controllato visivamente. Dodici pagine reali rispondono correttamente.
-Evidenze: work/policy-import-suite.xml, work/policy-import-report.json,
-work/policy-import-live-report.json, work/insurance-ui/policy-import-ui-report.json.
+Evidenze: policy-import-suite.xml, policy-import-report.json,
+policy-import-live-report.json, insurance-ui/policy-import-ui-report.json.
 
 ## Accorpamento approvato delle polizze del 16 ottobre 2026
 
@@ -1278,9 +1293,9 @@ scadenze, conservazione di entrambe le righe e assenza di errori JavaScript.
 Schermate controllate visivamente. La verifica sul database locale conferma
 281 accorpamenti con 564 righe collegate, zero duplicati, collegamenti validi,
 nessuna migrazione pendente e 14 pagine correttamente raggiungibili.
-Evidenze: work/equivalent-policy-suite.xml,
-work/equivalent-policy-import-report.json, work/policy-import-live-report.json,
-work/insurance-ui/equivalent-policy-ui-report.json.
+Evidenze: equivalent-policy-suite.xml,
+equivalent-policy-import-report.json, policy-import-live-report.json,
+insurance-ui/equivalent-policy-ui-report.json.
 
 ## Backup cifrato e ripristino isolato
 

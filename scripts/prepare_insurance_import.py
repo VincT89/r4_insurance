@@ -10,12 +10,8 @@ import io
 import json
 from pathlib import Path
 import re
-import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-if (ROOT / 'work/qa-python').is_dir():
-    sys.path.insert(0, str(ROOT / 'work/qa-python'))
-import xlrd
 
 CLIENT_FIELDS = {
     'Titolo': 'title', 'Contraente': 'name', 'Data Nascita': 'birth_date', 'Luogo Nascita': 'birth_place',
@@ -89,6 +85,8 @@ def money(value):
 
 
 def read_source(path, kind):
+    import xlrd
+
     binary = path.read_bytes()
     tolerant = False
     try:
@@ -234,7 +232,7 @@ def prepare(registry_rows, policy_rows):
         rows = [r for r in records if fiscal(r['values'][FISCAL]) == f]
         v = rows[0]['values']
         item = {'key': digest(['client', f]), 'fiscal_identifier': f, 'source': 'policies', 'source_rows': [r['row'] for r in rows],
-                'data': {'name': clean(v['Contraente']), 'title': clean(v['Titolo']), 'client_type': None, 'tax_code': f if len(f) == 16 else None, 'vat_number': None},
+                'data': {'name': clean(v['Contraente']), 'title': clean(v.get('Titolo')), 'client_type': None, 'tax_code': f if len(f) == 16 else None, 'vat_number': None},
                 'issues': ['cliente_assente_in_anagrafica'], 'conflicting_fields': [], 'result': 'da_verificare'}
         clients.append(item)
         client_by_fiscal[f] = item
@@ -275,7 +273,7 @@ def prepare(registry_rows, policy_rows):
         if not company or not clean(v['Agenzia']) or not clean(v['Ramo']):
             problems.add('collegamento_catalogo_mancante')
         data = {'category': b, 'subcategory': s, 'company': company, 'agency': key(v['Agenzia']), 'number': number,
-                'insured_subject': clean(v['Interesse Assic.']) or None, 'product': None, 'status': None,
+                'insured_subject': clean(v.get('Interesse Assic.')) or None, 'product': None, 'status': None,
                 'source_status': clean(v['Polizze']), 'notes': clean(v.get('Note')) or None}
         for field, limit in {'number': 100, 'category': 100, 'subcategory': 100, 'company': 150, 'insured_subject': 255, 'notes': 10000}.items():
             if data[field] and len(data[field]) > limit:
@@ -365,8 +363,17 @@ def main():
     out = args.output.resolve()
     if not out.is_relative_to((ROOT/'storage/app/private').resolve()):
         raise ValueError('Il lotto deve restare nella cartella privata del gestionale.')
-    reg_meta, reg = read_source(args.registry, 'clients')
-    pol_meta, pol = read_source(args.policies, 'policies')
+    try:
+        reg_meta, reg = read_source(args.registry, 'clients')
+        pol_meta, pol = read_source(args.policies, 'policies')
+    except ModuleNotFoundError as error:
+        if error.name != 'xlrd':
+            raise
+        parser.exit(
+            1,
+            'Per leggere i file XLS esegui python -m pip install -r scripts/requirements-import.txt '
+            'dalla radice del progetto.\n',
+        )
     result = prepare(reg, pol)
     summary = result[0]
     summary['sources'] = [reg_meta, pol_meta]

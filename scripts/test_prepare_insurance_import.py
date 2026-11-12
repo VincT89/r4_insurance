@@ -1,18 +1,16 @@
 import unittest
 import hashlib
 from pathlib import Path
-import uuid
-from prepare_insurance_import import clean, fiscal, fiscal_valid, parse_date, money, prepare, write_json, CLIENT_FIELDS, FISCAL, digest, ROOT
+from tempfile import TemporaryDirectory
+from prepare_insurance_import import clean, fiscal, fiscal_valid, parse_date, money, prepare, write_json, CLIENT_FIELDS, FISCAL, digest
 
 
 class ImportPreparationTest(unittest.TestCase):
     def test_integrity_hash_matches_written_bytes_on_windows(self):
-        path = ROOT/'work'/('import-hash-test-'+uuid.uuid4().hex+'.json')
-        try:
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / 'import-hash-test.json'
             expected = write_json(path, {'test': 'Dati dimostrativi con accenti: città'})
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), expected)
-        finally:
-            if path.is_file(): path.unlink()
 
     def registry(self, row=8, **changes):
         values = {name: '' for name in CLIENT_FIELDS}
@@ -74,6 +72,14 @@ class ImportPreparationTest(unittest.TestCase):
         self.assertIsNone(candidate['data']['status'])
         self.assertEqual(candidate['data']['source_status'], 'OLD')
         self.assertEqual(candidate['data']['number'], '00012')
+
+    def test_missing_optional_policy_columns_leave_the_values_empty(self):
+        policy = self.policy()
+        del policy['values']['Titolo']
+        del policy['values']['Interesse Assic.']
+        _, clients, policies, *_ = prepare([], [policy])
+        self.assertEqual(clients[0]['data']['title'], '')
+        self.assertIsNone(policies[0]['data']['insured_subject'])
 
 
 if __name__ == '__main__':
