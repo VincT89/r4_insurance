@@ -12,6 +12,6 @@ class AiConfiguration
     public function publicValues(): array
     {
         $setting=$this->settings();
-        return ['enabled'=>$setting?->enabled ?? false,'key_saved'=>filled($setting?->api_key),'model'=>$setting?->model ?? 'gpt-6.1-terra','monthly_budget'=>number_format(($setting?->monthly_budget_microusd ?? 10000000)/1000000,2,'.',''),'document_budget'=>number_format(($setting?->document_budget_microusd ?? 250000)/1000000,2,'.','')];
+        return ['enabled'=>$setting?->enabled ?? false,'key_saved'=>filled($setting?->api_key),'revision'=>$setting?->revision,'model'=>$setting?->model ?? 'gpt-6.1-terra','monthly_budget'=>number_format(($setting?->monthly_budget_microusd ?? 10000000)/1000000,2,'.',''),'document_budget'=>number_format(($setting?->document_budget_microusd ?? 250000)/1000000,2,'.','')];
     }
 }

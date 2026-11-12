@@ -33,7 +33,7 @@ class AiController extends Controller
     {
         $this->authorize('system.admin');
         abort_unless($configuration->settings(),503,'Completa prima l’aggiornamento del database per la sezione AI.');
-        $data=$request->validate(['enabled'=>['required','boolean'],'ai_api_key'=>['nullable','string','min:20','max:2048','not_regex:/[\x00-\x20\x7f]/'],'model'=>['required',Rule::in(array_keys(AiPricing::MODELS))],'monthly_budget'=>['required','numeric','decimal:0,2','min:0.01','max:10000'],'document_budget'=>['required','numeric','decimal:0,2','min:0.01','lte:monthly_budget']]);
+        $data=$request->validate(['enabled'=>['required','boolean'],'replace_api_key'=>['sometimes','boolean'],'ai_api_key'=>[Rule::requiredIf($request->boolean('replace_api_key')),'nullable','string','min:20','max:2048','not_regex:/[\x00-\x20\x7f]/'],'model'=>['required',Rule::in(array_keys(AiPricing::MODELS))],'monthly_budget'=>['required','numeric','decimal:0,2','min:0.01','max:10000'],'document_budget'=>['required','numeric','decimal:0,2','min:0.01','lte:monthly_budget']],['ai_api_key.required'=>'Inserisci la nuova chiave oppure premi Annulla modifica per conservare quella salvata.']);
         DB::transaction(function()use($request,$data) {
             $setting=AiSetting::lockForUpdate()->findOrFail(1);
             $key=filled($data['ai_api_key'] ?? null) ? $data['ai_api_key'] : $setting->api_key;
@@ -43,6 +43,26 @@ class AiController extends Controller
             app(AuditLogService::class)->log('ai_settings_updated',$setting,description:'Aggiornata la configurazione AI e i limiti di spesa.');
         });
         return to_route('ai.index')->with('success','Configurazione AI salvata. Salvare la chiave non esegue letture a pagamento.');
+    }
+
+    public function checkConnection(Request $request, AiConfiguration $configuration, \App\Services\AiConnectionChecker $checker)
+    {
+        $this->authorize('system.admin');
+        $data = $request->validate(['revision'=>['required','uuid']]);
+        $setting = $configuration->settings();
+        $changed = ['state'=>'error','code'=>'configuration_changed','message'=>'La configurazione è cambiata. Ricarica la pagina e ripeti la verifica.'];
+        if (!$setting) {
+            $result = ['state'=>'error','code'=>'not_installed','message'=>'La configurazione AI non è ancora disponibile in questo archivio.'];
+        } elseif ($setting->revision !== $data['revision']) {
+            $result = $changed;
+        } else {
+            $result = $checker->check($setting);
+            /** Un esito riferito a una chiave o a un modello sostituiti nel frattempo non conferma la configurazione corrente. */
+            if ($configuration->settings()?->revision !== $setting->revision) $result = $changed;
+        }
+        $result += ['revision'=>$data['revision'],'checked_at'=>now()->format('d/m/Y H:i')];
+        if ($request->expectsJson()) return response()->json($result)->header('Cache-Control','no-store, private');
+        return redirect()->to(route('ai.index').'#ai-configuration')->with('ai_connection_check',$result);
     }
 
     public function extract(Request $request, \App\Services\AiContractReader $reader)

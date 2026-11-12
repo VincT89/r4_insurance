@@ -1,6 +1,8 @@
 <x-app-layout title="AI e consumi">
-    <x-page-header meta="Contatori dei token, costi delle elaborazioni e configurazione OpenAI."><x-slot:title>AI e consumi</x-slot:title><x-slot:actions><a class="btn btn-g" href="#ai-configuration">Configura AI</a></x-slot:actions></x-page-header>
+    <x-page-header meta="Configura il collegamento OpenAI e controlla i consumi."><x-slot:title>AI e consumi</x-slot:title><x-slot:actions><a class="btn btn-g" href="#ai-consumption">Vedi consumi</a></x-slot:actions></x-page-header>
     @if(!$installed)<p class="u-alert-error">La sezione richiede l’aggiornamento del database. Nessuna lettura AI è attiva.</p>@endif
+    @include('ai.configuration')
+    <h2 id="ai-consumption" tabindex="-1">Consumi AI</h2>
     <form method="GET" action="{{ route('ai.index') }}" class="client-search-form" aria-label="Periodo dei consumi AI">
         <x-form-group name="from" label="Dal"><input id="field-from" type="date" name="from" class="form-in" value="{{ $from }}"></x-form-group>
         <x-form-group name="to" label="Al"><input id="field-to" type="date" name="to" class="form-in" value="{{ $to }}"></x-form-group>
@@ -48,19 +50,4 @@
         </tbody></table></div>
         @if($usages){{ $usages->links() }}@endif
     </x-panel>@endif
-    <x-panel title="Configurazione OpenAI" id="ai-configuration" padded>
-        <p class="u-mb-md">{{ $ready ? 'Lettura AI abilitata.' : 'Lettura AI non attiva. Il gestionale mantiene disponibile la lettura locale.' }} La chiave API si configura qui e rimane riservata agli amministratori.</p>
-        @if($installed)<form method="POST" action="{{ route('ai.update') }}" autocomplete="off" class="form-stack">@csrf @method('PATCH')
-            <div class="form-row">
-                <x-form-group name="ai_api_key" label="Chiave API OpenAI"><input id="field-ai-api-key" name="ai_api_key" type="password" class="form-in" autocomplete="new-password" autocapitalize="none" spellcheck="false" maxlength="2048"><p class="u-text-meta">{{ $settings['key_saved'] ? 'Chiave salvata. Lascia vuoto per conservarla.' : 'Inserisci una chiave della piattaforma API OpenAI.' }} La chiave viene conservata cifrata e non viene mostrata né inviata al browser degli operatori.</p></x-form-group>
-                <x-form-group name="model" label="Modello"><select id="field-ai-model" name="model" class="form-sel">@foreach(\App\Services\AiPricing::MODELS as $id=>$model)<option value="{{ $id }}" @selected(old('model',$settings['model'])===$id)>{{ $model['name'] }}</option>@endforeach</select></x-form-group>
-                <x-form-group name="monthly_budget" label="Limite mensile (USD)"><input id="field-ai-monthly-budget" name="monthly_budget" type="number" min="0.01" max="10000" step="0.01" class="form-in" value="{{ old('monthly_budget',$settings['monthly_budget']) }}" required></x-form-group>
-                <x-form-group name="document_budget" label="Massimo per documento (USD)"><input id="field-ai-document-budget" name="document_budget" type="number" min="0.01" max="10000" step="0.01" class="form-in" value="{{ old('document_budget',$settings['document_budget']) }}" required></x-form-group>
-            </div>
-            <input type="hidden" name="enabled" value="0"><label class="contract-confirm"><input type="checkbox" name="enabled" value="1" @checked(old('enabled',$settings['enabled']))> Abilita l’AI per la lettura dei contratti</label>
-            <p class="u-text-meta">Abilitando l’AI, i contratti caricati per questa funzione saranno elaborati da OpenAI. Prima di ogni elaborazione vengono controllati i limiti di spesa. La polizza viene creata soltanto dopo il controllo dell’operatore.</p>
-            <p class="u-text-meta">Tariffe di riferimento verificate il {{ \Carbon\Carbon::parse(\App\Services\AiPricing::VERIFIED_ON)->format('d/m/Y') }}: <a href="{{ \App\Services\AiPricing::SOURCE }}" target="_blank" rel="noopener">prezzi ufficiali OpenAI</a>. Il contatore riguarda le chiamate effettuate da questo gestionale.</p>
-            <div class="insurance-form-actions"><button type="submit" class="btn btn-p">Salva configurazione AI</button></div>
-        </form>@endif
-    </x-panel>
 </x-app-layout>

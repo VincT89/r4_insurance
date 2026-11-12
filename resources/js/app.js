@@ -23,6 +23,7 @@ import './quote-recipients.js';
 import './quote-comparison.js';
 import './client-fiscal-check.js';
 import './page-guide.js';
+import './ai-configuration.js';
 import './signing-stations.js';
 import { initShell } from './app-shell.js';
 import { createIcons } from 'lucide';

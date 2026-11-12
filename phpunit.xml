@@ -60,6 +60,7 @@
             <file>tests/Feature/InsuranceReadPerformanceTest.php</file>
             <file>tests/Feature/PracticeOverviewTest.php</file>
             <file>tests/Feature/AiUsageTest.php</file>
+            <file>tests/Feature/AiConfigurationTest.php</file>
             <file>tests/Feature/QuoteComparisonTest.php</file>
             <file>tests/Feature/InsurancePolicyWorkflowTest.php</file>
             <file>tests/Feature/QuoteRequestEmailTest.php</file>

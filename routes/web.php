@@ -265,6 +265,7 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('/audit-logs', [AuditLogController::class, 'index'])->middleware('can:system.admin')->name('audit-logs.index');
     Route::get('/ai', [\App\Http\Controllers\AiController::class, 'index'])->middleware('can:system.admin')->name('ai.index');
     Route::patch('/ai/settings', [\App\Http\Controllers\AiController::class, 'update'])->middleware(['can:system.admin','throttle:10,1'])->name('ai.update');
+    Route::post('/ai/connection-check', [\App\Http\Controllers\AiController::class, 'checkConnection'])->middleware(['can:system.admin','throttle:5,1,ai-connection'])->name('ai.connection.check');
     Route::post('/ai/usages/{usage}/reconcile', [\App\Http\Controllers\AiController::class, 'reconcile'])->middleware(['can:system.admin','throttle:10,1'])->name('ai.reconcile');
     Route::post('/ai/contracts/read', [\App\Http\Controllers\AiController::class, 'extract'])->middleware('throttle:10,1')->name('ai.contracts.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
