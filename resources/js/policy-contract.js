@@ -1,6 +1,8 @@
 import {parsePolicyContract, contractLabels} from './policy-contract-parser.js';
+import {interpretAiContract} from './policy-contract-ai.js';
+import {initContractPreparation} from './policy-contract-preparation.js';
 
-const scheduleNames = ['starts_on','expires_on','premium','installment_premium','payment_frequency','payment_method','status'];
+const scheduleNames = ['starts_on','expires_on','premium','installment_premium','first_installment_premium','payment_frequency','payment_method','status'];
 const money = cents => new Intl.NumberFormat('it-IT', {style:'currency', currency:'EUR'}).format(cents / 100);
 const date = value => /^\d{4}-\d{2}-\d{2}$/.test(value) ? value.split('-').reverse().join('/') : value;
 const tick = () => new Promise(resolve => requestAnimationFrame(resolve));
@@ -16,12 +18,23 @@ function initPolicyContracts() {
         const fingerprint = form.querySelector('[data-contract-fingerprint]'), refresh = form.querySelector('[data-refresh-contract-schedule]');
         const errors = form.querySelector('[data-contract-errors]'), review = form.elements.contract_reviewed;
         const catalog = JSON.parse(form.querySelector('[data-contract-catalog]').textContent);
+        const ai=JSON.parse(form.querySelector('[data-contract-ai]')?.textContent || '{}'), aiChoice=form.querySelector('[data-use-contract-ai]'), aiUsage=form.querySelector('[data-contract-ai-usage]'), aiRetry=form.querySelector('[data-contract-ai-retry]');
         const transition = form.hasAttribute('data-policy-transition'), renewalSource = form.querySelector('[data-renewal-source]');
         let saveLabel = save.textContent, clearedRenewalNumber = false;
         const initial = Object.fromEntries(Object.keys(contractLabels).map(name => [name, form.elements.namedItem(name)?.value || '']));
-        let generation = 0, reading = false, submitting = false, readerAbort, scheduleAbort, scheduleGeneration = 0, scheduleTimer;
-        let autoValues = {}, validFile = false;
-        function enableSave() { save.disabled = submitting || reading || !validFile || ((transition || form.elements.titles_mode.value === 'automatic') && !fingerprint.value); }
+        let generation = 0, reading = false, submitting = false, readerAbort, scheduleAbort, scheduleGeneration = 0, scheduleTimer, originalUrl;
+        const original=form.querySelector('[data-contract-original]');
+        let autoValues = {}, validFile = false, contractVehicles = [], aiInFlight = 0;
+        const vehicleDraft=form.querySelector('[data-contract-new-vehicle]'), createVehicle=form.querySelector('[data-create-contract-vehicle]');
+        const vehicleValues={};
+        let vehicleChoiceTouched=false;
+        function toggleVehicleFields() {
+            if(!vehicleDraft) return;
+            if(form.elements.vehicle_id.value || form.elements.client_asset_id?.value) createVehicle.checked=false;
+            vehicleDraft.querySelector('[data-contract-vehicle-fields]').hidden=!createVehicle.checked;
+            for(const field of vehicleDraft.querySelectorAll('[data-contract-vehicle-field]')) { field.disabled=!createVehicle.checked; field.required=createVehicle.checked && field.dataset.contractVehicleField==='plate'; }
+        }
+        function enableSave() { if(aiChoice)aiChoice.disabled=reading || submitting; save.disabled = submitting || reading || !validFile || ((transition || form.elements.titles_mode.value === 'automatic') && !fingerprint.value); }
         function updateRenewalMode() {
             if(!renewalSource)return;
             const normalize=value=>String(value||'').trim().replace(/\s+/g,' ').toLocaleUpperCase('it');
@@ -36,7 +49,25 @@ function initPolicyContracts() {
             saveLabel=changed ? 'Conferma nuova polizza' : 'Conferma rinnovo';
             if(!submitting)save.textContent=saveLabel;
         }
-        function addWarning(message) { const item = document.createElement('li'); item.textContent = message; warnings.append(item); warnings.hidden = false; }
+        function addWarning(message) { const item = document.createElement('li'); item.textContent = message; warnings.append(item); warnings.hidden = false; return item; }
+        function missingFields() {
+            const names=['number','category','company','starts_on','expires_on'];
+            if(transition || form.elements.titles_mode.value==='automatic') names.push('premium','payment_frequency','payment_method');
+            return names.filter(name=>!form.elements.namedItem(name)?.value);
+        }
+        function updateMissing() {
+            warnings.querySelector('[data-contract-required]')?.remove();
+            const missing=missingFields();
+            if(missing.length) {
+                const item=addWarning('Da completare: '); item.dataset.contractRequired='true';
+                for(const name of missing) {
+                    const button=document.createElement('button'); button.type='button'; button.className='contract-field-jump'; button.textContent=contractLabels[name];
+                    button.addEventListener('click',()=>{ const field=form.elements.namedItem(name); const details=field.closest('details'); if(details)details.open=true; field.scrollIntoView({block:'center'}); field.focus({preventScroll:true}); }); item.append(button);
+                }
+            }
+            warnings.hidden=!warnings.children.length;
+            return missing;
+        }
         function showFields() { fields.hidden = false; form.querySelector('[data-contract-initial-cancel]').hidden = true; }
         function fieldNote(field, message) {
             if (!field) return;
@@ -58,7 +89,7 @@ function initPolicyContracts() {
             if (manualTitles && !transition) { scheduleStatus.textContent = 'La polizza sarà salvata senza titoli. Potrai inserirli dalla sezione Titoli e pagamenti.'; return; }
             const values = transition ? Object.fromEntries([...new FormData(form)].filter(([name,value]) => typeof value === 'string' && !['cancel_titles[]','contract_reviewed','schedule_fingerprint'].includes(name)).map(([name,value]) => [name,value || null])) : Object.fromEntries(scheduleNames.map(name => [name, form.elements.namedItem(name)?.value || null]));
             if (transition) values.cancel_titles = [...form.querySelectorAll('[name="cancel_titles[]"]:checked')].map(field => field.value);
-            if (scheduleNames.filter(name => name !== 'installment_premium').some(name => !values[name])) {
+            if (scheduleNames.filter(name => !['installment_premium','first_installment_premium'].includes(name)).some(name => !values[name])) {
                 scheduleStatus.textContent = 'Completa decorrenza, scadenza, premio totale, frazionamento e metodo di pagamento per vedere i titoli.'; return;
             }
             const current = ++scheduleGeneration;
@@ -100,6 +131,7 @@ function initPolicyContracts() {
                 item.textContent = `${contractLabels[name] || 'Veicolo collegato'}: preventivo ${display(before)}; contratto ${display(after)}.`;
                 list.append(item);
             }
+            if(createVehicle?.checked) { const item=document.createElement('li'); item.textContent='Veicolo da registrare e collegare al contratto: '+vehicleDraft.querySelector('[data-contract-vehicle-field="plate"]').value+'.'; list.append(item); }
             root.hidden = !list.children.length;
             form.elements.quote_changes_confirmed.required = !root.hidden;
             form.elements.quote_changes_confirmed.checked = false;
@@ -124,16 +156,39 @@ function initPolicyContracts() {
             if (['company','category'].includes(name)) await tick();
             return true;
         }
-        async function readFile() {
+        async function linkContractVehicle() {
+            if(contractVehicles.length!==1 || !form.elements.vehicle_id) { if(vehicleDraft) { vehicleDraft.hidden=true; createVehicle.checked=false; toggleVehicleFields(); } return; }
+            const plate=contractVehicles[0].plate;
+            const option=[...form.elements.vehicle_id.options].find(option=>(option.dataset.plate || option.textContent.split('/')[0]).replace(/\s/g,'').toUpperCase()===plate);
+            if(option) { await setField('vehicle_id',option.value); fieldNote(form.elements.vehicle_id,'Targa letta nel contratto: '+plate+'. Il veicolo è già nella scheda cliente.'); }
+            else fieldNote(form.elements.vehicle_id,'Targa letta: '+plate+'. Puoi salvarla nella scheda cliente insieme alla polizza.');
+            if(vehicleDraft) {
+                vehicleDraft.hidden=Boolean(option);
+                if(!option) for(const field of vehicleDraft.querySelectorAll('[data-contract-vehicle-field]')) {
+                    const key=field.dataset.contractVehicleField;
+                    if(!field.value || field.value===vehicleValues[key]) { field.value=contractVehicles[0][key] || ''; vehicleValues[key]=field.value; }
+                }
+                createVehicle.checked=!option && !form.elements.vehicle_id.value && !form.elements.client_asset_id?.value && (!vehicleChoiceTouched || createVehicle.checked);
+                toggleVehicleFields();
+            }
+        }
+        async function readFile({retry=false}={}) {
             const current = ++generation;
             readerAbort?.abort(); readerAbort = new AbortController();
             reading = false; validFile = false; review.checked = false; warnings.replaceChildren(); warnings.hidden = true;
+            contractVehicles=[];
+            vehicleChoiceTouched=false;
+            if(aiUsage) { aiUsage.hidden=true; aiUsage.textContent=''; }
+            if(aiRetry)aiRetry.hidden=true;
             form.querySelector('[data-contract-source]').hidden = true; manual.hidden = true;
+            if(originalUrl) { URL.revokeObjectURL(originalUrl); originalUrl=null; }
+            if(original) { original.hidden=true; original.removeAttribute('href'); }
             enableSave();
             const file = fileInput.files?.[0];
             if (!file) { status.textContent = 'Carica il contratto PDF per poter confermare la polizza.'; return; }
             if (!/\.pdf$/i.test(file.name) || (file.type && file.type !== 'application/pdf') || file.size > 10 * 1024 * 1024) { status.textContent = 'Scegli un file PDF di massimo 10 MB.'; return; }
             validFile = true; reading = true; manual.hidden = false; enableSave();
+            if(original) { originalUrl=URL.createObjectURL(file); original.href=originalUrl; original.hidden=false; }
             const choice = form.querySelector('[data-contract-quote-choice]'); if (choice) choice.hidden = true;
             for (const [name,value] of Object.entries(autoValues)) {
                 const field = form.elements.namedItem(name);
@@ -144,27 +199,57 @@ function initPolicyContracts() {
             invalidateSchedule();
             status.textContent = 'Lettura del contratto in corso…';
             try {
-                const {readPolicyContract} = await import('./policy-contract-reader.js');
-                const result = await readPolicyContract(file, form.dataset.ocrBase, message => { if (current === generation) status.textContent = message; }, readerAbort.signal);
-                if (current !== generation || !form.isConnected) return;
-                const parsed = parsePolicyContract(result.text, catalog);
+                const useAi=Boolean(ai.ready && aiChoice?.checked);
+                let result, parsed, aiFailure;
+                if(useAi) {
+                    status.textContent='Lettura AI del contratto in corso…';
+                    aiInFlight=current;
+                    try {
+                        const body=new FormData(); body.append('contract',file); body.append('ai_processing','1'); if(retry)body.append('retry','1');
+                        const response=await fetch(ai.url,{method:'POST',credentials:'same-origin',signal:readerAbort.signal,headers:{Accept:'application/json','X-CSRF-TOKEN':form.elements._token.value},body});
+                        const data=await response.json();
+                        if(current!==generation || !form.isConnected) return;
+                        if(!response.ok) { const error=new Error(Object.values(data.errors || {}).flat().join(' ') || 'La lettura AI non è disponibile.'); error.retryAllowed=data.ai_retry_allowed===true; throw error; }
+                        parsed=interpretAiContract(data.extraction,catalog);
+                        result={skipped:0,ai:true,text:(data.extraction.fields || []).filter(field=>field.quote && field.page).map(field=>`Pagina ${field.page}: ${field.quote}`).join('\n\n')};
+                        if(aiUsage) { aiUsage.hidden=false; aiUsage.textContent=data.usage.cached ? 'Lettura precedente riutilizzata: nessun nuovo consumo AI.' : `Consumo AI: ${data.usage.tokens===null ? 'token da verificare' : new Intl.NumberFormat('it-IT').format(data.usage.tokens)+' token'} / ${data.usage.cost}.`; }
+                    } catch(error) {
+                        if(error.name==='AbortError' || current!==generation) return;
+                        aiFailure='Lettura AI non completata. '+error.message+' Sono mostrati i dati riconosciuti dalla lettura standard.';
+                        if(aiRetry)aiRetry.hidden=!error.retryAllowed;
+                    } finally { if(aiInFlight===current)aiInFlight=0; }
+                }
+                if(!parsed) {
+                    const {readPolicyContract}=await import('./policy-contract-reader.js');
+                    result=await readPolicyContract(file,form.dataset.ocrBase,message=>{ if(current===generation)status.textContent=message; },readerAbort.signal);
+                    if(current!==generation || !form.isConnected) return;
+                    parsed=parsePolicyContract(result.text,catalog);
+                    if(aiFailure)parsed.warnings.unshift(aiFailure);
+                }
+                contractVehicles=parsed.vehicles || [];
                 for (const name of ['category','company', ...Object.keys(parsed.values).filter(name => !['category','company'].includes(name))]) {
                     if (current !== generation) return;
                     if (parsed.values[name] !== undefined) await setField(name, parsed.values[name]);
                 }
+                if(parsed.values.tacit_renewal===undefined && !transition) { await setField('tacit_renewal',''); fieldNote(form.elements.tacit_renewal,'Non indicato nel contratto.'); }
+                for(const [name,note] of Object.entries(parsed.notes || {})) if(parsed.values[name]!==undefined && autoValues[name]===parsed.values[name]) fieldNote(form.elements.namedItem(name),note);
+                await linkContractVehicle();
+                const firstDetails=form.querySelector('[data-contract-first-installment]');
+                if(firstDetails) firstDetails.open=Boolean(form.elements.first_installment_premium.value && form.elements.first_installment_premium.value!==form.elements.installment_premium.value);
                 for (const message of parsed.warnings) addWarning(message);
                 if (result.skipped) addWarning(`${result.skipped} pagine non sono state lette automaticamente. Controlla il documento completo.`);
                 const picker = form.querySelector('[data-policy-client-picker]');
                 const selectedName = picker?.querySelector('[name="client_id"]')?.value ? picker.querySelector('[data-client-search]').value : catalog.client?.name;
                 if (selectedName && parsed.client.name && selectedName.trim().toLocaleUpperCase('it') !== parsed.client.name.trim().toLocaleUpperCase('it')) addWarning(`Contraente da verificare: nel contratto è indicato “${parsed.client.name}”, mentre hai selezionato “${selectedName}”.`);
                 picker?.dispatchEvent(new CustomEvent('contract-client-read', {detail:parsed.client}));
+                form.dispatchEvent(new Event('contract-data-read'));
                 form.querySelector('[data-contract-text]').textContent = result.text || 'Nessun testo leggibile trovato.';
+                form.querySelector('[data-contract-source] summary').textContent=result.ai ? 'Consulta i riferimenti letti dall’AI' : 'Consulta il testo letto dal contratto';
                 form.querySelector('[data-contract-source]').hidden = false;
-                const missing = ['number','category','company','starts_on','expires_on','premium','payment_frequency','payment_method'].filter(name => !form.elements.namedItem(name)?.value);
+                const missing = updateMissing();
                 for (const name of missing) fieldNote(form.elements.namedItem(name), 'Da completare: dato non riconosciuto nel contratto.');
-                if (missing.length) addWarning(`Completa: ${missing.map(name => contractLabels[name]).join(', ')}.`);
-                const count = Object.keys(autoValues).length;
-                status.textContent = count ? `Lettura completata: ${count} campi compilati. Controlla i dati prima di confermare.` : 'Nessun dato riconosciuto con certezza. Puoi compilare i campi controllando il contratto.';
+                const count = Object.values(autoValues).filter(value=>value!=='').length;
+                status.textContent = count ? `Lettura completata: ${count} ${count === 1 ? 'campo compilato' : 'campi compilati'}. Controlla i dati prima di confermare.` : 'Nessun dato riconosciuto con certezza. Puoi compilare i campi controllando il contratto.';
             } catch (error) {
                 if (current !== generation) return;
                 status.textContent = error.message?.startsWith('Il PDF') || error.message?.startsWith('La lettura') ? error.message : 'Non è stato possibile leggere il PDF. Puoi riprovare con una copia leggibile oppure compilare i dati controllando il contratto.';
@@ -173,7 +258,11 @@ function initPolicyContracts() {
             }
         }
         fileInput.addEventListener('change', readFile);
-        manual.addEventListener('click', () => { generation++; readerAbort?.abort(); reading = false; manual.hidden = true; showFields(); status.textContent = 'Lettura interrotta. Completa i dati controllando il contratto.'; void renderSchedule(); enableSave(); });
+        createVehicle?.addEventListener('change',()=>{ vehicleChoiceTouched=true; toggleVehicleFields(); differences(); });
+        form.addEventListener('change',event=>{ if(['vehicle_id','client_asset_id'].includes(event.target.name)) toggleVehicleFields(); });
+        aiRetry?.addEventListener('click',()=>{ if(!reading)void readFile({retry:true}); });
+        aiChoice?.addEventListener('change',()=>{ if(fileInput.files?.length && !reading) void readFile(); });
+        manual.addEventListener('click', () => { const pendingAi=aiInFlight===generation; generation++; readerAbort?.abort(); reading = false; manual.hidden = true; showFields(); status.textContent = 'Lettura interrotta. Completa i dati controllando il contratto.'; if(pendingAi && aiUsage) { aiUsage.hidden=false; aiUsage.textContent='La richiesta AI era già partita e potrebbe aver generato un consumo. Verifica AI e consumi prima di ripetere la lettura.'; } void renderSchedule(); enableSave(); });
         refresh.addEventListener('click', () => { review.checked = false; void renderSchedule(); });
         form.addEventListener('input', event => {
             if(event.target.name==='company')updateRenewalMode();
@@ -181,8 +270,13 @@ function initPolicyContracts() {
             if (!['contract_reviewed','quote_changes_confirmed'].includes(event.target.name)) review.checked = false;
             if (scheduleNames.includes(event.target.name) || (transition && !['contract','contract_reviewed','quote_changes_confirmed'].includes(event.target.name))) invalidateSchedule();
             if (Object.hasOwn(catalog.quote || {}, event.target.name)) differences();
+            if(!reading && validFile) {
+                const note=event.target.closest('.form-g')?.querySelector('.contract-field-note');
+                if(note && event.target.value!==autoValues[event.target.name]) note.remove();
+                updateMissing();
+            }
         });
-        form.addEventListener('change', event => { if(event.target.name==='company')updateRenewalMode(); if (event.target.name === 'titles_mode' || (transition && !['contract','contract_reviewed','quote_changes_confirmed'].includes(event.target.name))) invalidateSchedule(); });
+        form.addEventListener('change', event => { if(event.target.name==='company')updateRenewalMode(); if (event.target.name === 'titles_mode' || (transition && !['contract','contract_reviewed','quote_changes_confirmed'].includes(event.target.name))) invalidateSchedule(); if(!reading && validFile)updateMissing(); });
         form.querySelector('[data-use-contract-quote]')?.addEventListener('click', () => {
             const select = form.querySelector('[data-contract-quote]');
             if (select.value) window.location.assign(select.value); else select.focus();
@@ -209,8 +303,9 @@ function initPolicyContracts() {
             finally { submitting = false; save.textContent = saveLabel; enableSave(); }
         });
         if (form.dataset.restore === 'true') { showFields(); status.textContent = 'I dati inseriti sono conservati. Ricarica il contratto PDF e controllali prima di confermare.'; }
-        form.addEventListener('client-context-loaded', () => { review.checked = false; differences(); });
-        window.addEventListener('pagehide', () => { readerAbort?.abort(); scheduleAbort?.abort(); clearTimeout(scheduleTimer); }, {once:true});
+        form.addEventListener('client-context-loaded', () => { review.checked = false; void linkContractVehicle(); differences(); });
+        window.addEventListener('pagehide', () => { readerAbort?.abort(); scheduleAbort?.abort(); clearTimeout(scheduleTimer); if(originalUrl)URL.revokeObjectURL(originalUrl); }, {once:true});
+        initContractPreparation(form);
         differences();
         updateRenewalMode();
     });

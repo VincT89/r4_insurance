@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 class AuditLog extends Model
 {
     public const ACTIONS = [
+        'inbound_email_received', 'inbound_email_associated',
         'document_signed',
         'allowance_recorded','allowance_voided','allowance_coverage_confirmed','allowance_coverage_revoked',
         'allowance_recovery_recorded','allowance_recovery_voided',
@@ -162,6 +163,7 @@ class AuditLog extends Model
     public function getDisplayActionLabelAttribute(): string
     {
         return match ($this->action) {
+            'inbound_email_received','inbound_email_associated' => 'Email ricevute',
             'allowance_recorded','allowance_voided' => 'Abbuoni',
             'allowance_coverage_confirmed','allowance_coverage_revoked' => 'Conferma copertura',
             'registry_import_completed' => 'Importazione anagrafiche',

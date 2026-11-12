@@ -51,6 +51,16 @@ class DashboardController extends Controller
             ->selectRaw('COUNT(*) as count, '.\App\Models\InsuranceCollection::totalsSql())->first();
         $claimActivities=\App\Models\InsuranceClaimActivity::pending()->visibleTo($request->user())->where('due_on','<',today()->addDays(4)->toDateString())->with(['claim.client','claim.assignee'])->orderBy('due_on')->orderBy('id')->paginate(\App\Support\TableListing::perPage(8),['*'],'claims_page')->withQueryString();
         $paymentSummary = app(\App\Services\InsurancePaymentSummary::class)->forQuery(\App\Models\InsuranceTitle::visibleTo($request->user()));
-        return view('dashboard', compact('overview', 'period', 'duePolicies', 'missingDocuments', 'todayPolicies','dueTitles','claimActivities','paymentSummary','titlesDates','todayCollections'));
+        $openPractices = $query->forUser($request->user(), ['work'=>'open'])->with(['client', 'contracts'])
+            ->orderByRaw("CASE WHEN status='review' THEN 0 ELSE 1 END")->orderByDesc('updated_at')->orderByDesc('id')->limit(3)->get();
+        $workTasks = app(\App\Services\PolicyWorkOverview::class)->forPolicies($openPractices, $request->user());
+        $pendingSignatures = \App\Models\InsuranceFormDocument::where('signature_required', true)
+            ->whereHas('package', fn ($q) => $q->whereIn('client_id', Client::current()->visibleTo($request->user())->select('id')))
+            ->whereDoesntHave('latestSubmission', fn ($q) => $q->where('status','validated'))
+            ->with(['package.client:id,name', 'package.policy:id,number', 'latestSubmission:id,insurance_form_document_id,version,status'])
+            ->orderByDesc('insurance_form_package_id')->orderBy('id')->limit(5)->get(['id','insurance_form_package_id','title']);
+        $pendingCommunications = $request->user()->can('communications.manage')
+            ? app(\App\Services\CollectionCommunicationStatus::class)->pending(app(\App\Services\CollectionCommunicationStatus::class)->payments($request->user()))->count() : 0;
+        return view('dashboard', compact('overview', 'period', 'duePolicies', 'missingDocuments', 'todayPolicies','dueTitles','claimActivities','paymentSummary','titlesDates','todayCollections','openPractices','workTasks','pendingSignatures','pendingCommunications'));
     }
 }

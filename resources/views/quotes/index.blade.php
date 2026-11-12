@@ -1,4 +1,5 @@
 <x-app-layout title="Preventivi">
+<p class="page-back-row"><a href="{{ route('quotes.offers', $selectedClient ? ['client'=>$selectedClient->id] : []) }}">Riepilogo offerte e confronto</a></p>
 <x-page-header><x-slot:title>Preventivi{{ $selectedClient ? ' / '.$selectedClient->name : '' }}</x-slot:title><x-slot:actions>@if($selectedClient)<a class="btn btn-g" href="{{ route('clients.show',$selectedClient) }}">Scheda cliente</a><a class="btn btn-g" href="{{ route('quotes.index') }}">Tutti i preventivi</a>@endif @can('create',\App\Models\Client::class)<a class="btn btn-p" href="{{ route('quotes.create', $selectedClient ? ['client_id'=>$selectedClient->id] : []) }}">Nuovo preventivo</a>@endcan</x-slot:actions></x-page-header>
 <form id="quotes-filters" method="GET" class="client-search-form" aria-label="Filtra preventivi" data-list-filters>
 @if($filters['client']??null)<input type="hidden" name="client" value="{{ $filters['client'] }}">@endif

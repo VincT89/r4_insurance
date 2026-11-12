@@ -48,6 +48,9 @@ export async function mount(root) {
     eventBus.on('pagesinit', () => {
         root.dispatchEvent(new CustomEvent('document:ready', {detail:{pages:documentPdf.numPages}}));
         viewer.currentScaleValue = zoom.value;
+        const initialPage = Number(root.dataset.initialPage || 1);
+        if (Number.isInteger(initialPage) && initialPage >= 1 && initialPage <= documentPdf.numPages) viewer.currentPageNumber = initialPage;
+        else { root.dataset.state = 'error'; status.textContent = 'La pagina indicata non è presente nel PDF. Controlla la fonte del dato.'; }
         pageNumber.max = documentPdf.numPages;
         root.querySelector('[data-page-count]').textContent = `di ${documentPdf.numPages}`;
         root.querySelectorAll('.document-preview-toolbar button, .document-preview-toolbar input, .document-preview-toolbar select').forEach(control => { control.disabled = false; });
@@ -71,6 +74,7 @@ export async function mount(root) {
     on(query, 'search', () => { if (!query.value) { eventBus.dispatch('find', { source: root, type: '', query: '' }); searchStatus.textContent = ''; } });
     const observer = new ResizeObserver(() => { if (documentPdf && ['page-width', 'page-fit'].includes(zoom.value)) viewer.currentScaleValue = zoom.value; });
     observer.observe(container);
+    on(root, 'document:dispose', cleanup);
     timer = setTimeout(() => { fail('Il documento impiega troppo tempo a caricarsi. Ricarica la pagina oppure usa Scarica PDF.'); void loadingTask.destroy(); }, 45000);
     try {
         documentPdf = await loadingTask.promise;

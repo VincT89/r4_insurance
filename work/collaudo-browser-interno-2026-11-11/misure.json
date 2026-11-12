@@ -1,0 +1,830 @@
+{
+  "date": "2026-11-11",
+  "app": "R4",
+  "mode": "compiled",
+  "browser": "Codex internal browser",
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 1000
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844
+    }
+  },
+  "method": "Tre aperture sequenziali per schermata e viewport, cache normale, senza limitazione simulata di rete o CPU. Da comando di navigazione a evento load, titolo visibile e controllo principale visibile. Firma: ricaricamento fino al canvas della prima pagina renderizzato, testo del documento presente e messaggio di caricamento assente. Tempi comprensivi dell’automazione; screenshot e lettura delle dimensioni esclusi. Le sei prime misure della firma sono state sostituite perché i comandi risultavano attivi prima del rendering completo del PDF.",
+  "counts": {
+    "clients": 50,
+    "policies": 60,
+    "titles": 10,
+    "offers": 5
+  },
+  "summary": [
+    {
+      "page": "Dashboard",
+      "desktop": {
+        "samples": [
+          1515,
+          1645,
+          1651
+        ],
+        "median": 1645,
+        "min": 1515,
+        "max": 1651
+      },
+      "mobile": {
+        "samples": [
+          1736,
+          1795,
+          1858
+        ],
+        "median": 1795,
+        "min": 1736,
+        "max": 1858
+      }
+    },
+    {
+      "page": "Clienti",
+      "desktop": {
+        "samples": [
+          1443,
+          1550,
+          1557
+        ],
+        "median": 1550,
+        "min": 1443,
+        "max": 1557
+      },
+      "mobile": {
+        "samples": [
+          1435,
+          1581,
+          2081
+        ],
+        "median": 1581,
+        "min": 1435,
+        "max": 2081
+      }
+    },
+    {
+      "page": "Preventivi",
+      "desktop": {
+        "samples": [
+          1409,
+          1422,
+          1575
+        ],
+        "median": 1422,
+        "min": 1409,
+        "max": 1575
+      },
+      "mobile": {
+        "samples": [
+          1478,
+          1542,
+          2615
+        ],
+        "median": 1542,
+        "min": 1478,
+        "max": 2615
+      }
+    },
+    {
+      "page": "Confronto",
+      "desktop": {
+        "samples": [
+          1579,
+          1848,
+          1929
+        ],
+        "median": 1848,
+        "min": 1579,
+        "max": 1929
+      },
+      "mobile": {
+        "samples": [
+          1615,
+          1767,
+          2850
+        ],
+        "median": 1767,
+        "min": 1615,
+        "max": 2850
+      }
+    },
+    {
+      "page": "Polizze",
+      "desktop": {
+        "samples": [
+          1574,
+          1814,
+          1907
+        ],
+        "median": 1814,
+        "min": 1574,
+        "max": 1907
+      },
+      "mobile": {
+        "samples": [
+          1534,
+          1890,
+          2414
+        ],
+        "median": 1890,
+        "min": 1534,
+        "max": 2414
+      }
+    },
+    {
+      "page": "Titoli",
+      "desktop": {
+        "samples": [
+          1589,
+          1698,
+          1935
+        ],
+        "median": 1698,
+        "min": 1589,
+        "max": 1935
+      },
+      "mobile": {
+        "samples": [
+          1573,
+          1687,
+          2915
+        ],
+        "median": 1687,
+        "min": 1573,
+        "max": 2915
+      }
+    },
+    {
+      "page": "Scadenze",
+      "desktop": {
+        "samples": [
+          1563,
+          1599,
+          1652
+        ],
+        "median": 1599,
+        "min": 1563,
+        "max": 1652
+      },
+      "mobile": {
+        "samples": [
+          1587,
+          1618,
+          2369
+        ],
+        "median": 1618,
+        "min": 1587,
+        "max": 2369
+      }
+    },
+    {
+      "page": "Contabilità",
+      "desktop": {
+        "samples": [
+          1699,
+          1792,
+          1892
+        ],
+        "median": 1792,
+        "min": 1699,
+        "max": 1892
+      },
+      "mobile": {
+        "samples": [
+          1671,
+          1689,
+          1771
+        ],
+        "median": 1689,
+        "min": 1671,
+        "max": 1771
+      }
+    },
+    {
+      "page": "Comunicazioni",
+      "desktop": {
+        "samples": [
+          1581,
+          1622,
+          1672
+        ],
+        "median": 1622,
+        "min": 1581,
+        "max": 1672
+      },
+      "mobile": {
+        "samples": [
+          1568,
+          1631,
+          2038
+        ],
+        "median": 1631,
+        "min": 1568,
+        "max": 2038
+      }
+    },
+    {
+      "page": "Firma",
+      "desktop": {
+        "samples": [
+          1693,
+          1958,
+          1996
+        ],
+        "median": 1958,
+        "min": 1693,
+        "max": 1996
+      },
+      "mobile": {
+        "samples": [
+          1708,
+          1852,
+          2204
+        ],
+        "median": 1852,
+        "min": 1708,
+        "max": 2204
+      }
+    }
+  ],
+  "samples": [
+    {
+      "view": "desktop",
+      "round": 1,
+      "page": "Dashboard",
+      "ms": 1515,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 1,
+      "page": "Clienti",
+      "ms": 1550,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 1,
+      "page": "Preventivi",
+      "ms": 1409,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 1,
+      "page": "Confronto",
+      "ms": 1579,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 1,
+      "page": "Polizze",
+      "ms": 1574,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 1,
+      "page": "Titoli",
+      "ms": 1698,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 1,
+      "page": "Scadenze",
+      "ms": 1563,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 1,
+      "page": "Contabilità",
+      "ms": 1792,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 1,
+      "page": "Comunicazioni",
+      "ms": 1581,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 2,
+      "page": "Dashboard",
+      "ms": 1645,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 2,
+      "page": "Clienti",
+      "ms": 1557,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 2,
+      "page": "Preventivi",
+      "ms": 1422,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 2,
+      "page": "Confronto",
+      "ms": 1848,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 2,
+      "page": "Polizze",
+      "ms": 1907,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 2,
+      "page": "Titoli",
+      "ms": 1589,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 2,
+      "page": "Scadenze",
+      "ms": 1599,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 2,
+      "page": "Contabilità",
+      "ms": 1892,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 2,
+      "page": "Comunicazioni",
+      "ms": 1622,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 3,
+      "page": "Dashboard",
+      "ms": 1651,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 3,
+      "page": "Clienti",
+      "ms": 1443,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 3,
+      "page": "Preventivi",
+      "ms": 1575,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 3,
+      "page": "Confronto",
+      "ms": 1929,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 3,
+      "page": "Polizze",
+      "ms": 1814,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 3,
+      "page": "Titoli",
+      "ms": 1935,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 3,
+      "page": "Scadenze",
+      "ms": 1652,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 3,
+      "page": "Contabilità",
+      "ms": 1699,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 3,
+      "page": "Comunicazioni",
+      "ms": 1672,
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "view": "mobile",
+      "round": 1,
+      "page": "Dashboard",
+      "ms": 1858,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 1,
+      "page": "Clienti",
+      "ms": 1581,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 1,
+      "page": "Preventivi",
+      "ms": 2615,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 1,
+      "page": "Confronto",
+      "ms": 2850,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 1,
+      "page": "Polizze",
+      "ms": 2414,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 1,
+      "page": "Titoli",
+      "ms": 2915,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 1,
+      "page": "Scadenze",
+      "ms": 2369,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 1,
+      "page": "Contabilità",
+      "ms": 1689,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 1,
+      "page": "Comunicazioni",
+      "ms": 1631,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 2,
+      "page": "Dashboard",
+      "ms": 1795,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 2,
+      "page": "Clienti",
+      "ms": 1435,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 2,
+      "page": "Preventivi",
+      "ms": 1478,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 2,
+      "page": "Confronto",
+      "ms": 1615,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 2,
+      "page": "Polizze",
+      "ms": 1534,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 2,
+      "page": "Titoli",
+      "ms": 1687,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 2,
+      "page": "Scadenze",
+      "ms": 1618,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 2,
+      "page": "Contabilità",
+      "ms": 1671,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 2,
+      "page": "Comunicazioni",
+      "ms": 2038,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 3,
+      "page": "Dashboard",
+      "ms": 1736,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 3,
+      "page": "Clienti",
+      "ms": 2081,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 3,
+      "page": "Preventivi",
+      "ms": 1542,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 3,
+      "page": "Confronto",
+      "ms": 1767,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 3,
+      "page": "Polizze",
+      "ms": 1890,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 3,
+      "page": "Titoli",
+      "ms": 1573,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 3,
+      "page": "Scadenze",
+      "ms": 1587,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 3,
+      "page": "Contabilità",
+      "ms": 1771,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 3,
+      "page": "Comunicazioni",
+      "ms": 1568,
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "view": "mobile",
+      "round": 1,
+      "page": "Firma",
+      "ms": 1852,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "view": "mobile",
+      "round": 2,
+      "page": "Firma",
+      "ms": 2204,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "view": "mobile",
+      "round": 3,
+      "page": "Firma",
+      "ms": 1708,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "view": "desktop",
+      "round": 1,
+      "page": "Firma",
+      "ms": 1693,
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 2,
+      "page": "Firma",
+      "ms": 1996,
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "view": "desktop",
+      "round": 3,
+      "page": "Firma",
+      "ms": 1958,
+      "scrollWidth": 1440,
+      "width": 1440
+    }
+  ],
+  "exploratoryOperatorSteps": [
+    {
+      "view": "desktop",
+      "step": "Ricerca cliente",
+      "ms": 912,
+      "actions": 2
+    },
+    {
+      "view": "desktop",
+      "step": "Apertura scheda cliente",
+      "ms": 2269,
+      "actions": 1
+    },
+    {
+      "view": "desktop",
+      "step": "Salvataggio richiesta preventivo",
+      "ms": 1458,
+      "actions": 1
+    },
+    {
+      "view": "desktop",
+      "step": "Apertura confronto due offerte",
+      "ms": 1326,
+      "actions": 1
+    },
+    {
+      "view": "desktop",
+      "step": "Apertura modulo incasso",
+      "ms": 4455,
+      "actions": 1
+    },
+    {
+      "view": "desktop",
+      "step": "Conferma incasso dimostrativo",
+      "ms": 1509,
+      "actions": 1,
+      "flowActions": 4
+    },
+    {
+      "view": "desktop",
+      "step": "Preparazione email incassi",
+      "ms": 5775,
+      "actions": 1
+    },
+    {
+      "view": "mobile",
+      "step": "Salto ai titoli in Dashboard",
+      "ms": 112,
+      "actions": 1
+    },
+    {
+      "view": "mobile",
+      "step": "Filtro date titoli Dashboard",
+      "ms": 2242,
+      "actions": 3
+    },
+    {
+      "view": "mobile",
+      "step": "Ricerca cliente",
+      "ms": 912,
+      "actions": 2
+    },
+    {
+      "view": "mobile",
+      "step": "Apertura scheda cliente",
+      "ms": 1380,
+      "actions": 1
+    },
+    {
+      "view": "mobile",
+      "step": "Apertura modulo incasso dalla polizza",
+      "ms": 1136,
+      "actions": 1
+    },
+    {
+      "view": "mobile",
+      "step": "Salvataggio firma simulata fino alla copia nello storico",
+      "ms": 2881,
+      "actions": 1
+    }
+  ],
+  "operatorStepsNote": "Misure esplorative in modalità mista Vite/compilata, non direttamente confrontabili con il benchmark finale. actions indica il flusso descritto, ms può misurare il solo comando conclusivo. Per incasso flowActions=4 dal comando Incassa.",
+  "tests": {
+    "application": {
+      "passed": 79,
+      "assertions": 857
+    },
+    "frontend": {
+      "passed": 81
+    },
+    "build": "passed",
+    "diffCheck": "passed"
+  }
+}

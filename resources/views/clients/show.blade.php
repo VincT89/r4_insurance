@@ -81,6 +81,7 @@
         @include('clients.partials.vehicles')
     @elseif($tab === 'documents')
         @include('clients.partials.documents')
+        <x-inbound-emails :client="$client" />
     @elseif($tab === 'network')
         @include('clients.partials.network')
     @elseif($tab === 'assets')

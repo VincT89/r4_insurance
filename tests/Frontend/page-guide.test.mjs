@@ -5,6 +5,15 @@ import { resolvePageGuide } from '../../resources/js/page-guide-content.js';
 const policy = (extra = {}) => resolvePageGuide({ route: 'clients.policies.show', section: 'overview', paymentState: 'open', ...extra });
 const email = (extra = {}) => resolvePageGuide({ route: 'agency-communications.show', messageState: 'review', mailReady: true, recipientReady: true, ...extra });
 
+test('incoming mail and comparison explain their own actions without treating association as approval', () => {
+    const inbox = resolvePageGuide({route:'inbound-emails.index'});
+    assert.equal(inbox.title,'Email ricevute');
+    assert.ok(inbox.actions.some(item=>item.target.selector==='.inbound-email-views'));
+    assert.match(resolvePageGuide({route:'inbound-emails.show'}).check,/Non approva/);
+    assert.equal(resolvePageGuide({route:'quotes.offers'}).title,'Offerte e confronto');
+    assert.match(resolvePageGuide({route:'quotes.compare'}).check,/distinta dall’approvazione/);
+});
+
 test('policy guidance follows the active tab rather than always proposing an incasso', () => {
     assert.equal(policy({ section: 'payments' }).title, 'Titoli e pagamenti');
     assert.equal(policy({ section: 'forms' }).title, 'Moduli e firme');

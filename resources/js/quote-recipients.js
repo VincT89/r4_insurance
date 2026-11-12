@@ -89,9 +89,11 @@ function initQuoteRecipients() {
                 else refresh();
             }
             form.addEventListener('quote-recipients-context', refreshEntryContext);
-            form.addEventListener('client-context-cleared', () => {
-                manualChoices.clear(); groupKeys.clear();
-                boxes.forEach(box => { box.checked = false; });
+            form.addEventListener('client-context-cleared', (event) => {
+                if (!event.detail?.preserveRecipients) {
+                    manualChoices.clear(); groupKeys.clear();
+                    boxes.forEach(box => { box.checked = false; });
+                }
                 refreshEntryContext();
             });
             refreshEntryContext();

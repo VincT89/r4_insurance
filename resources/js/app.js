@@ -20,6 +20,7 @@ import './policy-contract.js';
 import './document-expiry.js';
 import './quote-vehicle.js';
 import './quote-recipients.js';
+import './quote-comparison.js';
 import './client-fiscal-check.js';
 import './page-guide.js';
 import './signing-stations.js';

@@ -39,6 +39,12 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'force.password.change'])->group(function () {
+    Route::prefix('inbound-emails')->name('inbound-emails.')->middleware('can:communications.manage')->group(function () {
+        Route::get('/', [\App\Http\Controllers\InboundEmailController::class, 'index'])->name('index');
+        Route::get('/{inboundEmail}', [\App\Http\Controllers\InboundEmailController::class, 'show'])->whereUuid('inboundEmail')->name('show');
+        Route::patch('/{inboundEmail}/association', [\App\Http\Controllers\InboundEmailController::class, 'associate'])->whereUuid('inboundEmail')->middleware('throttle:30,1')->name('associate');
+        Route::get('/{inboundEmail}/files/{file}', [\App\Http\Controllers\InboundEmailController::class, 'download'])->whereUuid('inboundEmail')->whereNumber('file')->name('files.download');
+    });
     Route::get('/settings/signing-stations',[\App\Http\Controllers\SigningStationController::class,'index'])->name('signing-stations.index');
     Route::post('/settings/signing-stations',[\App\Http\Controllers\SigningStationController::class,'pair'])->middleware('throttle:10,1')->name('signing-stations.pair');
     Route::post('/settings/signing-stations/{station}/revoke',[\App\Http\Controllers\SigningStationController::class,'revoke'])->whereUuid('station')->name('signing-stations.revoke');
@@ -95,6 +101,12 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/quotes',[\App\Http\Controllers\InsuranceQuoteController::class,'index'])->name('quotes.index');
     Route::get('/quotes/create',[\App\Http\Controllers\InsuranceQuoteController::class,'create'])->name('quotes.create');
+    Route::get('/quotes/offers',[\App\Http\Controllers\QuoteComparisonController::class,'index'])->name('quotes.offers');
+    Route::get('/quotes/compare',[\App\Http\Controllers\QuoteComparisonController::class,'show'])->name('quotes.compare');
+    Route::get('/quotes/offers/upload',[\App\Http\Controllers\QuoteComparisonController::class,'upload'])->name('quotes.offers.upload');
+    Route::post('/quotes/{quoteCase}/offers',[\App\Http\Controllers\QuoteComparisonController::class,'store'])->middleware('throttle:10,1')->name('quotes.offers.store');
+    Route::post('/quote-proposals/{quote}/comparison/read',[\App\Http\Controllers\QuoteComparisonController::class,'read'])->middleware('throttle:10,1')->name('quotes.comparison.read');
+    Route::post('/quote-proposals/{quote}/comparison/{action}',[\App\Http\Controllers\QuoteComparisonController::class,'update'])->where('action','correct|verify|coverage|prefer')->name('quotes.comparison.update');
     Route::post('/quotes',[\App\Http\Controllers\InsuranceQuoteController::class,'store'])->name('quotes.store');
     Route::get('/quotes/{quoteCase}',[\App\Http\Controllers\InsuranceQuoteController::class,'show'])->name('quotes.show');
     Route::post('/quotes/{quoteCase}/documents',[\App\Http\Controllers\InsuranceQuoteController::class,'documents'])->middleware('throttle:10,1')->name('quotes.documents.store');
@@ -251,6 +263,10 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::delete('/attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
 
     Route::get('/audit-logs', [AuditLogController::class, 'index'])->middleware('can:system.admin')->name('audit-logs.index');
+    Route::get('/ai', [\App\Http\Controllers\AiController::class, 'index'])->middleware('can:system.admin')->name('ai.index');
+    Route::patch('/ai/settings', [\App\Http\Controllers\AiController::class, 'update'])->middleware(['can:system.admin','throttle:10,1'])->name('ai.update');
+    Route::post('/ai/usages/{usage}/reconcile', [\App\Http\Controllers\AiController::class, 'reconcile'])->middleware(['can:system.admin','throttle:10,1'])->name('ai.reconcile');
+    Route::post('/ai/contracts/read', [\App\Http\Controllers\AiController::class, 'extract'])->middleware('throttle:10,1')->name('ai.contracts.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsReadAndRedirect'])->name('notifications.read');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');

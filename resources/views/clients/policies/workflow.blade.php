@@ -1,4 +1,4 @@
-<x-panel title="Lavorazione" padded>
+<x-panel title="Lavorazione" padded id="policy-work">
     @if($policy->work_closed_at)
         <p>Completata il {{ $policy->work_closed_at->format('d/m/Y H:i') }} da {{ $policy->workClosedBy?->name ?: 'Utente non disponibile' }}.</p>
         <p class="u-text-meta">Dal {{ $policy->work_closed_at->copy()->addDay()->format('d/m/Y') }} le modifiche sono riservate all’admin. Lo stato del contratto resta {{ mb_strtolower($policy->status_label) }}.</p>

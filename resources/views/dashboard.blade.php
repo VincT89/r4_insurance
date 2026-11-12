@@ -1,9 +1,14 @@
 <x-app-layout title="Dashboard">
+    <div class="dashboard-page">
     <x-page-header>
         <x-slot:title>Dashboard</x-slot:title>
         <x-slot:actions>@can('create', \App\Models\Client::class)<a href="{{ route('clients.create') }}" class="btn btn-g">Nuovo cliente</a><a href="{{ route('policies.create') }}" class="btn btn-p">Nuova polizza</a>@endcan</x-slot:actions>
     </x-page-header>
     @if($overview)
+        <form method="GET" action="{{ route('policies.index') }}" class="dashboard-find" aria-label="Trova una polizza">
+            <div><label for="dashboard-search">Trova una polizza</label><input id="dashboard-search" class="form-in" type="search" name="search" maxlength="255" placeholder="Cliente, targa o numero polizza" required></div><button class="btn btn-p">Cerca</button>
+        </form>
+        <a href="#due-titles" class="btn btn-g btn-sm dashboard-titles-shortcut">Vai ai titoli da incassare</a>
         <section class="overview-totals" aria-label="Situazione del portafoglio">
             @foreach([
                 ['Clienti', $overview['clients'], route('clients.index'), false],
@@ -17,7 +22,7 @@
         <x-payment-summary :summary="$paymentSummary" />
         <div class="workspace-columns">
             <section class="workspace-primary" aria-label="Operatività e scadenze">
-                <x-panel title="Titoli da incassare" id="due-titles">
+                <x-panel title="Titoli da incassare" id="due-titles" tabindex="-1">
                     <x-slot:headerActions><a class="btn btn-g btn-sm" href="{{ route('titles.index',['state'=>'open']) }}">Tutti i titoli</a></x-slot:headerActions>
                     <form method="GET" action="{{ route('dashboard') }}#due-titles" class="client-search-form" aria-label="Scadenza dei titoli">
                         <input type="hidden" name="period" value="{{ $period }}">
@@ -26,10 +31,30 @@
                         <div class="search-form-actions"><button class="btn btn-p">Filtra titoli</button><a class="btn btn-g" href="{{ route('dashboard',['period'=>$period]) }}#due-titles">Azzera date</a></div>
                     </form>
                     <p class="u-text-meta">{{ array_filter($titlesDates) ? 'Titoli con residuo nel periodo scelto.' : 'Titoli scaduti e in scadenza entro '.$period.' giorni.' }}</p>
-                    <div class="client-table-scroll" role="region" aria-label="Titoli da incassare" tabindex="0"><table class="t-table"><thead><tr><th>Scadenza</th><th>Cliente e polizza</th><th>Residuo</th><th>Stato</th></tr></thead><tbody>
-                        @forelse($dueTitles as $title)<tr><td class="u-nowrap"><x-status-text :alert="$title->state === 'overdue'">{{ $title->due_on->format('d/m/Y') }}</x-status-text></td><td>{{ $title->policy->client->name }}<div><a href="{{ route('titles.show',$title) }}">{{ $title->policy->number }} / #{{ $title->id }}</a></div><div class="u-text-meta">{{ $title->payment_frequency }}</div></td><td class="u-nowrap"><x-status-text :alert="in_array($title->state, ['due_today', 'partial', 'overdue'], true)">{{ \App\Support\Money::format($title->balance_cents) }}</x-status-text></td><td><x-title-status :title="$title" /></td></tr>
+                    <div class="client-table-scroll" role="region" aria-label="Titoli da incassare" tabindex="0"><table class="t-table dashboard-due-table"><thead><tr><th>Scadenza e stato</th><th>Cliente e polizza</th><th>Residuo</th><th>Azioni</th></tr></thead><tbody>
+                        @forelse($dueTitles as $title)
+                            <tr>
+                                <td><span class="dashboard-title-date"><x-status-text :alert="$title->state === 'overdue'">{{ $title->due_on->format('d/m/Y') }}</x-status-text></span><small class="dashboard-title-state"><x-title-status :title="$title" /></small></td>
+                                <td>{{ $title->policy->client->name }}<div><a href="{{ route('titles.show',$title) }}">{{ $title->policy->number }} / #{{ $title->id }}</a></div><div class="u-text-meta">{{ $title->payment_frequency }}</div></td>
+                                <td><span class="dashboard-title-amount"><x-status-text :alert="in_array($title->state, ['due_today', 'partial', 'overdue'], true)">{{ \App\Support\Money::format($title->balance_cents) }}</x-status-text></span></td>
+                                <td>
+                                    @if(auth()->user()->can('ledger.manage') && auth()->user()->can('updateRegistry',$title->policy->client))
+                                        <a class="btn btn-p btn-sm" href="{{ route('clients.policies.show',[$title->policy->client_id,$title->insurance_policy_id,'tab'=>'payments','title'=>$title->id]).'#payment-entry' }}">Incassa</a>
+                                    @else<a href="{{ route('titles.show',$title) }}">Apri titolo</a>@endif
+                                </td>
+                            </tr>
                         @empty<tr><td colspan="4">Nessun titolo da incassare nel periodo.</td></tr>@endforelse
                     </tbody></table></div>{{ $dueTitles->links() }}
+                </x-panel>
+                <x-panel title="Pratiche da completare" id="open-practices">
+                    <x-slot:headerActions><a class="btn btn-g btn-sm" href="{{ route('policies.index',['work'=>'open']) }}">Vedi tutte</a></x-slot:headerActions>
+                    @forelse($openPractices as $practice)
+                        @php($task = $workTasks[$practice->id][0] ?? null)
+                        <div class="dashboard-practice-row">
+                            <div><a class="practice-person" href="{{ route('clients.policies.show',[$practice->client_id,$practice]) }}">{{ $practice->client->name }}</a><span class="practice-reference">{{ $practice->number }}</span><p>{{ $task['detail'] ?? 'Apri la pratica per controllare la lavorazione.' }}</p></div>
+                            <a class="btn btn-g btn-sm" href="{{ $task['url'] ?? route('clients.policies.show',[$practice->client_id,$practice]) }}">{{ $task['label'] ?? 'Apri pratica' }}</a>
+                        </div>
+                    @empty<p class="practice-empty">Nessuna lavorazione aperta.</p>@endforelse
                 </x-panel>
                 <section id="today-policies" aria-label="Polizze inserite oggi">
                 <x-dashboard-section title="Polizze inserite oggi" :empty="$todayPolicies->total() === 0" message="Nessuna polizza aperta oggi e ancora attiva.">
@@ -43,10 +68,10 @@
                     <nav class="period-options" aria-label="Periodo scadenze">@foreach(['7','15','30','60'] as $days)<a href="{{ route('dashboard', ['period'=>$days]+$titlesDates) }}" class="btn btn-g btn-sm" @if($period===$days) aria-current="page" @endif>{{ $days }} giorni</a>@endforeach</nav>
                 </x-slot:actions>
                     <div class="client-table-scroll" role="region" aria-label="Prossime scadenze" tabindex="0">
-                        <table class="t-table"><thead><tr><th>Scadenza</th><th>Cliente</th><th>Polizza</th><th>Ramo</th><th>Stato</th></tr></thead><tbody>
+                        <table class="t-table dashboard-policy-table"><thead><tr><th>Scadenza</th><th>Cliente e polizza</th><th>Ramo</th><th>Stato</th></tr></thead><tbody>
                         @forelse($duePolicies as $policy)
-                            <tr><td><x-status-text :alert="$policy->is_expired">{{ $policy->expires_on->format('d/m/Y') }}</x-status-text></td><td><a href="{{ route('clients.show', $policy->client) }}">{{ $policy->client->name }}</a></td><td><a class="u-nowrap" href="{{ route('clients.policies.show', [$policy->client_id,$policy]) }}">{{ $policy->number }}</a><div class="u-text-meta">{{ $policy->company }}</div></td><td>{{ $policy->category }}</td><td><x-policy-status :policy="$policy" /></td></tr>
-                        @empty<tr><td colspan="5" class="u-empty-state">Nessuna polizza in scadenza nel periodo.</td></tr>@endforelse
+                            <tr><td><span class="dashboard-title-date"><x-status-text :alert="$policy->is_expired">{{ $policy->expires_on->format('d/m/Y') }}</x-status-text></span></td><td><a href="{{ route('clients.show', $policy->client) }}">{{ $policy->client->name }}</a><div><a href="{{ route('clients.policies.show', [$policy->client_id,$policy]) }}">{{ $policy->number }}</a></div><div class="u-text-meta">{{ $policy->company }}</div></td><td>{{ $policy->category }}</td><td><x-policy-status :policy="$policy" /></td></tr>
+                        @empty<tr><td colspan="4" class="u-empty-state">Nessuna polizza in scadenza nel periodo.</td></tr>@endforelse
                         </tbody></table>
                     </div>
                     {{ $duePolicies->links() }}
@@ -67,7 +92,13 @@
                     </details>
                     <p class="collection-summary-note">Data effettiva del pagamento. Gli storni sono esclusi.</p>
                 </x-panel>
+                <x-panel title="Firme da completare" padded>
+                    @forelse($pendingSignatures->unique(fn($doc) => $doc->package->client_id.'|'.($doc->package->insurance_policy_id ?? 'client')) as $document)
+                        <a class="dashboard-signature-link" href="{{ $document->signatureActionUrl() }}"><strong>{{ $document->package->client->name }}</strong><span>{{ $document->package->policy?->number ?: 'Moduli del cliente' }}</span><small>Apri moduli e firme</small></a>
+                    @empty<p class="practice-empty">Nessuna firma di moduli da completare.</p>@endforelse
+                </x-panel>
                 <x-panel title="Da seguire" padded>
+                    @can('communications.manage')<a class="work-queue-link" href="{{ route('agency-communications.collections',['view'=>'pending']) }}"><span>Incassi da comunicare</span><strong>{{ $pendingCommunications }}</strong></a>@endcan
                     <a class="work-queue-link" href="{{ route('titles.index', ['state'=>'overdue']) }}"><span>Sospese di cassa</span><strong><x-status-text :alert="$paymentSummary['overdue']['count'] > 0">{{ number_format($paymentSummary['overdue']['count'],0,',','.') }}</x-status-text></strong></a>
                     <a class="work-queue-link" href="{{ route('policies.index', ['status'=>'review']) }}"><span>Stato da chiarire</span><strong>{{ number_format($overview['review'],0,',','.') }}</strong></a>
                     <a class="work-queue-link" href="{{ route('deadlines.index', ['kind'=>'request','period'=>'overdue']) }}"><span>Documenti da ricevere</span><span>Apri</span></a>
@@ -83,4 +114,5 @@
     @else
         <x-panel title="Area di lavoro" padded><p class="u-mb-md">Benvenuto, {{ auth()->user()->name }}.</p><a href="{{ route('daily-notes.index') }}" class="btn btn-g">Blocco note</a></x-panel>
     @endif
+    </div>
 </x-app-layout>

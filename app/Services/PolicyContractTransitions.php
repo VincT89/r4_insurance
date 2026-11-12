@@ -105,7 +105,7 @@ class PolicyContractTransitions
         if ($kind === 'renewal' && !$companyChanged) $duplicates->where('id','!=',$source->id);
         if ($duplicates->exists()) $this->fail('Questo numero è già presente per il cliente e la compagnia. Controlla il contratto.', 'number');
         $next = new InsurancePolicy($values);
-        $rows = ($data['titles_mode'] ?? 'automatic') === 'manual' ? [] : app(InsuranceLedger::class)->plan($next);
+        $rows = ($data['titles_mode'] ?? 'automatic') === 'manual' ? [] : app(InsuranceLedger::class)->plan($next, app(PolicyContractSchedule::class)->firstInstallment($data));
         $cancel = array_map('intval', $data['cancel_titles'] ?? []);
         sort($cancel);
         if ($kind !== 'replacement' && $cancel) $this->fail('Il rinnovo conserva i titoli precedenti.');

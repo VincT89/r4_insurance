@@ -8,7 +8,10 @@ export function initializeListFilters(form) {
     const fields = details?.querySelector('.search-more-fields');
     if (!fields) return;
     initializedFilters.add(form);
-    const groups = [...form.children].filter(node => node.matches('.form-group, .form-g')).slice(1);
+    const mainFields = new Set((form.dataset.filterPrimaryNames || '').split(',').filter(Boolean));
+    const allGroups = [...form.children].filter(node => node.matches('.form-group, .form-g'));
+    /** I filtri essenziali restano visibili sul telefono; gli altri conservano valori ed etichette. */
+    const groups = mainFields.size ? allGroups.filter(group => ![...group.querySelectorAll('input, select, textarea')].some(field => mainFields.has(field.name) || mainFields.has(field.id))) : allGroups.slice(1);
     const positions = groups.map(group => {
         const position = document.createTextNode('');
         group.before(position);

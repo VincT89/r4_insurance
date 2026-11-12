@@ -1,0 +1,24 @@
+.inbound-email-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1rem;padding:1rem 0;border-bottom:1px solid var(--ap-border,#d1d5db)}
+.inbound-email-row h2{font-size:1rem;margin:0 0 .35rem;overflow-wrap:anywhere}
+.inbound-email-subject,.inbound-email-section{overflow-wrap:anywhere}
+.inbound-email-row p{margin:.2rem 0;overflow-wrap:anywhere}
+.inbound-email-message,.inbound-email-section{margin:1.5rem 0;min-width:0}
+.inbound-email-section h2{font-size:1.15rem;margin-bottom:.75rem}
+.inbound-email-details{display:grid;gap:.6rem;margin-bottom:1rem}
+.inbound-email-details>div{display:grid;grid-template-columns:minmax(7rem,1fr) minmax(0,4fr);gap:1rem}
+.inbound-email-details dt{font-weight:600}
+.inbound-email-details dd{margin:0;overflow-wrap:anywhere}
+.inbound-email-body{white-space:pre-wrap;overflow-wrap:anywhere;border-top:1px solid var(--ap-border,#d1d5db);padding-top:1rem}
+.inbound-email-files,.inbound-email-client-results{padding-left:1.25rem}
+.inbound-email-files li,.inbound-email-client-results li{margin:.6rem 0;overflow-wrap:anywhere}
+.inbound-email-files span{margin-left:1rem}
+.inbound-email-association{margin-top:1rem}
+.inbound-email-confirm{display:flex;align-items:flex-start;gap:.6rem;margin:1rem 0}
+.inbound-email-views{display:flex;gap:1.5rem;flex-wrap:wrap;border-bottom:1px solid var(--ap-border,#d1d5db);margin:1rem 0}
+.inbound-email-views a{display:block;min-height:44px;padding:.65rem 0;text-decoration:none}
+.inbound-email-views [aria-current=page]{font-weight:700;border-bottom:2px solid currentColor}
+.inbound-email-filters,.inbound-email-client-search,.inbound-email-note{margin:1rem 0}
+.inbound-email-filters summary,.inbound-email-client-search summary,.inbound-email-note summary{cursor:pointer;min-height:44px;padding:.65rem 0}
+.inbound-email-filters .client-search-form{margin-top:.5rem}
+#email-association-title{scroll-margin-top:5rem}
+@media(max-width:640px){.inbound-email-row{grid-template-columns:minmax(0,1fr);gap:.3rem}.inbound-email-details>div{grid-template-columns:minmax(0,1fr);gap:.15rem}.inbound-email-files span{display:block;margin-left:0}}

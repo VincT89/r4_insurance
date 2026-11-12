@@ -59,6 +59,7 @@ function initClientFiscalChecks() {
                     }
                     matches.append(action);
                 }
+                root.dispatchEvent(new CustomEvent('client-fiscal-checked',{bubbles:true,detail:data}));
             } catch (error) {
                 if (error.name !== 'AbortError' && generation === current && root.isConnected) status.textContent = 'Controllo momentaneamente non disponibile. I dati saranno ricontrollati quando salvi.';
             }

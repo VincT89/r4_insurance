@@ -21,7 +21,7 @@ class InsuranceLedger
         /** Identical instalments on another contract must not reuse an operator's reviewed preview. */
         return hash('sha256', json_encode([$policy->editFingerprint(), $policy->client->getRawOriginal(), $rows], JSON_THROW_ON_ERROR));
     }
-    public function plan(InsurancePolicy $policy): array
+    public function plan(InsurancePolicy $policy, ?int $firstInstallmentCents = null): array
     {
         if (!in_array($policy->status,['active','renewed'],true)) $this->fail('Genera i titoli soltanto per una polizza attiva o rinnovata.');
         if ($policy->premium===null || Money::cents($policy->premium)<=0 || !in_array($policy->payment_frequency,InsurancePolicy::PAYMENT_FREQUENCIES,true)) $this->fail('Completa premio e frazionamento della polizza prima di generare i titoli.');
@@ -34,22 +34,31 @@ class InsuranceLedger
             for($i=0;$i<120;$i++) {
                 $from=$start->copy()->addMonthsNoOverflow($i*$months); if($from->gte($end)) break;
                 $to=$start->copy()->addMonthsNoOverflow(($i+1)*$months);
-                if($to->gt($end)) $this->fail('Le date non coincidono con periodi completi del frazionamento. Inserisci i titoli manualmente con gli importi della compagnia.');
+                if($to->gt($end)) {
+                    if(!$rows && $firstInstallmentCents !== null) $to=$end->copy();
+                    else $this->fail('Le date non coincidono con periodi completi del frazionamento. Inserisci i titoli manualmente con gli importi della compagnia.');
+                }
                 $rows[]=['coverage_from'=>$from->toDateString(),'coverage_to'=>$to->toDateString(),'due_on'=>$from->toDateString()];
             }
             if (!$rows || end($rows)['coverage_to']!==$end->toDateString()) $this->fail('Intervallo troppo esteso: inserisci i titoli per singolo periodo.');
         }
         $total=Money::cents($policy->premium); $count=count($rows); $amount=intdiv($total,$count);
         if($amount<1) $this->fail('Premio insufficiente per il numero di rate.');
+        if($firstInstallmentCents !== null) {
+            $ordinary=$policy->installment_premium !== null ? Money::cents($policy->installment_premium) : 0;
+            if($firstInstallmentCents<1 || ($count>1 && $ordinary<1) || $firstInstallmentCents+$ordinary*($count-1)!==$total) $this->fail('Prima rata, rate successive e premio totale non coincidono. Controlla gli importi del contratto.');
+            foreach($rows as $index=>&$row) $row+=['amount_cents'=>$index===0 ? $firstInstallmentCents : $ordinary,'kind'=>$index===0 ? ($policy->status==='renewed' ? 'renewal' : 'emission') : 'quietance','payment_frequency'=>$policy->payment_frequency,'payment_method'=>$policy->payment_method];
+            return $rows;
+        }
         if($policy->installment_premium!==null && Money::cents($policy->installment_premium)*$count!==$total) $this->fail('Premio rata e premio totale non coincidono. Correggi gli importi oppure inserisci i titoli manualmente.');
         foreach($rows as $index=>&$row) $row+=['amount_cents'=>$amount+($index===$count-1 ? $total%$count : 0),'kind'=>$index===0 ? ($policy->status==='renewed' ? 'renewal' : 'emission') : 'quietance','payment_frequency'=>$policy->payment_frequency,'payment_method'=>$policy->payment_method];
         return $rows;
     }
-    public function generate(InsurancePolicy $policy,string $fingerprint): void
+    public function generate(InsurancePolicy $policy,string $fingerprint, ?int $firstInstallmentCents = null): void
     {
         \Illuminate\Support\Facades\Gate::authorize('ledger.manage');
-        DB::transaction(function()use($policy,$fingerprint){
-            $policy=InsurancePolicy::whereKey($policy->id)->lockForUpdate()->firstOrFail(); $rows=$this->plan($policy);
+        DB::transaction(function()use($policy,$fingerprint,$firstInstallmentCents){
+            $policy=InsurancePolicy::whereKey($policy->id)->lockForUpdate()->firstOrFail(); $rows=$this->plan($policy,$firstInstallmentCents);
             if(!hash_equals($this->previewFingerprint($policy,$rows),$fingerprint)) $this->fail('I dati sono cambiati: ricontrolla l’anteprima.');
             foreach($rows as $row) $this->insert($policy,$row);
             $this->refresh($policy); $this->log($policy,'titles_generated','generati '.count($rows).' titoli.', ['titles'=>$rows]);

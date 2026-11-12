@@ -20,6 +20,39 @@ class SigningStationsTest extends TestCase
     private Attachment $source;
     private string $pdf;
 
+    public function test_station_creation_uses_explicit_datetimes_without_legacy_mysql_timestamp_defaults(): void
+    {
+        $mysql=new \Illuminate\Database\MySqlConnection(fn()=>throw new \LogicException('No database connection expected.'));
+        $mysql->useDefaultSchemaGrammar();
+        $queries=[];
+        \Illuminate\Support\Facades\Schema::shouldReceive('hasTable')->andReturn(false);
+        \Illuminate\Support\Facades\Schema::shouldReceive('hasColumns')->andReturn(true);
+        \Illuminate\Support\Facades\Schema::shouldReceive('hasIndex')->andReturn(true);
+        \Illuminate\Support\Facades\Schema::shouldReceive('create')->times(3)->andReturnUsing(function($table,$definition)use($mysql,&$queries) {
+            $blueprint=new \Illuminate\Database\Schema\Blueprint($mysql,$table);
+            $blueprint->create(); $definition($blueprint);
+            $queries[$table]=implode("\n",$blueprint->toSql());
+        });
+        (require database_path('migrations/2026_11_09_120000_create_signing_stations.php'))->up();
+        foreach(['pairing_expires_at','credential_expires_at'] as $column) $this->assertStringContainsString('`'.$column.'` datetime not null',$queries['signing_stations']);
+        foreach(['identity_confirmed_at','expires_at'] as $column) $this->assertStringContainsString('`'.$column.'` datetime not null',$queries['station_signing_requests']);
+        $this->assertDoesNotMatchRegularExpression('/timestamp(?:\\(\\d+\\))? not null/i',implode("\n",$queries));
+        preg_match_all('/(?:index|key|constraint|unique)\\s+`([^`]+)`/i',implode("\n",$queries),$names);
+        foreach($names[1] as $name) $this->assertLessThanOrEqual(64,strlen($name),$name);
+    }
+
+    public function test_the_migration_resumes_partial_tables_and_preserves_existing_station_credentials(): void
+    {
+        [$station]=$this->device();
+        $before=$station->fresh()->getRawOriginal();
+        \Illuminate\Support\Facades\Schema::drop('station_signing_items');
+        \Illuminate\Support\Facades\Schema::table('station_signing_requests',fn($table)=>$table->dropIndex('station_requests_pending_idx'));
+        (require database_path('migrations/2026_11_09_120000_create_signing_stations.php'))->up();
+        $this->assertSame($before,$station->fresh()->getRawOriginal());
+        $this->assertTrue(\Illuminate\Support\Facades\Schema::hasIndex('station_signing_requests',['signing_station_id','status','expires_at']));
+        $this->assertTrue(\Illuminate\Support\Facades\Schema::hasIndex('station_signing_items',['station_signing_request_id','source_attachment_id'],'unique'));
+    }
+
     protected function setUp(): void
     {
         parent::setUp(); Storage::fake('attachments');

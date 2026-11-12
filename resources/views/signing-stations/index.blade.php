@@ -1,8 +1,7 @@
 <x-app-layout title="Postazioni firma">
     <x-page-header><x-slot:title>Postazioni firma</x-slot:title></x-page-header>
     @include('profile.partials.settings-navigation')
-    <p class="u-mb-md">Sul tablet apri <strong>{{ route('signing-terminal.index') }}</strong> e premi «Collega questa postazione». Riporta qui il codice visualizzato. Ogni tablet ha il proprio collegamento.</p>
-    @if(in_array(request()->getHost(),['127.0.0.1','localhost','::1','[::1]'],true))<p class="u-text-meta u-mb-md">Questo indirizzo funziona soltanto su questo computer. Per un tablet fisico serve l’indirizzo HTTPS del gestionale raggiungibile dalla rete.</p>@endif
+    <p class="u-mb-md">Sul tablet apri <strong>{{ config('document_signing.station_public_url') }}</strong> e premi «Collega questa postazione». Riporta qui il codice visualizzato. Ogni tablet ha il proprio collegamento.</p>
     <x-panel title="Collega un tablet" padded>
         <form method="post" action="{{ route('signing-stations.pair') }}">
             @csrf

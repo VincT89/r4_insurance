@@ -1,0 +1,114 @@
+.quote-list-toolbar,.quote-list-footer,.quote-comparison-toolbar,.quote-source-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
+.quote-list-footer { margin-top:16px; color:var(--ap-page-muted); font-size:13px; }
+.quote-list-toolbar p,.quote-comparison-toolbar p { margin:0; }
+.quote-list-toolbar [data-quote-selection-error] { flex-basis:100%; }
+.quote-offers-table,.quote-comparison-table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:13px; background:var(--ap-table-body); color:var(--ap-table-body-text); }
+.quote-offers-table caption,.quote-comparison-table caption { text-align:left; }
+.quote-offers-table th,.quote-comparison-table th { text-align:left; font-weight:500; }
+.quote-offers-table :is(th,td),.quote-comparison-table :is(th,td) { padding:12px; vertical-align:top; border-bottom:1px solid var(--ap-table-body-line); overflow-wrap:anywhere; }
+.quote-offers-table thead th,.quote-comparison-table thead th { background:var(--ap-table-header); color:var(--ap-table-header-text); border-top:1px solid var(--ap-panel-line); font-size:12px; }
+.quote-offers-table th:first-child { width:40px; }
+.quote-offers-table th:nth-child(2) { width:24%; }
+.quote-offers-table th:nth-child(3) { width:20%; }
+.quote-offers-table th:nth-child(4) { width:14%; }
+.quote-offers-table th:nth-child(5) { width:23%; }
+.quote-offers-table small,.quote-comparison-table small { display:block; margin-top:4px; font-size:12px; color:var(--ap-table-body-muted); }
+.quote-offers-table strong,.quote-comparison-table strong { font-weight:600; }
+.quote-small-link { display:block; font-size:12px; margin-top:6px; text-underline-offset:3px; }
+.quote-money { font-variant-numeric:tabular-nums; }
+.quote-offers-table tr.is-selected,.quote-comparison-table tr[data-different="true"]>td { background:var(--ap-table-hover); }
+.quote-warning,.quote-offers-table .quote-warning,.quote-comparison-table .quote-warning { color:var(--ap-panel-orange); }
+.quote-select-cell input,.quote-comparison-toolbar input { accent-color:var(--ap-primary); width:18px; height:18px; vertical-align:middle; }
+.quote-upload-case { display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; }
+.quote-upload-case .form-g { flex:1 1 320px; }
+.quote-upload-offer { border:0; border-top:1px solid var(--ap-panel-line); padding:18px 0; margin:0 0 18px; }
+.quote-upload-offer legend { padding:0 12px 0 0; font-size:16px; }
+.quote-upload-offer label { display:block; margin-bottom:6px; }
+.quote-upload-offer .form-in { max-width:660px; }
+.quote-comparison-toolbar { border-bottom:1px solid var(--ap-page-line); padding-bottom:14px; font-size:13px; }
+.quote-comparison-toolbar label { display:inline-flex; align-items:center; gap:8px; min-height:36px; }
+.quote-comparison-workspace { display:grid; grid-template-columns:minmax(0,1fr); gap:24px; align-items:start; }
+.quote-comparison-workspace.has-source { grid-template-columns:minmax(0,1fr) minmax(330px,40%); }
+.quote-comparison-table-wrap { min-width:0; overflow-x:auto; }
+.quote-comparison-table { min-width:520px; }
+.quote-comparison-table thead th:first-child { width:23%; }
+.quote-comparison-table thead strong { display:block; font-size:16px; color:var(--ap-table-header-heading); }
+.quote-comparison-table thead :is(small,.quote-small-link,.quote-warning) { color:var(--ap-table-header-text); }
+.quote-comparison-table tbody th { color:var(--ap-table-body-muted); }
+.quote-comparison-table .quote-comparison-group th { background:var(--ap-table-header); color:var(--ap-table-header-text); padding-block:9px; font-weight:600; }
+.quote-source-link { display:inline-block; font-size:12px; text-underline-offset:3px; margin:4px 8px 0 0; overflow-wrap:anywhere; }
+.quote-cell-editor summary { color:var(--ap-table-body-text); text-decoration:underline; text-decoration-style:dotted; text-underline-offset:4px; cursor:pointer; list-style:none; }
+.quote-cell-editor summary::-webkit-details-marker { display:none; }
+.quote-cell-editor[open] { min-width:150px; }
+.quote-correction-form,.quote-verify-form,.quote-add-coverage form { display:grid; gap:10px; margin-top:12px; }
+.quote-correction-form label,.quote-verify-form label,.quote-add-coverage label { display:grid; gap:5px; font-size:12px; }
+.quote-correction-form :is(input,select,textarea),.quote-verify-form textarea,.quote-add-coverage :is(input,select) { width:100%; min-width:0; }
+.quote-correction-form .btn,.quote-verify-form .btn,.quote-add-coverage .btn { justify-self:start; white-space:normal; }
+.quote-verify-form label:has(input[type="checkbox"]) { display:block; }
+.quote-verify-form input[type="checkbox"] { vertical-align:middle; margin-right:5px; }
+.quote-add-coverage { margin:14px 0; }
+.quote-add-coverage summary { cursor:pointer; font-size:12px; text-decoration:underline; }
+.quote-prefer-form { margin-top:14px; }
+.quote-prefer-form .btn { white-space:normal; }
+.quote-preferred { color:var(--ap-panel-heading); font-weight:600; margin-top:8px; }
+.quote-verification-note { white-space:pre-wrap; margin:10px 0; font-size:12px; }
+.quote-ai-read { display:grid; gap:8px; margin-top:12px; font-size:12px; font-weight:400; }
+.quote-ai-read .btn { justify-self:start; white-space:normal; }
+.quote-offer-warning { font-weight:400; font-size:12px; margin-top:10px; }
+.quote-comparison-source { min-width:0; background:var(--ap-panel); border-left:1px solid var(--ap-panel-line); padding-left:20px; }
+.quote-source-heading { align-items:flex-start; }
+.quote-source-heading h2 { font-size:16px; margin:0; overflow-wrap:anywhere; }
+.quote-source-heading p { font-size:12px; margin:5px 0 0; }
+.quote-comparison-source blockquote { margin:12px 0; padding:12px; background:var(--ap-table-hover); white-space:pre-wrap; font-size:13px; }
+.quote-comparison-source .document-preview { margin:14px 0; }
+.quote-comparison-source .document-preview-stage { height:580px; min-height:300px; }
+.quote-comparison-source .document-preview-toolbar { flex-wrap:wrap; }
+.quote-comparison-explanation { margin-top:18px; font-size:13px; }
+.quote-mobile-selectors { display:none; }
+[data-quote-comparison] [hidden],[data-quote-offer-selection] [hidden] { display:none !important; }
+@media(max-width:1200px) {
+    .quote-comparison-workspace.has-source { grid-template-columns:minmax(0,1fr); }
+    .quote-comparison-source { grid-row:1; border-left:0; border-bottom:1px solid var(--ap-panel-line); padding:0 0 20px; }
+}
+@media(max-width:760px) {
+    [data-quote-offer-selection]:has(.quote-select-cell input:checked) .quote-list-toolbar {
+        position:sticky;
+        top:0;
+        z-index:2;
+        padding:8px 0;
+        border-bottom:1px solid var(--ap-panel-line);
+        background:var(--ap-panel);
+    }
+    [data-quote-offer-selection]:has(.quote-select-cell input:checked) .quote-select-cell input { scroll-margin-top:100px; }
+    .quote-offers-table thead { display:none; }
+    .quote-offers-table tbody { display:block; }
+    .quote-offers-table tbody tr { display:grid; grid-template-columns:28px minmax(0,1fr) minmax(0,1fr); gap:12px; padding:14px 8px; border-top:1px solid var(--ap-table-body-line); }
+    .quote-offers-table tbody td { display:block; border:0; padding:0; }
+    .quote-offers-table .quote-select-cell { grid-column:1; grid-row:1; padding-top:3px; }
+    .quote-offers-table .quote-client-cell { grid-column:2/-1; }
+    .quote-offers-table td:nth-child(3),.quote-offers-table td:nth-child(5) { grid-column:2; }
+    .quote-offers-table td:nth-child(4),.quote-offers-table td:nth-child(6) { grid-column:3; }
+    .quote-offers-table td[data-label]::before { display:block; content:attr(data-label); font-size:12px; color:var(--ap-table-body-muted); margin-bottom:4px; }
+    .quote-offers-table td[colspan] { grid-column:1/-1; }
+    .quote-mobile-selectors { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+    .quote-mobile-selectors label { display:grid; gap:5px; font-size:12px; min-width:0; }
+    .quote-mobile-selectors select { min-width:0; width:100%; }
+    .quote-comparison-table-wrap { overflow:visible; }
+    .quote-comparison-table { display:block; min-width:0; }
+    .quote-comparison-table :is(thead,tbody) { display:block; }
+    .quote-comparison-table tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .quote-comparison-table[data-offer-count="1"] tr { grid-template-columns:minmax(0,1fr); }
+    .quote-comparison-table th,.quote-comparison-table td { display:block; width:auto !important; padding:10px 8px; }
+    .quote-comparison-table thead th:first-child { display:none; }
+    .quote-comparison-table tbody th { grid-column:1/-1; border-bottom:0; padding-bottom:4px; }
+    .quote-comparison-table .quote-comparison-group th { margin-top:6px; padding-block:10px; }
+    .quote-comparison-table td::before { display:block; content:attr(data-offer-label); color:var(--ap-table-body-muted); font-size:12px; margin-bottom:6px; }
+    .quote-comparison-table .quote-mobile-hidden { display:none; }
+    .quote-cell-editor[open] { min-width:0; }
+    .quote-comparison-source .document-preview-stage { height:480px; }
+}
+@media(pointer:coarse) {
+    .quote-source-link,.quote-cell-editor summary,.quote-add-coverage summary { display:inline-flex; align-items:center; min-height:44px; }
+    .quote-select-cell input { width:24px; height:24px; }
+    .quote-correction-form :is(input,select,textarea),.quote-verify-form textarea { font-size:16px; }
+}

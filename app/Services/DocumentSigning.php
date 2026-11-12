@@ -151,7 +151,7 @@ class DocumentSigning
                     $files = $submission->files()->get();
                 } else {
                     $files = collect(app(PrivateAttachmentBatch::class)->upload($client, [$upload], ['type'=>'document', 'document_category'=>'policy',
-                        'insurance_policy_id'=>$source->insurance_policy_id, 'insurance_policy_change_id'=>$source->insurance_policy_change_id, 'review_status'=>'received', 'description'=>'Copia con firma raccolta sul tablet. Originale: '.$source->original_name], $operator));
+                        'insurance_policy_id'=>$source->insurance_policy_id, 'insurance_policy_change_id'=>$source->insurance_policy_change_id, 'review_status'=>'received', 'description'=>'Copia con firma raccolta nel gestionale. Originale: '.$source->original_name], $operator));
                 }
                 $stored = $files->map(fn ($file) => [$file->disk,$file->path])->all();
                 $record = DocumentSignature::create(['request_key'=>$payload['request_key'], 'client_id'=>$client->id, 'insurance_policy_id'=>$source->insurance_policy_id,

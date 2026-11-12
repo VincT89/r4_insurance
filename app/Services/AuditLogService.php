@@ -16,6 +16,7 @@ class AuditLogService
         }
         if ($auditable instanceof SupplierAgency || $auditable instanceof SupplierCompany) $fields = $auditable->getFillable();
         if ($auditable instanceof \App\Models\InsurancePolicy) $fields = $auditable->getFillable();
+        if ($auditable instanceof \App\Models\InboundEmail) $fields = ['status','client_id','insurance_quote_case_id','insurance_policy_id','document_kind','version'];
         if ($action === 'document_signed') $fields = ['signature_id','source_attachment_id','signed_attachment_id','source_hash','signed_hash'];
         if ($auditable instanceof SupplierAgency) $fields[] = 'supplier_company_ids';
         if ($auditable instanceof \App\Models\QuoteRecipientGroup) $fields = ['name','insurance_branch_id','insurance_subbranch_id','cu_from','cu_to','status','company_ids','recipient_keys'];

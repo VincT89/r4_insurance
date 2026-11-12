@@ -164,12 +164,12 @@
         <div class="nav-group">
           <div class="nav-group-label">Gestione</div>
           <x-nav-item href="{{ route('claims.index') }}" icon="folder-open" label="Sinistri" :active="request()->routeIs('claims.*')" />
-          <x-nav-item href="{{ route('quotes.index') }}" icon="file-text" label="Preventivi" :active="request()->routeIs('quotes.*')" />
+          <x-nav-item href="{{ route('quotes.offers') }}" icon="file-text" label="Preventivi" :active="request()->routeIs('quotes.*')" />
           <x-nav-item href="{{ route('titles.index') }}" icon="files" label="Titoli" :active="request()->routeIs('titles.*')" />
           <x-nav-item href="{{ route('collections.index') }}" icon="wallet" label="Contabilità" :active="request()->routeIs('collections.*')" />
           <x-nav-item href="{{ route('policies.index') }}" icon="files" label="Polizze" :active="request()->routeIs('policies.index', 'clients.policies.show', 'clients.policies.edit')" />
           <x-nav-item href="{{ route('deadlines.index') }}" icon="clock" label="Scadenze" :active="request()->routeIs('deadlines.*')" />
-          @can('communications.manage')<x-nav-item href="{{ route('agency-communications.index') }}" icon="mail" label="Comunicazioni" :active="request()->routeIs('agency-communications.*')" />@endcan
+          @can('communications.manage')<x-nav-item href="{{ route('agency-communications.index') }}" icon="mail" label="Comunicazioni" :active="request()->routeIs('agency-communications.*','inbound-emails.*')" />@endcan
           @can('system.admin')<x-nav-item href="{{ route('reports.index') }}" icon="chart-no-axes-combined" label="Report" :active="request()->routeIs('reports.*','commissions.*')" />@endcan
         </div>
       @endcan
@@ -179,6 +179,7 @@
           <div class="nav-group-label">Amministrazione</div>
           <x-nav-item href="{{ route('users.index') }}" icon="user-cog" label="Utenti" :active="request()->routeIs('users.*')" />
           <x-nav-item href="{{ route('audit-logs.index') }}" icon="history" label="Registro attività" :active="request()->routeIs('audit-logs.*')" />
+          <x-nav-item href="{{ route('ai.index') }}" icon="chart-no-axes-combined" label="AI e consumi" :active="request()->routeIs('ai.*')" />
         </div>
       @endcan
       <div class="nav-spacer"></div>

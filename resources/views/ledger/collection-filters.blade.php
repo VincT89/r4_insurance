@@ -11,7 +11,7 @@
     $period = $dates === ['', ''] && filled($filters['month'] ?? null) ? 'month' : (array_search($dates, $ranges, true) ?: 'custom');
     $extraFilters = filled(request('_table_filters')) || collect($filters)->only(['payment_method','direction','state','category','subcategory','consultant','document_type','recipient'])->filter()->isNotEmpty();
 @endphp
-<form id="ledger-filters" method="GET" class="client-search-form collection-filters" aria-label="Filtra contabilità" data-compact-filter-results
+<form id="ledger-filters" method="GET" class="client-search-form collection-filters" aria-label="Filtra contabilità" data-compact-filter-results data-list-filters data-filter-primary-names="field-collection-period,search"
     x-data="{branch:@js($filters['category']??''), subbranches:@js($branches->mapWithKeys(fn($b)=>[$b->name=>$b->subbranches->pluck('name')->all()])),
         from:@js($dates[0]), to:@js($dates[1]), month:@js($filters['month']??''), period:@js($period), ranges:@js($ranges),
         company:@js((string)($filters['company']??'')), agency:@js((string)($filters['agency']??'')), agencyCompanies:@js($agencyCompanies),

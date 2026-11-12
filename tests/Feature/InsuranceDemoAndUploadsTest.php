@@ -84,6 +84,33 @@ class InsuranceDemoAndUploadsTest extends TestCase
         $this->assertDatabaseHas('clients',['id'=>$client->id]); $this->assertDatabaseHas('attachments',['id'=>$file->id]); Storage::disk('attachments')->assertExists($file->path);
     }
 
+    public function test_reset_preserves_ai_history_and_its_source_document(): void
+    {
+        $this->catalog();
+        $client=Client::factory()->create();
+        $this->post(route('clients.documents.store',$client),['file'=>$this->pdf('fonte.pdf'),'document_category'=>'identity'])->assertSessionHasNoErrors();
+        $file=$client->attachments()->sole();
+        $usage=\App\Models\AiUsage::create(['user_id'=>$this->admin->id,'attachment_id'=>$file->id,'feature'=>'quote_read','model'=>'test-model','state'=>'complete','request_key'=>hash('sha256','reset-history'),'document_hash'=>hash('sha256','demo-document'),'input_rate'=>1,'cached_rate'=>1,'output_rate'=>1,'cost_microusd'=>1,'started_at'=>now()]);
+        try { app(InsuranceDemoReset::class)->apply($this->admin); $this->fail('Il registro AI deve impedire il reset.'); }
+        catch (\RuntimeException $exception) { $this->assertStringContainsString('consumi AI da conservare',$exception->getMessage()); }
+        $this->assertDatabaseHas('ai_usages',['id'=>$usage->id,'attachment_id'=>$file->id,'cost_microusd'=>1]);
+        $this->assertDatabaseHas('clients',['id'=>$client->id]);
+        $this->assertDatabaseHas('attachments',['id'=>$file->id]);
+        Storage::disk('attachments')->assertExists($file->path);
+        $this->assertSame([],Storage::disk('local')->allFiles());
+    }
+
+    public function test_reset_still_refuses_unknown_dependencies(): void
+    {
+        $this->catalog();
+        $client=Client::factory()->create();
+        \Illuminate\Support\Facades\Schema::create('unexpected_client_history',function($table) { $table->id(); $table->foreignId('client_id')->constrained('clients'); });
+        try { app(InsuranceDemoReset::class)->apply($this->admin); $this->fail('Una dipendenza sconosciuta deve impedire il reset.'); }
+        catch (\RuntimeException $exception) { $this->assertSame('Dipendenza non prevista: unexpected_client_history',$exception->getMessage()); }
+        $this->assertDatabaseHas('clients',['id'=>$client->id]);
+        $this->assertSame([],Storage::disk('local')->allFiles());
+    }
+
     public function test_reset_refuses_existing_policy_changes_without_touching_their_history(): void
     {
         [$branch,$company,$agency]=$this->catalog();

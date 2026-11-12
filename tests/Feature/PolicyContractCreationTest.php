@@ -40,6 +40,51 @@ class PolicyContractCreationTest extends TestCase
         return $this->postJson(route('policies.contract-schedule'), $input)->assertOk()->json('fingerprint');
     }
 
+    public function test_real_unipol_first_and_subsequent_premiums_create_the_exact_six_titles(): void
+    {
+        $input=$this->input(['starts_on'=>'2023-07-31','expires_on'=>'2026-07-31','premium'=>'164850.45','first_installment_premium'=>'27475.00','installment_premium'=>'27475.09']);
+        $input['schedule_fingerprint']=$this->preview($input);
+        $this->postJson(route('policies.store'),$input)->assertOk();
+        $amounts=InsurancePolicy::sole()->titles()->orderBy('due_on')->pluck('amount_cents')->map(fn($value)=>(int)$value)->all();
+        $this->assertSame([2747500,2747509,2747509,2747509,2747509,2747509],$amounts);
+        $this->assertSame(16485045,array_sum($amounts));
+        $this->assertDatabaseCount('insurance_collections',0);
+    }
+
+    public function test_explicit_short_first_period_creates_no_titles_after_contract_expiry(): void
+    {
+        $input=$this->input(['starts_on'=>'2016-06-01','expires_on'=>'2016-12-31','premium'=>'5000.00','first_installment_premium'=>'5000.00','payment_frequency'=>'Annuale']);
+        $input['schedule_fingerprint']=$this->preview($input);
+        $this->postJson(route('policies.store'),$input)->assertOk();
+        $title=InsurancePolicy::sole()->titles()->sole();
+        $this->assertSame(500000,(int)$title->amount_cents);
+        $this->assertSame('2016-12-31',$title->coverage_to->toDateString());
+    }
+
+    public function test_a_changed_first_premium_cannot_reuse_a_reviewed_schedule(): void
+    {
+        $input=$this->input(['premium'=>'1200.00','first_installment_premium'=>'500.00','installment_premium'=>'700.00']);
+        $input['schedule_fingerprint']=$this->preview($input);
+        $input['first_installment_premium']='600.00'; $input['installment_premium']='600.00';
+        $this->postJson(route('policies.store'),$input)->assertUnprocessable()->assertJsonValidationErrors('schedule_fingerprint');
+        $this->assertDatabaseCount('insurance_policies',0);
+        $this->assertDatabaseCount('insurance_titles',0);
+    }
+
+    public function test_first_and_subsequent_premiums_must_reconcile_to_the_total(): void
+    {
+        $input=$this->input(['premium'=>'1200.00','first_installment_premium'=>'500.00','installment_premium'=>'600.00']);
+        $this->postJson(route('policies.contract-schedule'),$input)->assertUnprocessable()->assertJsonValidationErrors('ledger');
+        $this->assertDatabaseCount('insurance_titles',0);
+    }
+
+    public function test_an_undisclosed_renewal_clause_is_not_changed_to_yes(): void
+    {
+        $input=$this->input(['titles_mode'=>'manual','tacit_renewal'=>null]);
+        $this->postJson(route('policies.store'),$input)->assertOk();
+        $this->assertNull(InsurancePolicy::sole()->tacit_renewal);
+    }
+
     public function test_creation_starts_with_contract_with_or_without_a_quote(): void
     {
         $this->get(route('policies.create'))->assertOk()->assertSee('Carica il contratto')->assertSee('data-contract-fields hidden', false)->assertSee('name="contract"', false);

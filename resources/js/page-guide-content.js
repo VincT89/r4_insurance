@@ -120,6 +120,25 @@ export function resolvePageGuide(state = {}) {
     if (route === 'titles.show' && state.paymentState === 'open') return paymentGuide(state, 'Pagamento del titolo');
     if (route === 'agency-communications.show') return communicationGuide(state);
     if (route === 'clients.show') return clientGuide(state);
+    if (route === 'inbound-emails.index') return guide('Email ricevute', 'Trova i messaggi da collegare a clienti, preventivi e polizze.', [
+        action('Apri Da associare, Associate o Tutte per cambiare elenco.', '.inbound-email-views'),
+        action('Se serve, filtra per indirizzo del mittente o per data.', '.inbound-email-filters > summary'),
+        action('Apri l’oggetto del messaggio per leggere il testo e gli allegati.', '.inbound-email-row h2 a'),
+    ], 'Ogni nuova email arriva in Da associare. La ricezione richiede il collegamento della casella.');
+    if (route === 'inbound-emails.show') return guide('Associa l’email', 'Leggi il messaggio e collega l’originale alla destinazione corretta.', [
+        action('Controlla mittente, testo e allegati ricevuti.', '.inbound-email-message'),
+        action('Cerca il cliente oppure apri Cambia cliente per correggerlo.', '.inbound-email-client-search > summary'),
+        action('Scegli cliente, pratica o polizza e conferma l’associazione.', '.inbound-email-association'),
+    ], 'L’associazione è reversibile e conserva lo storico. Non approva offerte, contratti o incassi.');
+    if (route === 'quotes.offers') return guide('Offerte e confronto', 'Consulta le offerte delle compagnie e le richieste ancora in attesa.', [
+        search,
+        action('Se manca il documento, usa Carica offerte.', 'a', 'Carica offerte'),
+        action('Seleziona da due a sei offerte della stessa pratica e premi Confronta offerte.', '[data-quote-offer-selection]'),
+    ], 'I dati da verificare vanno confrontati con il PDF. Il confronto non approva automaticamente un’offerta.');
+    if (route === 'quotes.compare') return guide('Confronta le offerte', 'Confronta importi, coperture e condizioni dello stesso rischio.', [
+        action('Apri un dato per risalire alla sua fonte nel PDF.', '[data-quote-comparison]'),
+        action('Usa Mostra solo differenze per concentrare il confronto.', '[data-quote-differences]'),
+    ], 'La preferenza dell’operatore resta distinta dall’approvazione del cliente.');
     if (route === 'attachments.sign') return guide('Firma sul tablet', 'L’operatore prepara il documento. Il cliente lo legge e firma.', [
         action('Leggi il documento e scegli il punto firma. Controlla che lo spazio sia libero.', '[data-place-toggle]'),
         action(state.companySigner ? 'L’operatore verifica nome, cognome e qualifica della persona che firma per l’azienda.' : 'L’operatore verifica nome e cognome del firmatario.', '#signer-name'),
@@ -151,8 +170,9 @@ export function resolvePageGuide(state = {}) {
         return guide(route.endsWith('.edit') ? 'Modifica polizza' : 'Nuova polizza', 'Collega il contraente e controlla i dati del contratto prima di salvare.', [
         action('Scegli il cliente corretto. Se manca, puoi crearlo dai comandi presenti.', '[data-client-search], #field-search, input[name="number"]'),
         action('Se stai leggendo un contratto PDF, caricalo e verifica i dati estratti confrontandoli con il documento.', '#field-contract, input[name="number"]'),
+        action('Controlla il veicolo da salvare e scegli i moduli da preparare con la polizza.', '[data-contract-preparation], [data-contract-new-vehicle]'),
         action('Controlla compagnia, date, premio, frazionamento e titoli, poi salva.', 'form[method="post" i] button[type="submit"]', /^(Conferma|Salva)/),
-    ], 'I dati letti dal PDF vanno verificati. I moduli e le firme si completano dalla polizza dopo il salvataggio.');
+    ], 'Alla conferma vengono creati la polizza, i titoli e i moduli selezionati. Le firme si raccolgono dalla scheda della polizza.');
     }
     if (route.startsWith('agency-communications.')) {
         if (route.endsWith('.history')) return list('Storico comunicazioni', 'Controlla cosa è stato preparato e quale esito ha avuto l’invio.', 'Apri il messaggio per distinguere una bozza da un invio confermato.');

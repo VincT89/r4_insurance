@@ -17,3 +17,9 @@
     .contract-schedule th, .contract-schedule td { padding: 10px 4px; font-size: 12px; }
     .contract-schedule .contract-coverage { display: none; }
 }
+.contract-field-jump { display:inline-block; font:inherit; color:var(--ap-page-heading); text-decoration:underline; text-underline-offset:3px; background:none; border:0; padding:4px 6px; cursor:pointer; }
+.contract-field-jump:focus-visible { outline:2px solid var(--ap-primary); outline-offset:2px; }
+.contract-module-list { margin:12px 0; }
+.contract-module-choice { align-items:flex-start; }
+.contract-module-choice small { display:block; margin-top:4px; }
+[data-contract-form-tools] { margin:12px 0; }

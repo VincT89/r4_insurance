@@ -20,5 +20,5 @@
             <a class="btn btn-p" href="{{ $attachment->downloadUrl() }}">Scarica PDF</a>
         </x-slot:actions>
     </x-page-header>
-    <x-pdf-reader :source="$attachment->downloadUrl()" />
+    <x-pdf-reader :source="$attachment->downloadUrl()" :page="max(1,min(1000,(int)request('page',1)))" />
 </x-app-layout>

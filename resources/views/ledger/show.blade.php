@@ -45,7 +45,7 @@
 </div>
 @endif
 @can('updateRegistry',$title->policy->client)@if(!$title->cancelled_at && $title->balance_cents>0)
-<x-panel :title="$title->direction === 'refund' ? 'Registra rimborso al cliente' : 'Registra pagamento'" padded>
+<x-panel :title="$title->direction === 'refund' ? 'Registra rimborso al cliente' : 'Registra pagamento'" id="payment-entry" tabindex="-1" padded>
     @include('ledger.collection-form',['collectionPolicy'=>$title->policy,'collectionTitles'=>collect([$title]),'chooseTitle'=>false,'collectionAction'=>route('titles.collect',$title)])
     @can('ledger.manage')@include('ledger.allowance-form',['allowanceTitles'=>collect([$title]),'chooseAllowanceTitle'=>false,'allowanceAction'=>route('titles.allowances',$title)])@endcan
 </x-panel>

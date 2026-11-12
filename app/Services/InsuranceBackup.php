@@ -226,6 +226,9 @@ class InsuranceBackup
             if (!is_file($full) || ($hash && !hash_equals($hash,(string)hash_file('sha256',$full)))) throw new RuntimeException('Un documento collegato al database manca o è alterato.');
         };
         foreach ($db->table('attachments')->orderBy('id')->lazyById(500) as $file) $check($file->disk,$file->path);
+        if ($db->getSchemaBuilder()->hasTable('inbound_email_files')) {
+            foreach ($db->table('inbound_email_files')->orderBy('id')->lazyById(500) as $file) $check('local',$file->path,$file->sha256);
+        }
         foreach ($db->table('agency_communication_attachments')->orderBy('id')->lazyById(500) as $file) $check('attachments',$file->path,$file->sha256);
         foreach ($db->table('insurance_form_documents as f')->leftJoin('attachments as a',function($join) {
             $join->on('a.insurance_form_document_id','=','f.id')->where('a.review_status','generated');

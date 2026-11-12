@@ -12,7 +12,7 @@ class RecentActivity extends Component
     {
         Gate::authorize('system.admin');
         return view('livewire.dashboard.recent-activity', [
-            'logs' => AuditLog::with('user:id,name')->latest('created_at')->latest('id')->limit(12)->get(),
+            'logs' => AuditLog::with('user:id,name')->latest('created_at')->latest('id')->limit(4)->get(),
         ]);
     }
 }

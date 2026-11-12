@@ -1,0 +1,16 @@
+{
+  "flows": [
+    "selezione e blocco tra pratiche diverse",
+    "filtro delle differenze"
+  ],
+  "screenshots": [
+    "C:\\Users\\vince\\OneDrive\\Desktop\\SODANO\\R4_INSURANCE\\gestionale\\work\\quote-comparison-ui\\run-1794389004896\\riepilogo-desktop.png",
+    "C:\\Users\\vince\\OneDrive\\Desktop\\SODANO\\R4_INSURANCE\\gestionale\\work\\quote-comparison-ui\\run-1794389004896\\riepilogo-mobile.png",
+    "C:\\Users\\vince\\OneDrive\\Desktop\\SODANO\\R4_INSURANCE\\gestionale\\work\\quote-comparison-ui\\run-1794389004896\\confronto-desktop.png",
+    "C:\\Users\\vince\\OneDrive\\Desktop\\SODANO\\R4_INSURANCE\\gestionale\\work\\quote-comparison-ui\\run-1794389004896\\confronto-mobile.png"
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "servicesStopped": true,
+  "failure": "locator.inputValue: Error: strict mode violation: locator('[data-comparison-source] [data-page-number]') resolved to 3 elements:\n    1) <input min=\"1\" max=\"2\" value=\"1\" id=\"pdf-page\" type=\"number\" class=\"form-in\" data-page-number=\"\"/> aka getByRole('spinbutton', { name: 'Pagina' })\n    2) <div class=\"page\" role=\"region\" data-loaded=\"true\" data-page-number=\"1\" data-l10n-args=\"{\"page\":1}\" data-l10n-id=\"pdfjs-page-landmark\">…</div> aka getByLabel('Pagine del documento').getByRole('region').filter({ hasText: 'Offerta dimostrativa per il' })\n    3) <div class=\"page\" role=\"region\" data-loaded=\"true\" data-page-number=\"2\" data-l10n-args=\"{\"page\":2}\" data-l10n-id=\"pdfjs-page-landmark\">…</div> aka getByLabel('Pagine del documento').getByRole('region').filter({ hasText: 'Garanzie dimostrative: pagina' })\n\nCall log:\n\u001b[2m  - waiting for locator('[data-comparison-source] [data-page-number]')\u001b[22m\n\n    at C:\\Users\\vince\\OneDrive\\Desktop\\SODANO\\R4_INSURANCE\\gestionale\\work\\quote-comparison-ui\\check.cjs:77:88"
+}

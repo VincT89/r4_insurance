@@ -1,3 +1,5 @@
+import {matchingContractClient} from './policy-contract-preparation.js';
+
 function initPolicyClientPicker() {
     document.querySelectorAll('[data-policy-client-picker]').forEach((root) => {
         if (root.dataset.bound) return;
@@ -38,12 +40,12 @@ function initPolicyClientPicker() {
                 || [...form.querySelectorAll('input[name="recipient_keys[]"]')].some(input => input.checked)
                 || [...form.querySelectorAll('[data-quick-vehicle-field]')].some(input => input.value);
         }
-        function resetLinks() {
+        function resetLinks({preserveRecipients = false} = {}) {
             for (const [name, label] of [['vehicle_id', 'Nessun veicolo collegato'], ['client_asset_id', 'Nessun bene collegato'], ['current_policy_id', 'Nessuna polizza selezionata']]) {
                 const select = form.elements.namedItem(name);
                 if (select) { select.replaceChildren(new Option(label, '')); if (name==='current_policy_id') select.dispatchEvent(new Event('change',{bubbles:true})); }
             }
-            form.dispatchEvent(new CustomEvent('client-context-cleared'));
+            form.dispatchEvent(new CustomEvent('client-context-cleared', {detail: {preserveRecipients}}));
         }
         async function choose(client) {
             if (String(client.id) === selected.value) { ++generation; pending?.abort(); loading = false; showSelected(); return true; }
@@ -73,7 +75,8 @@ function initPolicyClientPicker() {
                 const data = await response.json();
                 if (current !== generation) return;
                 /** Conserva il lavoro precedente finché il nuovo cliente non è stato caricato correttamente. */
-                resetLinks();
+                /** La prima scelta del cliente conserva i destinatari già spuntati; un cambio cliente li azzera. */
+                resetLinks({preserveRecipients: !replacingClient});
                 deferClient(false);
                 selected.value = String(client.id);
                 selectedName = client.name;
@@ -97,7 +100,7 @@ function initPolicyClientPicker() {
                     form.elements.current_policy_id?.add(option);
                 }
                 showSelected();
-                form.dispatchEvent(new CustomEvent('client-context-loaded'));
+                form.dispatchEvent(new CustomEvent('client-context-loaded',{detail:{client:data.client}}));
                 if (quick) { quick.hidden = true; quick.dispatchEvent(new Event('client-fiscal-reset')); }
                 root.querySelector('[data-new-client]')?.setAttribute('aria-expanded', 'false');
                 return true;
@@ -151,6 +154,12 @@ function initPolicyClientPicker() {
             if (!quick.hidden) quick.querySelector('[data-quick-field="name"]').focus();
         });
         root.addEventListener('client-fiscal-selected', (event) => choose(event.detail));
+        root.addEventListener('client-fiscal-checked', event=>{
+            if(!deferred || !creatingClient || loading) return;
+            const values=Object.fromEntries([...quick.querySelectorAll('[data-quick-field]')].map(field=>[field.dataset.quickField,field.value]));
+            const existing=matchingContractClient(event.detail,contractClientValues,values);
+            if(existing) void choose(existing);
+        });
         root.addEventListener('contract-client-reset', () => {
             for (const field of quick?.querySelectorAll('[data-quick-field]') || []) {
                 if (field.value === contractClientValues[field.dataset.quickField]) field.value = field.dataset.quickField === 'client_type' ? 'person' : '';

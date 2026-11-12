@@ -35,5 +35,9 @@
 @import './sodano/_workbench.css';
 @import './sodano/_page-guide.css';
 @import './sodano/_signing-stations.css';
+@import './sodano/_practice-work.css';
+@import './sodano/_ai.css';
+@import './sodano/_quote-comparison.css';
+@import './sodano/_inbound-email.css';
 
 @font-face { font-family: 'Ubuntu'; src: url('../fonts/Ubuntu-R.ttf') format('truetype'); font-style: normal; font-weight: 400; font-display: swap; }

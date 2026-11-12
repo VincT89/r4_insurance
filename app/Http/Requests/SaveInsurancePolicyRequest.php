@@ -45,6 +45,22 @@ class SaveInsurancePolicyRequest extends ClientInsuranceRequest
             'existing_reason'=>$this->isMethod('POST') ? ['nullable','required_if:entry_mode,existing','string','min:5','max:1000'] : ['prohibited'],
             'client_id' => $this->route('client') ? ['prohibited'] : ['nullable', 'required_without:new_client', 'integer', Rule::exists('clients', 'id')->whereNull('merged_into_id')],
             'new_client' => $this->isContractCreation() && !$this->route('client') && !$this->filled('client_id') && $this->input('entry_mode') === 'contract' ? ['nullable', 'array:name,client_type,company_name,tax_code,vat_number,email,phone,address,city,postal_code,province'] : ['prohibited'],
+            'new_vehicle' => $this->isContractCreation() ? ['nullable','array:plate,make,model,vin,registered_on',Rule::prohibitedIf(fn()=>$this->filled('vehicle_id') || $this->filled('client_asset_id'))] : ['prohibited'],
+            'new_vehicle.plate' => ['required_with:new_vehicle','string','max:20','regex:/^[A-Z0-9-]+$/'],
+            'new_vehicle.make' => ['nullable','string','max:100'],
+            'new_vehicle.model' => ['nullable','string','max:100'],
+            'new_vehicle.vin' => ['nullable','string','max:30'],
+            'new_vehicle.registered_on' => ['nullable','date_format:Y-m-d','before_or_equal:today'],
+            'contract_forms' => $this->isContractCreation() ? ['nullable','array:mode,templates,revisions,signer_name,signer_role,place,document_date'] : ['prohibited'],
+            'contract_forms.mode' => ['required_with:contract_forms','in:prepare,later'],
+            'contract_forms.templates' => ['nullable','array','list','max:100'],
+            'contract_forms.templates.*' => ['required','integer','distinct'],
+            'contract_forms.revisions' => ['nullable','array','max:100'],
+            'contract_forms.revisions.*' => ['required','string','regex:/\A[a-f0-9]{64}\z/'],
+            'contract_forms.signer_name' => ['nullable','string','max:150'],
+            'contract_forms.signer_role' => ['nullable','string','max:150'],
+            'contract_forms.place' => ['nullable','string','max:150'],
+            'contract_forms.document_date' => ['nullable','date_format:Y-m-d'],
             'contract' => $this->isContractCreation() ? ['required', 'file', 'max:10240', 'mimes:pdf', 'extensions:pdf'] : ['prohibited'],
             'contract_reviewed' => $this->isContractCreation() ? ['accepted'] : ['prohibited'],
             'quote_changes_confirmed' => $this->isContractCreation() ? ['sometimes', 'boolean'] : ['prohibited'],
@@ -69,6 +85,7 @@ class SaveInsurancePolicyRequest extends ClientInsuranceRequest
             'payment_method' => ['nullable', 'string', 'max:150'],
             'payment_frequency' => ['nullable', Rule::in(InsurancePolicy::PAYMENT_FREQUENCIES)],
             'installment_premium' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99', 'decimal:0,2'],
+            'first_installment_premium' => $this->isContractCreation() ? ['nullable', 'numeric', 'min:0.01', 'max:9999999999.99', 'decimal:0,2'] : ['prohibited'],
             'tacit_renewal' => ['sometimes', 'nullable', 'boolean'],
             'ad_horas' => ['sometimes', 'boolean'],
             'notes' => ['nullable', 'string', 'max:10000'],
@@ -91,6 +108,8 @@ class SaveInsurancePolicyRequest extends ClientInsuranceRequest
             }
         }
         foreach (['premium', 'installment_premium'] as $field) if (is_string($this->input($field))) $values[$field] = str_replace(',', '.', $this->input($field));
+        foreach(['plate','vin'] as $field) if(is_string($this->input('new_vehicle.'.$field))) data_set($values,'new_vehicle.'.$field,mb_strtoupper($field==='plate' ? preg_replace('/\s+/','',$this->input('new_vehicle.'.$field)) : trim($this->input('new_vehicle.'.$field))));
+        if(isset($values['new_vehicle'])) $values['new_vehicle']=array_replace($this->input('new_vehicle'),$values['new_vehicle']);
         $this->merge($values);
     }
 
@@ -112,6 +131,14 @@ class SaveInsurancePolicyRequest extends ClientInsuranceRequest
     public function after(): array
     {
         return [function ($validator) {
+            if($this->input('contract_forms.mode')==='prepare' && is_array($ids=$this->input('contract_forms.templates')) && $ids && !$validator->errors()->has('contract_forms.templates') && !$validator->errors()->has('contract_forms.templates.*')) {
+                $templates=\App\Models\InsuranceFormTemplate::whereIn('id',array_filter($ids,'is_scalar'))->get();
+                if($templates->contains(fn($template)=>$template->needsSigner()) && blank($this->input('contract_forms.signer_name'))) $validator->errors()->add('contract_forms.signer_name','Indica chi firmerà i moduli selezionati.');
+                $clientType=$this->policyClient()?->client_type ?? $this->input('new_client.client_type');
+                if($clientType==='company' && $templates->contains(fn($template)=>$template->needsSigner()) && blank($this->input('contract_forms.signer_role'))) $validator->errors()->add('contract_forms.signer_role','Indica la qualifica del firmatario dell’azienda.');
+                if($templates->contains(fn($template)=>$template->needsPlace()) && blank($this->input('contract_forms.place'))) $validator->errors()->add('contract_forms.place','Indica il luogo da riportare nei moduli selezionati.');
+                if(blank($this->input('contract_forms.document_date'))) $validator->errors()->add('contract_forms.document_date','Indica la data di preparazione dei moduli.');
+            }
             if ($this->isContractCreation() && $this->input('titles_mode') === 'automatic' && !$this->user()->can('ledger.manage')) $validator->errors()->add('titles_mode', 'Non sei autorizzato a generare i titoli.');
             if ($this->input('entry_mode') === 'contract' && $this->filled('insurance_quote_id')) $validator->errors()->add('insurance_quote_id', 'Usa il percorso del preventivo selezionato per conservarne il collegamento.');
             if (!$validator->errors()->has('new_client') && is_array($this->input('new_client')) && $this->input('new_client')) {

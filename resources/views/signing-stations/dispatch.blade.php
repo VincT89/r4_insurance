@@ -4,7 +4,7 @@
     </x-page-header>
     @php($available = $stations->where('pending_requests_count',0))
     @if($stations->isEmpty())
-        <p>Collega prima una postazione di firma. Sul tablet apri {{ route('signing-terminal.index') }}.</p>
+        <p>Collega prima una postazione di firma. Sul tablet apri {{ config('document_signing.station_public_url') }}.</p>
         <a class="btn btn-p" href="{{ route('signing-stations.index') }}">Collega un tablet</a>
         <a class="btn btn-g" href="{{ route('attachments.sign',$source) }}">Firma su questo dispositivo</a>
     @else

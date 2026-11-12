@@ -5,6 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 class InsuranceQuote extends Model
 {
     public function policyChange() { return $this->hasOne(InsurancePolicyChange::class); }
+    public function comparisonReview() { return $this->hasOne(InsuranceQuoteReview::class); }
+    public function readings() { return $this->hasMany(InsuranceQuoteReading::class); }
     public const STATUSES=['requested'=>'Richiesto','received'=>'Ricevuto','pending'=>'In approvazione cliente','approved'=>'Approvato dal cliente','rejected'=>'Rifiutato dal cliente','converted'=>'Polizza stipulata'];
     protected $guarded=['id'];
     protected function casts(): array {return ['priority'=>'boolean','requested_at'=>'datetime','received_at'=>'datetime','submitted_at'=>'datetime','approved_on'=>'date','starts_on'=>'date','expires_on'=>'date','valid_until'=>'date','premium_cents'=>'integer','request_recipient'=>'array'];}

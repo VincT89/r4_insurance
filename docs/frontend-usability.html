@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R4: ricezione email e revisione dell’interfaccia</title>
+<style>
+body{font:16px/1.65 system-ui,sans-serif;color:#18232d;max-width:1040px;margin:auto;padding:24px}h1,h2{line-height:1.3}h2{margin-top:32px}a{color:#0b498c}table{border-collapse:collapse;width:100%}th,td{border:1px solid #cbd5df;padding:10px;text-align:left;vertical-align:top}.table-wrap{overflow:auto}figure{margin:28px 0}img{display:block;max-width:100%;height:auto;border:1px solid #cbd5df}figcaption{margin-top:8px;color:#465563}.mobile{max-width:390px}code{overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<h1>Ricezione email e revisione dell’interfaccia R4</h1>
+<p>Collaudo dell’11 novembre 2026. La ricezione è predisposta nel codice e provata su dati dimostrativi separati. La casella dedicata e n8n non sono collegati; le nuove tabelle non sono state applicate all’archivio reale e la ricezione resta disabilitata.</p>
+
+<h2>Cosa è disponibile</h2>
+<p>Un endpoint protetto riceve messaggi e allegati, riconosce le consegne ripetute ed evita di duplicarle. La nuova sezione “Email ricevute”, nelle Comunicazioni, permette di consultare il testo, scaricare i file originali e collegare il messaggio a un cliente, una pratica preventivo o una polizza. Le associazioni sono correggibili e tracciate.</p>
+<p>Ogni messaggio entra in “Da associare”. L’operatore sceglie la destinazione e il tipo di documento: questa predisposizione non effettua classificazioni automatiche, non crea offerte e non approva contratti o incassi. <a href="inbound-email.html">La documentazione del collegamento</a> descrive il formato accettato, i limiti e la futura configurazione di n8n.</p>
+
+<h2>Interventi per rendere più rapido il lavoro</h2>
+<ul>
+<li><strong>Posta in arrivo:</strong> viste “Da associare”, “Associate” e “Tutte” con un clic; filtri per mittente e date richiudibili; passaggio fra gli stati senza perdere i filtri.</li>
+<li><strong>Associazione delle email:</strong> comando iniziale che porta al modulo; ricerca cliente che mantiene la posizione nella pagina; cambio cliente e nota facoltativa richiudibili. Restano la conferma della destinazione e lo storico.</li>
+<li><strong>Ricerca dalla dashboard:</strong> “Trova una polizza” descrive correttamente l’elenco in cui viene eseguita la ricerca.</li>
+<li><strong>Titoli:</strong> “Incassa” o “Registra rimborso” porta direttamente al modulo, solo con i permessi previsti e un residuo da saldare. I titoli saldati o annullati non propongono questa azione.</li>
+<li><strong>Preventivi su smartphone:</strong> ricerca subito accessibile, filtri secondari richiudibili e indicazione esplicita quando è stata selezionata una sola offerta per il confronto. I filtri mantengono il contesto della pratica o del cliente.</li>
+<li><strong>Contabilità su smartphone:</strong> periodo e ricerca restano visibili; gli altri filtri si aprono quando servono. Le selezioni si conservano nel passaggio fra larghezze desktop e mobile.</li>
+<li><strong>Guida nelle pagine:</strong> indicazioni specifiche per posta ricevuta e confronto offerte, con collegamenti ai controlli interessati.</li>
+</ul>
+<p>La revisione mantiene l’identità e la struttura di R4. Sono stati esaminati anche ricerca e scheda cliente, elenco polizze, scadenze e comunicazioni, intervenendo sui punti in cui il flusso poteva essere reso più chiaro o diretto.</p>
+
+<h2>Verifiche eseguite</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Controllo</th><th>Risultato</th></tr></thead>
+<tbody>
+<tr><td>Regressione applicativa dopo la revisione dell’interfaccia</td><td>93 test e 924 asserzioni superati, su SQLite in memoria. Comprende ricezione email, contabilità, permessi, confronto preventivi, pagine principali, letture e promemoria.</td></tr>
+<tr><td>Test del codice dell’interfaccia</td><td>82 test superati, comprese le indicazioni aggiunte alla guida.</td></tr>
+<tr><td>Verifiche precedenti sulla ricezione email</td><td>23 test specifici e 220 asserzioni superati. La precedente regressione estesa ha superato 107 test e 993 asserzioni, con un avviso PHPUnit già presente nel test dei backup. Le esecuzioni si sovrappongono e non vanno sommate come test distinti.</td></tr>
+<tr><td>Compilazione</td><td>Completata. Restano gli avvisi preesistenti sulla dimensione di un pacchetto JavaScript e sulla combinazione di import statici e dinamici del rapporto contabile.</td></tr>
+<tr><td>Desktop e smartphone</td><td>Browser interno a 1280 × 900 e 390 × 844, con archivio dimostrativo separato. Provati ricerca polizza dalla dashboard, ricerca cliente per numero polizza, apertura del pagamento dai titoli, selezione e confronto di due offerte, filtri mobili, periodi contabili, navigazione fra scadenze e comunicazioni, ricezione e associazione delle email.</td></tr>
+<tr><td>Posta ricevuta</td><td>Provati ricerca cliente, conferma obbligatoria, collegamenti a pratica e polizza, rimozione dell’associazione, storico, download e consultazione dalle schede interessate. Verificati gli stati e la conservazione dei filtri. L’HTML ricevuto è mostrato come testo.</td></tr>
+<tr><td>Controlli del browser</td><td>Nessun errore o avviso JavaScript rilevato nella sessione finale; nessuna eccedenza orizzontale della pagina nei controlli mobili effettuati.</td></tr>
+<tr><td>Chiusura del collaudo</td><td>Accesso terminato, scheda del browser interno chiusa, dimensioni del browser ripristinate. Servizio temporaneo arrestato e porta 8012 verificata libera.</td></tr>
+</tbody>
+</table></div>
+<p>I dati e gli importi mostrati nelle immagini sono dimostrativi. Il collaudo non costituisce una verifica di ogni possibile combinazione di dati, dispositivo o tecnologia assistiva.</p>
+
+<h2>Sicurezza e limiti verificati</h2>
+<p>I test della ricezione coprono autenticazione, HTTPS, limiti di frequenza e dimensione, formati dei file, duplicazioni e conflitti, annullamento delle consegne incomplete, permessi di consultazione e download, associazioni fra clienti diversi e modifiche concorrenti. Il corpo del messaggio e i nomi originali sono cifrati nel database; gli allegati sono conservati in un archivio privato.</p>
+<p>Il controllo del tipo di file non è una scansione antivirus. Non è stato svolto un test con una casella reale o un flusso n8n e non è stato effettuato un ripristino completo del backup dell’archivio reale. Non si dichiara il progetto privo di vulnerabilità.</p>
+<p>La versione e il pacchetto PHP effettivamente usati dal servizio R4 restano da verificare: il controllo è stato rinviato dall’utente. Il completamento dei test applicativi non prova la presenza delle correzioni nel motore PHP. Nessun aggiornamento PHP o riavvio del servizio R4 è stato effettuato.</p>
+
+<h2>Cosa resta per l’attivazione</h2>
+<p>Occorrerà predisporre l’archivio reale dopo backup e autorizzazione, scegliere la casella, configurare la credenziale del connettore e attivare il collegamento diretto o tramite n8n. Prima dell’uso effettivo andranno verificati HTTPS, limiti del server, runtime PHP e consegna completa di email e allegati dal fornitore scelto.</p>
+
+<h2>Schermate del collaudo</h2>
+<figure><img src="../work/inbound-email-preview/usabilita-email-desktop.jpg" alt="Posta ricevuta di R4 su desktop con tre messaggi dimostrativi e viste per stato" width="1280" height="900"><figcaption>Posta ricevuta su desktop: messaggi, stato e allegati consultabili dall’elenco.</figcaption></figure>
+<figure><img class="mobile" src="../work/inbound-email-preview/usabilita-email-mobile.jpg" alt="Posta ricevuta su smartphone con filtri richiudibili e messaggi visibili" width="390" height="844"><figcaption>Posta ricevuta su smartphone.</figcaption></figure>
+<figure><img class="mobile" src="../work/inbound-email-preview/usabilita-contabilita-mobile.jpg" alt="Contabilità su smartphone con periodo e ricerca in primo piano" width="390" height="844"><figcaption>Contabilità su smartphone: i filtri essenziali restano immediatamente accessibili.</figcaption></figure>
+</body>
+</html>

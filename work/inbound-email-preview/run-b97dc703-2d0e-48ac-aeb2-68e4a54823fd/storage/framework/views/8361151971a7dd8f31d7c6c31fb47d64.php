@@ -1,0 +1,17 @@
+<?php ($formStatus = app(\App\Services\InsuranceDocumentation::class)->forms($client, $formPolicy ?? null)); ?>
+<div class="document-form-status">
+    <div class="document-form-summary">
+        <h3><?php echo e(isset($formPolicy) ? 'Moduli della polizza' : 'Moduli del cliente'); ?></h3>
+        <p><?php echo e($formStatus['package']?->state_label ?? 'Nessun fascicolo preparato.'); ?></p>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($formStatus['templates']->isEmpty()): ?><p class="u-text-meta">Nessun modello approvato per questo <?php echo e($client->client_type === 'company' ? 'cliente azienda' : 'cliente privato'); ?>.</p><?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+    </div>
+    <div class="insurance-form-actions">
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($formStatus['package']): ?><a class="btn btn-g btn-sm" href="<?php echo e(route('clients.forms.show', [$client, $formStatus['package']])); ?>">Apri ultimo fascicolo</a><?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+        <a class="btn btn-g btn-sm" href="<?php echo e(route('clients.forms.index', [$client, 'policy'=>$formPolicy?->id ?? null, 'reason'=>isset($formPolicy) ? null : 'client'])); ?>"><?php echo e(isset($formPolicy) ? 'Storico moduli polizza' : 'Storico moduli cliente'); ?></a>
+        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('updateRegistry', $client)): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!isset($formPolicy) || $formPolicy->editableBy(auth()->user())): ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($formStatus['templates']->isNotEmpty()): ?><a class="btn btn-p btn-sm" href="<?php echo e(route('clients.forms.create', [$client, 'policy'=>$formPolicy?->id ?? null])); ?>">Prepara moduli <?php echo e(isset($formPolicy) ? 'polizza' : 'cliente'); ?></a><?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?><?php endif; ?>
+        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('forms.manage')): ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($formStatus['templates']->isEmpty()): ?><a class="btn btn-g btn-sm" href="<?php echo e(route('form-templates.index', ['scope'=>isset($formPolicy) ? 'policy' : 'client'])); ?>">Configura modelli</a><?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?><?php endif; ?>
+    </div>
+</div>
+<?php /**PATH C:\Users\vince\OneDrive\Desktop\SODANO\R4_INSURANCE\gestionale\resources\views/insurance-forms/status.blade.php ENDPATH**/ ?>

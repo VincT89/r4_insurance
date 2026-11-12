@@ -23,14 +23,16 @@ class InsurancePolicyController extends Controller
     public function store(SaveInsurancePolicyRequest $request, ?Client $client): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $stored = [];
+        $preparedForms = 0;
         try {
-            $policy = DB::transaction(function () use ($request, &$client, &$stored) {
+            $policy = DB::transaction(function () use ($request, &$client, &$stored, &$preparedForms) {
                 if (!$client) $client = app(\App\Actions\Clients\CreateClientAction::class)->execute($request->newClientValues());
                 /** Lock the current registry before creating related records and attaching the private contract. */
                 $client = Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
                 $this->authorize('updateRegistry', $client);
-                $values = $request->safe()->except(['client_id','documents','entry_mode','insurance_quote_id','existing_reason','new_client','contract','contract_reviewed','quote_changes_confirmed','titles_mode','schedule_fingerprint']);
-                $values['tacit_renewal'] ??= true;
+                $values = $request->safe()->except(['client_id','documents','entry_mode','insurance_quote_id','existing_reason','new_client','new_vehicle','contract_forms','contract','contract_reviewed','quote_changes_confirmed','titles_mode','schedule_fingerprint','first_installment_premium']);
+                if($vehicleId=app(\App\Services\PolicyContractPreparation::class)->vehicle($client,$request->validated('new_vehicle') ?? [])) $values['vehicle_id']=$vehicleId;
+                if (!array_key_exists('tacit_renewal', $values)) $values['tacit_renewal'] = true;
                 if($request->input('entry_mode')==='new') $policy=app(\App\Services\InsuranceQuoteWorkflow::class)->createPolicy($client,$values,$request->integer('insurance_quote_id'),$request->boolean('quote_changes_confirmed'));
                 else {
                     $policy = $client->policies()->create(app(\App\Services\PolicyProviders::class)->values(app(\App\Services\InsuranceCatalog::class)->policyValues($values)));
@@ -42,11 +44,13 @@ class InsurancePolicyController extends Controller
                     $policy->refresh();
                     $ledger = app(\App\Services\InsuranceLedger::class);
                     if ($request->input('titles_mode') === 'automatic') {
-                        $rows = $ledger->plan($policy);
+                        $first = app(\App\Services\PolicyContractSchedule::class)->firstInstallment($request->validated());
+                        $rows = $ledger->plan($policy, $first);
                         if (!hash_equals(app(\App\Services\PolicyContractSchedule::class)->fingerprint($rows), (string) $request->input('schedule_fingerprint'))) throw ValidationException::withMessages(['schedule_fingerprint'=>'I dati dei titoli sono cambiati. Ricontrolla l’anteprima prima di confermare.']);
-                        $ledger->generate($policy, $ledger->previewFingerprint($policy, $rows));
+                        $ledger->generate($policy, $ledger->previewFingerprint($policy, $rows), $first);
                     } else $ledger->log($policy, 'titles_pending', 'L’operatore ha scelto l’inserimento manuale dei titoli.');
                     PolicyFormReminder::record($policy);
+                    $preparedForms=app(\App\Services\PolicyContractPreparation::class)->prepare($policy,$request->validated('contract_forms') ?? [],$stored);
                 }
                 foreach ($request->file('documents', []) as $file) $stored[] = app(\App\Services\ClientDocumentRegistry::class)->upload($client, $file, ['document_category'=>'policy', 'insurance_policy_id'=>$policy->id]);
                 return $policy;
@@ -56,7 +60,8 @@ class InsurancePolicyController extends Controller
             throw $e;
         }
         $message = $request->isContractCreation() ? ($request->input('titles_mode') === 'automatic' ? 'Contratto salvato, polizza e titoli creati.' : 'Contratto e polizza salvati. I titoli sono da inserire manualmente.') : 'Polizza aggiunta al cliente.';
-        $url = $request->isContractCreation() ? PolicyFormReminder::url($policy) : route('clients.policies.show', [$client, $policy, 'tab'=>'overview']);
+        if($preparedForms) $message.=' Preparati '.$preparedForms.' moduli PDF con i dati della pratica.';
+        $url = $request->isContractCreation() && !$request->has('contract_forms') ? PolicyFormReminder::url($policy) : route('clients.policies.show', [$client, $policy, 'tab'=>$preparedForms ? 'forms' : 'overview']);
         if ($request->expectsJson()) { session()->flash('success', $message); return response()->json(['url'=>$url]); }
         return redirect($url)->with('success', $message);
     }
@@ -99,8 +104,9 @@ class InsurancePolicyController extends Controller
             : null;
         $formReminder = $policy->editableBy($request->user()) ? PolicyFormReminder::find($policy) : null;
         $signatures = app(InsuranceDocumentation::class)->policySignatures($client,$policy);
+        $workTasks = app(\App\Services\PolicyWorkOverview::class)->forPolicies(new \Illuminate\Database\Eloquent\Collection([$policy]), $request->user())[$policy->id];
         $allowanceAgencies = $canCollect ? \App\Models\SupplierAgency::where('status','active')->orderBy('name')->get(['id','name']) : collect();
-        return view('clients.policies.show', compact('settledAllowanceTitles', 'selectedPaymentTitle', 'allowanceAgencies', 'signatures', 'client', 'policy', 'policyTab', 'policyTitles', 'corrections', 'accountingReview', 'commissionSummary', 'changes', 'hasTitles', 'payableTitles', 'consultants', 'formReminder'));
+        return view('clients.policies.show', compact('workTasks', 'settledAllowanceTitles', 'selectedPaymentTitle', 'allowanceAgencies', 'signatures', 'client', 'policy', 'policyTab', 'policyTitles', 'corrections', 'accountingReview', 'commissionSummary', 'changes', 'hasTitles', 'payableTitles', 'consultants', 'formReminder'));
     }
 
     public function edit(Client $client, InsurancePolicy $policy): View
@@ -200,8 +206,10 @@ class InsurancePolicyController extends Controller
             }
         }
         $companies = \App\Models\SupplierCompany::with(['agencies' => fn ($q) => $q->where(fn ($q) => $q->where('supplier_agencies.status', 'active')->orWhere('supplier_agencies.id', $policy->supplier_agency_id))])->where('status', 'active')->orWhere('id', $policy->supplier_company_id)->orderBy('name')->get();
-        $agenciesByCompany = $companies->mapWithKeys(fn ($company) => [\App\Services\InsuranceCatalog::normalize($company->name) => $company->agencies->map(fn ($agency) => ['id' => $agency->id, 'name' => $agency->name])->values()->all()]);
-        if ($policy->supplier_company_id && $policy->company && ($originalCompany = $companies->firstWhere('id', $policy->supplier_company_id))) $agenciesByCompany[\App\Services\InsuranceCatalog::normalize($policy->company)] = $originalCompany->agencies->map(fn ($agency) => ['id' => $agency->id, 'name' => $agency->name])->values()->all();
-        return view('clients.policies.form', compact('client', 'policy', 'vehicles', 'assets', 'categories', 'subcategories', 'usesCatalog', 'companies', 'agenciesByCompany', 'globalCreate','approvedQuotes','selectedQuote','existingEntry'));
+        $agenciesByCompany = $companies->mapWithKeys(fn ($company) => [\App\Services\InsuranceCatalog::normalize($company->name) => $company->agencies->map(fn ($agency) => ['id' => $agency->id, 'name' => $agency->name, 'code'=>$agency->agency_code])->values()->all()]);
+        if ($policy->supplier_company_id && $policy->company && ($originalCompany = $companies->firstWhere('id', $policy->supplier_company_id))) $agenciesByCompany[\App\Services\InsuranceCatalog::normalize($policy->company)] = $originalCompany->agencies->map(fn ($agency) => ['id' => $agency->id, 'name' => $agency->name, 'code'=>$agency->agency_code])->values()->all();
+        $contractTemplates = !$policy->exists && !$existingEntry ? app(\App\Services\PolicyContractPreparation::class)->templates() : [];
+        $contractClientContext = !$policy->exists && !$existingEntry ? app(\App\Services\PolicyContractPreparation::class)->clientContext($client) : [];
+        return view('clients.policies.form', compact('contractTemplates','contractClientContext','client', 'policy', 'vehicles', 'assets', 'categories', 'subcategories', 'usesCatalog', 'companies', 'agenciesByCompany', 'globalCreate','approvedQuotes','selectedQuote','existingEntry'));
     }
 }

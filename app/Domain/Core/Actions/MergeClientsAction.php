@@ -78,6 +78,10 @@ class MergeClientsAction
                 $source->$relation()->update([$relation === 'attachments' ? 'attachable_id' : 'client_id' => $target->id]);
             }
             $this->moveNetwork($target, $source);
+            /** Anche la posta segue l'anagrafica unificata; i moduli aperti prima devono essere ricaricati. */
+            if (\Illuminate\Support\Facades\Schema::hasTable('inbound_emails')) {
+                DB::table('inbound_emails')->where('client_id',$source->id)->update(['client_id'=>$target->id,'version'=>DB::raw('version + 1'),'updated_at'=>now()]);
+            }
             $source->mergedSources()->update(['merged_into_id' => $target->id]);
             $source->forceFill(['merged_into_id' => $target->id, 'merged_at' => now(), 'status' => 'inactive'])->save();
             $target->fill($changes)->save();
@@ -99,6 +103,9 @@ class MergeClientsAction
         $data['relationships'] = $client->relationships()->orderBy('id')->get()->toArray();
         $data['households'] = $client->households()->with(['members' => fn ($q) => $q->orderBy('clients.id')])->orderBy('client_households.id')->get()->toArray();
         $data['aliases'] = $client->mergedSources()->orderBy('id')->pluck('id')->all();
+        if (\Illuminate\Support\Facades\Schema::hasTable('inbound_emails')) {
+            $data['inbound_emails'] = DB::table('inbound_emails')->where('client_id',$client->id)->orderBy('id')->get(['id','client_id','insurance_quote_case_id','insurance_policy_id','version'])->map(fn($row)=>(array)$row)->all();
+        }
 
         return $data;
     }

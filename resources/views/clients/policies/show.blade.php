@@ -42,6 +42,12 @@
     </nav>
     <div class="policy-desk-body">
     <section data-policy-section="overview" aria-label="Dati polizza" @if($policyTab!=='overview') hidden @endif>
+        <section class="practice-actions" aria-label="Attività da completare">
+            <h2>Da completare</h2>
+            @forelse($workTasks as $task)
+                <div class="practice-action"><p>{{ $task['detail'] }}</p><a class="btn btn-g btn-sm" data-policy-section-link href="{{ $task['url'] }}">{{ $task['label'] }}</a></div>
+            @empty<p class="u-text-meta">Nessuna attività documentale aperta. Puoi consultare dati, pagamenti e storico dalle sezioni della polizza.</p>@endforelse
+        </section>
         <div class="policy-facts" id="policy-overview">
             <h2>Il contratto</h2>
             <dl class="policy-key-facts">
@@ -104,6 +110,7 @@
             <x-panel title="Contratti e firme" padded id="policy-contracts">@include('document-signing.contract-list')</x-panel>
         @endif
         <x-panel title="Documenti della polizza" id="policy-documents">@include('clients.documents.table', ['documents'=>$policy->documents, 'documentContextPolicy'=>$policy])</x-panel>
+        <x-inbound-emails :client="$client" :policy="$policy" />
     </section>
     <section data-policy-section="payments" aria-label="Titoli e pagamenti" @if($policyTab!=='payments') hidden @endif>
         @include('ledger.recorded-payment')

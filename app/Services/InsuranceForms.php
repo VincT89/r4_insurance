@@ -96,10 +96,10 @@ class InsuranceForms
         $values += ['operazione'=>$change ? $change->kind_label : null,'riferimento_variazione'=>$change?->reference,'coperture_aggiuntive'=>$change?->description,'decorrenza_variazione'=>$change?->effective_on->format('d/m/Y'),'scadenza_variazione'=>$change?->expires_on->format('d/m/Y'),'premio_variazione'=>$change ? \App\Support\Money::format($change->premium_cents) : null,'polizza_precedente'=>$change?->snapshot['before']['policy']['number']??null];
         $result=[]; foreach($values as $name=>$value) $result['{{'.$name.'}}']=filled($value)?(string)$value:'________________'; return $result;
     }
-    public function createPackage(Client $client, ?InsurancePolicy $policy, array $data): InsuranceFormPackage
+    public function createPackage(Client $client, ?InsurancePolicy $policy, array $data, ?array &$stored = null): InsuranceFormPackage
     {
         Gate::authorize('updateRegistry',$client); $paths=[];
-        try { return DB::transaction(function() use ($client,$policy,$data,&$paths) {
+        try { return DB::transaction(function() use ($client,$policy,$data,&$paths,&$stored) {
             $client=Client::current()->whereKey($client->id)->lockForUpdate()->firstOrFail();
             Gate::authorize('updateRegistry',$client);
             $policy=$policy ? $client->policies()->whereKey($policy->id)->lockForUpdate()->firstOrFail() : null;
@@ -137,7 +137,8 @@ class InsuranceForms
                 $directory='client/'.$client->id.'/forms'; $path=$directory.'/'.Str::uuid().'.pdf';
                 if(!Storage::disk('attachments')->put($path,$pdf)) $this->fail('Impossibile conservare il PDF. Riprova.');
                 $paths[]=$path;
-                $client->attachments()->create(['insurance_policy_id'=>$policy?->id,'insurance_policy_change_id'=>$change?->id,'insurance_form_document_id'=>$document->id,'document_category'=>$template->category,'type'=>'document','uploaded_by'=>auth()->id(),'disk'=>'attachments','directory'=>$directory,'path'=>$path,'stored_name'=>basename($path),'original_name'=>Str::slug($document->title).'-f'.$package->id.'-v'.$template->version.'.pdf','mime_type'=>'application/pdf','extension'=>'pdf','size'=>strlen($pdf),'review_status'=>'generated']);
+                $attachment=$client->attachments()->create(['insurance_policy_id'=>$policy?->id,'insurance_policy_change_id'=>$change?->id,'insurance_form_document_id'=>$document->id,'document_category'=>$template->category,'type'=>'document','uploaded_by'=>auth()->id(),'disk'=>'attachments','directory'=>$directory,'path'=>$path,'stored_name'=>basename($path),'original_name'=>Str::slug($document->title).'-f'.$package->id.'-v'.$template->version.'.pdf','mime_type'=>'application/pdf','extension'=>'pdf','size'=>strlen($pdf),'review_status'=>'generated']);
+                if($stored!==null) $stored[]=$attachment;
                 $document->update(['pdf_hash'=>hash('sha256',$pdf)]);
             }
             $this->log($client,$policy,'forms_prepared','Preparato fascicolo moduli #'.$package->id.'.');

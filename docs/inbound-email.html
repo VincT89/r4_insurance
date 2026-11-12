@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>R4 — Ricezione email e allegati</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#18232d;max-width:960px;margin:auto;padding:24px}h1,h2{line-height:1.3}h2{margin-top:32px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #cbd5df;padding:10px;text-align:left;vertical-align:top}pre{background:#f1f4f7;padding:16px;overflow:auto}code{overflow-wrap:anywhere}a{color:#0b498c}.table-wrap{overflow:auto}</style></head><body>
+<h1>Ricezione email e allegati in R4</h1>
+<p>Predisposizione dell’11 novembre 2026. La casella e n8n non sono collegati; nessuna credenziale è inclusa e l’endpoint è disabilitato per impostazione predefinita. La migrazione deve essere applicata soltanto dopo autorizzazione e backup dell’archivio interessato.</p>
+<h2>Comportamento disponibile</h2>
+<p>Il connettore consegna un messaggio strutturato e i suoi allegati. R4 conserva i metadati, il testo e l’eventuale HTML cifrati nel database, i nomi degli allegati cifrati e i file in archivio privato. Nell’interfaccia il messaggio viene mostrato come testo, senza caricare immagini remote o eseguire HTML. Non è previsto l’import di un file EML completo.</p>
+<p>Gli amministratori e gli operatori attivi trovano “Email ricevute” nelle Comunicazioni. Possono filtrare la posta, scaricare gli allegati, cercare un cliente e associare il messaggio alla sua scheda, a una pratica preventivo o a una polizza. L’associazione può essere corretta o rimossa ed è registrata nello storico. Le schede interessate mostrano i collegamenti alle email e ai relativi allegati.</p>
+<p>Ogni nuova email entra in “Da associare”. I riferimenti della conversazione sono conservati per sviluppare il riconoscimento successivo. Questa predisposizione non esegue classificazioni AI, non crea automaticamente offerte, non approva contratti e non registra incassi. I file ricevuti restano nel messaggio originale, senza diventare automaticamente contratti validati nel registro documentale.</p>
+<h2>Contratto dell’endpoint</h2>
+<p><code>POST /api/v1/inbound-emails</code>, esclusivamente tramite HTTPS. Il token consente soltanto la consegna: non autorizza lettura, download, associazione o cancellazione di dati.</p>
+<pre>Authorization: Bearer &lt;credenziale configurata nel connettore&gt;
+Accept: application/json</pre>
+<p>Per messaggi senza allegati usare JSON con la proprietà <code>message</code>. Per includere allegati usare <code>multipart/form-data</code>: un campo testuale <code>message</code> contenente lo stesso JSON e i file binari <code>attachments[0]</code>, <code>attachments[1]</code>, ecc. URL da scaricare e file in base64 non sono accettati.</p>
+<p>Esempio esclusivamente dimostrativo del contenuto di <code>message</code>:</p>
+<pre>{
+  "external_id": "casella-dimostrativa:uidvalidity-1:uid-25",
+  "message_id": "&lt;messaggio-dimostrativo@example.test&gt;",
+  "from": {"address": "agenzia@example.test", "name": "Agenzia dimostrativa"},
+  "to": ["ricezione@example.test"],
+  "cc": [],
+  "subject": "Preventivo dimostrativo",
+  "text": "Trasmettiamo il documento di prova allegato.",
+  "html": null,
+  "sent_at": "2026-11-11T12:00:00+01:00",
+  "in_reply_to": null,
+  "references": []
+}</pre>
+<p><code>external_id</code>, <code>from.address</code> e almeno un destinatario in <code>to</code> sono obbligatori. Gli altri campi sono facoltativi. L’identificativo esterno deve essere stabile e univoco nella sorgente, anche dopo riconnessioni o retry. Un UID IMAP da solo non è sufficiente: il connettore deve includere casella e UIDVALIDITY oppure usare un identificativo durevole del fornitore.</p>
+<div class="table-wrap"><table><thead><tr><th>Limite</th><th>Valore</th></tr></thead><tbody>
+<tr><td>Identificativi, oggetto e riferimenti</td><td>998 caratteri per campo; massimo 50 riferimenti</td></tr>
+<tr><td>Destinatari</td><td>Massimo 30 in A e 30 in copia</td></tr>
+<tr><td>Testo e HTML</td><td>500.000 caratteri ciascuno; metadati JSON complessivi entro 2 MiB</td></tr>
+<tr><td>Allegati</td><td>Massimo 10, massimo 10 MiB ciascuno, totale entro 25 MiB</td></tr>
+<tr><td>Formati accettati</td><td>PDF, JPG/JPEG, PNG, WEBP, DOCX, XLSX, CSV, TXT; controlli sia sull’estensione sia sul tipo rilevato. ZIP, eseguibili, HTML e P7M non sono accettati da questo contratto.</td></tr>
+<tr><td>Frequenza</td><td>30 richieste al minuto per indirizzo IP</td></tr>
+</tbody></table></div>
+<p>I limiti di PHP e del server possono essere inferiori. Prima dell’attivazione occorre allinearli al carico concordato e imporre un limite della richiesta anche a monte dell’applicazione, comprese richieste senza Content-Length. La richiesta dichiarata oltre 28 MiB viene rifiutata. Non sono stati modificati i limiti del sistema attuale.</p>
+<h2>Esiti e consegna affidabile</h2>
+<pre>{
+  "id": "&lt;identificativo UUID assegnato da R4&gt;",
+  "duplicate": false,
+  "status": "unassigned",
+  "attachments_count": 1
+}</pre>
+<div class="table-wrap"><table><thead><tr><th>Codice</th><th>Significato</th><th>Gestione nel connettore</th></tr></thead><tbody>
+<tr><td>201</td><td>Messaggio e tutti gli allegati salvati</td><td>Registrare l’UUID restituito e il completamento della consegna.</td></tr>
+<tr><td>200, duplicate=true</td><td>Stessa consegna già completata</td><td>Trattare come successo. Non creare altri messaggi.</td></tr>
+<tr><td>409</td><td>Identificativo già usato con contenuto diverso</td><td>Segnalare il conflitto. Non generare un nuovo identificativo per nascondere l’errore.</td></tr>
+<tr><td>400 / 401</td><td>HTTPS mancante / credenziale non valida</td><td>Correggere il collegamento; non ripetere senza modifiche.</td></tr>
+<tr><td>413 / 422</td><td>Dimensioni, formato o dati non accettati</td><td>Conservare l’email originale e segnalare l’errore. Nessun allegato viene scartato silenziosamente.</td></tr>
+<tr><td>429 / 5xx / timeout</td><td>Limite temporaneo o mancata conferma</td><td>Retry con attesa crescente, lo stesso identificativo e gli stessi dati. Il 503 indica anche ricezione disattivata o archivio non predisposto.</td></tr>
+</tbody></table></div>
+<p>Un vincolo univoco nel database impedisce duplicazioni anche per richieste simultanee. Una consegna con lo stesso identificativo ma corpo o file diversi riceve 409. L’ordine dei file può variare; nomi e contenuti devono rimanere identici. Per il connettore, il messaggio è consegnato solo dopo un 201 o un 200 valido. Conservare una coda degli errori ed evitare di eliminare la posta dopo il solo avvio del flusso.</p>
+<h2>Attivazione futura</h2>
+<p>Le impostazioni sono in <code>config/inbound-email.php</code>. Dopo le autorizzazioni operative, applicare la migrazione <code>2026_11_11_180000_create_inbound_emails.php</code> sul database destinato alla ricezione e configurare:</p>
+<ul><li><code>INBOUND_EMAIL_ENABLED</code>: attivazione esplicita, disabilitata in assenza del valore.</li><li><code>INBOUND_EMAIL_TOKEN_SHA256</code>: impronta SHA-256 esadecimale di una credenziale casuale con almeno 32 byte di entropia. La credenziale originale, fra 32 e 256 caratteri, deve restare nel gestore credenziali del connettore. Mai nel repository, negli URL o nei log.</li><li><code>INBOUND_EMAIL_SOURCE</code>: identificativo durevole della sorgente, massimo 64 caratteri fra lettere, numeri, punto, trattino e underscore. Il valore non viene accettato dal messaggio. Cambiarlo crea un distinto spazio di identificativi.</li></ul>
+<p>Il collegamento n8n previsto usa Email Trigger (IMAP), con allegati abilitati e formato “Resolved”, seguito da HTTP Request con autenticazione nell’header. In Form-Data, <code>message</code> è un parametro testuale; ogni <code>attachments[n]</code> è un parametro “n8n Binary File” riferito al corrispondente file ricevuto. Il flusso dovrà gestire il numero variabile di allegati e mantenere stabile la mappatura nei retry. Ogni fornitore dovrà essere verificato per metadati, riconnessioni e dimensioni. Nessun workflow n8n o accesso alla casella è stato attivato da questa predisposizione.</p>
+<p>In produzione HTTPS è obbligatorio e <code>APP_DEBUG</code> deve essere disabilitato. Se un proxy termina TLS, i proxy attendibili vanno configurati specificamente; non fidarsi indiscriminatamente degli header inoltrati. Il runtime PHP effettivamente usato da R4 resta da verificare secondo il controllo rinviato dall’utente. L’archivio privato e la chiave di cifratura dell’applicazione devono rientrare nelle procedure di backup; la verifica del backup comprende percorso e hash degli allegati ricevuti.</p>
+<p>I controlli sui formati non sono una scansione antivirus. Non sono stati eseguiti exploit, scansioni distruttive o test su servizi esterni. Eventuali scansioni malware e formati ulteriori richiedono una scelta esplicita prima dell’attivazione della casella.</p>
+<h2>Riferimenti del connettore</h2>
+<p><a href="frontend-usability.html">Esito del collaudo e revisione dell’interfaccia</a>: funzionalità provate, risultati dei test, schermate e limiti della predisposizione.</p>
+<p><a href="https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.emailimap/">n8n: ricezione email IMAP</a> · <a href="https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.httprequest/">n8n: richiesta HTTP e file binari</a>.</p>
+</body></html>

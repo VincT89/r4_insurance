@@ -44,6 +44,19 @@ class InsuranceAccountingWorkspaceTest extends TestCase
 
     private function page(): string { return route('clients.policies.show',[$this->client,$this->policy]); }
 
+    public function test_title_shortcuts_only_offer_payment_for_outstanding_titles(): void
+    {
+        $open=$this->title(['reference'=>'APERTA']);
+        $refund=$this->title(['reference'=>'RIMBORSO','direction'=>'refund']);
+        $paid=$this->title(['reference'=>'SALDATA','collected_cents'=>100000]);
+        $cancelled=$this->title(['reference'=>'ANNULLATA','cancelled_at'=>now(),'cancelled_residual_cents'=>100000]);
+        $response=$this->get(route('titles.index',['month'=>'']))->assertOk();
+        foreach([$open,$refund] as $title) $response->assertSee(e(route('titles.show',$title).'#payment-entry'),false);
+        foreach([$paid,$cancelled] as $title) $response->assertDontSee(e(route('titles.show',$title).'#payment-entry'),false);
+        $this->get(route('titles.show',$open))->assertOk()->assertSee('id="payment-entry"',false);
+        $this->assertDatabaseCount('insurance_collections',0);
+    }
+
     public function test_policy_register_without_titles_does_not_suggest_a_settled_contract_or_an_incasso(): void
     {
         $response=$this->get(route('policies.index',['search'=>$this->policy->number]))->assertOk();

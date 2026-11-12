@@ -1,0 +1,9 @@
+.ai-totals { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); margin:22px 0 12px; border-block:1px solid var(--ap-page-line); }
+.ai-totals > div { padding:16px; min-width:0; }
+.ai-totals > div + div { border-left:1px solid var(--ap-page-line); }
+.ai-totals dt { color:var(--ap-page-muted); font-size:13px; margin-bottom:8px; }
+.ai-totals dd { margin:0; font-size:21px; font-weight:600; color:var(--ap-page-heading); overflow-wrap:anywhere; }
+.ai-reconciliation { min-width:210px; max-width:340px; margin-top:8px; }
+.ai-reconciliation label { display:block; margin:10px 0; }
+.ai-reconciliation .form-in { width:100%; margin-top:5px; }
+@media(max-width:700px) { .ai-totals { grid-template-columns:repeat(2,minmax(0,1fr)); } .ai-totals > div:nth-child(odd) { border-left:0; } .ai-totals > div:nth-child(n+3) { border-top:1px solid var(--ap-page-line); } }

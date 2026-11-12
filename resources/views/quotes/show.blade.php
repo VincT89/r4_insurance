@@ -11,12 +11,16 @@
         <x-slot:title>{{ $case->subject }}</x-slot:title>
         <x-slot:meta>{{ $case->client->name }} · {{ $case->branch->name }}{{ $case->subbranch ? ' / '.$case->subbranch->name : '' }}@if($case->vehicle_snapshot['plate'] ?? null) · {{ $case->vehicle_snapshot['plate'] }}@endif</x-slot:meta>
         <x-slot:actions>
+            <a class="btn btn-g" href="{{ route('quotes.offers',['case'=>$case->id]) }}">Riepilogo offerte</a>
+            @php($comparisonIds=$case->quotes->filter(fn($quote)=>$quote->documents->contains('document_category','quote'))->take(6)->modelKeys())
+            @if($comparisonIds)<a class="btn btn-g" href="{{ route('quotes.compare',['quotes'=>$comparisonIds]) }}">Confronta garanzie</a>@endif
             @if($mayWork)<a @class(['btn', 'btn-p'=>$case->quotes->isEmpty(), 'btn-g'=>$case->quotes->isNotEmpty()]) href="{{ route('quotes.emails.create',$case) }}">Prepara email</a>@endif
             <a class="btn btn-g" href="{{ route('clients.show',$case->client_id) }}">Cliente</a>
             <a class="btn btn-g" href="{{ route('quotes.index',['client'=>$case->client_id]) }}">Preventivi</a>
         </x-slot:actions>
     </x-page-header>
     @include('quotes.proposals')
+    <x-inbound-emails :client="$case->client" :quote-case="$case" />
 @can('updateRegistry',$case->client)@if($case->status==='open')
 <x-panel padded>
 <details class="client-detail-section" data-manual-quote-request @if($errors->hasAny(['recipient_key','requested_on','confirmed'])) open @endif><summary>Registra un contatto già effettuato fuori dal gestionale</summary><p class="u-text-meta">Qui puoi annotare una richiesta già fatta per telefono o via email.</p><form method="POST" action="{{ route('quotes.request',$case) }}">@csrf<div class="form-row">

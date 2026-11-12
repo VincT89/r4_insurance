@@ -9,7 +9,16 @@
             <tbody>
             @forelse($titles as $title)
                 <tr data-title-summary-group="{{ $title->summary_state }}" data-title-balance-cents="{{ $title->balance_cents }}">
-                    <td><a href="{{ route('titles.show',$title) }}">{{ \App\Models\InsuranceTitle::KINDS[$title->kind] }} {{ $title->reference ?: '#'.$title->id }}</a></td>
+                    <td>
+                        <a href="{{ route('titles.show',$title) }}">{{ \App\Models\InsuranceTitle::KINDS[$title->kind] }} {{ $title->reference ?: '#'.$title->id }}</a>
+                        @can('ledger.manage')
+                            @can('updateRegistry',$title->policy->client)
+                                @if(!$title->cancelled_at && $title->balance_cents > 0)
+                                    <div><a class="btn btn-g btn-sm" href="{{ route('titles.show',$title) }}#payment-entry" aria-label="{{ $title->direction==='refund' ? 'Registra rimborso per' : 'Incassa' }} {{ $title->reference ?: 'titolo '.$title->id }}">{{ $title->direction==='refund' ? 'Registra rimborso' : 'Incassa' }}</a></div>
+                                @endif
+                            @endcan
+                        @endcan
+                    </td>
                     <td><a href="{{ route('clients.policies.show',[$title->policy->client_id,$title->policy]) }}">{{ $title->contract->number }}</a></td>
                     <td><a href="{{ route('clients.show',$title->policy->client) }}">{{ $title->policy->client->name }}</a></td>
                     <td>{{ $title->contract->supplierAgency?->name ?: 'Rapporto diretto' }}</td><td>{{ $title->contract->company }}</td>

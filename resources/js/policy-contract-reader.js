@@ -1,8 +1,10 @@
 import {policyContractPageText} from './policy-contract-text.js';
+import {parsePolicyContract} from './policy-contract-parser.js';
 
-export async function readPolicyContract(file, base, progress, signal) {
+export async function readPolicyContract(file, base, progress, signal, {nativeOnly=false}={}) {
     const origin = new URL(base, location.href);
     if (origin.origin !== location.origin) throw new Error('Lettura locale non disponibile.');
+    const assets = new URL('../pdfjs/', origin);
     let loading, worker, timer, stopped = false;
     const cancel = () => { stopped = true; void worker?.terminate(); void loading?.destroy(); };
     signal?.addEventListener('abort', cancel, {once:true});
@@ -13,16 +15,28 @@ export async function readPolicyContract(file, base, progress, signal) {
             const {default: workerUrl} = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
             check();
             pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
-            loading = pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()), isEvalSupported:false, disableFontFace:true, useSystemFonts:true, maxImageSize:16000000});
+            /** Software image decoding also supports browser views without a complete OffscreenCanvas implementation. */
+            loading = pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer()), isEvalSupported:false, enableXfa:false,
+                disableFontFace:true, useSystemFonts:true, maxImageSize:16000000, isOffscreenCanvasSupported:false, isImageDecoderSupported:false,
+                cMapUrl:new URL('cmaps/',assets).href, cMapPacked:true, standardFontDataUrl:new URL('standard_fonts/',assets).href, wasmUrl:new URL('wasm/',assets).href});
             const pdf = await loading.promise;
-            const pages = Math.min(pdf.numPages, 60), parts = [];
+            const pages = Math.min(pdf.numPages, 60), parts = [], scanPages = [];
             let scanned = 0, skipped = pdf.numPages - pages;
             for (let index = 1; index <= pages; index++) {
                 check(); progress(`Lettura del contratto: pagina ${index} di ${pdf.numPages}…`);
                 const page = await pdf.getPage(index), content = await page.getTextContent();
-                let text = policyContractPageText(content.items);
-                if (text.replace(/\s/g, '').length < 60) {
-                    if (scanned >= 8) { skipped++; parts.push(text); continue; }
+                const text = policyContractPageText(content.items);
+                if (text.replace(/\s/g, '').length < 60) scanPages.push(index);
+                parts.push(text); page.cleanup();
+            }
+            const native = parsePolicyContract(parts.join('\n\f\n')).values;
+            /** A readable personalised schedule avoids OCR of blank signature pages; every unprocessed image page is reported. */
+            const needsOcr = !nativeOnly && (!native.number || !native.starts_on || !native.expires_on);
+            if (!needsOcr) skipped += scanPages.length;
+            else for (const index of scanPages) {
+                    check();
+                    if (scanned >= 8) { skipped++; continue; }
+                    const page = await pdf.getPage(index);
                     if (!worker) {
                         progress('Preparazione della lettura delle pagine scansionate…');
                         const {createWorker} = await import('tesseract.js');
@@ -36,12 +50,11 @@ export async function readPolicyContract(file, base, progress, signal) {
                     canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
                     try {
                         await page.render({canvasContext:canvas.getContext('2d'), viewport}).promise;
-                        const result = await worker.recognize(canvas); check(); text += '\n' + result.data.text; scanned++;
+                        const result = await worker.recognize(canvas); check(); parts[index-1] += '\n' + result.data.text; scanned++;
                     } finally { canvas.width = canvas.height = 0; }
-                }
-                parts.push(text); page.cleanup();
+                    page.cleanup();
             }
-            return {text:parts.join('\n').slice(0, 500000), skipped, scanned, pages:pdf.numPages};
+            return {text:parts.join('\n\f\n').slice(0, 500000), skipped, scanned, pages:pdf.numPages};
         })(), new Promise((_,reject) => { timer = setTimeout(() => { cancel(); reject(new Error('La lettura richiede troppo tempo. Puoi completare i dati controllando il contratto.')); }, 90000); })]);
     } catch (error) {
         if (error.name === 'PasswordException') throw new Error('Il PDF è protetto da password. Carica una copia leggibile oppure compila i dati controllando il contratto.');

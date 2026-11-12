@@ -1,5 +1,5 @@
-@props(['source'])
-<section class="document-preview" data-document-preview data-source="{{ $source }}" data-assets="{{ asset('vendor/pdfjs') }}/" data-state="loading" aria-label="Lettura del documento">
+@props(['source','page'=>1])
+<section class="document-preview" data-document-preview data-source="{{ $source }}" data-initial-page="{{ (int)$page }}" data-assets="{{ asset('vendor/pdfjs') }}/" data-state="loading" aria-label="Lettura del documento">
     <div class="document-preview-toolbar">
         <div class="document-preview-pages">
             <button type="button" class="btn btn-g btn-sm" data-previous-page aria-label="Pagina precedente" disabled>Precedente</button>

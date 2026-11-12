@@ -14,6 +14,7 @@ class PolicyPortfolioQuery
     {
         return $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
+            'work' => ['nullable', 'in:open,closed'],
             'status' => ['nullable', 'in:'.implode(',', array_keys(self::STATES))],
             'category' => ['nullable', 'string', 'max:100'], 'subcategory' => ['nullable', 'string', 'max:100'],
             'company' => ['nullable', 'string', 'max:150'], 'agency' => ['nullable', 'integer', 'min:1'],
@@ -31,6 +32,8 @@ class PolicyPortfolioQuery
     public function forUser(User $user, array $filters = []): Builder
     {
         $query = InsurancePolicy::whereIn('client_id', Client::current()->visibleTo($user)->select('id'));
+        if (($filters['work'] ?? null) === 'open') $query->whereNull('work_closed_at')->whereNotIn('status', InsurancePolicy::CLOSED_STATUSES);
+        elseif (($filters['work'] ?? null) === 'closed') $query->whereNotNull('work_closed_at');
         foreach (['category', 'subcategory', 'company', 'payment_method', 'payment_frequency'] as $field) if (filled($filters[$field] ?? null)) $query->where($field, $filters[$field]);
         if (filled($filters['agency'] ?? null)) $query->where('supplier_agency_id', $filters['agency']);
         if (filled($filters['responsible'] ?? null)) $query->whereHas('client', fn ($q) => $q->where('commercial_user_id', $filters['responsible']));

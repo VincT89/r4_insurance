@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(SecurityHeaders::class);
-        $middleware->trimStrings(except: ['smtp_password']);
+        $middleware->trimStrings(except: ['smtp_password','ai_api_key','message','message.*']);
         $middleware->web(append: [\App\Http\Middleware\EnsureActiveUser::class, \App\Http\Middleware\RememberAppearance::class, \App\Http\Middleware\ActivatePolicyReplacements::class]);
 
         $middleware->alias([
@@ -23,5 +23,5 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['smtp_password','pairing_code']);
+        $exceptions->dontFlash(['smtp_password','pairing_code','ai_api_key']);
     })->create();

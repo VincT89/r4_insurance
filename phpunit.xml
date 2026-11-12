@@ -6,6 +6,7 @@
 >
     <testsuites>
         <testsuite name="Core">
+            <file>tests/Feature/InboundEmailTest.php</file>
             <file>tests/Feature/BackupSafetyTest.php</file>
             <file>tests/Unit/PhoneNormalizerTest.php</file>
             <file>tests/Feature/Auth/AuthenticationTest.php</file>
@@ -49,6 +50,7 @@
             <file>tests/Feature/CommunicationPaginationTest.php</file>
             <file>tests/Feature/InsuranceOperationsTest.php</file>
             <file>tests/Feature/PolicyContractCreationTest.php</file>
+            <file>tests/Feature/PolicyContractPreparationTest.php</file>
             <file>tests/Feature/PolicyContractTransitionsTest.php</file>
             <file>tests/Feature/InsurancePaymentSummaryTest.php</file>
             <file>tests/Feature/InsuranceAccountingWorkspaceTest.php</file>
@@ -56,6 +58,9 @@
             <file>tests/Feature/OperationalReminderFlowTest.php</file>
             <file>tests/Feature/NotificationInboxTest.php</file>
             <file>tests/Feature/InsuranceReadPerformanceTest.php</file>
+            <file>tests/Feature/PracticeOverviewTest.php</file>
+            <file>tests/Feature/AiUsageTest.php</file>
+            <file>tests/Feature/QuoteComparisonTest.php</file>
             <file>tests/Feature/InsurancePolicyWorkflowTest.php</file>
             <file>tests/Feature/QuoteRequestEmailTest.php</file>
             <file>tests/Feature/AgencyCommissionTest.php</file>

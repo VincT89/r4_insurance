@@ -47,6 +47,7 @@ class InsuranceQuoteWorkflow
                 $stored=app(ClientDocumentRegistry::class)->uploadMany($case->client,$files,['document_category'=>'quote','insurance_quote_id'=>$quote->id]);
             } elseif($action==='submit') {
                 if($quote->status!=='received') $this->fail('Carica prima il preventivo ricevuto dalla compagnia.');
+                if(\Illuminate\Support\Facades\Schema::hasTable('insurance_quote_reviews') && $quote->comparisonReview && !$quote->comparisonReview->verified_at) $this->fail('Conferma prima i dati nel confronto offerte.');
                 if($quote->valid_until->lt(today())) $this->fail('Il preventivo non è più valido.');
                 $quote->update(['status'=>'pending','submitted_at'=>now()]);
             } elseif($action==='approve') {

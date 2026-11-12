@@ -69,12 +69,12 @@
             </div></x-form-section>
             <x-form-section title="Veicolo, bene o soggetto assicurato"><div class="form-row">
                 <x-form-group label="Veicolo / targa" name="vehicle_id">
-                    <select id="field-vehicle-id" name="vehicle_id" class="form-sel"><option value="">Nessun veicolo collegato</option>@foreach($vehicles as $vehicle)<option value="{{ $vehicle->id }}" @selected((string) old('vehicle_id', $policy->vehicle_id) === (string) $vehicle->id)>{{ $vehicle->plate }} / {{ trim($vehicle->make.' '.$vehicle->model) }}</option>@endforeach</select>
-                    <p class="u-text-meta">Le targhe si registrano nella sezione Veicoli e targhe del cliente.</p>
+                    <select id="field-vehicle-id" name="vehicle_id" class="form-sel"><option value="">Nessun veicolo collegato</option>@foreach($vehicles as $vehicle)<option value="{{ $vehicle->id }}" data-plate="{{ $vehicle->plate }}" @selected((string) old('vehicle_id', $policy->vehicle_id) === (string) $vehicle->id)>{{ $vehicle->plate }} / {{ trim($vehicle->make.' '.$vehicle->model) }}</option>@endforeach</select>
+                    <p class="u-text-meta">{{ $fromContract ? 'Una targa letta nel contratto viene proposta qui. Puoi collegarla o salvarla insieme alla polizza.' : 'Le targhe si registrano nella sezione Veicoli e targhe del cliente.' }}</p>
                 </x-form-group>
                 <x-form-group label="Bene o soggetto assicurato" name="insured_subject"><input id="field-insured-subject" name="insured_subject" class="form-in" value="{{ old('insured_subject', $policy->insured_subject) }}" maxlength="255"></x-form-group>
                 <x-form-group label="Immobile o altro bene collegato" name="client_asset_id"><select id="field-client-asset-id" name="client_asset_id" class="form-sel"><option value="">Nessun bene collegato</option>@foreach($assets as $asset)<option value="{{ $asset->id }}" @selected((string)old('client_asset_id', $policy->client_asset_id) === (string)$asset->id)>{{ $asset->name }} / {{ $asset->category }}</option>@endforeach</select><p class="u-text-meta">Scegli un bene oppure un veicolo. Registra i beni nella sezione Immobili e beni del cliente.</p></x-form-group>
-            </div></x-form-section>
+            </div>@if($fromContract) @include('policies.contract-vehicle') @endif</x-form-section>
             <x-form-section title="Classi di merito RC Auto">@if($selectedQuote)<p class="u-text-meta u-mb-md">Controlla le classi riportate nel contratto. La classe della compagnia dipende dalle regole dell’impresa scelta.</p>@endif<div class="form-row">
                 <x-form-group label="Classe universale CU" name="merit_class_cu"><select id="field-merit-class-cu" name="merit_class_cu" class="form-sel"><option value="">Non indicata / non applicabile</option>@foreach(range(1,18) as $class)<option value="{{ $class }}" @selected((string) old('merit_class_cu', $policy->merit_class_cu) === (string) $class)>{{ $class }}</option>@endforeach</select></x-form-group>
                 <x-form-group label="Classe della compagnia" name="merit_class_internal"><input id="field-merit-class-internal" name="merit_class_internal" class="form-in" value="{{ old('merit_class_internal', $policy->merit_class_internal) }}" maxlength="30"></x-form-group>
@@ -110,7 +110,7 @@
                 @foreach($errors->get('documents.*') as $messages)@foreach($messages as $message)<p class="invalid-feedback">{{ $message }}</p>@endforeach @endforeach
             </x-form-section>@endunless
             @if($fromContract)</details>@endif
-            @if($fromContract) @include('policies.contract-review') @endif
+            @if($fromContract) @include('policies.contract-forms') @include('policies.contract-review') @endif
             <div class="insurance-form-actions"><a href="{{ $policyReturnUrl }}" class="btn btn-g">Annulla</a><button type="submit" class="btn btn-p" @if($fromContract) data-contract-save disabled @endif>{{ $fromContract ? 'Conferma e crea polizza' : 'Salva polizza' }}</button></div>
             @if($fromContract) </div> @endif
         </form>
